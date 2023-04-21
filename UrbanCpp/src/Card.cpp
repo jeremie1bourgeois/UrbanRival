@@ -1,4 +1,4 @@
-#include "Card.h"
+#include "../include/Card.h"
 
 string Card::getName() const {
     return name;

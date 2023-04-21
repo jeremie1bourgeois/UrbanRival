@@ -24,7 +24,7 @@ class Card {
 
     public:
 
-        Card::Card(const string& name, const string& faction, const int& power, const int& damage, const int& stars, const string& ability, const string& bonus)
+        Card(const string& name, const string& faction, const int& power, const int& damage, const int& stars, const string& ability, const string& bonus)
             : name(name), faction(faction), power(power), damage(damage), stars(stars), ability(ability), bonus(bonus),
             powerFight(power), damageFight(damage), abilityFight(ability), bonusFight(bonus), pillzFight(0), attack(0), played(0) {}
         

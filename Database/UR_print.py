@@ -28,7 +28,7 @@ def print_database_info(db):
     # Fermeture de la connexion à la base de données
     conn.close()
 
-
+# print_database_info("dataBase_UrbanRival_officielle")
 
 def print_table_elements_with_string(db, name_table, str1, str2=""):
     # Connexion à la base de données

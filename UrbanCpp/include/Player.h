@@ -1,5 +1,6 @@
-#include <list>
 #include <array>
+#include <list>
+#include <tuple>
 #include "Card.h"
 
 using namespace std;
@@ -14,7 +15,7 @@ class Player {
         list<tuple<void*, int, int>> effectsList;   // liste d'effets
 
     public:
-        Player::Player(const array<Card, 4>& cardArray, int life, int pillz)
+        Player(const array<Card, 4>& cardArray, int life, int pillz)
             : cardArray(cardArray), life(life), pillz(pillz) {}
 
         array<Card, 4> getCardArray();

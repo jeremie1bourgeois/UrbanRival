@@ -3,13 +3,13 @@
 class Game {
     
     private:
-        Player ally;
-        Player enemy;
+        // Player ally;
+        // Player enemy;
         bool turn;
         char nb_turn;
 
         void getCardNames();
-        Card searchCardInDB();
+//        Card* searchCard();
 
     public:
         Game();
@@ -18,8 +18,8 @@ class Game {
         void Play();
 
         // Getters
-        Player getAlly() const;
-        Player getEnemy() const;
+        // Player getAlly() const;
+        // Player getEnemy() const;
         bool getTurn() const;
         char getNbTurn() const;
 

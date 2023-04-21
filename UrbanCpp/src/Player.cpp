@@ -1,4 +1,4 @@
-#include "Player.h"
+#include "../include/Player.h"
 
 // getters et setters pour les attributs
 array<Card, 4> Player::getCardArray() {

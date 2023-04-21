@@ -3,6 +3,7 @@
         "xstring": "cpp",
         "list": "cpp",
         "tuple": "cpp",
-        "array": "cpp"
+        "array": "cpp",
+        "iostream": "cpp"
     }
 }
