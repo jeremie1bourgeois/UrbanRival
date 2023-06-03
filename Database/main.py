@@ -12,7 +12,7 @@ name_table = 'capacities_without_conditions'
 # L = sort_ignore_numbers(get_table_elements(db, name_table))
 
 
-print_database_info(db)
+# print_database_info(db)
 # for row in L:
 #     print(*row, sep='\n')
 

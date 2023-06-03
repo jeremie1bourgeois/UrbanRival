@@ -1,5 +1,6 @@
 #include "../include/Game.h"
 #include <iostream>
+#include "../../SQLiteCpp-3.2.1/sqlite3/sqlite3.h"
 
 using namespace std;
 
@@ -19,6 +20,7 @@ void Game::getCardNames() {
         // searchCard()
     }
 }
+
 
 // Card* Game::searchCard(){
 //     return nullptr;

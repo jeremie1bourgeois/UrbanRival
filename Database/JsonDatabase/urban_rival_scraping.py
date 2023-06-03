@@ -3,12 +3,13 @@ from bs4 import BeautifulSoup, Tag
 import time
 import sqlite3
 import os
-
+import json
 list_ID = [38,31,46,53,25,40,47,32,52,51,48,43,26,54,27,36,3,37,57,56,55,42,4,50,41,49,29,30,33,44,10,28,45]
 url = "https://iclintz.com/characters/clan.php?ID="
 url_dim = "https://iclintz.com"
 # example de nom de faction a récupérer
 # <title>iClintz | Aamir - All Stars</title>
+
 
 class Card:
     def __init__(self):
@@ -57,6 +58,7 @@ def recup():
         
         list_all_cards_by_faction.append(list_cards_faction)
     return list_all_cards
+
 
 def config_card(url_card):
     res = requests.get(url_card)
@@ -122,3 +124,36 @@ def create_database(list_all_cards):
     
     print("Base de données créée et remplie avec succès !")
 
+
+def create_json(list_all_cards, filename):
+    # Création d'un dictionnaire pour stocker les informations des cartes
+    cards_data = {}
+
+    # Ajout des informations de chaque carte au dictionnaire
+    for card in list_all_cards:
+        # Vérification si la clé du nom de la carte existe déjà dans le dictionnaire
+        if card.name in cards_data:
+            # Récupération du dictionnaire existant pour le nom de la carte
+            card_dict = cards_data[card.name]
+        else:
+            # Création d'un nouveau dictionnaire pour le nom de la carte avec les informations initiales
+            card_dict = {
+                'faction': card.faction,
+                'starOff': card.starOff,
+                'bonus': card.bonus
+            }
+            # Ajout du dictionnaire au dictionnaire principal
+            cards_data[card.name] = card_dict
+
+        # Ajout des informations de la carte sous la clé card.starOn
+        card_dict[card.starOn] = {
+            'power': card.power,
+            'damage': card.damage,
+            'ability': card.ability
+        }
+
+    # Écriture du dictionnaire dans le fichier JSON
+    with open(filename, 'w') as json_file:
+        json.dump(cards_data, json_file, indent=4)
+
+    print("Fichier JSON créé avec succès !")
