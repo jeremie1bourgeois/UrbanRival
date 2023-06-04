@@ -1,13 +1,53 @@
 #include "../include/Game.h"
 #include <iostream>
-#include "../../SQLiteCpp-3.2.1/sqlite3/sqlite3.h"
+#include "../include/Player.h"
+#include "annex.cpp"
 
 using namespace std;
 
 Game::Game() {
-    int life = 12;
-    int pillz = 12;
-    cout << "HEYHEYHEY" << endl;
+
+    string stringNbTurn;
+    int intTurn;
+    while (true) {
+        cout <<  "What turn are we on?" << endl;
+        getline(cin, stringNbTurn);
+        
+        if(! isDigitString(stringNbTurn))
+        {
+            cout << "\nYour choice should be a number.\n " << endl;
+            continue;
+        }
+        intTurn = stoi(stringNbTurn);
+        if(intTurn < 1 || intTurn > 4)
+        {
+            cout << "\nYour choice is out of range.\n " << endl;
+            continue;
+        }
+        break;
+    }
+    nb_turn = intTurn;
+
+    string stringTurn;
+    while (true) {
+        cout << "It's whose turn to play?" << endl;
+        cout << "Your turn : 1    ;    his turn : 0" << endl;
+        getline(cin, stringTurn);
+        
+        if(! isDigitString(stringNbTurn) || stringTurn != "1" && stringTurn != "0")
+        {
+            cout << "\nYour choice should be \"1\" or \"0\".\n " << endl;
+            continue;
+        }
+        break;
+    }
+    if (stringTurn == "1")
+        turn = 1;
+    else
+        turn = 0;
+
+    ally = new Player("ally");
+    enemy = new Player("enemy");
 }
 
 void Game::getCardNames() {
@@ -22,46 +62,6 @@ void Game::getCardNames() {
 }
 
 
-// Card* Game::searchCard(){
-//     return nullptr;
-// }
-
-
-
-// // Définition de la fonction de recherche
-// void search_database(const string& db_name, const string& table_name, const string& name_to_find) {
-//     try {
-//         // Connexion à la base de données
-//         SQLite::Database db(db_name);
-
-//         // Exécution d'une requête SQL pour chercher le nom dans la première colonne de la table
-//         SQLite::Statement query(db, "SELECT * FROM " + table_name + " WHERE name = ?");
-//         query.bind(1, name_to_find);
-//         if (query.executeStep()) {
-//             // Si le nom est trouvé, récupérer toutes les colonnes de la ligne correspondante
-//             string column1 = query.getColumn(0).getString();
-//             string column2 = query.getColumn(1).getString();
-//             int column3 = query.getColumn(2).getInt();
-//             int column4 = query.getColumn(3).getInt();
-//             int column5 = query.getColumn(4).getInt();
-//             string column6 = query.getColumn(5).getString();
-//             string column7 = query.getColumn(6).getString();
-//             cout << "Name: " << column1 << ", Column 2: " << column2 << ", Column 3: " << column3
-//                  << ", Column 4: " << column4 << ", Column 5: " << column5 << ", Column 6: " << column6
-//                  << ", Column 7: " << column7 << endl;
-//         } else {
-//             // Si le nom n'est pas trouvé, afficher un message d'erreur
-//             cout << "Aucun nom trouvé." << endl;
-//         }
-
-//         // Fermeture de la connexion
-//         db.close();
-
-//     } catch (SQLite::Exception& e) {
-//         cerr << "SQLite exception: " << e.what() << endl;
-//     }
-// }
-
 
 
 bool Game::checkEnd() {
@@ -72,7 +72,7 @@ bool Game::winner() {
     return false;
 }
 
-void Game::Play() {
+void Game::Play() {   
 }
 
 // Définition des getters
