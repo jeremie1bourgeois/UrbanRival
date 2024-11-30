@@ -3,7 +3,7 @@ from src.core.use_cases.process_round import process_round
 from src.core.domain.player import Player
 from src.schemas.game_schemas import PlayerCards, ProcessRoundInput
 from src.core.domain.card import Card
-
+from enum import Enum
 from src.adapters.repositories.game_repository import get_new_game_id, load_game_from_json, save_game_to_json
 from src.core.domain.game import Game
 from src.utils.config import BASE_DIR
@@ -21,10 +21,35 @@ def process_round_service(game_id: str, round_data: ProcessRoundInput):
 	print("updated_game", updated_game)
 	# Sauvegarder la partie mise à jour
 	save_game_to_json(updated_game, game_id)
+ 
+	state = check_end(updated_game)
 
-	return updated_game
+	return (updated_game, state)
 
 
+class GameResult(Enum):
+    ALLY = "Ally Wins"
+    ENEMY = "Enemy Wins"
+    DRAW = "Draw"
+    NONE = "Game Not Finished"
+
+def check_end(board: Game) -> GameResult:
+	"""
+	Vérifie si la partie est terminée et renvoie un GameResult.
+	"""
+	if board.nb_turn == 4:
+		if board.ally.life > board.enemy.life:
+			return GameResult.ALLY
+		elif board.ally.life < board.enemy.life:
+			return GameResult.ENEMY
+		else:
+			return GameResult.DRAW
+	elif board.ally.life == 0:
+		return GameResult.ENEMY
+	elif board.enemy.life == 0:
+		return GameResult.ALLY
+	else:
+		return GameResult.NONE
 
 def create_game(players_cards: PlayerCards) -> Game:
 	"""

@@ -1,10 +1,10 @@
 {
-    "nb_turn": 0,
+    "nb_turn": 2,
     "turn": true,
     "ally": {
         "name": "ally",
         "life": 12,
-        "pillz": 12,
+        "pillz": 10,
         "cards": [
             {
                 "name": "Aamir",
@@ -79,8 +79,8 @@
     },
     "enemy": {
         "name": "enemy",
-        "life": 12,
-        "pillz": 12,
+        "life": 10,
+        "pillz": 10,
         "cards": [
             {
                 "name": "Asporov",

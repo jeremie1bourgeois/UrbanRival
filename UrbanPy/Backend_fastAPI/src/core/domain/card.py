@@ -27,7 +27,7 @@ class Card:
         Charge les données depuis un fichier JSON.
         """
         # Chemin codé en dur vers le fichier JSON
-        json_path = "jsonData_officiel.json"
+        json_path = "../data/jsonData_officiel.json"
 
         # Vérifier que le fichier JSON existe
         if not os.path.exists(json_path):

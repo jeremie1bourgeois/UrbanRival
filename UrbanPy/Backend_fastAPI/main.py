@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 from src.schemas.game_schemas import PlayerCards, ProcessRoundInput
 
-from fastapi import FastAPI, HTTPException, Query, Body
+from fastapi import FastAPI, HTTPException, Body
 from src.core.services.game_service import create_game, process_round_service
 from src.utils.config import BASE_DIR
 
@@ -19,9 +19,9 @@ def process_game_round(game_id: str, round_data: ProcessRoundInput = Body(...)):
     """
     try:
         # Appeler le service en passant l'objet round_data
-        updated_game = process_round_service(game_id, round_data)
+        (updated_game, state) = process_round_service(game_id, round_data)
 
-        return {"status": "success", "game": updated_game.to_dict()}
+        return {"status": "success", "game": updated_game.to_dict(), "state": state}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except FileNotFoundError:
