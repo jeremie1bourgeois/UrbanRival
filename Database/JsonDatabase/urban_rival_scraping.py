@@ -39,7 +39,7 @@ def recup():
         list_cards_faction = []
         url_faction = url + str(ID)
 
-        res = requests.get(url_faction)
+      ++  res = requests.get(url_faction)
         soup = BeautifulSoup(res.text, "html.parser") # ,from_encoding='utf-8'
 
         cards_in_faction = soup.find_all('div', {'class': 'cardFrame'})
