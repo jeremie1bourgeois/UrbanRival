@@ -45,9 +45,12 @@ class GameSchema(BaseModel):
 
 class ProcessRoundInput(BaseModel):
     player1_card_index: int
-    player2_card_index: int
     player1_pillz: int
+    player1_fury: bool = False
+    
+    player2_card_index: int
     player2_pillz: int
+    player2_fury: bool = False
 
     @classmethod
     def validate_pillz_and_indices(cls, values):

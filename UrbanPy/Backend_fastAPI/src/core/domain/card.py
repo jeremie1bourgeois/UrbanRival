@@ -59,13 +59,18 @@ class Card:
         self.power: int = int(star_data.get("power", 0))
         self.damage: int = int(star_data.get("damage", 0))
         self.ability: str = star_data.get("ability", "")
+        
         self.power_fight: int = 0
         self.damage_fight: int = 0
         self.ability_fight: str = ""
         self.bonus_fight: str = ""
         self.pillz_fight: int = 0
+        self.fury: bool = False
+        
         self.attack: int = 0
-        self.played: int = 0
+        self.played: bool = False
+        self.lvl_priority: int = 0
+        self.win: bool = False
 
     @staticmethod
     def from_dict(data: dict) -> "Card":

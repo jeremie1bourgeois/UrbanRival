@@ -19,6 +19,7 @@ def process_round_service(game_id: str, round_data: ProcessRoundInput):
 	# Jouer un round en passant l'objet round_data
 	updated_game = process_round(game, round_data)
 	print("updated_game", updated_game)
+
 	# Sauvegarder la partie mise à jour
 	save_game_to_json(updated_game, game_id)
  
