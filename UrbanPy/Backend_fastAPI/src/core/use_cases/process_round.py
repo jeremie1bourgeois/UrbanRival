@@ -15,26 +15,32 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> Game:
             raise ValueError(f"Invalid player2_card_index: {round_data.player2_card_index}")
 
         # Vérifier le nombre de pillz
-        if round_data.player1_pillz > game.ally.pillz:
+        if round_data.player1_pillz + 3 * round_data.player1_fury > game.ally.pillz:
             raise ValueError(f"Player 1 does not have enough pillz: {round_data.player1_pillz}")
-        if round_data.player2_pillz > game.enemy.pillz:
+        if round_data.player2_pillz + 3 * round_data.player2_fury > game.enemy.pillz:
             raise ValueError(f"Player 2 does not have enough pillz: {round_data.player2_pillz}")
 
-        game.ally.pillz = min(0, game.ally.pillz - round_data.player1_pillz)
-        game.enemy.pillz = min(0, game.enemy.pillz - round_data.player2_pillz)
+        game.ally.pillz = game.ally.pillz - round_data.player1_pillz - 3 * round_data.player1_fury
+        game.enemy.pillz = game.enemy.pillz - round_data.player2_pillz - 3 * round_data.player2_fury
 
         # Récupérer les cartes sélectionnées
         player1_card = game.ally.cards[round_data.player1_card_index]
         player2_card = game.enemy.cards[round_data.player2_card_index]
         
-        init_fight_data(player1_card, round_data.player1_pillz)
-        init_fight_data(player2_card, round_data.player2_pillz)
+        init_fight_data(player1_card, round_data.player1_pillz, round_data.player1_fury)
+        init_fight_data(player2_card, round_data.player2_pillz, round_data.player2_fury)
         
         apply_combat_effects(game, player1_card, player2_card, player1_card.ability)
         apply_combat_effects(game, player1_card, player2_card, player1_card.bonus)
         
         apply_combat_effects(game, player2_card, player1_card, player2_card.ability)
         apply_combat_effects(game, player2_card, player1_card, player2_card.bonus)
+        
+        # Appliquer les fury
+        if player1_card.fury:
+            player1_card.damage_fight += 2
+        if player2_card.fury:
+            player2_card.damage_fight += 2
 
         # Calculer les attaques
         player1_attack = player1_card.power * (round_data.player1_pillz + 1)
@@ -74,12 +80,13 @@ def check_capacity_condition(history, capacity: Capacity, player: Player):
         True
     
 
-def init_fight_data(card: Card, nb_pillz: int):
+def init_fight_data(card: Card, nb_pillz: int, fury: bool):
     card.power_fight = card.power
     card.damage_fight = card.damage
     card.ability_fight = card.ability
     card.bonus_fight = card.bonus
     card.pillz_fight = nb_pillz
+    card.fury = fury
     card.attack = 0
 
 
