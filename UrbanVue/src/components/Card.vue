@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from "vue";
 import ModalCard from "./ModalCard.vue";
 import { ref } from "vue";
 import CardDisplay from "./CardDisplay.vue";
@@ -18,6 +17,10 @@ const props = defineProps({
 			bonus: "",
 		}),
 	},
+	pillz: {
+		type: Number,
+		required: true,
+	},
 });
 
 const isModalVisible = ref(false);
@@ -31,5 +34,5 @@ const openModal = () => {
 	<div class="cursor-pointer" @click="openModal">
         <CardDisplay :card="card" />
 	</div>
-	<ModalCard :isVisible="isModalVisible" :card="card" @close="isModalVisible = false" />
+	<ModalCard :isVisible="isModalVisible" :card="card" @close="isModalVisible = false" :maxPillz="props.pillz" />
 </template>

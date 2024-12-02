@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import Card from "@/components/Card.vue";
+import Card from "../components/Card.vue";
 
 // Données du jeu
 const data = ref({
@@ -57,12 +57,13 @@ scaleDiv();
 					<p class="text-sm text-gray-300 mt-2">Life: {{ data.game.enemy.life }} | Pillz: {{ data.game.enemy.pillz }}</p>
 				</div>
 				<div class="flex flex-wrap justify-center gap-4">
-					<Card v-for="(card, index) in data.game.enemy.cards" :key="'enemy-' + index" :card="card" />
+					<Card v-for="(card, index) in data.game.enemy.cards" :key="'enemy-' + index" :card="card" :pillz="data.game.enemy.pillz" />
 				</div>
 			</div>
+			<div class="w-full border-t border-gray-600 my-4"></div>
 			<div class="w-full flex flex-col items-center">
 				<div class="flex flex-wrap justify-center gap-4">
-					<Card v-for="(card, index) in data.game.ally.cards" :key="'ally-' + index" :card="card" />
+					<Card v-for="(card, index) in data.game.ally.cards" :key="'ally-' + index" :card="card" :pillz="data.game.ally.pillz" />
 				</div>
 				<div class="flex w-full justify-end space-x-10 pt-4">
 					<p class="text-sm text-gray-300 mt-2">Life: {{ data.game.ally.life }} | Pillz: {{ data.game.ally.pillz }}</p>
