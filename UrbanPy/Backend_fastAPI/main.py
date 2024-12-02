@@ -2,15 +2,10 @@ from typing import Any, Dict, List
 from src.schemas.game_schemas import PlayerCards, ProcessRoundInput
 
 from fastapi import FastAPI, HTTPException, Body
-from src.core.services.game_service import create_game, process_round_service
+from src.core.services.game_service import create_game, process_round_service, init_game_from_template
 from src.utils.config import BASE_DIR
 
 app = FastAPI()
-
-@app.get("/")
-def read_root():
-    return {"message": "Hello World"}
-
 
 @app.post("/process_round/{game_id}", response_model=Dict[str, Any])
 def process_game_round(game_id: str, round_data: ProcessRoundInput = Body(...)):
@@ -30,7 +25,6 @@ def process_game_round(game_id: str, round_data: ProcessRoundInput = Body(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-
 @app.post("/init_game/", response_model=Dict[str, Any])
 def init_game(players_cards: PlayerCards = Body(...)) -> Dict[str, Any]:
     """
@@ -39,6 +33,21 @@ def init_game(players_cards: PlayerCards = Body(...)) -> Dict[str, Any]:
     try:
         # Créer une partie avec les données validées
         game = create_game(players_cards)
+
+        # Retourner la partie initialisée
+        return {"status": "success", "game": game.to_dict()}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/init_game/template", response_model=Dict[str, Any])
+def init_game_template() -> Dict[str, Any]:
+    """
+    Initialise une partie à partir d'un template JSON prédéfini.
+    """
+    try:
+        # Initialiser la partie depuis le template
+        game = init_game_from_template()
 
         # Retourner la partie initialisée
         return {"status": "success", "game": game.to_dict()}
