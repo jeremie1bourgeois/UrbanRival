@@ -1,0 +1,109 @@
+{
+    "nb_turn": 2,
+    "turn": true,
+    "ally": {
+        "name": "ally",
+        "life": 12,
+        "pillz": 12,
+        "cards": [
+            {
+                "name": "Agustino",
+                "stars": 2,
+                "power_fight": 0,
+                "damage_fight": 0,
+                "ability_fight": "",
+                "bonus_fight": "",
+                "pillz_fight": 0,
+                "attack": 0,
+                "played": 0
+            },
+            {
+                "name": "Allison",
+                "stars": 3,
+                "power_fight": 0,
+                "damage_fight": 0,
+                "ability_fight": "",
+                "bonus_fight": "",
+                "pillz_fight": 0,
+                "attack": 0,
+                "played": 0
+            },
+            {
+                "name": "Amelia",
+                "stars": 3,
+                "power_fight": 0,
+                "damage_fight": 0,
+                "ability_fight": "",
+                "bonus_fight": "",
+                "pillz_fight": 0,
+                "attack": 0,
+                "played": 0
+            },
+            {
+                "name": "Ashley",
+                "stars": 2,
+                "power_fight": 0,
+                "damage_fight": 0,
+                "ability_fight": "",
+                "bonus_fight": "",
+                "pillz_fight": 0,
+                "attack": 0,
+                "played": 0
+            }
+        ],
+        "effect_list": []
+    },
+    "enemy": {
+        "name": "enemy",
+        "life": 12,
+        "pillz": 12,
+        "cards": [
+            {
+                "name": "Asporov",
+                "stars": 4,
+                "power_fight": 0,
+                "damage_fight": 0,
+                "ability_fight": "",
+                "bonus_fight": "",
+                "pillz_fight": 0,
+                "attack": 0,
+                "played": 0
+            },
+            {
+                "name": "B Mappe Mt",
+                "stars": 5,
+                "power_fight": 0,
+                "damage_fight": 0,
+                "ability_fight": "",
+                "bonus_fight": "",
+                "pillz_fight": 0,
+                "attack": 0,
+                "played": 0
+            },
+            {
+                "name": "Bhudd",
+                "stars": 3,
+                "power_fight": 0,
+                "damage_fight": 0,
+                "ability_fight": "",
+                "bonus_fight": "",
+                "pillz_fight": 0,
+                "attack": 0,
+                "played": 0
+            },
+            {
+                "name": "Bixente",
+                "stars": 2,
+                "power_fight": 0,
+                "damage_fight": 0,
+                "ability_fight": "",
+                "bonus_fight": "",
+                "pillz_fight": 0,
+                "attack": 0,
+                "played": 0
+            }
+        ],
+        "effect_list": []
+    },
+    "history": []
+}

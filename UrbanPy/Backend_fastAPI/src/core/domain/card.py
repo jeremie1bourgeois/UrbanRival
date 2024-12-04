@@ -60,6 +60,9 @@ class Card:
         self.damage: int = int(star_data.get("damage", 0))
         self.ability: str = star_data.get("ability", "")
         
+        self.bonus_description: str = []
+        self.ability_description: str = []
+        
         self.power_fight: int = 0
         self.damage_fight: int = 0
         self.ability_fight: str = ""
@@ -69,8 +72,34 @@ class Card:
         
         self.attack: int = 0
         self.played: bool = False
-        self.lvl_priority: int = 0
         self.win: bool = False
+    
+    @staticmethod
+    def from_dict_template(data: dict) -> "Card":
+        
+        card = Card.__new__(Card)
+        card.name = data.get("name")
+        card.faction = data.get("faction")
+        card.starOff = data.get("starOff")
+        card.bonus = data.get("bonus")
+        card.stars = data.get("stars")
+        card.power = data.get("power")
+        card.damage = data.get("damage")
+        card.ability = data.get("ability")
+        
+        card.bonus_description = data.get("bonus_description")
+        card.ability_description = data.get("ability_description")
+        
+        card.pillz_fight = data.get("pillz_fight")
+        card.attack = data.get("attack")
+        card.played = data.get("played")
+
+        card.power_fight = data.get("power_fight")
+        card.damage_fight = data.get("damage_fight")
+        card.ability_fight = data.get("ability_fight")
+        card.bonus_fight = data.get("bonus_fight")
+        card.win = data.get("win")
+        return card
 
     @staticmethod
     def from_dict(data: dict) -> "Card":

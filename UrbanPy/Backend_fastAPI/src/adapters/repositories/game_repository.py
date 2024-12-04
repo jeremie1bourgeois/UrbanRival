@@ -21,5 +21,5 @@ def load_game_from_json(file_path: str) -> Game:
         raise FileNotFoundError(f"Game file not found: {file_path}")
     with open(file_path, "r") as file:
         data = json.load(file)
-    # print(f"Game loaded: {data}")
-    return Game.from_dict(data)
+    print(f"Game loaded: {data}")
+    return Game.from_dict_template(data)
