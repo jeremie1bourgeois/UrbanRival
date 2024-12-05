@@ -2,7 +2,7 @@ import json
 import os
 from src.core.use_cases.process_round import process_round
 from src.core.domain.player import Player
-from src.schemas.game_schemas import PlayerCards, ProcessRoundInput
+from src.schemas.game_schemas import GameResult, PlayerCards, ProcessRoundInput
 from src.core.domain.card import Card
 from enum import Enum
 from src.adapters.repositories.game_repository import get_new_game_id, load_game_from_json, save_game_to_json
@@ -29,11 +29,6 @@ def process_round_service(game_id: str, round_data: ProcessRoundInput):
     return (updated_game, state)
 
 
-class GameResult(Enum):
-    ALLY = "Ally Wins"
-    ENEMY = "Enemy Wins"
-    DRAW = "Draw"
-    NONE = "Game Not Finished"
 
 def check_end(board: Game) -> GameResult:
     """

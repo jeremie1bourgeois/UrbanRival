@@ -2,24 +2,9 @@
 import json
 import os
 
+from src.core.domain.capacity import Capacity
 
 class Card:
-    # def __init__(self):
-    #     self.name: str
-    #     self.faction: str
-    #     self.starOff: int
-    #     self.bonus: str
-    #     self.stars: int
-    #     self.power: int
-    #     self.damage: int
-    #     self.ability: str
-    #     self.power_fight: int
-    #     self.damage_fight: int
-    #     self.ability_fight: str
-    #     self.bonus_fight: str
-    #     self.pillz_fight: int
-    #     self.attack: int
-    #     self.played: int
     
     def __init__(self, card_name: str, nb_stars: int = 1):
         """
@@ -81,11 +66,11 @@ class Card:
         card.name = data.get("name")
         card.faction = data.get("faction")
         card.starOff = data.get("starOff")
-        card.bonus = data.get("bonus")
+        card.bonus = Capacity.from_dict(data.get("bonus"))
         card.stars = data.get("stars")
         card.power = data.get("power")
         card.damage = data.get("damage")
-        card.ability = data.get("ability")
+        card.ability = Capacity.from_dict(data.get("ability"))
         
         card.bonus_description = data.get("bonus_description")
         card.ability_description = data.get("ability_description")
@@ -116,5 +101,27 @@ class Card:
         card.played = data.get("played", 0)
         return card
 
-    def to_dict(self):
-        return self.__dict__
+    def to_dict(self) -> dict:
+        """
+        Convertit la carte en dictionnaire JSON-serializable.
+        """
+        return {
+            "name": self.name,
+            "faction": self.faction,
+            "starOff": self.starOff,
+            "bonus": self.bonus.to_dict() if self.bonus else None,
+            "stars": self.stars,
+            "power": self.power,
+            "damage": self.damage,
+            "ability": self.ability.to_dict() if self.ability else None,
+            "bonus_description": self.bonus_description,
+            "ability_description": self.ability_description,
+            "pillz_fight": self.pillz_fight,
+            "attack": self.attack,
+            "played": self.played,
+            "power_fight": self.power_fight,
+            "damage_fight": self.damage_fight,
+            "ability_fight": self.ability_fight.to_dict() if self.ability_fight else None,
+            "bonus_fight": self.bonus_fight.to_dict() if self.bonus_fight else None,
+            "win": self.win,
+        }

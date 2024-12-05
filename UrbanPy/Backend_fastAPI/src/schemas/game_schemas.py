@@ -1,3 +1,4 @@
+from enum import Enum
 from pydantic import BaseModel, validator
 from typing import List, Dict, Union
 from pydantic import Field
@@ -42,6 +43,11 @@ class GameSchema(BaseModel):
 	enemy: Dict[str, List[CardSchema]]
 	history: List[str]
 
+class GameResult(Enum):
+    ALLY = "Ally Wins"
+    ENEMY = "Enemy Wins"
+    DRAW = "Draw"
+    NONE = "Game Not Finished"
 
 class ProcessRoundInput(BaseModel):
     player1_card_index: int

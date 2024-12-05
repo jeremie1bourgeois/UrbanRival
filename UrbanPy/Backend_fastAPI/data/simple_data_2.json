@@ -6,9 +6,9 @@
             "target": "enemy",
             "type": "power",
             "value": -2,
-            "how": null,
+            "how": "",
             "borne": 1,
-            "condition_effect": null,
+            "condition_effect": "",
             "lvl_priority": 0
         },
         "2": {
@@ -18,9 +18,9 @@
                 "target": "enemy",
                 "type": "power",
                 "value": -1,
-                "how": null,
+                "how": "",
                 "borne": 2,
-                "condition_effect": null,
+                "condition_effect": "",
                 "lvl_priority": 0
             },
             "ability_v2": "-1 Opp Power And Damage, Min 2"
@@ -34,9 +34,9 @@
             "target": "enemy",
             "type": "power",
             "value": -2,
-            "how": null,
+            "how": "",
             "borne": 1,
-            "condition_effect": null,
+            "condition_effect": "",
             "lvl_priority": 0
         },
         "3": {
@@ -46,8 +46,8 @@
                 "target": "enemy",
                 "type": "damage",
                 "value": 3,
-                "how": null,
-                "borne": null,
+                "how": "",
+                "borne": "",
                 "condition_effect": "Courage",
                 "lvl_priority": 0
             },
@@ -62,9 +62,9 @@
             "target": "enemy",
             "type": "power",
             "value": -2,
-            "how": null,
+            "how": "",
             "borne": 1,
-            "condition_effect": null,
+            "condition_effect": "",
             "lvl_priority": 0
         },
         "3": {
@@ -74,9 +74,9 @@
                 "target": "enemy",
                 "type": "power",
                 "value": 4,
-                "how": null,
-                "borne": null,
-                "condition_effect": null,
+                "how": "",
+                "borne": "",
+                "condition_effect": "",
                 "lvl_priority": 0
             },
             "ability_v2": "Power +4"
@@ -90,9 +90,9 @@
             "target": "enemy",
             "type": "power",
             "value": -2,
-            "how": null,
+            "how": "",
             "borne": 1,
-            "condition_effect": null,
+            "condition_effect": "",
             "lvl_priority": 0
         },
         "2": {
@@ -102,9 +102,9 @@
                 "target": "enemy",
                 "type": "damage",
                 "value": -3,
-                "how": null,
+                "how": "",
                 "borne": 2,
-                "condition_effect": null,
+                "condition_effect": "",
                 "lvl_priority": 0
             },
             "ability_v2": "-3 Opp Damage, Min 2"
@@ -118,9 +118,9 @@
         "target": "enemy",
         "type": "power",
         "value": -2,
-        "how": null,
+        "how": "",
         "borne": 1,
-        "condition_effect": null,
+        "condition_effect": "",
         "lvl_priority": 0
     },
     "4": {
@@ -131,8 +131,8 @@
             "type": "damage",
             "value": 1,
             "how": "Support",
-            "borne": null,
-            "condition_effect": null,
+            "borne": "",
+            "condition_effect": "",
             "lvl_priority": 0
         },
         "ability_v2": "Support: Damage +1"
@@ -146,9 +146,9 @@
 			"target": "enemy",
 			"type": "power",
 			"value": -2,
-			"how": null,
+			"how": "",
 			"borne": 1,
-			"condition_effect": null,
+			"condition_effect": "",
 			"lvl_priority": 0
 		},
 		"5": {
@@ -160,7 +160,7 @@
 				"value": -1,
 				"how": "Equalizer",
 				"borne": 1,
-				"condition_effect": null,
+				"condition_effect": "",
 				"lvl_priority": 0
 			},
 			"ability_v2": "Equalizer: -1 Opp Pow. & Dam., Min 1"
@@ -174,9 +174,9 @@
 			"target": "enemy",
 			"type": "power",
 			"value": -2,
-			"how": null,
+			"how": "",
 			"borne": 1,
-			"condition_effect": null,
+			"condition_effect": "",
 			"lvl_priority": 0
 		},
 		"3": {
@@ -186,9 +186,9 @@
 				"target": "enemy",
 				"type": "damage",
 				"value": 5,
-				"how": null,
-				"borne": null,
-				"condition_effect": null,
+				"how": "",
+				"borne": "",
+				"condition_effect": "",
 				"lvl_priority": 0
 			},
 			"ability_v2": "Damage +5"
@@ -202,9 +202,9 @@
 			"target": "enemy",
 			"type": "power",
 			"value": -2,
-			"how": null,
+			"how": "",
 			"borne": 1,
-			"condition_effect": null,
+			"condition_effect": "",
 			"lvl_priority": 0
 		},
 		"2": {
@@ -214,9 +214,9 @@
 				"target": "enemy",
 				"type": "damage",
 				"value": 2,
-				"how": null,
-				"borne": null,
-				"condition_effect": null,
+				"how": "",
+				"borne": "",
+				"condition_effect": "",
 				"lvl_priority": 0
 			},
 			"ability_v2": "+2 Attack Per Opp. Damage"

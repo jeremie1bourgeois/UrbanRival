@@ -14,15 +14,23 @@
                     "target": "enemy",
                     "type": "power",
                     "value": -2,
-                    "how": null,
+                    "how": "",
                     "borne": 1,
-                    "condition_effect": null,
+                    "condition_effect": "",
                     "lvl_priority": 0
                 },
                 "stars": 2,
                 "power": 6,
                 "damage": 2,
-                "ability": null,
+                "ability": {
+                    "target": "enemy",
+                    "type": "power",
+                    "value": -1,
+                    "how": "",
+                    "borne": 2,
+                    "condition_effect": "",
+                    "lvl_priority": 0
+                },
                 "bonus_description": "-2 Opp Power, Min 1",
                 "ability_description": "Growth: -1 Opp Power, Min 4",
                 "pillz_fight": 0,
@@ -30,8 +38,8 @@
                 "played": 0,
                 "power_fight": 0,
                 "damage_fight": 0,
-                "ability_fight": "",
-                "bonus_fight": "",
+                "ability_fight": null,
+                "bonus_fight": null,
                 "win": false
             },
             {
@@ -42,9 +50,9 @@
                     "target": "enemy",
                     "type": "power",
                     "value": -2,
-                    "how": null,
+                    "how": "",
                     "borne": 1,
-                    "condition_effect": null,
+                    "condition_effect": "",
                     "lvl_priority": 0
                 },
                 "stars": 3,
@@ -54,8 +62,8 @@
                     "target": "enemy",
                     "type": "damage",
                     "value": 3,
-                    "how": null,
-                    "borne": null,
+                    "how": "",
+                    "borne": 0,
                     "condition_effect": "Courage",
                     "lvl_priority": 0
                 },
@@ -66,8 +74,8 @@
                 "played": 0,
                 "power_fight": 0,
                 "damage_fight": 0,
-                "ability_fight": "",
-                "bonus_fight": "",
+                "ability_fight": null,
+                "bonus_fight": null,
                 "win": false
             },
             {
@@ -78,9 +86,9 @@
                     "target": "enemy",
                     "type": "power",
                     "value": -2,
-                    "how": null,
+                    "how": "",
                     "borne": 1,
-                    "condition_effect": null,
+                    "condition_effect": "",
                     "lvl_priority": 0
                 },
                 "stars": 3,
@@ -90,9 +98,9 @@
                     "target": "enemy",
                     "type": "power",
                     "value": 4,
-                    "how": null,
-                    "borne": null,
-                    "condition_effect": null,
+                    "how": "",
+                    "borne": 0,
+                    "condition_effect": "",
                     "lvl_priority": 0
                 },
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -102,8 +110,8 @@
                 "played": 0,
                 "power_fight": 0,
                 "damage_fight": 0,
-                "ability_fight": "",
-                "bonus_fight": "",
+                "ability_fight": null,
+                "bonus_fight": null,
                 "win": false
             },
             {
@@ -114,9 +122,9 @@
                     "target": "enemy",
                     "type": "power",
                     "value": -2,
-                    "how": null,
+                    "how": "",
                     "borne": 1,
-                    "condition_effect": null,
+                    "condition_effect": "",
                     "lvl_priority": 0
                 },
                 "stars": 2,
@@ -126,9 +134,9 @@
                     "target": "enemy",
                     "type": "damage",
                     "value": -3,
-                    "how": null,
+                    "how": "",
                     "borne": 2,
-                    "condition_effect": null,
+                    "condition_effect": "",
                     "lvl_priority": 0
                 },
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -138,8 +146,8 @@
                 "played": 0,
                 "power_fight": 0,
                 "damage_fight": 0,
-                "ability_fight": "",
-                "bonus_fight": "",
+                "ability_fight": null,
+                "bonus_fight": null,
                 "win": false
             }
         ],
@@ -158,9 +166,9 @@
                     "target": "enemy",
                     "type": "power",
                     "value": -2,
-                    "how": null,
+                    "how": "",
                     "borne": 1,
-                    "condition_effect": null,
+                    "condition_effect": "",
                     "lvl_priority": 0
                 },
                 "stars": 4,
@@ -171,8 +179,8 @@
                     "type": "damage",
                     "value": 1,
                     "how": "Support",
-                    "borne": null,
-                    "condition_effect": null,
+                    "borne": 0,
+                    "condition_effect": "",
                     "lvl_priority": 0
                 },
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -182,8 +190,8 @@
                 "played": 0,
                 "power_fight": 0,
                 "damage_fight": 0,
-                "ability_fight": "",
-                "bonus_fight": "",
+                "ability_fight": null,
+                "bonus_fight": null,
                 "win": false
             },
             {
@@ -194,9 +202,9 @@
                     "target": "enemy",
                     "type": "power",
                     "value": -2,
-                    "how": null,
+                    "how": "",
                     "borne": 1,
-                    "condition_effect": null,
+                    "condition_effect": "",
                     "lvl_priority": 0
                 },
                 "stars": 5,
@@ -208,7 +216,7 @@
                     "value": -1,
                     "how": "Equalizer",
                     "borne": 1,
-                    "condition_effect": null,
+                    "condition_effect": "",
                     "lvl_priority": 0
                 },
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -218,8 +226,8 @@
                 "played": 0,
                 "power_fight": 0,
                 "damage_fight": 0,
-                "ability_fight": "",
-                "bonus_fight": "",
+                "ability_fight": null,
+                "bonus_fight": null,
                 "win": false
             },
             {
@@ -230,9 +238,9 @@
                     "target": "enemy",
                     "type": "power",
                     "value": -2,
-                    "how": null,
+                    "how": "",
                     "borne": 1,
-                    "condition_effect": null,
+                    "condition_effect": "",
                     "lvl_priority": 0
                 },
                 "stars": 3,
@@ -242,9 +250,9 @@
                     "target": "enemy",
                     "type": "damage",
                     "value": 5,
-                    "how": null,
-                    "borne": null,
-                    "condition_effect": null,
+                    "how": "",
+                    "borne": 0,
+                    "condition_effect": "",
                     "lvl_priority": 0
                 },
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -254,8 +262,8 @@
                 "played": 0,
                 "power_fight": 0,
                 "damage_fight": 0,
-                "ability_fight": "",
-                "bonus_fight": "",
+                "ability_fight": null,
+                "bonus_fight": null,
                 "win": false
             },
             {
@@ -266,9 +274,9 @@
                     "target": "enemy",
                     "type": "power",
                     "value": -2,
-                    "how": null,
+                    "how": "",
                     "borne": 1,
-                    "condition_effect": null,
+                    "condition_effect": "",
                     "lvl_priority": 0
                 },
                 "stars": 2,
@@ -278,9 +286,9 @@
                     "target": "enemy",
                     "type": "damage",
                     "value": 2,
-                    "how": null,
-                    "borne": null,
-                    "condition_effect": null,
+                    "how": "",
+                    "borne": 0,
+                    "condition_effect": "",
                     "lvl_priority": 0
                 },
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -290,8 +298,8 @@
                 "played": 0,
                 "power_fight": 0,
                 "damage_fight": 0,
-                "ability_fight": "",
-                "bonus_fight": "",
+                "ability_fight": null,
+                "bonus_fight": null,
                 "win": false
             }
         ],
