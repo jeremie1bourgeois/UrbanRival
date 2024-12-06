@@ -23,7 +23,6 @@ export const getInitGameTemplate = async (): Promise<{ status: string; game: Gam
 	}
 };
 
-
 // Fonction pour traiter un round
 export const processGameRound = async (
 	gameId: string,

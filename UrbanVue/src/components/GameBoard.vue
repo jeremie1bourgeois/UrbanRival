@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { Game } from "../models/game.interface.ts"; // Assurez-vous que le chemin est correct
-import { getInitGameTemplate } from "../api/game"; // Assurez-vous que le chemin est correct
+import { Game } from "../models/game.interface.ts";
+import { getInitGameTemplate } from "../api/game";
 import Card from "./Card.vue";
 
 // Références pour les données de la game
 const game = ref<Game | null>(null);
 const status = ref<string | null>(null);
 const gameId = ref<string | null>(null);
+const maxPillz = ref<number>(12); // Nombre maximal de pillz disponibles (peut varier selon la logique)
 
 const fetchGame = async () => {
 	try {
@@ -56,14 +57,24 @@ const fetchGame = async () => {
 					<p class="text-sm text-gray-300 mt-2">Life: {{ game.enemy.life }} | Pillz: {{ game.enemy.pillz }}</p>
 				</div>
 				<div class="flex flex-wrap justify-center gap-4">
-					<Card v-for="(card, index) in game.enemy.cards" :key="'enemy-' + index" :card="card" />
+					<Card
+						v-for="(card, index) in game.enemy.cards"
+						:key="'enemy-' + index"
+						:card="card"
+						:maxPillz="game.enemy.pillz"
+					/>
 				</div>
 			</div>
 
 			<!-- Ally Board -->
 			<div class="w-full flex flex-col items-center">
 				<div class="flex flex-wrap justify-center gap-4">
-					<Card v-for="(card, index) in game.ally.cards" :key="'ally-' + index" :card="card" />
+					<Card
+						v-for="(card, index) in game.ally.cards"
+						:key="'ally-' + index"
+						:card="card"
+						:maxPillz="game.ally.pillz"
+					/>
 				</div>
 				<div class="flex w-full justify-end space-x-10 pt-4">
 					<p class="text-sm text-gray-300 mt-2">Life: {{ game.ally.life }} | Pillz: {{ game.ally.pillz }}</p>
