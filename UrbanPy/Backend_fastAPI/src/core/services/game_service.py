@@ -92,4 +92,4 @@ def init_game_from_template():
     # Sauvegarder la partie en JSON
     save_game_to_json(game, new_id)
 
-    return game
+    return (game, new_id)

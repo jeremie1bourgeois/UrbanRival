@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import ModalCard from "./ModalCard.vue";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import CardDisplay from "./CardDisplay.vue";
+import ModalCard from "./ModalCard.vue";
 
 const props = defineProps({
 	card: {
@@ -20,6 +19,10 @@ const props = defineProps({
 	},
 });
 
+onMounted(() => {
+	console.log("Card loaded:", props.card);
+});
+
 const isModalVisible = ref(false);
 
 const openModal = () => {
@@ -29,7 +32,7 @@ const openModal = () => {
 
 <template>
 	<div class="cursor-pointer" @click="openModal">
-        <CardDisplay :card="card" />
+		<CardDisplay :card="card" />
 	</div>
 	<ModalCard :isVisible="isModalVisible" :card="card" @close="isModalVisible = false" />
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CardDisplay from "./CardDisplay.vue";
+import CardDisplay from "./CardDisplay.vue";	
 
 defineProps({
 	isVisible: {

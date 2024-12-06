@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { Card } from "@/models/game"; // Assurez-vous d'importer la bonne interface ou classe
 
 const props = defineProps({
 	card: {
-		type: Object,
+		type: Object as () => Card, // Utilisation du type Card
 		required: true,
 		default: () => ({
 			name: "",
@@ -17,11 +18,15 @@ const props = defineProps({
 	},
 });
 
+// Source de l'image de la carte
 const imageSrc = computed(() => {
+	if (!props.card.name) return "src/assets/default-card.jpg"; // Fallback image
 	return "src/assets/imageCard/" + `${props.card.name.replace(/\s+/g, "_")}_${props.card.stars}.jpg`;
 });
 
+// Source de l'image du clan
 const clanSrc = computed(() => {
+	if (!props.card.faction) return "src/assets/default-clan.jpg"; // Fallback image
 	return "src/assets/Clan/" + props.card.faction.replace(/\s+/g, "").toUpperCase() + ".jpg";
 });
 </script>
@@ -31,27 +36,32 @@ const clanSrc = computed(() => {
 		class="bg-gray-800 text-white border border-gray-700 rounded-md shadow-md w-[166px] h-[237px] text-center cardFrame urbanFont"
 		:style="{ backgroundImage: `url(${imageSrc})`, backgroundSize: 'cover', backgroundPosition: 'center' }"
 	>
+		<!-- En-tête de la carte -->
 		<div class="cardHeader flex items-center">
 			<img alt="Clan Image" :src="clanSrc" class="cardClanPict" />
 			<span class="cardName urbanFont">{{ card.name }}</span>
 		</div>
+
+		<!-- Corps de la carte -->
 		<div class="cardBottom">
 			<div class="cardStars">
 				<div v-for="i in card.stars" :key="'star-on-' + i" class="cardStarOn"></div>
-				<div v-for="i in card.maxStars - card.stars" :key="'star-off-' + i" class="cardStarOff"></div>
+				<div v-for="i in 5 - card.stars" :key="'star-off-' + i" class="cardStarOff"></div>
 			</div>
 			<div class="cardDescription">
+				<!-- Statistiques principales -->
 				<div class="flex h-[30px] items-center">
 					<img src="../assets/Power.png" alt="Power Image" class="w-[22px] h-[22px]" />
 					<div class="cardPH urbanFont">{{ card.power }}</div>
 					<img src="../assets/Ability.png" alt="Ability Image" class="w-[22px] h-[22px] ml-1" />
-					<div class="vcenterContent">{{ card.ability }}</div>
+					<div class="vcenterContent">{{ card.ability?.type || 'N/A' }}</div>
 				</div>
+
 				<div class="flex h-[30px] items-center">
 					<img src="../assets/Damage.png" alt="Damage Image" class="w-[22px] h-[22px]" />
 					<div class="cardPH urbanFont">{{ card.damage }}</div>
 					<img src="../assets/Bonus.png" alt="Bonus Image" class="w-[22px] h-[22px] ml-1" />
-					<div class="vcenterContent">{{ card.bonus }}</div>
+					<div class="vcenterContent">{{ card.bonus?.type || 'N/A' }}</div>
 				</div>
 			</div>
 		</div>
