@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.urbanFont {
+	font-family: "Urban Rivals", Arial, Sans-serif, Serif;
+	font-weight: bolder;
+	font-style: normal;
+	font-variant: normal;
+	text-shadow:
+		-1px -1px 0 #00383f,
+		1px -1px 0 #00383f,
+		-1px 1px 0 #00383f,
+		1px 1px 0 #00383f,
+		2px 2px 1px #000;
+}

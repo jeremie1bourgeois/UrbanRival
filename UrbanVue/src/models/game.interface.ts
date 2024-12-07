@@ -91,3 +91,12 @@ export class Game {
 		this.history = data.history || [];
 	}
 }
+
+export class RoundData {
+	player1_card_index: number;
+	player1_pillz: number;
+	player1_fury: boolean;
+	player2_card_index: number;
+	player2_pillz: number;
+	player2_fury: boolean;
+}

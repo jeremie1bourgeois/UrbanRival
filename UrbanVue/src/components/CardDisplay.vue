@@ -36,20 +36,17 @@ const clanSrc = computed(() => {
 		class="bg-gray-800 text-white border border-gray-700 rounded-md shadow-md w-[166px] h-[237px] text-center cardFrame urbanFont"
 		:style="{ backgroundImage: `url(${imageSrc})`, backgroundSize: 'cover', backgroundPosition: 'center' }"
 	>
-		<!-- En-tête de la carte -->
 		<div class="cardHeader flex items-center">
 			<img alt="Clan Image" :src="clanSrc" class="cardClanPict" />
 			<span class="cardName urbanFont">{{ card.name }}</span>
 		</div>
 
-		<!-- Corps de la carte -->
 		<div class="cardBottom">
 			<div class="cardStars">
 				<div v-for="i in card.stars" :key="'star-on-' + i" class="cardStarOn"></div>
 				<div v-for="i in 5 - card.stars" :key="'star-off-' + i" class="cardStarOff"></div>
 			</div>
 			<div class="cardDescription">
-				<!-- Statistiques principales -->
 				<div class="flex h-[30px] items-center">
 					<img src="../assets/Power.png" alt="Power Image" class="w-[22px] h-[22px]" />
 					<div class="cardPH urbanFont">{{ card.power }}</div>
@@ -74,19 +71,6 @@ const clanSrc = computed(() => {
 	src: url("@/assets/urbanrivalsfont-webfont.woff") format("woff");
 	font-weight: normal;
 	font-style: normal;
-}
-
-.urbanFont {
-	font-family: "Urban Rivals", Arial, Sans-serif, Serif;
-	font-weight: bolder;
-	font-style: normal;
-	font-variant: normal;
-	text-shadow:
-		-1px -1px 0 #00383f,
-		1px -1px 0 #00383f,
-		-1px 1px 0 #00383f,
-		1px 1px 0 #00383f,
-		2px 2px 1px #000;
 }
 
 .cardFrame {

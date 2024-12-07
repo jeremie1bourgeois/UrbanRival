@@ -13,6 +13,10 @@ const props = defineProps({
 		type: Number,
 		required: true,
 	},
+	turn: {
+		type: Boolean,
+		required: true,
+	},
 });
 
 const isModalVisible = ref(false);
@@ -21,9 +25,10 @@ const openModal = () => {
 	isModalVisible.value = true;
 };
 
-const handleAttack = (data: { card: any; pillz: number }) => {
-	console.log("Attacking with card:", data.card, "using pillz:", data.pillz);
-	isModalVisible.value = false; // Fermer la modal après l'attaque
+const emit = defineEmits(["combat"]);
+
+const confirmCombat = (pillz: number, isFury: boolean) => {
+	emit("combat", pillz, isFury);
 };
 </script>
 
@@ -31,5 +36,13 @@ const handleAttack = (data: { card: any; pillz: number }) => {
 	<div class="cursor-pointer" @click="openModal">
 		<CardDisplay :card="card" />
 	</div>
-	<ModalCard :isVisible="isModalVisible" :card="card" @close="isModalVisible = false" :maxPillz="props.pillz" />
+	<div v-if="turn">
+		<ModalCard
+			:isVisible="isModalVisible"
+			:card="card"
+			@close="isModalVisible = false"
+			:maxPillz="props.pillz"
+			@combat="confirmCombat"
+		/>
+	</div>
 </template>

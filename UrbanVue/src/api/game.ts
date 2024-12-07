@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Game } from '../models/game.interface.ts';
+import { Game, RoundData } from '../models/game.interface.ts';
 
 const apiClient = axios.create({
 	baseURL: 'http://127.0.0.1:8000',
@@ -11,7 +11,6 @@ const apiClient = axios.create({
 export const getInitGameTemplate = async (): Promise<{ status: string; game: Game; gameId: string }> => {
 	try {
 		const response = await apiClient.get('/init_game/template');
-		console.log('Init game template:', JSON.stringify(response.data));
 		return {
 			status: response.data.status,
 			game: new Game(response.data.game),
@@ -26,18 +25,11 @@ export const getInitGameTemplate = async (): Promise<{ status: string; game: Gam
 // Fonction pour traiter un round
 export const processGameRound = async (
 	gameId: string,
-	roundData: {
-		player1_card_index: number;
-		player1_pillz: number;
-		player1_fury: boolean;
-		player2_card_index: number;
-		player2_pillz: number;
-		player2_fury: boolean;
-	}
+	roundData: RoundData,
 ): Promise<{ status: string; game: Game; state: any }> => {
 	try {
 		const response = await apiClient.post(`/process_round/${gameId}`, roundData);
-		console.log('Round processed:', response.data);
+		console.log('processGameRound response:', (response.data));
 		return {
 			status: response.data.status,
 			game: new Game(response.data.game),

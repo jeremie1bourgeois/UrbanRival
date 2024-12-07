@@ -9,7 +9,7 @@ const props = defineProps({
 	maxPillz: { type: Number, required: true },
 });
 
-const isFury = ref(false);
+const isFury = ref<boolean>(false);
 const currentPillz = ref(1);
 
 const emit = defineEmits(["close", "combat"]);
@@ -39,11 +39,8 @@ const confirmCombat = () => {
 	closeModal();
 };
 
-const selectedPillz = ref(0);
-
-const confirmAttack = () => {
-	emit("combat", { card: props.card, pillz: selectedPillz.value });
-	closeModal();
+const toggleFury = () => {
+    isFury.value = !isFury.value;
 };
 </script>
 
@@ -57,14 +54,14 @@ const confirmAttack = () => {
 					<button :disabled="currentPillz <= 1" @click="decreasePillz()" class="bg-gray-700 p-2 rounded text-white">-</button>
 					<span class="text-white urbanFont">{{ currentPillz }}</span>
 					<button @click="increasePillz" class="bg-gray-700 p-2 rounded text-white">+</button>
-					<div class="cardPH urbanFont text-white">attaque: {{ currentPillz * card.power }}</div>
+					<div class="text-2xl text-center urbanFont text-white">attaque: {{ currentPillz * card.power }}</div>
 				</div>
 
 				<div>
 					<button
-						:disabled="currentPillz + 3 > props.maxPillz"
-						@click="isFury.value = !isFury.value"
-						:class="`p-2 rounded text-white ${isFury.value ? 'bg-green-500 hover:bg-green-600' : 'bg-red-700 hover:bg-red-800'}`"
+						:disabled="currentPillz + 3 > maxPillz"
+						@click="toggleFury"
+						:class="`p-2 rounded text-white ${isFury.valueOf() ? 'bg-green-500 hover:bg-green-600' : 'bg-red-700 hover:bg-red-800'}`"
 					>
 						Fury
 					</button>
@@ -88,23 +85,5 @@ button:disabled {
 	cursor: not-allowed;
 	opacity: 0.5;
 	background-color: #4a5568;
-}
-
-.cardPH {
-	font-size: 24px;
-	text-align: center;
-}
-
-.urbanFont {
-	font-family: "Urban Rivals", Arial, Sans-serif, Serif;
-	font-weight: bolder;
-	font-style: normal;
-	font-variant: normal;
-	text-shadow:
-		-1px -1px 0 #00383f,
-		1px -1px 0 #00383f,
-		-1px 1px 0 #00383f,
-		1px 1px 0 #00383f,
-		2px 2px 1px #000;
 }
 </style>
