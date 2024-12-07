@@ -1,7 +1,8 @@
+import json
 import os
 from src.core.use_cases.process_round import process_round
 from src.core.domain.player import Player
-from src.schemas.game_schemas import PlayerCards, ProcessRoundInput
+from src.schemas.game_schemas import GameResult, PlayerCards, ProcessRoundInput
 from src.core.domain.card import Card
 from enum import Enum
 from src.adapters.repositories.game_repository import get_new_game_id, load_game_from_json, save_game_to_json
@@ -14,13 +15,11 @@ def process_round_service(game_id: str, round_data: ProcessRoundInput):
     game_file_path = os.path.join(BASE_DIR, "data/game/", f"game_data_{game_id}.json")
     os.makedirs(os.path.dirname(game_file_path), exist_ok=True)
 
-    print("game_file_path", game_file_path)
     # Charger la partie
     game = load_game_from_json(game_file_path)
 
     # Jouer un round en passant l'objet round_data
     updated_game = process_round(game, round_data)
-    print("updated_game", updated_game)
 
     # Sauvegarder la partie mise à jour
     save_game_to_json(updated_game, game_id)
@@ -30,11 +29,6 @@ def process_round_service(game_id: str, round_data: ProcessRoundInput):
     return (updated_game, state)
 
 
-class GameResult(Enum):
-    ALLY = "Ally Wins"
-    ENEMY = "Enemy Wins"
-    DRAW = "Draw"
-    NONE = "Game Not Finished"
 
 def check_end(board: Game) -> GameResult:
     """
@@ -85,11 +79,17 @@ def create_game(players_cards: PlayerCards) -> Game:
 
 
 def init_game_from_template():
-    game = load_game_from_json(os.path.join(BASE_DIR, "data/simple_data_2.json"))
-    
+    # Charger le chemin du fichier de la partie
+    game_file_path = os.path.join(BASE_DIR, "data/", f"template_game_v1.json")
+    os.makedirs(os.path.dirname(game_file_path), exist_ok=True)
+
+    # Charger la partie
+    game = load_game_from_json(game_file_path)
+
+    # Générer un nouvel ID pour le jeu
     new_id = get_new_game_id()
-    
-    # Appeler la fonction pour sauvegarder la partie en JSON
+
+    # Sauvegarder la partie en JSON
     save_game_to_json(game, new_id)
-    
-    return game
+
+    return (game, new_id)

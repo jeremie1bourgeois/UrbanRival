@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import CardDisplay from "./CardDisplay.vue";
+import { Card } from "../models/game.interface";
 
 const props = defineProps({
 	isVisible: { type: Boolean, required: true },
-	card: { type: Object, required: true },
+	card: { type: Object as () => Card, required: true },
 	maxPillz: { type: Number, required: true },
 });
 
@@ -37,6 +38,13 @@ const confirmCombat = () => {
 	emit("combat", currentPillz.value, isFury.value);
 	closeModal();
 };
+
+const selectedPillz = ref(0);
+
+const confirmAttack = () => {
+	emit("combat", { card: props.card, pillz: selectedPillz.value });
+	closeModal();
+};
 </script>
 
 <template>
@@ -55,8 +63,8 @@ const confirmCombat = () => {
 				<div>
 					<button
 						:disabled="currentPillz + 3 > props.maxPillz"
-						@click="isFury.valueOf = !isFury.valueOf"
-						:class="`p-2 rounded text-white ${isFury.valueOf() ? 'bg-green-500 hover:bg-green-600' : 'bg-red-700 hover:bg-red-800'}`"
+						@click="isFury.value = !isFury.value"
+						:class="`p-2 rounded text-white ${isFury.value ? 'bg-green-500 hover:bg-green-600' : 'bg-red-700 hover:bg-red-800'}`"
 					>
 						Fury
 					</button>

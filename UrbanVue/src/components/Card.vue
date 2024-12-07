@@ -2,20 +2,12 @@
 import ModalCard from "./ModalCard.vue";
 import { ref } from "vue";
 import CardDisplay from "./CardDisplay.vue";
+import { Card } from "../models/game.interface";
 
 const props = defineProps({
 	card: {
-		type: Object,
+		type: Object as () => Card,
 		required: true,
-		default: () => ({
-			name: "",
-			faction: "",
-			stars: 0,
-			power: 0,
-			damage: 0,
-			ability: "",
-			bonus: "",
-		}),
 	},
 	pillz: {
 		type: Number,
@@ -28,11 +20,16 @@ const isModalVisible = ref(false);
 const openModal = () => {
 	isModalVisible.value = true;
 };
+
+const handleAttack = (data: { card: any; pillz: number }) => {
+	console.log("Attacking with card:", data.card, "using pillz:", data.pillz);
+	isModalVisible.value = false; // Fermer la modal après l'attaque
+};
 </script>
 
 <template>
 	<div class="cursor-pointer" @click="openModal">
-        <CardDisplay :card="card" />
+		<CardDisplay :card="card" />
 	</div>
 	<ModalCard :isVisible="isModalVisible" :card="card" @close="isModalVisible = false" :maxPillz="props.pillz" />
 </template>

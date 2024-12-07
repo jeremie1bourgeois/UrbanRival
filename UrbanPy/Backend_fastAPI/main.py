@@ -1,11 +1,20 @@
 from typing import Any, Dict, List
 from src.schemas.game_schemas import PlayerCards, ProcessRoundInput
-
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException, Body
 from src.core.services.game_service import create_game, process_round_service, init_game_from_template
 from src.utils.config import BASE_DIR
 
 app = FastAPI()
+
+# Configuration du middleware CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Frontend URL (changer si nécessaire)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post("/process_round/{game_id}", response_model=Dict[str, Any])
 def process_game_round(game_id: str, round_data: ProcessRoundInput = Body(...)):
@@ -47,9 +56,9 @@ def init_game_template() -> Dict[str, Any]:
     """
     try:
         # Initialiser la partie depuis le template
-        game = init_game_from_template()
+        (game, new_id) = init_game_from_template()
 
         # Retourner la partie initialisée
-        return {"status": "success", "game": game.to_dict()}
+        return {"status": "success", "game": game.to_dict(), "game_id": new_id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

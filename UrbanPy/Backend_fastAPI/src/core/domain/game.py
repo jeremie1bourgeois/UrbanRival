@@ -19,6 +19,16 @@ class Game:
         game.enemy = Player.from_dict(data["enemy"])
         game.history = []
         return game
+    
+    @staticmethod
+    def from_dict_template(data):
+        game = Game()
+        game.nb_turn = data.get("nb_turn", 0)
+        game.turn = data.get("turn", True)
+        game.ally = Player.from_dict_template(data["ally"])
+        game.enemy = Player.from_dict_template(data["enemy"])
+        game.history = []
+        return game
 
     def to_dict(self):
         return {
