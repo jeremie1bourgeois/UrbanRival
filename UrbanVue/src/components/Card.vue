@@ -19,7 +19,7 @@ const props = defineProps({
 	},
 });
 
-const isModalVisible = ref(false);
+let isModalVisible = ref(false);
 
 const openModal = () => {
 	isModalVisible.value = true;
@@ -33,16 +33,10 @@ const confirmCombat = (pillz: number, isFury: boolean) => {
 </script>
 
 <template>
-	<div class="cursor-pointer" @click="openModal">
-		<CardDisplay :card="card" />
-	</div>
-	<div v-if="turn">
-		<ModalCard
-			:isVisible="isModalVisible"
-			:card="card"
-			@close="isModalVisible = false"
-			:maxPillz="props.pillz"
-			@combat="confirmCombat"
-		/>
+	<div>
+		<CardDisplay :class="turn ? 'cursor-pointer' : 'cursor-not-allowed'" :card="card" @click="openModal" />
+		<div v-if="turn && isModalVisible">
+			<ModalCard :isVisible="isModalVisible" :card="card" @close="isModalVisible = false" :maxPillz="props.pillz" @combat="confirmCombat" />
+		</div>
 	</div>
 </template>

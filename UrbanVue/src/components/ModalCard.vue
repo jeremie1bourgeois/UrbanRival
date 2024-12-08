@@ -14,7 +14,9 @@ const currentPillz = ref(1);
 
 const emit = defineEmits(["close", "combat"]);
 
-const closeModal = () => emit("close");
+const closeModal = () => {
+	emit("close");
+};
 
 const increasePillz = () => {
 	if (isFury.value) {
@@ -30,7 +32,7 @@ const increasePillz = () => {
 
 const decreasePillz = () => {
 	if (currentPillz.value > 1) {
-		currentPillz.value --;
+		currentPillz.value--;
 	}
 };
 
@@ -40,13 +42,13 @@ const confirmCombat = () => {
 };
 
 const toggleFury = () => {
-    isFury.value = !isFury.value;
+	isFury.value = !isFury.value;
 };
 </script>
 
 <template>
-	<div v-if="isVisible" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click="closeModal">
-		<div class="flex bg-gray-900 p-4 rounded-md" @click.stop>
+	<div v-if="isVisible" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click.self="closeModal">
+		<div class="flex bg-gray-900 p-4 rounded-md">
 			<CardDisplay :card="card" />
 
 			<div class="flex flex-col items-center justify-center pl-4 space-y-4 w-[350px]">

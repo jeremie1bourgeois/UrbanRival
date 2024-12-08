@@ -4,29 +4,23 @@ import { Card } from "../models/game.interface";
 
 const props = defineProps({
 	card: {
-		type: Object as () => Card, // Utilisation du type Card
+		type: Object as () => Card,
 		required: true,
-		default: () => ({
-			name: "",
-			faction: "",
-			stars: 0,
-			power: 0,
-			damage: 0,
-			ability: "",
-			bonus: "",
-		}),
+	},
+	class: {
+		type: String,
+		default: "",
+		required: false,
 	},
 });
 
-// Source de l'image de la carte
 const imageSrc = computed(() => {
-	if (!props.card.name) return "src/assets/default-card.jpg"; // Fallback image
+	if (!props.card.name) return "src/assets/default-card.jpg";
 	return "src/assets/imageCard/" + `${props.card.name.replace(/\s+/g, "_")}_${props.card.stars}.jpg`;
 });
 
-// Source de l'image du clan
 const clanSrc = computed(() => {
-	if (!props.card.faction) return "src/assets/default-clan.jpg"; // Fallback image
+	if (!props.card.faction) return "src/assets/default-clan.jpg";
 	return "src/assets/Clan/" + props.card.faction.replace(/\s+/g, "").toUpperCase() + ".jpg";
 });
 </script>
@@ -35,6 +29,7 @@ const clanSrc = computed(() => {
 	<div
 		class="bg-gray-800 text-white border border-gray-700 rounded-md shadow-md w-[166px] h-[237px] text-center cardFrame urbanFont"
 		:style="{ backgroundImage: `url(${imageSrc})`, backgroundSize: 'cover', backgroundPosition: 'center' }"
+		:class="class"
 	>
 		<div class="cardHeader flex items-center">
 			<img alt="Clan Image" :src="clanSrc" class="cardClanPict" />
