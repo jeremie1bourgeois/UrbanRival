@@ -34,7 +34,7 @@ const confirmCombat = (pillz: number, isFury: boolean) => {
 
 <template>
 	<div>
-		<CardDisplay :class="turn ? 'cursor-pointer' : 'cursor-not-allowed'" :card="card" @click="openModal" />
+		<CardDisplay :class="turn ? 'cursor-pointer' : 'cursor-not-allowed'" :card="card" @click="turn && openModal()" />
 		<div v-if="turn && isModalVisible">
 			<ModalCard :isVisible="isModalVisible" :card="card" @close="isModalVisible = false" :maxPillz="props.pillz" @combat="confirmCombat" />
 		</div>
