@@ -1,3 +1,5 @@
+import copy
+from src.core.domain.round import Round
 from src.core.domain.capacity import Capacity
 from src.core.domain.player import Player
 from src.core.domain.card import Card
@@ -20,22 +22,24 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> Game:
         if round_data.player2_pillz + 3 * round_data.player2_fury > game.enemy.pillz:
             raise ValueError(f"Player 2 does not have enough pillz: {round_data.player2_pillz}")
 
-        game.ally.pillz = game.ally.pillz - round_data.player1_pillz - 3 * round_data.player1_fury
-        game.enemy.pillz = game.enemy.pillz - round_data.player2_pillz - 3 * round_data.player2_fury
+        # Mise à jour des pillz
+        game.ally.pillz -= round_data.player1_pillz + 3 * round_data.player1_fury
+        game.enemy.pillz -= round_data.player2_pillz + 3 * round_data.player2_fury
 
         # Récupérer les cartes sélectionnées
         player1_card = game.ally.cards[round_data.player1_card_index]
         player2_card = game.enemy.cards[round_data.player2_card_index]
-        
+
+        # Initialiser les données de combat
         init_fight_data(player1_card, round_data.player1_pillz, round_data.player1_fury)
         init_fight_data(player2_card, round_data.player2_pillz, round_data.player2_fury)
-        
+
+        # Appliquer les effets de combat
         apply_combat_effects(game, player1_card, player2_card, player1_card.ability)
         apply_combat_effects(game, player1_card, player2_card, player1_card.bonus)
-        
         apply_combat_effects(game, player2_card, player1_card, player2_card.ability)
         apply_combat_effects(game, player2_card, player1_card, player2_card.bonus)
-        
+
         # Appliquer les fury
         if player1_card.fury:
             player1_card.damage_fight += 2
@@ -46,21 +50,41 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> Game:
         player1_attack = player1_card.power * (round_data.player1_pillz + 1)
         player2_attack = player2_card.power * (round_data.player2_pillz + 1)
 
+        # Créer une nouvelle instance de Round
+        round_result = Round()
+        round_result.ally.card_index = round_data.player1_card_index  # Stocker l'index de la carte
+        round_result.enemy.card_index = round_data.player2_card_index  # Stocker l'index de la carte
+
         # Résoudre le combat
         if player1_attack > player2_attack:
             game.enemy.life = max(0, game.enemy.life - player1_card.damage)
+            round_result.ally.win = True
+            round_result.enemy.win = False
         elif player2_attack > player1_attack:
             game.ally.life = max(0, game.ally.life - player2_card.damage)
+            round_result.ally.win = False
+            round_result.enemy.win = True
         elif game.turn:
             game.enemy.life = max(0, game.enemy.life - player1_card.damage)
+            round_result.ally.win = True
+            round_result.enemy.win = False
         else:
             game.ally.life = max(0, game.ally.life - player2_card.damage)
+            round_result.ally.win = False
+            round_result.enemy.win = True
+
+        # Ajouter le round au history
+        game.history.append(round_result)
 
         # Mettre à jour le tour
+        player1_card.played = True
+        player2_card.played = True
+
         game.nb_turn += 1
         game.ally.pillz += 1
         game.enemy.pillz += 1
         game.turn = not game.turn
+
         return game
     except Exception as e:
         print(f"Exception in process_round: {e}")
@@ -78,13 +102,13 @@ def check_capacity_condition(history, capacity: Capacity, player: Player):
         return history[-1].ally.win == True
     else:
         True
-    
+
 
 def init_fight_data(card: Card, nb_pillz: int, fury: bool):
     card.power_fight = card.power
     card.damage_fight = card.damage
-    card.ability_fight = card.ability
-    card.bonus_fight = card.bonus
+    card.ability_fight = copy.deepcopy(card.ability)
+    card.bonus_fight = copy.deepcopy(card.bonus)
     card.pillz_fight = nb_pillz
     card.fury = fury
     card.attack = 0

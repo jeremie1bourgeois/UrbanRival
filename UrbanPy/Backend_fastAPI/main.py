@@ -1,11 +1,24 @@
+import logging
+import traceback
 from typing import Any, Dict, List
+
+from fastapi.responses import JSONResponse
 from src.schemas.game_schemas import PlayerCards, ProcessRoundInput
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, HTTPException, Body
+from fastapi import FastAPI, HTTPException, Body, Request
 from src.core.services.game_service import create_game, process_round_service, init_game_from_template
 from src.utils.config import BASE_DIR
 
-app = FastAPI()
+# logging.basicConfig(level=logging.DEBUG)
+import sys
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)],  # Assure l'affichage dans le terminal
+)
+
+app = FastAPI(debug=True)
 
 # Configuration du middleware CORS
 app.add_middleware(
@@ -15,6 +28,30 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def log_exceptions_middleware(request: Request, call_next):
+    try:
+        print("DEBUG: Middleware appelé pour", request.url)
+        return await call_next(request)
+    except Exception as exc:
+        logging.error(f"Erreur capturée pour {request.url}: {exc}")
+        traceback.print_exc()  # Affiche la trace complète
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Erreur interne. Consultez les logs pour plus d'informations."},
+        )
+
+
+# Gestionnaire global des erreurs
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logging.error(f"Erreur globale pour {request.url}: {exc}")
+    traceback.print_exc()
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Erreur inattendue. Consultez les logs pour plus d'informations."},
+    )
 
 @app.post("/process_round/{game_id}", response_model=Dict[str, Any])
 def process_game_round(game_id: str, round_data: ProcessRoundInput = Body(...)):

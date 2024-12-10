@@ -3,6 +3,8 @@ from pydantic import BaseModel, validator
 from typing import List, Dict, Union
 from pydantic import Field
 
+from src.core.domain.round import Round
+
 
 class CardInput(BaseModel):
     card_name: str
@@ -41,7 +43,7 @@ class GameSchema(BaseModel):
 	turn: bool
 	ally: Dict[str, List[CardSchema]]
 	enemy: Dict[str, List[CardSchema]]
-	history: List[str]
+	history: List[Round]
 
 class GameResult(Enum):
     ALLY = "Ally Wins"

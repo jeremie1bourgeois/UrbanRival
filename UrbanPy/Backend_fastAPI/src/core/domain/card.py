@@ -81,8 +81,8 @@ class Card:
 
         card.power_fight = data.get("power_fight")
         card.damage_fight = data.get("damage_fight")
-        card.ability_fight = data.get("ability_fight")
-        card.bonus_fight = data.get("bonus_fight")
+        card.ability_fight = Capacity.from_dict(data.get("ability_fight")) if data.get("ability_fight") else None
+        card.bonus_fight = Capacity.from_dict(data.get("bonus_fight")) if data.get("bonus_fight") else None
         card.win = data.get("win")
         return card
 

@@ -1,0 +1,3 @@
+*.pyc
+__pycache__/
+UrbanPy/Backend_fastAPI/data/game

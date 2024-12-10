@@ -1,15 +1,14 @@
-class Round:
-    
-    class Ally:
-        def __init__(self):
-            self.card = None
-            self.win = False
-    
-    class Enemy:
-        def __init__(self):
-            self.card = None
-            self.win = False
+from pydantic import BaseModel
+from typing import Optional
 
-    def __init__(self):
-        self.ally: self.Ally = self.Ally()
-        self.enemy: self.Enemy = self.Enemy()
+class Ally(BaseModel):
+    card_index: Optional[int] = None
+    win: bool = False
+
+class Enemy(BaseModel):
+    card_index: Optional[int] = None
+    win: bool = False
+
+class Round(BaseModel):
+    ally: Ally = Ally()
+    enemy: Enemy = Enemy()
