@@ -159,6 +159,8 @@ def apply_combat_effects(game: Game, card1: Card, card2: Card, capacity: Capacit
                 card1.attack += capacity.value * game.ally.pillz
             elif capacity.how == "nb_dam_opp_left":
                 card1.attack = card1.attack + capacity.value * card2.damage
+            elif capacity.how == "nb_pow_opp_left":
+                card1.attack = card1.attack + capacity.value * card2.power
             elif capacity.how == "":
                 card1.attack += capacity.value
             else:
@@ -253,3 +255,18 @@ def apply_combat_effects(game: Game, card1: Card, card2: Card, capacity: Capacit
                 card2.damage += capacity.value
             else:
                 raise ValueError(f"Invalid how: {capacity.how} for power_and_damage")
+
+
+def check_round_correct(game: Game, round_data: ProcessRoundInput):
+    if round_data.player1_card_index >= 4:
+        raise ValueError("Player 1: invalid card index.")
+    if round_data.player2_card_index >= 4:
+        raise ValueError("Player 2: invalid card index.")
+    if round_data.player1_pillz + 3 * round_data.player1_fury > game.ally.pillz:
+        raise ValueError("Player 1: too many pillz.")
+    if round_data.player2_pillz + 3 * round_data.player2_fury > game.enemy.pillz:
+        raise ValueError("Player 2: too many pillz.")
+    if game.ally.cards[round_data.player1_card_index].played:
+        raise ValueError("Player 1: card already played.")
+    if game.enemy.cards[round_data.player2_card_index].played:
+        raise ValueError("Player 2: card already played.")

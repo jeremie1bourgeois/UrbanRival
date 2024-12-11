@@ -27,8 +27,8 @@
 					"target": "enemy",
 					"type": "power",
 					"value": -1,
-					"how": "",
-					"borne": 2,
+					"how": "Growth",
+					"borne": 4,
 					"condition_effect": "",
 					"lvl_priority": 0
 				},
@@ -60,7 +60,7 @@
                 "power": 5,
                 "damage": 3,
 				"ability": {
-					"target": "enemy",
+					"target": "ally",
 					"type": "damage",
 					"value": 3,
 					"how": "",
@@ -68,7 +68,7 @@
 					"condition_effect": "Courage",
 					"lvl_priority": 0
 				},
-                "ability_description": "Ability at Level 3",
+                "ability_description": "Courage: Damage +3",
                 "power_fight": 0,
                 "damage_fight": 0,
                 "ability_fight": null,
@@ -96,7 +96,7 @@
                 "power": 3,
                 "damage": 5,
 				"ability": {
-					"target": "enemy",
+					"target": "ally",
 					"type": "power",
 					"value": 4,
 					"how": "",
@@ -104,7 +104,7 @@
 					"condition_effect": "",
 					"lvl_priority": 0
 				},
-                "ability_description": "Ability at Level 3",
+                "ability_description": "Power +4",
                 "power_fight": 0,
                 "damage_fight": 0,
                 "ability_fight": null,
@@ -131,7 +131,7 @@
 					"condition_effect": "",
 					"lvl_priority": 0
 				},
-                "ability_description": "Ability at Level 3",
+                "ability_description": "-3 Opp Damage, Min 2",
                 "power_fight": 0,
                 "damage_fight": 0,
 				"ability": {
@@ -175,11 +175,11 @@
                 "stars": 4,
                 "power": 7,
                 "damage": 3,
-                "ability_description": "Ability at Level 2",
+                "ability_description": "Support: Damage +1",
                 "power_fight": 0,
                 "damage_fight": 0,
 				"ability": {
-					"target": "enemy",
+					"target": "ally",
 					"type": "damage",
 					"value": 1,
 					"how": "Support",
@@ -211,7 +211,7 @@
                 "stars": 5,
                 "power": 3,
                 "damage": 8,
-                "ability_description": "Ability at Level 2",
+                "ability_description": "Equalizer: -1 Opp Pow. & Dam., Min 1",
                 "power_fight": 0,
                 "damage_fight": 0,
 				"ability": {
@@ -284,15 +284,15 @@
                 "power": 6,
                 "damage": 3,
 				"ability": {
-					"target": "enemy",
-					"type": "damage",
+					"target": "ally",
+					"type": "attack",
 					"value": 2,
-					"how": "",
+					"how": "nb_dam_opp_left",
 					"borne": 0,
 					"condition_effect": "",
 					"lvl_priority": 0
 				},
-                "ability_description": "Ability at Level 4",
+                "ability_description": "+2 Attack Per Opp. Damage",
                 "power_fight": 0,
                 "damage_fight": 0,
                 "ability_fight": null,

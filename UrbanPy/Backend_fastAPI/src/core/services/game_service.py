@@ -1,5 +1,5 @@
 import os
-from src.core.use_cases.process_round import process_round
+from src.core.use_cases.process_round import check_round_correct, process_round
 from src.core.domain.player import Player
 from src.schemas.game_schemas import GameResult, PlayerCards, ProcessRoundInput
 from src.core.domain.card import Card
@@ -15,6 +15,9 @@ def process_round_service(game_id: str, round_data: ProcessRoundInput):
 
     # Charger la partie
     game = load_game_from_json(game_file_path)
+    
+    # Vérifier si le round est correct
+    check_round_correct(game, round_data)
 
     # Jouer un round en passant l'objet round_data
     updated_game = process_round(game, round_data)
