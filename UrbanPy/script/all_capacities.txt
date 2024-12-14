@@ -1,0 +1,587 @@
++X Atk per Pillz left
+The Attack points of CHARACTER are increased by X points for every currently remaining Pillz owned by the player controlling the character at the beginning of the round.
+
++X Attack per Life left
+The Attack points of CHARACTER are increased by X points for every remaining Life point owned by the player controlling the character.
+
++X Life
+If CHARACTER wins the fight, the player controlling CHARACTER will win X Life points at the end of the round.
+
++X Life per Damage
+For each Damage inflicted by CHARACTER to the opponent at the end of a round, the player controlling the character will win X Life points at the end of the round.
+
++X Life per Damage max. Y
+For each Damage inflicted by CHARACTER to the opponent at the end of a round, the player controlling the character will win X Life points until he reaches a total of Y Life points at the end of the round.
+
++X Life per round
+At the start of each round after the first one, the player with CHARACTER in their team receives one extra Life point.
+
++X Pillz
+If CHARACTER wins the fight, the player controlling CHARACTER will receive X Pillz at the beginning of the next round.
+
++X Pillz and Life
+If CHARACTER wins the fight, the player controlling CHARACTER will win X Life points & X Pillz at the end of the round.
+
++X Pillz max. Y
+If CHARACTER wins the fight, the player controlling CHARACTER will receive X Pillz at the beginning of the next round up to a maximum of Y.
+
++X Pillz per Damage
+For each Damage inflicted by CHARACTER to the opponent at the end of a round, the player controlling the character will receive X Pillz at the beginning of the next round.
+
++X Pillz per round, max. Y
+At the start of each round, after the first one, the player with CHARACTER in their team receives one extra Pillz up to a maximum of Y.
+
+- X opp. Life min Y
+If CHARACTER wins the fight, the number of Life points of the player controlling the opposing character will be reduced by X, or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect.
+
+-X opp Att. per Life left, min Y
+The opponents Attack points are reduced by X points for every remaining Life point owned by the player controlling the character, or up to a minimum of Y. If the opponents number of Attack points are lower or equal to Y, then the ability has no effect.
+
+-X opp Att. per Pillz left, min Y
+The opponents Attack points are reduced by X points for every remaining Pillz owned by the player controlling the character, or up to a minimum of Y. If the opponents number of Attack points are lower or equal to Y, then the ability has no effect.
+
+-X opp Attack, min Y
+The opponents Attack points are reduced by X points or up to a minimum of Y. If the opponents number of Attack points are lower or equal to Y, then the ability has no effect.
+
+-X opp Damage, min Y
+If CHARACTER loses their fight, the Damage inflicted on CHARACTERs owner will be reduced by X points or up to a minimum of Y. If the winning characters Damage points are lower than or equal to Y, then the Ability has no effect.
+
+-X opp Pillz. min Y
+If CHARACTER wins the fight, the number of Pillz of the player controlling the opposing character will be reduced by X Pillz, or up to a minimum of Y. If the number of Pillz of the player controlling the opposing character is lower than or equal to Y, then the ability will have no effect.
+
+-X opp Pow. and Damage, min Y
+The opponents Power and Damage are reduced by X points or up to a minimum of Y.
+
+-X opp Power, min Y
+The Power of the opposing character is reduced by X points or up to a minimum of Y. If the opposing characters Power is lower than or equal to Y, then the Ability has no effect.
+
+-X opp. Pillz, per round, min Y
+At the start of each round, after the first round, the opponent loses X Pillz up to a minimum of Y.
+
+Attack +X
+CHARACTER's Attack points are increased by X points. (Remember: Power * Pillz = Attack)
+
+Backlash: - X Life min Y
+If CHARACTER wins the round, the number of Life points of the player controlling CHARACTER will be reduced by X, or up to a minimum of Y. If the number of Life points of the player controlling CHARACTER is lower than or equal to Y, then the ability will have no effect.
+
+Backlash: - X Pillz min Y
+If CHARACTER wins the round, the number of Pillz of the player controlling CHARACTER will be reduced by X, or up to a minimum of Y. If the number of Pillz of the player controlling CHARACTER is lower than or equal to Y, then the ability will have no effect.
+
+Cancel opp. Attack Modif.
+Any modifier of the opposing character affecting attack will be deactivated. This applies to attack reductions AND increases. This effect is not a Stop Ability or a Stop Bonus. Please not that the attack gained by your opponent through playing Pillz does not constitute a modification.
+
+Cancel opp. Damage Modif.
+Any modifier of the opposing character affecting Damage will be deactivated. This applies to Damage reductions AND increases. This effect is not a Stop Ability or a Stop Bonus.
+
+Cancel opp. Life Modif.
+Any modifier of the opposing character affecting life will be deactivated. This applies to life reductions AND increases. This effect is not a Stop Ability or a Stop Bonus. The effects of your opponents poison and heal abilities will be deactivated for the round in which the cancel opponent life modification is activated. These effects will then be reactivated for the following rounds.
+
+Cancel opp. Pillz & Life Modif.
+Any of your opponent's abilities or bonuses that alter Pillz and/or Life will be cancelled. This applies to reductions AND increases in Pillz / Life. This effect is not a Stop Ability or a Stop Bonus. The effects of your opponents poison and heal abilities will be deactivated for the round in which the cancel opponent life modification is activated. These effects will then be reactivated for the following rounds.
+
+Cancel opp. Pillz Modif.
+Any of your opponent's abilities or bonuses that alter Pillz will be cancelled. This applies to reductions AND increases in Pillz.
+
+Cancel opp. Power and Damage Modif.
+Any modifier of the opposing character affecting Damage and/or Power will be deactivated. This applies to Damage/Power reductions AND increases. This effect is not a Stop Ability or a Stop Bonus.
+
+Cancel opp. Power Modif.
+Any modifier of the opposing character affecting power will be deactivated. This applies to power reductions AND increases. This effect is not a Stop Ability or a Stop Bonus.
+
+Confidence : +X life
+If a character belonging to the same team as CHARACTER wins a round and if CHARACTER wins the following round, the player controlling CHARACTER will win X Life points at the end of the round.
+
+Confidence : -X opp. attack, min Y
+If a character belonging to the same team as CHARACTER wins a round, in the next round, the Attack of the opposing character is reduced by X points or up to a minimum of Y. If the opposing characters Attack is lower than or equal to Y, then the Ability has no effect.
+
+Confidence : -X opp. power, min Y
+If a character belonging to the same team as CHARACTER wins a round, in the next round, the Power of the opposing character is reduced by X points or up to a minimum of Y. If the opposing characters Power is lower than or equal to Y, then the Ability has no effect.
+
+Confidence: +X Atk per Life left
+If a character belonging to the same team as CHARACTER wins a round, in the next round, the Attack points of CHARACTER are increased by X points for every remaining Life point owned by the player controlling the character.
+
+Confidence: +X life per dmg.
+If a character belonging to the same team as CHARACTER wins a round, in the next round the player controlling CHARACTER will win X Life points for each Damage inflicted by CHARACTER to the opposing player
+
+Confidence: +X Pillz
+If a character belonging to the same team as CHARACTER wins a round, if CHARACTER wins the fight, the player controlling CHARACTER will receive X Pillz at the beginning of the next round.
+
+Confidence: -X opp Damage, min Y
+If a character belonging to the same team as CHARACTER wins a round and if CHARACTER loses the following round, the Damage inflicted to CHARACTER owner will be reduced by X points or up to a minimum of Y. If the winning characters Damage points are lower than or equal to Y, then the Ability has no effect.
+
+Confidence: -X opp. Life, min Y
+If a character belonging to the same team as CHARACTER wins a round, in the next round if CHARACTER wins his fight, the number of Life points of the player controlling the opposing player will be reduced by X or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower or equal to Y, then the ability has no effect.
+
+Confidence: Attack +X
+If a character belonging to the same team as CHARACTER wins a round, in the next round the Attack of CHARACTER will be increased to X
+
+Confidence: Damage +X
+If a character belonging to the same team as CHARACTER wins a round, in the next round Damage points of CHARACTER will be increased by X
+
+Confidence: Power +X
+If a character belonging to the same team as CHARACTER wins a round, in the next round the Power of CHARACTER will be increased by X
+
+Confidence: Power = Power opp
+If a character belonging to the same team as CHARACTER wins a round, CHARACTER has equal Power to their opponent. This number only takes into account the figure shown on the opponents card and does not include changes connected to an Ability or a Bonus. If the Ability is blocked, the characters Power is equal to that shown on their card.
+
+Confidence: Power and Damage +X
+If a character belonging to the same team as CHARACTER wins a round, in the next round, the Power and Damage of CHARACTER will be increased by X.
+
+Confidence: Stop Ability
+If a character belonging to the same team as CHARACTER wins a round, in the next round the Ability of CHARACTER opponent will be cancelled, if he has one.
+
+Confidence: Stop Opp. Bonus
+If a character belonging to the same team as CHARACTER wins a round, in the next round the opponents clan Bonus, if activated, is cancelled. If the opponent's clan Bonus is not activated, then the ability has no effect.
+
+Consume X, min Y
+If CHARACTER wins the round, your opponent will lose X Pillz, minimum Y. This effect will be felt at the end of each of the following rounds. (If two Consume are applied, the second will replace the first as soon as the latter takes effect).
+
+Copy: Opp. Bonus
+When CHARACTER is engaged in combat with another character, his Copy: Bonus ability is replaced by his opponent's Bonus. If the opponents Bonus is not activated, then this ability has no effect.
+
+Copy: Opp. Damage
+CHARACTER has the same number of Damage points as their opponent. This number only takes into account the figure shown on the opponents card and does not include changes related to an Ability, Bonus or Fury. If the Ability is blocked, CHARACTERs Damage is that shown on their card.
+
+Copy: Opp. Power
+CHARACTER has equal Power to their opponent. This number only takes into account the figure shown on the opponents card and does not include changes connected to an Ability or a Bonus. If the Ability is blocked, the characters Power is equal to that shown on their card.
+
+Copy: Power and Damage opp.
+CHARACTER has equal Power and Damage to their opponent. This number only takes into account the figure shown on the opponents card and does not include changes connected to an Ability or a Bonus. If the Ability is blocked, the characters Power and Damage is equal to that shown on their card.
+
+Counter-attack
+The player who has CHARACTER in their team always plays second in the fight. If both players have CHARACTER in their team, the order of play is decided in the usual way. (This will activate reprisal in your team and courage in your opponent's team for the entire fight).
+
+Courage: +X Life
+If CHARACTER is played first in the round and if CHARACTER wins the fight, the player controlling CHARACTER will receive X Life points at the end of the round.
+
+Courage: +X Atk per Pillz left
+When CHARACTER is played first in the round, the Attack points of CHARACTER are increased by X points for every currently remaining Pillz owned by the player controlling the character.
+
+Courage: +X life per dmg
+When CHARACTER is played first in the round, for each Damage inflicted by CHARACTER to the opponent at the end of a round, the player controlling CHARACTER wins X Life points at the end of the round.
+
+Courage: -X opp Pow. & Dam., min Y
+When CHARACTER is played first in the round, the opponents Power and Damage are reduced by X points or up to a minimum of Y.
+
+Courage: -X opp Power, min Y
+When CHARACTER is played first in the round, the Power of the opposing character is reduced by X points or up to a minimum of Y. If the opposing characters Power is lower than or equal to Y, then the Ability has no effect.
+
+Courage: -X opp. dmg, min Y
+If CHARACTER is played first in the round and loses their fight, the Damage inflicted on their owner will be reduced by X points or up to a minimum of Y. If the winning characters Damage points are lower than or equal to Y, then the Ability has no effect.
+
+Courage: Atk +X
+When CHARACTER is played first in the round, CHARACTERs Attack is increased by X points. When played second in the round, CHARACTERs Attack does not change.
+
+Courage: Bonus Protection
+If CHARACTER is played first in the round, their bonus cannot be blocked while the Protection Ability is activated. When CHARACTER is played second in the round, the Ability has no effect.
+
+Courage: Dmg +X
+When CHARACTER is played first in the round, CHARACTERs Damage is increased by X points. When played second in a round, CHARACTERs Damage is equal to the amount shown on the card.
+
+Courage: Power +X
+When played first in the round, CHARACTER's Power is increased by X. If CHARACTER is played second in the round, their Power is equal to the amount shown on the card.
+
+Courage: Power and Damage + X
+When CHARACTER is played first in the round, the Power and Damage of CHARACTER are increased by X. When played second in a round, CHARACTERs Power and Damage is equal to the amount shown on the card.
+
+Courage: Prot.: Power & Damage
+When CHARACTER is played first in the round, The Power and Damage of CHARACTER cannot be reduced by an opposing character while the Protection ability is activated.
+
+Courage: Stop Ability
+When CHARACTER is played first in the round, the opposing character's Ability  if they have one - will be cancelled. When CHARACTER is played second in the round, the Ability has no effect.
+
+Courage: Stop Bonus
+When CHARACTER is played first in the round, the opposing character's Clan Bonus - if activated - will be cancelled. When CHARACTER is played second in the round, the Ability has no effect.
+
+Courage; -X opp Pillz. min Y
+If CHARACTER is played first in the round and if CHARACTER wins the fight, the number of Pillz of the player controlling the opposing character will be reduced by X Pillz, or up to a minimum of Y. If the number of Pillz of the player controlling the opposing character is lower than or equal to Y, then the ability will have no effect.
+
+Damage +X
+CHARACTERs Damage points are increased by X points. (Remember: Damage points are inflicted on your opponent if you win the round)
+
+Day: Confidence: +X Life per Damage
+For each Damage inflicted by CHARACTER to the opponent at the end of a round, the player controlling the character will win X Life points at the end of the round. This effect is active only if one of your characters won the precedent round.
+
+Day: Stop Opp. Bonus
+The opponents clan Bonus, if activated, is cancelled. If the opponent's clan Bonus is not activated, then the ability has no effect.
+
+Defeat : Heal X max. Y
+If CHARACTER loses the round, at the end of each of the following rounds the player controlling CHARACTER will earn X Life point(s) if he/she has fewer than Y Life points. If the player controlling CHARACTER has Y life points or more, the Heal effect is not triggered.
+
+Defeat: + X Life
+If CHARACTER loses the fight, the player controlling CHARACTER will win X Life points at the end of the round.
+
+Defeat: + X Pillz
+If CHARACTER loses the fight, the player controlling CHARACTER will win X Pillz at the end of the round.
+
+Defeat: + X Pillz max. Y
+If CHARACTER loses the fight, the player controlling CHARACTER will win X Pillz at the end of the round up to a maximum of Y.
+
+Defeat: +X Life, Max. Y
+If CHARACTER loses the fight, the player controlling CHARACTER will win X Life points at the end of the round up to a maximum of Y.
+
+Defeat: -X opp. life, min Y
+If CHARACTER loses the fight, the number of Life points of the player controlling the opposing character will be reduced by X, or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect.
+
+Defeat: -X opp. Pillz, min Y
+If CHARACTER loses the fight, the number of Pillz of the player controlling the opposing character will be reduced by X Pillz, or up to a minimum of Y. If the number of Pillz of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect.
+
+Defeat: Equalizer: +X Life
+If CHARACTER loses the fight, the player controlling CHARACTER will win X Life points at the end of the round. This effect is multiplied by the level (number of stars) of the opponent's card it is up against.
+
+Defeat: Growth: -X opp. life, min Y
+In the event of a loss by CHARACTER, the life points of the player controlling CHARACTER decrease by X multiplied by the number of the round in which CHARACTER has lost up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect.
+
+Defeat: Poison X, min Y
+If CHARACTER loses the fight, at the end of each of the following rounds the number of Life points of the player controlling the opposing character will be reduced by X, or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect.
+
+Defeat: recover X Pillz out of Y
+If CHARACTER loses the fight, at the start of the next round the player controlling CHARACTER will receive X/Y of the Pillz placed on CHARACTER, rounded down to the nearest unit, with a minimum of 1.
+
+Defeat: Regen X, max Y
+If CHARACTER loses the round, the player controlling CHARACTER will win X Life points, maximum Y. The effect will be felt at the end of each of the following rounds. (If two heal or regens are applied, the second will replace the first as soon as the latter takes effect).
+
+Dope X, max. Y
+If CHARACTER wins the round, the opponent controlling CHARACTER will win X Pillz, maximum Y. The effect will be felt at the end of each of the following rounds. (If two Dope are applied, the second will replace the first as soon as the latter takes effect).
+
+Equalizer: +X Life
+If CHARACTER wins the fight, the player controlling CHARACTER will win X Life points at the end of the round. This effect is multiplied by the level (number of stars) of the opponent's card it is up against.
+
+Equalizer: - X opp. Life min Y
+If CHARACTER wins the fight, the number of Life points of the player controlling the opposing character will be reduced by X, or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect. This effect is multiplied by the level (number of stars) of the opponent's card it is up against.
+
+Equalizer: -X opp Damage, min Y
+If CHARACTER loses their fight, the Damage inflicted on CHARACTERs owner will be reduced by X points or up to a minimum of Y. If the winning characters Damage points are lower than or equal to Y, then the Ability has no effect. This effect is multiplied by the level (number of stars) of the opponent's card it is up against.
+
+Equalizer: -X opp Power, min Y
+The Power of the opposing character is reduced by X points or up to a minimum of Y. If the opposing characters Power is lower than or equal to Y, then the Ability has no effect. This effect is multiplied by the level (number of stars) of the opponent's card it is up against.
+
+Equalizer: Damage +X
+CHARACTERs Damage points are increased by X points. (Remember: Damage points are inflicted on your opponent if you win the round). This effect is multiplied by the level (number of stars) of the opponent's card it is up against.
+
+Equalizer: Power +X
+CHARACTERs Power is increased by X points. (Remember: Power * Pillz = Attack). This effect is multiplied by the level (number of stars) of the opponent's card it is up against.
+
+Equalizer: Power and Damage +X
+The Power and Damage of CHARACTER are increased by X.. (Remember: Power * Pillz = Attack). This effect is multiplied by the level (number of stars) of the opponent's card it is up against.
+
+Growth : Power & Damage +X
+CHARACTERs Power and Damage points increases by X extra point(s) with each Round. (This increase corresponds to the number of the round being played multiplied by X)
+
+Growth: +X Life
+If CHARACTER wins the fight, the player controlling CHARACTER will win X Life points multiplied by the number of the round in which CHARACTER has won.
+
+Growth: +X Pillz
+In the event of a win by CHARACTER, the pillz counter of the player controlling CHARACTER increases by X multiplied by the number of the round in which CHARACTER has won.
+
+Growth: - X opp. Life min Y
+If CHARACTER wins the fight, the number of Life points of the player controlling the opposing character will be reduced by X multiplied by the number of the round in which CHARACTER has won, or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect.
+
+Growth: -X opp Attack, min Y
+The opponents Attack points are reduced by X extra points with each Round up to a minimum of Y. (This increase corresponds to the number of the round being played multiplied by X)
+
+Growth: -X opp Damage, min Y
+The opponents Damage are reduced by X extra points with each Round up to a minimum of Y. (This increase corresponds to the number of the round being played multiplied by X)
+
+Growth: -X opp Pillz. min Y
+In the event of a win by CHARACTER, the pillz counter of the opposing player decreases by X multiplied by the number of the round in which CHARACTER has won.
+
+Growth: -X opp Power, min Y
+The Power of the opposing character is reduced by X extra point(s) with each Round. (This increase corresponds to the number of the round being played multiplied by X)
+
+Growth: Attack +X
+CHARACTER's Attack points are increased by X extra points with each Round. (This increase corresponds to the number of the round being played multiplied by X)
+
+Growth: Damage +X
+CHARACTERs Damage points increases by X extra point(s) with each Round. (This increase corresponds to the number of the round being played multiplied by X)
+
+Growth: Heal X max. Y
+If CHARACTER wins the round, at the end of each of the following rounds the player controlling CHARACTER will earn X Life point(s) multiplied by the number of the round in which CHARACTER has won. If the player controlling CHARACTER has Y life points or more, the Heal effect is not triggered.
+
+Growth: Poison X, min Y
+If CHARACTER wins the round, at the end of each of the following turns the opponent will lose X life points multiplied by the number of the round in which CHARACTER has won. If the opponent has Y or less Life point(s), the poison effect is not triggered.
+
+Growth: Power +X
+CHARACTERs Power increases by X extra point(s) with each Round. (This increase corresponds to the number of the round being played multiplied by X)
+
+Growth: Regen X, max. Y
+If CHARACTER wins the round, the player controlling CHARACTER will win X Life points, maximum Y, multiplied by the number of the round in which CHARACTER has won. The effect will be felt at the end of each of the following rounds. (If two heal or regens are applied, the second will replace the first as soon as the latter takes effect).
+
+Growth: Toxin X, min Y
+If CHARACTER wins the round, your opponent will lose X Life points, minimum Y, multiplied by the number of the round in which CHARACTER has won. This effect will be felt at the end of each of the following rounds. (If two poisons or toxins are applied, the second will replace the first as soon as the latter takes effect).
+
+Heal X max. Y
+If CHARACTER wins the round, at the end of each of the following rounds the player controlling CHARACTER will earn X Life point(s) if he/she has fewer than Y Life points. If the player controlling CHARACTER has Y life points or more, the Heal effect is not triggered.
+
+Infection X, min Y
+If CHARACTER wins the fight, at the end of each of the following rounds the number of Life points of the player controlling CHARACTER will be reduced by X, or up to a minimum of Y. If the number of Life points of the player controlling CHARACTER is lower than or equal to Y, then the ability will have no effect.
+
+Killshot: +X Life
+If the Attack of CHARACTER is equal or higher than the double of the opposing character's attack and if CHARACTER wins the round, the player controlling the character will win X Life points
+
+Killshot: +X Life max. Y
+If the Attack of CHARACTER is equal or higher than the double of the opposing character's attack, the player controlling the character will win X Life points until he reaches a total of Y Life points at the end of the round.
+
+Killshot: -X opp. Life min Y
+If the Attack of CHARACTER is equal or higher than the double of the opposing character's attack and if CHARACTER wins the round, the number of Life points of the player controlling the opposing character will be reduced by X, or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect.
+
+No ability
+
+
+Nuke
+The damage of all the cards in play cannot be reduced (as if every card in play had the Protection: Damage ability).
+
+Poison X, min Y
+If CHARACTER wins the round, at the end of each of the following turns the opponent will lose X Life point(s) if he/she has more than Y Life point(s). If the opponent has Y or less Life point(s), the poison effect is not triggered.
+
+Power +X
+CHARACTERs Power is increased by X points. (Remember: Power * Pillz = Attack)
+
+Power and Damage + X
+The Power and Damage of CHARACTER are increased by X.
+
+Protection : Damage
+The Damage of CHARACTER cannot be reduced by an opposing character while the Protection ability is activated.
+
+Protection: Attack
+The attack of CHARACTER cannot be reduced by an opposing character so long as the Protection ability is activated.
+
+Protection: Bonus
+The Bonus of CHARACTER can not be blocked while the Ability Protection Bonus is activated.
+
+Protection: Power
+The Power of CHARACTER cannot be reduced by an opposing character while the Protection ability is activated.
+
+Protection: Power and Damage
+The Power and Damage of CHARACTER cannot be reduced by an opposing character while the Protection ability is activated.
+
+Regen X, max. Y
+If CHARACTER wins the round, the player controlling CHARACTER will win X Life points, maximum Y. The effect will be felt at the end of each of the following rounds. (If two heal or regens are applied, the second will replace the first as soon as the latter takes effect).
+
+Reprisal : -X opp. life, min Y
+When CHARACTER is played second in the round and if CHARACTER wins his fight, the number of Life points of the player controlling the opposing character will be reduced by X, or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect.
+
+Reprisal: +X Atk per Life left
+When CHARACTER is played second in the round, the Attack points of CHARACTER are increased by X points for every remaining Life point owned by the player controlling the character.
+
+Reprisal: +X Life per Damage
+When CHARACTER is played second in the round, for each Damage inflicted by CHARACTER to the opponent at the end of a round, the player controlling the character will win X Life points at the end of the round.
+
+Reprisal: -X opp Damage, min Y
+When CHARACTER is played second in the round, if CHARACTER loses their fight, the Damage inflicted on CHARACTERs owner will be reduced by X points or up to a minimum of Y. If the winning characters Damage points are lower than or equal to Y, then the Ability has no effect.
+
+Reprisal: -X opp Pow. & Dmg,min Y
+When CHARACTER is played second in the round, the opponents Power and Damage are reduced by X points or up to a minimum of Y.
+
+Reprisal: -X opp Power, min Y
+When CHARACTER is played second in the round, the Power of the opposing character is reduced by X points or up to a minimum of Y. If the opposing characters Power is lower than or equal to Y, then the Ability has no effect.
+
+Reprisal: Attack +X
+When CHARACTER is played second in the round, CHARACTER's Attack points are increased by X points. (Remember: Power * Pillz = Attack)
+
+Reprisal: Copy Opp. Bonus
+When CHARACTER is played second in the round, when CHARACTER is engaged in combat with another character, his Copy: Bonus ability is replaced by his opponent's Bonus. If the opponents Bonus is not activated, then this ability has no effect.
+
+Reprisal: Damage +X
+When CHARACTER is played second in the round, the Damage of CHARACTER are increased by X points.
+
+Reprisal: Damage = Damage opp.
+When CHARACTER is played second in the round, CHARACTER has the same number of Damage points as their opponent. This number only takes into account the figure shown on the opponents card and does not include changes related to an Ability, Bonus or Fury. If the Ability is blocked, CHARACTERs Damage is that shown on their card.
+
+Reprisal: Power +X
+When CHARACTER is played second in the round, the Power of CHARACTER will be increased by X.
+
+Reprisal: Power = Power opp
+When CHARACTER is played second in the round, CHARACTER has equal Power to their opponent. This number only takes into account the figure shown on the opponents card and does not include changes connected to an Ability or a Bonus. If the Ability is blocked, the characters Power is equal to that shown on their card.
+
+Reprisal: Power and Damage +X
+When CHARACTER is played second in the round, the Power and Damage of CHARACTER will be increased by X.
+
+Reprisal: Protect. Power and Damage
+When CHARACTER is played second in the round, the Power and Damage of CHARACTER cannot be altered by an opposing character while the Protection ability is activated.
+
+Reprisal: Stop Opp. Ability
+When CHARACTER is played second in the round, the opponents Ability is cancelled if they have one.
+
+Reprisal: Stop Opp. Bonus
+When CHARACTER is played second in the round, the opponents clan Bonus, if activated, is cancelled. If the opponent's clan Bonus is not activated, then the ability has no effect.
+
+Revenge : +X life
+If a character belonging to the same team asCHARACTER loses a round and if CHARACTER wins the following round, the player controlling CHARACTER will winX Life points at the end of the round.
+
+Revenge: +X Atk per Life left
+If a character belonging to the same team as CHARACTER loses a round, in the next round, the Attack points of CHARACTER are increased by X points for every remaining Life point owned by the player controlling the character.
+
+Revenge: -X opp Attack, min Y
+If a character belonging to the same team as CHARACTER loses a round, in the next round the opponents Attack points are reduced by X points or up to a minimum of Y. If the opponents number of Attack points are lower or equal to Y, then the ability has no effect.
+
+Revenge: -X opp Pow. & Dmg,min Y
+If a character belonging to the same team as CHARACTER loses a round, in the next round, the opponents Power and Damage are reduced by X points or up to a minimum of Y.
+
+Revenge: -X opp. Life, min Y
+If a character belonging to the same team as CHARACTER loses a round and if CHARACTER wins his fight, the number of Life points of the player controlling the opposing player will be reduced by X or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower or equal to Y, then the ability has no effect.
+
+Revenge: -X opp. power, min Y
+If a character belonging to the same team as CHARACTER loses a round, in the next round the Power of the opposing character is reduced by X points or up to a minimum of Y. If the opposing characters Power is lower than or equal to Y, then the Ability has no effect.
+
+Revenge: Attack +X
+If a character belonging to the same team as CHARACTER loses a round, in the next round the Attack of CHARACTER will be increased to X
+
+Revenge: Copy Opp. Bonus
+If a character belonging to the same team as CHARACTER loses a round, in the next round, when CHARACTER is engaged in combat with another character, his Copy: Bonus ability is replaced by his opponent's Bonus. If the opponents Bonus is not activated, then this ability has no effect.
+
+Revenge: Damage +X
+If a character belonging to the same team as CHARACTER loses a round, in the next round the Damage of CHARACTER will be increased to X
+
+Revenge: Poison X, min Y
+If a character belonging to the same team as CHARACTER loses a round, if CHARACTER wins the round, at the end of each of the following turns the opponent will lose X Life point(s) if he/she has more than Y Life point(s). If the opponent has Y or less Life point(s), the poison effect is not triggered.
+
+Revenge: Power +X
+If a character belonging to the same team as CHARACTER loses a round, in the next round the Ability of CHARACTER will be increased to X
+
+Revenge: Power and Damage +X
+If a character belonging to the same team as CHARACTER loses a round, in the next round, the Power and Damage of CHARACTER will be increased by X.
+
+Revenge: Protec. Power and Dmg
+If a character belonging to the same team asCHARACTER loses a round and if CHARACTER wins the following round, the Power and Damage of CHARACTER cannot be altered by an opposing character while the Protection ability is activated.
+
+Revenge: Stop Ability
+If a character belonging to the same team as CHARACTER loses a round, in the next round the Ability of CHARACTER opponent will be cancelled, if he has one.
+
+Revenge: Stop Bonus
+If a character belonging to the same team as CHARACTER loses a round, in the next round the Bonus of CHARACTER opponent will be cancelled, if he has one.
+
+Stop : - X opp. life, min Y
+If CHARACTER'S ability is cancelled by the opposing character and if CHARACTER wins his/her fight, the number of Life points of the player controlling the opposing character is reduced by X up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, then the ability has no effect.
+
+Stop : -X opp Power, min Y
+If CHARACTERs ability is cancelled out by the opposing character, the Power of the opposing character is reduced by X points or up to a minimum of Y. If the opposing characters Power is lower than or equal to Y, then the Ability has no effect.
+
+Stop Opp. Ability
+The opponents Ability is cancelled if they have one.
+
+Stop Opp. Bonus
+The opponents clan Bonus, if activated, is cancelled. If the opponent's clan Bonus is not activated, then the ability has no effect.
+
+Stop: +X Life
+If CHARACTERS ability is cancelled by the opposing character and if CHARACTER wins his/her fight, the player controlling CHARACTER wins X Life points at the end of the round.
+
+Stop: +X life per dmg.
+If CHARACTER'S ability is cancelled by the opposing character, for each Damage inflicted by CHARACTER to the opposing player at the end of a round, the player controlling CHARACTER wins X Life points at the end of the round.
+
+Stop: +X Pillz
+If CHARACTERS ability is cancelled by the opposing character and ifCHARACTER wins his/her fight, the player controlling CHARACTER receives X Pillz at the beginning of the next round.
+
+Stop: -X opp Pow. & Dmg,min Y
+If CHARACTERs ability is cancelled out by the opposing character, The opponents Power and Damage are reduced by X points or up to a minimum of Y.
+
+Stop: -X opp. dmg, min Y
+If CHARACTERS ability is cancelled by the opposing character and if CHARACTER loses his/her fight, the Damage inflicted on his/her owner will be reduced by X points up to a minimum of Y. If the winning characters Damage points are lower than or equal to Y, then the ability has no effect.
+
+Stop: -X Pillz opp. min Y
+If CHARACTER'S ability is cancelled by the opposing character and if CHARACTER wins his/her fight, the number of Pillz of the player controlling the opposing character is reduced by X Pillz up to a minimum of Y. If the number of Pillz of the player controlling the opposing character is lower than or equal to Y, then the ability has no effect.
+
+Stop: Atk. +X
+If CHARACTERS ability is cancelled by the opposing character, CHARACTER'S attack is increased by X points.
+
+Stop: Damage +X
+If CHARACTERS ability is cancelled by the opposing character, CHARACTER'S damage is increased by X points.
+
+Stop: Heal X max. Y
+If CHARACTERs ability is cancelled out by the opposing character, If CHARACTER wins the round, at the end of each of the following rounds the player controlling CHARACTER will earn X Life point(s) if he/she has fewer than Y Life points. If the player controlling CHARACTER has Y life points or more, the Heal effect is not triggered.
+
+Stop: Poison X, min Y
+If CHARACTER'S ability is cancelled by the opposing character and if CHARACTER wins the round, at the end of each of the following turns the opponent will lose X Life point(s) if he/she has more than Y Life point(s). If the opponent has Y or less Life point(s), the poison effect is not triggered.
+
+Stop: Power +X
+If CHARACTERS ability is cancelled by the opposing character, CHARACTER'S power is increased by X points.
+
+Stop: Power and Damage +X
+If CHARACTERs ability is cancelled out by the opposing character, the Power and Damage of CHARACTER are increased by X.
+
+Support: + X Pillz
+If CHARACTER wins the fight, the player controlling CHARACTER will receive X pillz at the start of the next round for each character in their team belonging to the same clan as CHARACTER. Remember that is also taken into account.
+
+Support: +X Life
+If CHARACTER wins the fight, the player controlling CHARACTER will receive X Life points at the end of the round for each character in their team belonging to the same clan as CHARACTER. Remember that CHARACTER is also taken into account.
+
+Support: -X opp Attack, min Y
+The opponents Attack points are reduced by X points or up to a minimum of Y for each character in their team belonging to the same clan as CHARACTER. Remember that CHARACTER is also taken into account. If the opponents number of Attack points are lower or equal to Y, then the ability has no effect.
+
+Support: -X opp Damage, min Y
+If CHARACTER loses their fight, the Damage inflicted on CHARACTERs owner will be reduced by X points or up to a minimum of Y for each character belonging to CHARACTER's clan and who is part of their team. Remember that CHARACTER is also taken into account. If the winning characters Damage points are lower than or equal to Y, then the Ability has no effect.
+
+Support: -X opp Power, min Y
+The Power of the opposing character is reduced by X points or up to a minimum of Y for each character belonging to CHARACTER's clan and who is part of their team. Remember that CHARACTER is also taken into account. If the opposing characters Power is lower than or equal to Y, then the Ability has no effect.
+
+Support: -X opp. Life, min Y
+If CHARACTER wins their fight, the number of Life points of the player controlling the opposing character is reduced by X up to a minimum of Y for each character belonging to CHARACTERs clan and who is also part of their team. Remember that CHARACTER is also taken into account. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, then the ability has no effect.
+
+Support: Attack +X
+CHARACTERs attack points are increased by X points for each character belonging to CHARACTERs clan and who is part of their team. Remember that CHARACTER is also taken into account.
+
+Support: Damage +X
+CHARACTER's damage points are increased by X points for each character belonging to CHARACTER's clan and who is part of their team. Remember that CHARACTER is also taken into account.
+
+Support: Power +X
+CHARACTER's power is increased by X point(s) for each character belonging to CHARACTER's clan and who is also part of their team. Remember that CHARACTER is also taken into account.
+
+Support: Reanimate: +X Life
+If CHARACTER loses the fight, the player controlling CHARACTER will win X Life points at the end of the round for each character in their team belonging to the same clan as CHARACTER. Remember that CHARACTER is also taken into account. This ability is able to prevent you from going KO.
+
+Team: +X Attack
+All the characters in CHARACTERs team get X Attack points. (Remember: Power * Pillz = Attack)
+
+Team: +X Damage
+All the characters in CHARACTERs team win X Damage point.
+
+Team: -X opp. damage, min Y
+If one of the characters loses their fight, the Damage inflicted on CHARACTERs owner will be reduced by X points or up to a minimum of Y. If the winning characters Damage points are lower than or equal to Y, then the Ability has no effect.
+
+Team: -X opp. power, min Y
+The Power of the opposing character is reduced by X points or up to a minimum of Y. If the opposing characters Power is lower than or equal to Y, then the Ability has no effect.
+
+Team: Courage, Power +X, max. Y
+All the characters in CHARACTERs team receive the Courage, Power +X ability. When they are played first in a round, their Power is increased by X points, to a maximum of 10 points.
+
+Team: Defeat: Rec. X Pillz out of Y
+If one of your characters loses the fight, at the start of the next round the player controlling the character will receive X/Y of the Pillz placed on CHARACTER, rounded down to the nearest unit, with a minimum of 1.
+
+Team: Reprisal: -X Pow. & Dmg, min Y
+All the characters in CHARACTERs team receive the " Reprisal: -X Opponent Power & Damage minimum Y " ability. When they are played second in the round, the opponents Power and Damage are reduced by X points or down to a minimum of Y.
+
+Team: XP +X0%
+The Experience points won during the fight by each character in CHARACTERs team are increased by X0%.
+
+Tie-break
+During the entire fight, if your attack is equal to your opponents, you will always win the round. If your and your opponents Life points are equal at the end of the fight, you will win the fight. (These effects are cancelled out if your opponent also has CHARACTER)
+
+Toxin X, min Y
+If CHARACTER wins the round, your opponent will lose X Life points, minimum Y. This effect will be felt at the end of each of the following rounds. (If two poisons or toxins are applied, the second will replace the first as soon as the latter takes effect).
+
+Vict. or Def.: -X opp Life & Pillz min Y
+If CHARACTER wins or loses the fight, the number of Life points & Pillz of the player controlling the opposing character will be reduced by X, or up to a minimum of Y. If the number of Life points / Pillz of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect.
+
+Victory or Defeat : +X Life
+If CHARACTER wins or loses the fight, the player controlling CHARACTER will receive X Life at the end of the round.
+
+Victory or Defeat : +X pillz
+If CHARACTER wins or loses the fight, the player controlling CHARACTER will receive X Pillz at the end of the round.
+
+Victory or Defeat: - X opp. Life min Y
+If CHARACTER wins or loses the fight, the number of Life points of the player controlling the opposing character will be reduced by X, or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect.
+
+Xantiax: -X Life, min. Y
+Whether the character wins or loses the round, the two competing players lose X life point(s) or up to a minimum of Y life point(s).
+
+Cancel Leader
+Your Leader Bonuses are deactivated if you have more than one Leader in your team.
+
+Day: Power and Damage + X
+The Power and Damage of CHARACTER are increased by X.
+
+Equalizer: -X opp Attack, min Y
+The opponents Attack points are reduced by X points or up to a minimum of Y. If the opponents number of Attack points are lower or equal to Y, then the ability has no effect. This effect is multiplied by the level (number of stars) of the opponent's card it is up against.
+
+Protection: Ability
+The Ability of CHARACTER can not be blocked while the Protection: Ability Bonus is activated.

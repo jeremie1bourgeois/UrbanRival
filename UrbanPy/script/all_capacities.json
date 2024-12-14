@@ -1,0 +1,797 @@
+{
+    "capacity": [
+        {
+            "description": "+X Atk per Pillz left",
+            "explanation": "The Attack points of CHARACTER are increased by X points for every currently remaining Pillz owned by the player controlling the character at the beginning of the round."
+        },
+        {
+            "description": "+X Attack per Life left",
+            "explanation": "The Attack points of CHARACTER are increased by X points for every remaining Life point owned by the player controlling the character."
+        },
+        {
+            "description": "+X Life",
+            "explanation": "If CHARACTER wins the fight, the player controlling CHARACTER will win X Life points at the end of the round."
+        },
+        {
+            "description": "+X Life per Damage",
+            "explanation": "For each Damage inflicted by CHARACTER to the opponent at the end of a round, the player controlling the character will win X Life points at the end of the round."
+        },
+        {
+            "description": "+X Life per Damage max. Y",
+            "explanation": "For each Damage inflicted by CHARACTER to the opponent at the end of a round, the player controlling the character will win X Life points until he reaches a total of Y Life points at the end of the round."
+        },
+        {
+            "description": "+X Life per round",
+            "explanation": "At the start of each round after the first one, the player with CHARACTER in their team receives one extra Life point."
+        },
+        {
+            "description": "+X Pillz",
+            "explanation": "If CHARACTER wins the fight, the player controlling CHARACTER will receive X Pillz at the beginning of the next round."
+        },
+        {
+            "description": "+X Pillz and Life",
+            "explanation": "If CHARACTER wins the fight, the player controlling CHARACTER will win X Life points & X Pillz at the end of the round."
+        },
+        {
+            "description": "+X Pillz max. Y",
+            "explanation": "If CHARACTER wins the fight, the player controlling CHARACTER will receive X Pillz at the beginning of the next round up to a maximum of Y."
+        },
+        {
+            "description": "+X Pillz per Damage",
+            "explanation": "For each Damage inflicted by CHARACTER to the opponent at the end of a round, the player controlling the character will receive X Pillz at the beginning of the next round."
+        },
+        {
+            "description": "+X Pillz per round, max. Y",
+            "explanation": "At the start of each round, after the first one, the player with CHARACTER in their team receives one extra Pillz up to a maximum of Y."
+        },
+        {
+            "description": "- X opp. Life min Y",
+            "explanation": "If CHARACTER wins the fight, the number of Life points of the player controlling the opposing character will be reduced by X, or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect."
+        },
+        {
+            "description": "-X opp Att. per Life left, min Y",
+            "explanation": "The opponents Attack points are reduced by X points for every remaining Life point owned by the player controlling the character, or up to a minimum of Y. If the opponents number of Attack points are lower or equal to Y, then the ability has no effect."
+        },
+        {
+            "description": "-X opp Att. per Pillz left, min Y",
+            "explanation": "The opponents Attack points are reduced by X points for every remaining Pillz owned by the player controlling the character, or up to a minimum of Y. If the opponents number of Attack points are lower or equal to Y, then the ability has no effect."
+        },
+        {
+            "description": "-X opp Attack, min Y",
+            "explanation": "The opponents Attack points are reduced by X points or up to a minimum of Y. If the opponents number of Attack points are lower or equal to Y, then the ability has no effect."
+        },
+        {
+            "description": "-X opp Damage, min Y",
+            "explanation": "If CHARACTER loses their fight, the Damage inflicted on CHARACTERs owner will be reduced by X points or up to a minimum of Y. If the winning characters Damage points are lower than or equal to Y, then the Ability has no effect."
+        },
+        {
+            "description": "-X opp Pillz. min Y",
+            "explanation": "If CHARACTER wins the fight, the number of Pillz of the player controlling the opposing character will be reduced by X Pillz, or up to a minimum of Y. If the number of Pillz of the player controlling the opposing character is lower than or equal to Y, then the ability will have no effect."
+        },
+        {
+            "description": "-X opp Pow. and Damage, min Y",
+            "explanation": "The opponents Power and Damage are reduced by X points or up to a minimum of Y."
+        },
+        {
+            "description": "-X opp Power, min Y",
+            "explanation": "The Power of the opposing character is reduced by X points or up to a minimum of Y. If the opposing characters Power is lower than or equal to Y, then the Ability has no effect.",
+			"object": {
+					"target": "enemy",
+					"type": "power",
+					"value": -2,
+					"how": "",
+					"borne": 1,
+					"condition_effect": "",
+					"lvl_priority": 0
+				}
+        },
+        {
+            "description": "-X opp. Pillz, per round, min Y",
+            "explanation": "At the start of each round, after the first round, the opponent loses X Pillz up to a minimum of Y."
+        },
+        {
+            "description": "Attack +X",
+            "explanation": "CHARACTER's Attack points are increased by X points. (Remember: Power * Pillz = Attack)"
+        },
+        {
+            "description": "Backlash: - X Life min Y",
+            "explanation": "If CHARACTER wins the round, the number of Life points of the player controlling CHARACTER will be reduced by X, or up to a minimum of Y. If the number of Life points of the player controlling CHARACTER is lower than or equal to Y, then the ability will have no effect."
+        },
+        {
+            "description": "Backlash: - X Pillz min Y",
+            "explanation": "If CHARACTER wins the round, the number of Pillz of the player controlling CHARACTER will be reduced by X, or up to a minimum of Y. If the number of Pillz of the player controlling CHARACTER is lower than or equal to Y, then the ability will have no effect."
+        },
+        {
+            "description": "Cancel opp. Attack Modif.",
+            "explanation": "Any modifier of the opposing character affecting attack will be deactivated. This applies to attack reductions AND increases. This effect is not a Stop Ability or a Stop Bonus. Please not that the attack gained by your opponent through playing Pillz does not constitute a modification."
+        },
+        {
+            "description": "Cancel opp. Damage Modif.",
+            "explanation": "Any modifier of the opposing character affecting Damage will be deactivated. This applies to Damage reductions AND increases. This effect is not a Stop Ability or a Stop Bonus."
+        },
+        {
+            "description": "Cancel opp. Life Modif.",
+            "explanation": "Any modifier of the opposing character affecting life will be deactivated. This applies to life reductions AND increases. This effect is not a Stop Ability or a Stop Bonus. The effects of your opponents poison and heal abilities will be deactivated for the round in which the cancel opponent life modification is activated. These effects will then be reactivated for the following rounds."
+        },
+        {
+            "description": "Cancel opp. Pillz & Life Modif.",
+            "explanation": "Any of your opponent's abilities or bonuses that alter Pillz and/or Life will be cancelled. This applies to reductions AND increases in Pillz / Life. This effect is not a Stop Ability or a Stop Bonus. The effects of your opponents poison and heal abilities will be deactivated for the round in which the cancel opponent life modification is activated. These effects will then be reactivated for the following rounds."
+        },
+        {
+            "description": "Cancel opp. Pillz Modif.",
+            "explanation": "Any of your opponent's abilities or bonuses that alter Pillz will be cancelled. This applies to reductions AND increases in Pillz."
+        },
+        {
+            "description": "Cancel opp. Power and Damage Modif.",
+            "explanation": "Any modifier of the opposing character affecting Damage and/or Power will be deactivated. This applies to Damage/Power reductions AND increases. This effect is not a Stop Ability or a Stop Bonus."
+        },
+        {
+            "description": "Cancel opp. Power Modif.",
+            "explanation": "Any modifier of the opposing character affecting power will be deactivated. This applies to power reductions AND increases. This effect is not a Stop Ability or a Stop Bonus."
+        },
+        {
+            "description": "Confidence : +X life",
+            "explanation": "If a character belonging to the same team as CHARACTER wins a round and if CHARACTER wins the following round, the player controlling CHARACTER will win X Life points at the end of the round."
+        },
+        {
+            "description": "Confidence : -X opp. attack, min Y",
+            "explanation": "If a character belonging to the same team as CHARACTER wins a round, in the next round, the Attack of the opposing character is reduced by X points or up to a minimum of Y. If the opposing characters Attack is lower than or equal to Y, then the Ability has no effect."
+        },
+        {
+            "description": "Confidence : -X opp. power, min Y",
+            "explanation": "If a character belonging to the same team as CHARACTER wins a round, in the next round, the Power of the opposing character is reduced by X points or up to a minimum of Y. If the opposing characters Power is lower than or equal to Y, then the Ability has no effect."
+        },
+        {
+            "description": "Confidence: +X Atk per Life left",
+            "explanation": "If a character belonging to the same team as CHARACTER wins a round, in the next round, the Attack points of CHARACTER are increased by X points for every remaining Life point owned by the player controlling the character."
+        },
+        {
+            "description": "Confidence: +X life per dmg.",
+            "explanation": "If a character belonging to the same team as CHARACTER wins a round, in the next round the player controlling CHARACTER will win X Life points for each Damage inflicted by CHARACTER to the opposing player"
+        },
+        {
+            "description": "Confidence: +X Pillz",
+            "explanation": "If a character belonging to the same team as CHARACTER wins a round, if CHARACTER wins the fight, the player controlling CHARACTER will receive X Pillz at the beginning of the next round."
+        },
+        {
+            "description": "Confidence: -X opp Damage, min Y",
+            "explanation": "If a character belonging to the same team as CHARACTER wins a round and if CHARACTER loses the following round, the Damage inflicted to CHARACTER owner will be reduced by X points or up to a minimum of Y. If the winning characters Damage points are lower than or equal to Y, then the Ability has no effect."
+        },
+        {
+            "description": "Confidence: -X opp. Life, min Y",
+            "explanation": "If a character belonging to the same team as CHARACTER wins a round, in the next round if CHARACTER wins his fight, the number of Life points of the player controlling the opposing player will be reduced by X or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower or equal to Y, then the ability has no effect."
+        },
+        {
+            "description": "Confidence: Attack +X",
+            "explanation": "If a character belonging to the same team as CHARACTER wins a round, in the next round the Attack of CHARACTER will be increased to X"
+        },
+        {
+            "description": "Confidence: Damage +X",
+            "explanation": "If a character belonging to the same team as CHARACTER wins a round, in the next round Damage points of CHARACTER will be increased by X"
+        },
+        {
+            "description": "Confidence: Power +X",
+            "explanation": "If a character belonging to the same team as CHARACTER wins a round, in the next round the Power of CHARACTER will be increased by X"
+        },
+        {
+            "description": "Confidence: Power = Power opp",
+            "explanation": "If a character belonging to the same team as CHARACTER wins a round, CHARACTER has equal Power to their opponent. This number only takes into account the figure shown on the opponents card and does not include changes connected to an Ability or a Bonus. If the Ability is blocked, the characters Power is equal to that shown on their card."
+        },
+        {
+            "description": "Confidence: Power and Damage +X",
+            "explanation": "If a character belonging to the same team as CHARACTER wins a round, in the next round, the Power and Damage of CHARACTER will be increased by X."
+        },
+        {
+            "description": "Confidence: Stop Ability",
+            "explanation": "If a character belonging to the same team as CHARACTER wins a round, in the next round the Ability of CHARACTER opponent will be cancelled, if he has one."
+        },
+        {
+            "description": "Confidence: Stop Opp. Bonus",
+            "explanation": "If a character belonging to the same team as CHARACTER wins a round, in the next round the opponents clan Bonus, if activated, is cancelled. If the opponent's clan Bonus is not activated, then the ability has no effect."
+        },
+        {
+            "description": "Consume X, min Y",
+            "explanation": "If CHARACTER wins the round, your opponent will lose X Pillz, minimum Y. This effect will be felt at the end of each of the following rounds. (If two Consume are applied, the second will replace the first as soon as the latter takes effect)."
+        },
+        {
+            "description": "Copy: Opp. Bonus",
+            "explanation": "When CHARACTER is engaged in combat with another character, his Copy: Bonus ability is replaced by his opponent's Bonus. If the opponents Bonus is not activated, then this ability has no effect."
+        },
+        {
+            "description": "Copy: Opp. Damage",
+            "explanation": "CHARACTER has the same number of Damage points as their opponent. This number only takes into account the figure shown on the opponents card and does not include changes related to an Ability, Bonus or Fury. If the Ability is blocked, CHARACTERs Damage is that shown on their card."
+        },
+        {
+            "description": "Copy: Opp. Power",
+            "explanation": "CHARACTER has equal Power to their opponent. This number only takes into account the figure shown on the opponents card and does not include changes connected to an Ability or a Bonus. If the Ability is blocked, the characters Power is equal to that shown on their card."
+        },
+        {
+            "description": "Copy: Power and Damage opp.",
+            "explanation": "CHARACTER has equal Power and Damage to their opponent. This number only takes into account the figure shown on the opponents card and does not include changes connected to an Ability or a Bonus. If the Ability is blocked, the characters Power and Damage is equal to that shown on their card."
+        },
+        {
+            "description": "Counter-attack",
+            "explanation": "The player who has CHARACTER in their team always plays second in the fight. If both players have CHARACTER in their team, the order of play is decided in the usual way. (This will activate reprisal in your team and courage in your opponent's team for the entire fight)."
+        },
+        {
+            "description": "Courage: +X Life",
+            "explanation": "If CHARACTER is played first in the round and if CHARACTER wins the fight, the player controlling CHARACTER will receive X Life points at the end of the round."
+        },
+        {
+            "description": "Courage: +X Atk per Pillz left",
+            "explanation": "When CHARACTER is played first in the round, the Attack points of CHARACTER are increased by X points for every currently remaining Pillz owned by the player controlling the character."
+        },
+        {
+            "description": "Courage: +X life per dmg",
+            "explanation": "When CHARACTER is played first in the round, for each Damage inflicted by CHARACTER to the opponent at the end of a round, the player controlling CHARACTER wins X Life points at the end of the round."
+        },
+        {
+            "description": "Courage: -X opp Pow. & Dam., min Y",
+            "explanation": "When CHARACTER is played first in the round, the opponents Power and Damage are reduced by X points or up to a minimum of Y."
+        },
+        {
+            "description": "Courage: -X opp Power, min Y",
+            "explanation": "When CHARACTER is played first in the round, the Power of the opposing character is reduced by X points or up to a minimum of Y. If the opposing characters Power is lower than or equal to Y, then the Ability has no effect."
+        },
+        {
+            "description": "Courage: -X opp. dmg, min Y",
+            "explanation": "If CHARACTER is played first in the round and loses their fight, the Damage inflicted on their owner will be reduced by X points or up to a minimum of Y. If the winning characters Damage points are lower than or equal to Y, then the Ability has no effect."
+        },
+        {
+            "description": "Courage: Atk +X",
+            "explanation": "When CHARACTER is played first in the round, CHARACTERs Attack is increased by X points. When played second in the round, CHARACTERs Attack does not change."
+        },
+        {
+            "description": "Courage: Bonus Protection",
+            "explanation": "If CHARACTER is played first in the round, their bonus cannot be blocked while the Protection Ability is activated. When CHARACTER is played second in the round, the Ability has no effect."
+        },
+        {
+            "description": "Courage: Dmg +X",
+            "explanation": "When CHARACTER is played first in the round, CHARACTERs Damage is increased by X points. When played second in a round, CHARACTERs Damage is equal to the amount shown on the card."
+        },
+        {
+            "description": "Courage: Power +X",
+            "explanation": "When played first in the round, CHARACTER's Power is increased by X. If CHARACTER is played second in the round, their Power is equal to the amount shown on the card."
+        },
+        {
+            "description": "Courage: Power and Damage + X",
+            "explanation": "When CHARACTER is played first in the round, the Power and Damage of CHARACTER are increased by X. When played second in a round, CHARACTERs Power and Damage is equal to the amount shown on the card."
+        },
+        {
+            "description": "Courage: Prot.: Power & Damage",
+            "explanation": "When CHARACTER is played first in the round, The Power and Damage of CHARACTER cannot be reduced by an opposing character while the Protection ability is activated."
+        },
+        {
+            "description": "Courage: Stop Ability",
+            "explanation": "When CHARACTER is played first in the round, the opposing character's Ability  if they have one - will be cancelled. When CHARACTER is played second in the round, the Ability has no effect."
+        },
+        {
+            "description": "Courage: Stop Bonus",
+            "explanation": "When CHARACTER is played first in the round, the opposing character's Clan Bonus - if activated - will be cancelled. When CHARACTER is played second in the round, the Ability has no effect."
+        },
+        {
+            "description": "Courage; -X opp Pillz. min Y",
+            "explanation": "If CHARACTER is played first in the round and if CHARACTER wins the fight, the number of Pillz of the player controlling the opposing character will be reduced by X Pillz, or up to a minimum of Y. If the number of Pillz of the player controlling the opposing character is lower than or equal to Y, then the ability will have no effect."
+        },
+        {
+            "description": "Damage +X",
+            "explanation": "CHARACTERs Damage points are increased by X points. (Remember: Damage points are inflicted on your opponent if you win the round)"
+        },
+        {
+            "description": "Day: Confidence: +X Life per Damage",
+            "explanation": "For each Damage inflicted by CHARACTER to the opponent at the end of a round, the player controlling the character will win X Life points at the end of the round. This effect is active only if one of your characters won the precedent round."
+        },
+        {
+            "description": "Day: Stop Opp. Bonus",
+            "explanation": "The opponents clan Bonus, if activated, is cancelled. If the opponent's clan Bonus is not activated, then the ability has no effect."
+        },
+        {
+            "description": "Defeat : Heal X max. Y",
+            "explanation": "If CHARACTER loses the round, at the end of each of the following rounds the player controlling CHARACTER will earn X Life point(s) if he/she has fewer than Y Life points. If the player controlling CHARACTER has Y life points or more, the Heal effect is not triggered."
+        },
+        {
+            "description": "Defeat: + X Life",
+            "explanation": "If CHARACTER loses the fight, the player controlling CHARACTER will win X Life points at the end of the round."
+        },
+        {
+            "description": "Defeat: + X Pillz",
+            "explanation": "If CHARACTER loses the fight, the player controlling CHARACTER will win X Pillz at the end of the round."
+        },
+        {
+            "description": "Defeat: + X Pillz max. Y",
+            "explanation": "If CHARACTER loses the fight, the player controlling CHARACTER will win X Pillz at the end of the round up to a maximum of Y."
+        },
+        {
+            "description": "Defeat: +X Life, Max. Y",
+            "explanation": "If CHARACTER loses the fight, the player controlling CHARACTER will win X Life points at the end of the round up to a maximum of Y."
+        },
+        {
+            "description": "Defeat: -X opp. life, min Y",
+            "explanation": "If CHARACTER loses the fight, the number of Life points of the player controlling the opposing character will be reduced by X, or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect."
+        },
+        {
+            "description": "Defeat: -X opp. Pillz, min Y",
+            "explanation": "If CHARACTER loses the fight, the number of Pillz of the player controlling the opposing character will be reduced by X Pillz, or up to a minimum of Y. If the number of Pillz of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect."
+        },
+        {
+            "description": "Defeat: Equalizer: +X Life",
+            "explanation": "If CHARACTER loses the fight, the player controlling CHARACTER will win X Life points at the end of the round. This effect is multiplied by the level (number of stars) of the opponent's card it is up against."
+        },
+        {
+            "description": "Defeat: Growth: -X opp. life, min Y",
+            "explanation": "In the event of a loss by CHARACTER, the life points of the player controlling CHARACTER decrease by X multiplied by the number of the round in which CHARACTER has lost up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect."
+        },
+        {
+            "description": "Defeat: Poison X, min Y",
+            "explanation": "If CHARACTER loses the fight, at the end of each of the following rounds the number of Life points of the player controlling the opposing character will be reduced by X, or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect."
+        },
+        {
+            "description": "Defeat: recover X Pillz out of Y",
+            "explanation": "If CHARACTER loses the fight, at the start of the next round the player controlling CHARACTER will receive X/Y of the Pillz placed on CHARACTER, rounded down to the nearest unit, with a minimum of 1."
+        },
+        {
+            "description": "Defeat: Regen X, max Y",
+            "explanation": "If CHARACTER loses the round, the player controlling CHARACTER will win X Life points, maximum Y. The effect will be felt at the end of each of the following rounds. (If two heal or regens are applied, the second will replace the first as soon as the latter takes effect)."
+        },
+        {
+            "description": "Dope X, max. Y",
+            "explanation": "If CHARACTER wins the round, the opponent controlling CHARACTER will win X Pillz, maximum Y. The effect will be felt at the end of each of the following rounds. (If two Dope are applied, the second will replace the first as soon as the latter takes effect)."
+        },
+        {
+            "description": "Equalizer: +X Life",
+            "explanation": "If CHARACTER wins the fight, the player controlling CHARACTER will win X Life points at the end of the round. This effect is multiplied by the level (number of stars) of the opponent's card it is up against."
+        },
+        {
+            "description": "Equalizer: - X opp. Life min Y",
+            "explanation": "If CHARACTER wins the fight, the number of Life points of the player controlling the opposing character will be reduced by X, or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect. This effect is multiplied by the level (number of stars) of the opponent's card it is up against."
+        },
+        {
+            "description": "Equalizer: -X opp Damage, min Y",
+            "explanation": "If CHARACTER loses their fight, the Damage inflicted on CHARACTERs owner will be reduced by X points or up to a minimum of Y. If the winning characters Damage points are lower than or equal to Y, then the Ability has no effect. This effect is multiplied by the level (number of stars) of the opponent's card it is up against."
+        },
+        {
+            "description": "Equalizer: -X opp Power, min Y",
+            "explanation": "The Power of the opposing character is reduced by X points or up to a minimum of Y. If the opposing characters Power is lower than or equal to Y, then the Ability has no effect. This effect is multiplied by the level (number of stars) of the opponent's card it is up against."
+        },
+        {
+            "description": "Equalizer: Damage +X",
+            "explanation": "CHARACTERs Damage points are increased by X points. (Remember: Damage points are inflicted on your opponent if you win the round). This effect is multiplied by the level (number of stars) of the opponent's card it is up against."
+        },
+        {
+            "description": "Equalizer: Power +X",
+            "explanation": "CHARACTERs Power is increased by X points. (Remember: Power * Pillz = Attack). This effect is multiplied by the level (number of stars) of the opponent's card it is up against."
+        },
+        {
+            "description": "Equalizer: Power and Damage +X",
+            "explanation": "The Power and Damage of CHARACTER are increased by X.. (Remember: Power * Pillz = Attack). This effect is multiplied by the level (number of stars) of the opponent's card it is up against."
+        },
+        {
+            "description": "Growth : Power & Damage +X",
+            "explanation": "CHARACTERs Power and Damage points increases by X extra point(s) with each Round. (This increase corresponds to the number of the round being played multiplied by X)"
+        },
+        {
+            "description": "Growth: +X Life",
+            "explanation": "If CHARACTER wins the fight, the player controlling CHARACTER will win X Life points multiplied by the number of the round in which CHARACTER has won."
+        },
+        {
+            "description": "Growth: +X Pillz",
+            "explanation": "In the event of a win by CHARACTER, the pillz counter of the player controlling CHARACTER increases by X multiplied by the number of the round in which CHARACTER has won."
+        },
+        {
+            "description": "Growth: - X opp. Life min Y",
+            "explanation": "If CHARACTER wins the fight, the number of Life points of the player controlling the opposing character will be reduced by X multiplied by the number of the round in which CHARACTER has won, or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect."
+        },
+        {
+            "description": "Growth: -X opp Attack, min Y",
+            "explanation": "The opponents Attack points are reduced by X extra points with each Round up to a minimum of Y. (This increase corresponds to the number of the round being played multiplied by X)"
+        },
+        {
+            "description": "Growth: -X opp Damage, min Y",
+            "explanation": "The opponents Damage are reduced by X extra points with each Round up to a minimum of Y. (This increase corresponds to the number of the round being played multiplied by X)"
+        },
+        {
+            "description": "Growth: -X opp Pillz. min Y",
+            "explanation": "In the event of a win by CHARACTER, the pillz counter of the opposing player decreases by X multiplied by the number of the round in which CHARACTER has won."
+        },
+        {
+            "description": "Growth: -X opp Power, min Y",
+            "explanation": "The Power of the opposing character is reduced by X extra point(s) with each Round. (This increase corresponds to the number of the round being played multiplied by X)"
+        },
+        {
+            "description": "Growth: Attack +X",
+            "explanation": "CHARACTER's Attack points are increased by X extra points with each Round. (This increase corresponds to the number of the round being played multiplied by X)"
+        },
+        {
+            "description": "Growth: Damage +X",
+            "explanation": "CHARACTERs Damage points increases by X extra point(s) with each Round. (This increase corresponds to the number of the round being played multiplied by X)"
+        },
+        {
+            "description": "Growth: Heal X max. Y",
+            "explanation": "If CHARACTER wins the round, at the end of each of the following rounds the player controlling CHARACTER will earn X Life point(s) multiplied by the number of the round in which CHARACTER has won. If the player controlling CHARACTER has Y life points or more, the Heal effect is not triggered."
+        },
+        {
+            "description": "Growth: Poison X, min Y",
+            "explanation": "If CHARACTER wins the round, at the end of each of the following turns the opponent will lose X life points multiplied by the number of the round in which CHARACTER has won. If the opponent has Y or less Life point(s), the poison effect is not triggered."
+        },
+        {
+            "description": "Growth: Power +X",
+            "explanation": "CHARACTERs Power increases by X extra point(s) with each Round. (This increase corresponds to the number of the round being played multiplied by X)"
+        },
+        {
+            "description": "Growth: Regen X, max. Y",
+            "explanation": "If CHARACTER wins the round, the player controlling CHARACTER will win X Life points, maximum Y, multiplied by the number of the round in which CHARACTER has won. The effect will be felt at the end of each of the following rounds. (If two heal or regens are applied, the second will replace the first as soon as the latter takes effect)."
+        },
+        {
+            "description": "Growth: Toxin X, min Y",
+            "explanation": "If CHARACTER wins the round, your opponent will lose X Life points, minimum Y, multiplied by the number of the round in which CHARACTER has won. This effect will be felt at the end of each of the following rounds. (If two poisons or toxins are applied, the second will replace the first as soon as the latter takes effect)."
+        },
+        {
+            "description": "Heal X max. Y",
+            "explanation": "If CHARACTER wins the round, at the end of each of the following rounds the player controlling CHARACTER will earn X Life point(s) if he/she has fewer than Y Life points. If the player controlling CHARACTER has Y life points or more, the Heal effect is not triggered."
+        },
+        {
+            "description": "Infection X, min Y",
+            "explanation": "If CHARACTER wins the fight, at the end of each of the following rounds the number of Life points of the player controlling CHARACTER will be reduced by X, or up to a minimum of Y. If the number of Life points of the player controlling CHARACTER is lower than or equal to Y, then the ability will have no effect."
+        },
+        {
+            "description": "Killshot: +X Life",
+            "explanation": "If the Attack of CHARACTER is equal or higher than the double of the opposing character's attack and if CHARACTER wins the round, the player controlling the character will win X Life points"
+        },
+        {
+            "description": "Killshot: +X Life max. Y",
+            "explanation": "If the Attack of CHARACTER is equal or higher than the double of the opposing character's attack, the player controlling the character will win X Life points until he reaches a total of Y Life points at the end of the round."
+        },
+        {
+            "description": "Killshot: -X opp. Life min Y",
+            "explanation": "If the Attack of CHARACTER is equal or higher than the double of the opposing character's attack and if CHARACTER wins the round, the number of Life points of the player controlling the opposing character will be reduced by X, or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect."
+        },
+        {
+            "description": "No ability",
+            "explanation": ""
+        },
+        {
+            "description": "",
+            "explanation": "Nuke\nThe damage of all the cards in play cannot be reduced (as if every card in play had the Protection: Damage ability)."
+        },
+        {
+            "description": "Poison X, min Y",
+            "explanation": "If CHARACTER wins the round, at the end of each of the following turns the opponent will lose X Life point(s) if he/she has more than Y Life point(s). If the opponent has Y or less Life point(s), the poison effect is not triggered."
+        },
+        {
+            "description": "Power +X",
+            "explanation": "CHARACTERs Power is increased by X points. (Remember: Power * Pillz = Attack)"
+        },
+        {
+            "description": "Power and Damage + X",
+            "explanation": "The Power and Damage of CHARACTER are increased by X."
+        },
+        {
+            "description": "Protection : Damage",
+            "explanation": "The Damage of CHARACTER cannot be reduced by an opposing character while the Protection ability is activated."
+        },
+        {
+            "description": "Protection: Attack",
+            "explanation": "The attack of CHARACTER cannot be reduced by an opposing character so long as the Protection ability is activated."
+        },
+        {
+            "description": "Protection: Bonus",
+            "explanation": "The Bonus of CHARACTER can not be blocked while the Ability Protection Bonus is activated."
+        },
+        {
+            "description": "Protection: Power",
+            "explanation": "The Power of CHARACTER cannot be reduced by an opposing character while the Protection ability is activated."
+        },
+        {
+            "description": "Protection: Power and Damage",
+            "explanation": "The Power and Damage of CHARACTER cannot be reduced by an opposing character while the Protection ability is activated."
+        },
+        {
+            "description": "Regen X, max. Y",
+            "explanation": "If CHARACTER wins the round, the player controlling CHARACTER will win X Life points, maximum Y. The effect will be felt at the end of each of the following rounds. (If two heal or regens are applied, the second will replace the first as soon as the latter takes effect)."
+        },
+        {
+            "description": "Reprisal : -X opp. life, min Y",
+            "explanation": "When CHARACTER is played second in the round and if CHARACTER wins his fight, the number of Life points of the player controlling the opposing character will be reduced by X, or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect."
+        },
+        {
+            "description": "Reprisal: +X Atk per Life left",
+            "explanation": "When CHARACTER is played second in the round, the Attack points of CHARACTER are increased by X points for every remaining Life point owned by the player controlling the character."
+        },
+        {
+            "description": "Reprisal: +X Life per Damage",
+            "explanation": "When CHARACTER is played second in the round, for each Damage inflicted by CHARACTER to the opponent at the end of a round, the player controlling the character will win X Life points at the end of the round."
+        },
+        {
+            "description": "Reprisal: -X opp Damage, min Y",
+            "explanation": "When CHARACTER is played second in the round, if CHARACTER loses their fight, the Damage inflicted on CHARACTERs owner will be reduced by X points or up to a minimum of Y. If the winning characters Damage points are lower than or equal to Y, then the Ability has no effect."
+        },
+        {
+            "description": "Reprisal: -X opp Pow. & Dmg,min Y",
+            "explanation": "When CHARACTER is played second in the round, the opponents Power and Damage are reduced by X points or up to a minimum of Y."
+        },
+        {
+            "description": "Reprisal: -X opp Power, min Y",
+            "explanation": "When CHARACTER is played second in the round, the Power of the opposing character is reduced by X points or up to a minimum of Y. If the opposing characters Power is lower than or equal to Y, then the Ability has no effect."
+        },
+        {
+            "description": "Reprisal: Attack +X",
+            "explanation": "When CHARACTER is played second in the round, CHARACTER's Attack points are increased by X points. (Remember: Power * Pillz = Attack)"
+        },
+        {
+            "description": "Reprisal: Copy Opp. Bonus",
+            "explanation": "When CHARACTER is played second in the round, when CHARACTER is engaged in combat with another character, his Copy: Bonus ability is replaced by his opponent's Bonus. If the opponents Bonus is not activated, then this ability has no effect."
+        },
+        {
+            "description": "Reprisal: Damage +X",
+            "explanation": "When CHARACTER is played second in the round, the Damage of CHARACTER are increased by X points."
+        },
+        {
+            "description": "Reprisal: Damage = Damage opp.",
+            "explanation": "When CHARACTER is played second in the round, CHARACTER has the same number of Damage points as their opponent. This number only takes into account the figure shown on the opponents card and does not include changes related to an Ability, Bonus or Fury. If the Ability is blocked, CHARACTERs Damage is that shown on their card."
+        },
+        {
+            "description": "Reprisal: Power +X",
+            "explanation": "When CHARACTER is played second in the round, the Power of CHARACTER will be increased by X."
+        },
+        {
+            "description": "Reprisal: Power = Power opp",
+            "explanation": "When CHARACTER is played second in the round, CHARACTER has equal Power to their opponent. This number only takes into account the figure shown on the opponents card and does not include changes connected to an Ability or a Bonus. If the Ability is blocked, the characters Power is equal to that shown on their card."
+        },
+        {
+            "description": "Reprisal: Power and Damage +X",
+            "explanation": "When CHARACTER is played second in the round, the Power and Damage of CHARACTER will be increased by X."
+        },
+        {
+            "description": "Reprisal: Protect. Power and Damage",
+            "explanation": "When CHARACTER is played second in the round, the Power and Damage of CHARACTER cannot be altered by an opposing character while the Protection ability is activated."
+        },
+        {
+            "description": "Reprisal: Stop Opp. Ability",
+            "explanation": "When CHARACTER is played second in the round, the opponents Ability is cancelled if they have one."
+        },
+        {
+            "description": "Reprisal: Stop Opp. Bonus",
+            "explanation": "When CHARACTER is played second in the round, the opponents clan Bonus, if activated, is cancelled. If the opponent's clan Bonus is not activated, then the ability has no effect."
+        },
+        {
+            "description": "Revenge : +X life",
+            "explanation": "If a character belonging to the same team asCHARACTER loses a round and if CHARACTER wins the following round, the player controlling CHARACTER will winX Life points at the end of the round."
+        },
+        {
+            "description": "Revenge: +X Atk per Life left",
+            "explanation": "If a character belonging to the same team as CHARACTER loses a round, in the next round, the Attack points of CHARACTER are increased by X points for every remaining Life point owned by the player controlling the character."
+        },
+        {
+            "description": "Revenge: -X opp Attack, min Y",
+            "explanation": "If a character belonging to the same team as CHARACTER loses a round, in the next round the opponents Attack points are reduced by X points or up to a minimum of Y. If the opponents number of Attack points are lower or equal to Y, then the ability has no effect."
+        },
+        {
+            "description": "Revenge: -X opp Pow. & Dmg,min Y",
+            "explanation": "If a character belonging to the same team as CHARACTER loses a round, in the next round, the opponents Power and Damage are reduced by X points or up to a minimum of Y."
+        },
+        {
+            "description": "Revenge: -X opp. Life, min Y",
+            "explanation": "If a character belonging to the same team as CHARACTER loses a round and if CHARACTER wins his fight, the number of Life points of the player controlling the opposing player will be reduced by X or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower or equal to Y, then the ability has no effect."
+        },
+        {
+            "description": "Revenge: -X opp. power, min Y",
+            "explanation": "If a character belonging to the same team as CHARACTER loses a round, in the next round the Power of the opposing character is reduced by X points or up to a minimum of Y. If the opposing characters Power is lower than or equal to Y, then the Ability has no effect."
+        },
+        {
+            "description": "Revenge: Attack +X",
+            "explanation": "If a character belonging to the same team as CHARACTER loses a round, in the next round the Attack of CHARACTER will be increased to X"
+        },
+        {
+            "description": "Revenge: Copy Opp. Bonus",
+            "explanation": "If a character belonging to the same team as CHARACTER loses a round, in the next round, when CHARACTER is engaged in combat with another character, his Copy: Bonus ability is replaced by his opponent's Bonus. If the opponents Bonus is not activated, then this ability has no effect."
+        },
+        {
+            "description": "Revenge: Damage +X",
+            "explanation": "If a character belonging to the same team as CHARACTER loses a round, in the next round the Damage of CHARACTER will be increased to X"
+        },
+        {
+            "description": "Revenge: Poison X, min Y",
+            "explanation": "If a character belonging to the same team as CHARACTER loses a round, if CHARACTER wins the round, at the end of each of the following turns the opponent will lose X Life point(s) if he/she has more than Y Life point(s). If the opponent has Y or less Life point(s), the poison effect is not triggered."
+        },
+        {
+            "description": "Revenge: Power +X",
+            "explanation": "If a character belonging to the same team as CHARACTER loses a round, in the next round the Ability of CHARACTER will be increased to X"
+        },
+        {
+            "description": "Revenge: Power and Damage +X",
+            "explanation": "If a character belonging to the same team as CHARACTER loses a round, in the next round, the Power and Damage of CHARACTER will be increased by X."
+        },
+        {
+            "description": "Revenge: Protec. Power and Dmg",
+            "explanation": "If a character belonging to the same team asCHARACTER loses a round and if CHARACTER wins the following round, the Power and Damage of CHARACTER cannot be altered by an opposing character while the Protection ability is activated."
+        },
+        {
+            "description": "Revenge: Stop Ability",
+            "explanation": "If a character belonging to the same team as CHARACTER loses a round, in the next round the Ability of CHARACTER opponent will be cancelled, if he has one."
+        },
+        {
+            "description": "Revenge: Stop Bonus",
+            "explanation": "If a character belonging to the same team as CHARACTER loses a round, in the next round the Bonus of CHARACTER opponent will be cancelled, if he has one."
+        },
+        {
+            "description": "Stop : - X opp. life, min Y",
+            "explanation": "If CHARACTER'S ability is cancelled by the opposing character and if CHARACTER wins his/her fight, the number of Life points of the player controlling the opposing character is reduced by X up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, then the ability has no effect."
+        },
+        {
+            "description": "Stop : -X opp Power, min Y",
+            "explanation": "If CHARACTERs ability is cancelled out by the opposing character, the Power of the opposing character is reduced by X points or up to a minimum of Y. If the opposing characters Power is lower than or equal to Y, then the Ability has no effect."
+        },
+        {
+            "description": "Stop Opp. Ability",
+            "explanation": "The opponents Ability is cancelled if they have one."
+        },
+        {
+            "description": "Stop Opp. Bonus",
+            "explanation": "The opponents clan Bonus, if activated, is cancelled. If the opponent's clan Bonus is not activated, then the ability has no effect."
+        },
+        {
+            "description": "Stop: +X Life",
+            "explanation": "If CHARACTERS ability is cancelled by the opposing character and if CHARACTER wins his/her fight, the player controlling CHARACTER wins X Life points at the end of the round."
+        },
+        {
+            "description": "Stop: +X life per dmg.",
+            "explanation": "If CHARACTER'S ability is cancelled by the opposing character, for each Damage inflicted by CHARACTER to the opposing player at the end of a round, the player controlling CHARACTER wins X Life points at the end of the round."
+        },
+        {
+            "description": "Stop: +X Pillz",
+            "explanation": "If CHARACTERS ability is cancelled by the opposing character and ifCHARACTER wins his/her fight, the player controlling CHARACTER receives X Pillz at the beginning of the next round."
+        },
+        {
+            "description": "Stop: -X opp Pow. & Dmg,min Y",
+            "explanation": "If CHARACTERs ability is cancelled out by the opposing character, The opponents Power and Damage are reduced by X points or up to a minimum of Y."
+        },
+        {
+            "description": "Stop: -X opp. dmg, min Y",
+            "explanation": "If CHARACTERS ability is cancelled by the opposing character and if CHARACTER loses his/her fight, the Damage inflicted on his/her owner will be reduced by X points up to a minimum of Y. If the winning characters Damage points are lower than or equal to Y, then the ability has no effect."
+        },
+        {
+            "description": "Stop: -X Pillz opp. min Y",
+            "explanation": "If CHARACTER'S ability is cancelled by the opposing character and if CHARACTER wins his/her fight, the number of Pillz of the player controlling the opposing character is reduced by X Pillz up to a minimum of Y. If the number of Pillz of the player controlling the opposing character is lower than or equal to Y, then the ability has no effect."
+        },
+        {
+            "description": "Stop: Atk. +X",
+            "explanation": "If CHARACTERS ability is cancelled by the opposing character, CHARACTER'S attack is increased by X points."
+        },
+        {
+            "description": "Stop: Damage +X",
+            "explanation": "If CHARACTERS ability is cancelled by the opposing character, CHARACTER'S damage is increased by X points."
+        },
+        {
+            "description": "Stop: Heal X max. Y",
+            "explanation": "If CHARACTERs ability is cancelled out by the opposing character, If CHARACTER wins the round, at the end of each of the following rounds the player controlling CHARACTER will earn X Life point(s) if he/she has fewer than Y Life points. If the player controlling CHARACTER has Y life points or more, the Heal effect is not triggered."
+        },
+        {
+            "description": "Stop: Poison X, min Y",
+            "explanation": "If CHARACTER'S ability is cancelled by the opposing character and if CHARACTER wins the round, at the end of each of the following turns the opponent will lose X Life point(s) if he/she has more than Y Life point(s). If the opponent has Y or less Life point(s), the poison effect is not triggered."
+        },
+        {
+            "description": "Stop: Power +X",
+            "explanation": "If CHARACTERS ability is cancelled by the opposing character, CHARACTER'S power is increased by X points."
+        },
+        {
+            "description": "Stop: Power and Damage +X",
+            "explanation": "If CHARACTERs ability is cancelled out by the opposing character, the Power and Damage of CHARACTER are increased by X."
+        },
+        {
+            "description": "Support: + X Pillz",
+            "explanation": "If CHARACTER wins the fight, the player controlling CHARACTER will receive X pillz at the start of the next round for each character in their team belonging to the same clan as CHARACTER. Remember that is also taken into account."
+        },
+        {
+            "description": "Support: +X Life",
+            "explanation": "If CHARACTER wins the fight, the player controlling CHARACTER will receive X Life points at the end of the round for each character in their team belonging to the same clan as CHARACTER. Remember that CHARACTER is also taken into account."
+        },
+        {
+            "description": "Support: -X opp Attack, min Y",
+            "explanation": "The opponents Attack points are reduced by X points or up to a minimum of Y for each character in their team belonging to the same clan as CHARACTER. Remember that CHARACTER is also taken into account. If the opponents number of Attack points are lower or equal to Y, then the ability has no effect."
+        },
+        {
+            "description": "Support: -X opp Damage, min Y",
+            "explanation": "If CHARACTER loses their fight, the Damage inflicted on CHARACTERs owner will be reduced by X points or up to a minimum of Y for each character belonging to CHARACTER's clan and who is part of their team. Remember that CHARACTER is also taken into account. If the winning characters Damage points are lower than or equal to Y, then the Ability has no effect."
+        },
+        {
+            "description": "Support: -X opp Power, min Y",
+            "explanation": "The Power of the opposing character is reduced by X points or up to a minimum of Y for each character belonging to CHARACTER's clan and who is part of their team. Remember that CHARACTER is also taken into account. If the opposing characters Power is lower than or equal to Y, then the Ability has no effect."
+        },
+        {
+            "description": "Support: -X opp. Life, min Y",
+            "explanation": "If CHARACTER wins their fight, the number of Life points of the player controlling the opposing character is reduced by X up to a minimum of Y for each character belonging to CHARACTERs clan and who is also part of their team. Remember that CHARACTER is also taken into account. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, then the ability has no effect."
+        },
+        {
+            "description": "Support: Attack +X",
+            "explanation": "CHARACTERs attack points are increased by X points for each character belonging to CHARACTERs clan and who is part of their team. Remember that CHARACTER is also taken into account."
+        },
+        {
+            "description": "Support: Damage +X",
+            "explanation": "CHARACTER's damage points are increased by X points for each character belonging to CHARACTER's clan and who is part of their team. Remember that CHARACTER is also taken into account."
+        },
+        {
+            "description": "Support: Power +X",
+            "explanation": "CHARACTER's power is increased by X point(s) for each character belonging to CHARACTER's clan and who is also part of their team. Remember that CHARACTER is also taken into account."
+        },
+        {
+            "description": "Support: Reanimate: +X Life",
+            "explanation": "If CHARACTER loses the fight, the player controlling CHARACTER will win X Life points at the end of the round for each character in their team belonging to the same clan as CHARACTER. Remember that CHARACTER is also taken into account. This ability is able to prevent you from going KO."
+        },
+        {
+            "description": "Team: +X Attack",
+            "explanation": "All the characters in CHARACTERs team get X Attack points. (Remember: Power * Pillz = Attack)"
+        },
+        {
+            "description": "Team: +X Damage",
+            "explanation": "All the characters in CHARACTERs team win X Damage point."
+        },
+        {
+            "description": "Team: -X opp. damage, min Y",
+            "explanation": "If one of the characters loses their fight, the Damage inflicted on CHARACTERs owner will be reduced by X points or up to a minimum of Y. If the winning characters Damage points are lower than or equal to Y, then the Ability has no effect."
+        },
+        {
+            "description": "Team: -X opp. power, min Y",
+            "explanation": "The Power of the opposing character is reduced by X points or up to a minimum of Y. If the opposing characters Power is lower than or equal to Y, then the Ability has no effect."
+        },
+        {
+            "description": "Team: Courage, Power +X, max. Y",
+            "explanation": "All the characters in CHARACTERs team receive the Courage, Power +X ability. When they are played first in a round, their Power is increased by X points, to a maximum of 10 points."
+        },
+        {
+            "description": "Team: Defeat: Rec. X Pillz out of Y",
+            "explanation": "If one of your characters loses the fight, at the start of the next round the player controlling the character will receive X/Y of the Pillz placed on CHARACTER, rounded down to the nearest unit, with a minimum of 1."
+        },
+        {
+            "description": "Team: Reprisal: -X Pow. & Dmg, min Y",
+            "explanation": "All the characters in CHARACTERs team receive the \" Reprisal: -X Opponent Power & Damage minimum Y \" ability. When they are played second in the round, the opponents Power and Damage are reduced by X points or down to a minimum of Y."
+        },
+        {
+            "description": "Team: XP +X0%",
+            "explanation": "The Experience points won during the fight by each character in CHARACTERs team are increased by X0%."
+        },
+        {
+            "description": "Tie-break",
+            "explanation": "During the entire fight, if your attack is equal to your opponents, you will always win the round. If your and your opponents Life points are equal at the end of the fight, you will win the fight. (These effects are cancelled out if your opponent also has CHARACTER)"
+        },
+        {
+            "description": "Toxin X, min Y",
+            "explanation": "If CHARACTER wins the round, your opponent will lose X Life points, minimum Y. This effect will be felt at the end of each of the following rounds. (If two poisons or toxins are applied, the second will replace the first as soon as the latter takes effect)."
+        },
+        {
+            "description": "Vict. or Def.: -X opp Life & Pillz min Y",
+            "explanation": "If CHARACTER wins or loses the fight, the number of Life points & Pillz of the player controlling the opposing character will be reduced by X, or up to a minimum of Y. If the number of Life points / Pillz of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect."
+        },
+        {
+            "description": "Victory or Defeat : +X Life",
+            "explanation": "If CHARACTER wins or loses the fight, the player controlling CHARACTER will receive X Life at the end of the round."
+        },
+        {
+            "description": "Victory or Defeat : +X pillz",
+            "explanation": "If CHARACTER wins or loses the fight, the player controlling CHARACTER will receive X Pillz at the end of the round."
+        },
+        {
+            "description": "Victory or Defeat: - X opp. Life min Y",
+            "explanation": "If CHARACTER wins or loses the fight, the number of Life points of the player controlling the opposing character will be reduced by X, or up to a minimum of Y. If the number of Life points of the player controlling the opposing character is lower than or equal to Y, the ability will have no effect."
+        },
+        {
+            "description": "Xantiax: -X Life, min. Y",
+            "explanation": "Whether the character wins or loses the round, the two competing players lose X life point(s) or up to a minimum of Y life point(s)."
+        },
+        {
+            "description": "Cancel Leader",
+            "explanation": "Your Leader Bonuses are deactivated if you have more than one Leader in your team."
+        },
+        {
+            "description": "Day: Power and Damage + X",
+            "explanation": "The Power and Damage of CHARACTER are increased by X."
+        },
+        {
+            "description": "Equalizer: -X opp Attack, min Y",
+            "explanation": "The opponents Attack points are reduced by X points or up to a minimum of Y. If the opponents number of Attack points are lower or equal to Y, then the ability has no effect. This effect is multiplied by the level (number of stars) of the opponent's card it is up against."
+        },
+        {
+            "description": "Protection: Ability",
+            "explanation": "The Ability of CHARACTER can not be blocked while the Protection: Ability Bonus is activated."
+        }
+    ]
+}
