@@ -39,7 +39,7 @@ const clanSrc = computed(() => {
 		<div class="cardBottom">
 			<div class="cardStars">
 				<div v-for="i in card.stars" :key="'star-on-' + i" class="cardStarOn"></div>
-				<div v-for="i in 5 - card.stars" :key="'star-off-' + i" class="cardStarOff"></div>
+				<div v-for="i in card.starOff - card.stars" :key="'star-off-' + i" class="cardStarOff"></div>
 			</div>
 			<div class="cardDescription">
 				<div class="flex h-[30px] items-center">

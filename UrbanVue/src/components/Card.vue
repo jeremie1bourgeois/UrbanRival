@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ModalCard from "./ModalCard.vue";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import CardDisplay from "./CardDisplay.vue";
 import { Card } from "../models/game.interface";
 
@@ -30,13 +30,31 @@ const emit = defineEmits(["combat"]);
 const confirmCombat = (pillz: number, isFury: boolean) => {
 	emit("combat", pillz, isFury);
 };
+
+// Calculer les classes dynamiques sous forme de chaîne
+const cardClasses = computed(() =>
+	[
+		props.card.played ? "opacity-60" : "",
+		props.turn ? "cursor-pointer" : "cursor-not-allowed",
+	].join(" ")
+);
 </script>
 
 <template>
 	<div>
-		<CardDisplay :class="turn ? 'cursor-pointer' : 'cursor-not-allowed'" :card="card" @click="turn && openModal()" />
+		<CardDisplay
+			:class="cardClasses"
+			:card="props.card"
+			@click="turn && openModal()"
+		/>
 		<div v-if="turn && isModalVisible">
-			<ModalCard :isVisible="isModalVisible" :card="card" @close="isModalVisible = false" :maxPillz="props.pillz" @combat="confirmCombat" />
+			<ModalCard
+				:isVisible="isModalVisible"
+				:card="card"
+				@close="isModalVisible = false"
+				:maxPillz="props.pillz"
+				@combat="confirmCombat"
+			/>
 		</div>
 	</div>
 </template>

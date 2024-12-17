@@ -287,7 +287,7 @@
 					"target": "ally",
 					"type": "attack",
 					"value": 2,
-					"how": "nb_dam_opp_left",
+					"how": "nb_dam_opp",
 					"borne": 0,
 					"condition_effect": "",
 					"lvl_priority": 0

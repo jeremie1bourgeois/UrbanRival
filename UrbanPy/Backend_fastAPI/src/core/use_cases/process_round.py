@@ -47,8 +47,8 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> Game:
             player2_card.damage_fight += 2
 
         # Calculer les attaques
-        player1_attack = player1_card.power * (round_data.player1_pillz + 1)
-        player2_attack = player2_card.power * (round_data.player2_pillz + 1)
+        player1_attack = player1_card.power_fight * (round_data.player1_pillz + 1)
+        player2_attack = player2_card.power_fight * (round_data.player2_pillz + 1)
 
         # Créer une nouvelle instance de Round
         round_result = Round()
@@ -81,8 +81,6 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> Game:
         player2_card.played = True
 
         game.nb_turn += 1
-        game.ally.pillz += 1
-        game.enemy.pillz += 1
         game.turn = not game.turn
 
         return game
@@ -117,90 +115,120 @@ def init_fight_data(card: Card, nb_pillz: int, fury: bool):
 def apply_combat_effects(game: Game, card1: Card, card2: Card, capacity: Capacity):
     if capacity.target == "ally":
         if capacity.type == "power":
-            if capacity.how == "Growth":
-                card1.power = card1.power * game.nb_turn
-            elif capacity.how == "Degrowth":
-                card1.power = card1.power * (5 - game.nb_turn)
-            elif capacity.how == "Support":
-                card1.power = card1.power + capacity.value * sum(1 for card in game.ally.cards if card.faction == card1.faction)
-            elif capacity.how == "Equalizer":
-                card1.power = card1.power + capacity.value * card2.stars
-            elif capacity.how == "nb_pillz_left":
-                card1.power += capacity.value * game.ally.pillz
-            elif capacity.how == "":
-                card1.power += capacity.value
+            if capacity.how == "Growth": # "Growth: Power +X"
+                card1.power_fight += (capacity.value * game.nb_turn)
+            elif capacity.how == "Degrowth": # "Degrowth: Power +X"
+                card1.power_fight += (capacity.value * (5 - game.nb_turn))
+            elif capacity.how == "Support": # "Support: Power +X"
+                card1.power_fight += (capacity.value * sum(1 for card in game.ally.cards if card.faction == card1.faction))
+            elif capacity.how == "Equalizer": # "Equalizer: Power +X"
+                card1.power_fight += (capacity.value * card2.stars)
+            elif capacity.how == "Brawl": # "Brawl: Power +X"
+                card1.power_fight += (capacity.value * sum(1 for card in game.enemy.cards if card.faction == card2.faction))
+            elif capacity.how == "nb_pillz_left": # "+X Power Per Pillz Left Max. Y"
+                if card1.power_fight < capacity.borne: # check if power is already at max
+                    card1.power_fight = max(card1.power_fight + capacity.value * game.ally.pillz, capacity.borne)
+            elif capacity.how == "": # "+X Power"
+                card1.power_fight += capacity.value
             else:
                 raise ValueError(f"Invalid how: {capacity.how} for power")
         elif capacity.type == "damage":
-            if capacity.how == "Growth":
-                card1.damage = card1.damage * game.nb_turn
-            elif capacity.how == "Degrowth":
-                card1.damage = card1.damage * (5 - game.nb_turn)
-            elif capacity.how == "Support":
-                card1.damage = card1.damage + capacity.value * sum(1 for card in game.ally.cards if card.faction == card1.faction)
-            elif capacity.how == "Equalizer":
-                card1.damage = card1.damage + capacity.value * card2.stars
-            elif capacity.how == "nb_pillz_left":
-                card1.damage += capacity.value * game.ally.pillz
-            elif capacity.how == "":
-                card1.damage += capacity.value
+            if capacity.how == "Growth": # "Growth: Damage +X"
+                card1.damage_fight += (capacity.value * game.nb_turn)
+            elif capacity.how == "Degrowth": 
+                if capacity.borne is None: # "Degrowth: Damage +X"
+                    card1.damage_fight += (capacity.value * (5 - game.nb_turn))
+                else: # "Degrowth: Damage +X Max. Y"
+                    if card1.damage_fight < capacity.borne: # check if damage is already at max
+                        card1.damage_fight = max(capacity.value * (5 - game.nb_turn), capacity.borne)
+            elif capacity.how == "Support": # "Support: Damage +X"
+                card1.damage_fight += (capacity.value * sum(1 for card in game.ally.cards if card.faction == card1.faction))
+            elif capacity.how == "Equalizer": # "Equalizer: Damage +X"
+                card1.damage_fight += (capacity.value * card2.stars)
+            elif capacity.how == "Brawl": # "Brawl: Damage +X"
+                card1.damage_fight += (capacity.value * sum(1 for card in game.enemy.cards if card.faction == card2.faction))
+            # elif capacity.how == "nb_pillz_left": # pas de pouvoir comme ça ?
+            #     card1.damage_fight += max(capacity.value * game.ally.pillz, capacity.borne)
+            elif capacity.how == "": # "Damage +X"
+                card1.damage_fight += capacity.value
             else:
                 raise ValueError(f"Invalid how: {capacity.how} for damage")
         elif capacity.type == "attack":
-            if capacity.how == "Growth":
-                card1.attack += capacity.value * game.nb_turn
-            elif capacity.how == "Degrowth":
-                card1.attack += capacity.value * (5 - game.nb_turn)
-            elif capacity.how == "Support":
-                card1.attack += capacity.value * sum(1 for card in game.ally.cards if card.faction == card1.faction)
-            elif capacity.how == "Equalizer":
-                card1.attack += capacity.value * card2.stars
-            elif capacity.how == "nb_pillz_left":
-                card1.attack += capacity.value * game.ally.pillz
-            elif capacity.how == "nb_dam_opp_left":
-                card1.attack = card1.attack + capacity.value * card2.damage
-            elif capacity.how == "nb_pow_opp_left":
-                card1.attack = card1.attack + capacity.value * card2.power
-            elif capacity.how == "":
+            if capacity.how == "Growth": # "Growth: Attack +X"
+                card1.attack += (capacity.value * game.nb_turn)
+            elif capacity.how == "Degrowth": # "Degrowth: Attack +X"
+                card1.attack += (capacity.value * (5 - game.nb_turn))
+            elif capacity.how == "Support": # "Support: Attack +X"
+                card1.attack += (capacity.value * sum(1 for card in game.ally.cards if card.faction == card1.faction))
+            elif capacity.how == "Equalizer": # "Equalizer: Attack +X"
+                card1.attack += (capacity.value * card2.stars)
+            elif capacity.how == "Brawl": # "Brawl: Attack +X"
+                card1.attack += (capacity.value * sum(1 for card in game.enemy.cards if card.faction == card2.faction))
+            elif capacity.how == "nb_pillz_left": # "+X Atk Per Pillz Left"
+                card1.attack += (capacity.value * game.ally.pillz)
+            elif capacity.how == "nb_opp_dam": # "+X Attack Per Opp. Damage"
+                card1.attack += (capacity.value * card2.damage)
+            elif capacity.how == "nb_opp_pow": # "+X Attack Per Opp. Damage"
+                card1.attack += (capacity.value * card2.power)
+            # pas de pouvoir comme ça ?
+            # elif capacity.how == "nb_pow_opp": # "+X Atk Per Pow Opp" 
+            #     card1.attack = card1.attack + capacity.value * card2.power_fight
+            elif capacity.how == "": # "+X Attack"
                 card1.attack += capacity.value
             else:
                 raise ValueError(f"Invalid how: {capacity.how} for attack")
         elif capacity.type == "power_and_damage":
             if capacity.how == "Growth":
-                card1.power = card1.power * game.nb_turn
-                card1.damage = card1.damage * game.nb_turn
+                if capacity.borne is None: # "Growth : Power & Damage +X"
+                    card1.power_fight += (capacity.value * game.nb_turn)
+                    card1.damage_fight += (capacity.value * game.nb_turn)
+                else: # "Growth: -X Power And Damage, Min Y"
+                    if card1.power_fight > capacity.borne: # check if power is already at min
+                        card1.power_fight = min(capacity.borne, card1.power_fight - capacity.value * game.nb_turn)
+                    if card1.damage_fight > capacity.borne: # check if damage is already at min
+                        card1.damage_fight = min(capacity.borne, card1.damage_fight - capacity.value * game.nb_turn)
             elif capacity.how == "Degrowth":
-                card1.power = card1.power * (5 - game.nb_turn)
-                card1.damage = card1.damage * (5 - game.nb_turn)
-            elif capacity.how == "Support":
+                if capacity.borne is None: # "Degrowth: Power & Damage +X"
+                    card1.power_fight += (capacity.value * (5 - game.nb_turn))
+                    card1.damage_fight += (capacity.value * (5 - game.nb_turn))
+                else: # existe peut-être pas ? "Degrowth: -X Power And Damage, Min Y"
+                    if card1.power_fight > capacity.borne: # check if power is already at min
+                        card1.power_fight = min(capacity.borne, card1.power_fight - capacity.value * (5 - game.nb_turn))
+                    if card1.damage_fight > capacity.borne: # check if damage is already at min
+                        card1.damage_fight = min(capacity.borne, card1.damage_fight - capacity.value * (5 - game.nb_turn))
+            elif capacity.how == "Support": # "Support: Power & Damage +X"
                 same_faction_count = sum(1 for card in game.ally.cards if card.faction == card1.faction)
-                card1.power = card1.power + capacity.value * same_faction_count
-                card1.damage = card1.damage + capacity.value * same_faction_count
-            elif capacity.how == "Equalizer":
-                card1.power = card1.power + capacity.value * card2.stars
-                card1.damage = card1.damage + capacity.value * card2.stars
-            elif capacity.how == "nb_pillz_left":
-                card1.power += capacity.value * game.ally.pillz
-                card1.damage += capacity.value * game.ally.pillz
+                card1.power_fight += (capacity.value * same_faction_count)
+                card1.damage_fight += (capacity.value * same_faction_count)
+            elif capacity.how == "Equalizer": # "Equalizer: Power And Damage +X"
+                card1.power_fight += (capacity.value * card2.stars)
+                card1.damage_fight += (capacity.value * card2.stars)
+            elif capacity.how == "Brawl": # "Brawl: Power And Damage + x"
+                card1.power_fight += (capacity.value * sum(1 for card in game.enemy.cards if card.faction == card2.faction))
+                card1.damage_fight += (capacity.value * sum(1 for card in game.enemy.cards if card.faction == card2.faction))
+            # pas de pouvoir comme ça ?
+            # elif capacity.how == "nb_pillz_left": # "+X Power & Damage Per Pillz Left"
+            #     card1.power_fight += (capacity.value * game.ally.pillz)
+            #     card1.damage_fight += (capacity.value * game.ally.pillz)
             elif capacity.how == "":
-                card1.power += capacity.value
-                card1.damage += capacity.value
+                card1.power_fight += capacity.value
+                card1.damage_fight += capacity.value
             else:
                 raise ValueError(f"Invalid how: {capacity.how} for power_and_damage")
     elif capacity.target == "enemy":
         if capacity.type == "power":
             if capacity.how == "Growth":
-                card2.power = min(capacity.borne, card2.power * game.nb_turn)
+                card2.power_fight = min(capacity.borne, card2.power_fight * game.nb_turn)
             elif capacity.how == "Degrowth":
-                card2.power = min(capacity.borne, card2.power * (5 - game.nb_turn))
+                card2.power_fight = min(capacity.borne, card2.power_fight * (5 - game.nb_turn))
             elif capacity.how == "Support":
-                card2.power = min(capacity.borne, card2.power + capacity.value * sum(1 for card in game.enemy.cards if card.faction == card2.faction))
+                card2.power_fight = min(capacity.borne, card2.power_fight + capacity.value * sum(1 for card in game.enemy.cards if card.faction == card2.faction))
             elif capacity.how == "Equalizer":
-                card2.power = min(capacity.borne, card2.power + capacity.value * card1.stars)
+                card2.power_fight = min(capacity.borne, card2.power_fight + capacity.value * card1.stars)
             elif capacity.how == "nb_pillz_left":
-                card2.power += capacity.value * game.enemy.pillz
+                card2.power_fight += capacity.value * game.enemy.pillz
             elif capacity.how == "":
-                card2.power += capacity.value
+                card2.power_fight += capacity.value
             else:
                 raise ValueError(f"Invalid how: {capacity.how} for power")
         elif capacity.type == "damage":
@@ -235,23 +263,25 @@ def apply_combat_effects(game: Game, card1: Card, card2: Card, capacity: Capacit
                 raise ValueError(f"Invalid how: {capacity.how} for attack")
         elif capacity.type == "power_and_damage":
             if capacity.how == "Growth":
-                card2.power = min(capacity.borne, card2.power * game.nb_turn)
+                card2.power_fight = min(capacity.borne, card2.power_fight * game.nb_turn)
                 card2.damage = min(capacity.borne, card2.damage * game.nb_turn)
             elif capacity.how == "Degrowth":
-                card2.power = min(capacity.borne, card2.power * (5 - game.nb_turn))
+                card2.power_fight = min(capacity.borne, card2.power_fight * (5 - game.nb_turn))
                 card2.damage = min(capacity.borne, card2.damage * (5 - game.nb_turn))
             elif capacity.how == "Support":
                 same_faction_count = sum(1 for card in game.enemy.cards if card.faction == card2.faction)
-                card2.power = min(capacity.borne, card2.power + capacity.value * same_faction_count)
+                card2.power_fight = min(capacity.borne, card2.power_fight + capacity.value * same_faction_count)
                 card2.damage = min(capacity.borne, card2.damage + capacity.value * same_faction_count)
-            elif capacity.how == "Equalizer":
-                card2.power = min(capacity.borne, card2.power + capacity.value * card1.stars)
-                card2.damage = min(capacity.borne, card2.damage + capacity.value * card1.stars)
+            elif capacity.how == "Equalizer": # "Equalizer: -X Opp Pow. & Dam., Min Y"
+                if card2.power_fight > capacity.borne:
+                    card2.power_fight = min(capacity.borne, card2.power_fight - capacity.value * card1.stars)
+                if card2.damage > capacity.borne:
+                    card2.damage = min(capacity.borne, card2.damage - capacity.value * card1.stars)
             elif capacity.how == "nb_pillz_left":
-                card2.power += capacity.value * game.enemy.pillz
+                card2.power_fight += capacity.value * game.enemy.pillz
                 card2.damage += capacity.value * game.enemy.pillz
             elif capacity.how == "":
-                card2.power += capacity.value
+                card2.power_fight += capacity.value
                 card2.damage += capacity.value
             else:
                 raise ValueError(f"Invalid how: {capacity.how} for power_and_damage")
@@ -270,3 +300,8 @@ def check_round_correct(game: Game, round_data: ProcessRoundInput):
         raise ValueError("Player 1: card already played.")
     if game.enemy.cards[round_data.player2_card_index].played:
         raise ValueError("Player 2: card already played.")
+
+
+# def apply_end_capacity_effects(game: Game, card1: Card, card2: Card, capacity: Capacity):
+#     if capacity.target == "ally":
+        

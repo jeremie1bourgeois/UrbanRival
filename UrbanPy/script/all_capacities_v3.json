@@ -1,0 +1,3320 @@
+{
+    "capacity": [
+        {
+            "description": "-8 Opp Damage, Min 3",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "Confidence: -3 Opp. Life, Min 0",
+            "description_with_var": "Confidence: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "Attack +3",
+            "description_with_var": "Attack +X"
+        },
+        {
+            "description": "Heal 1 Max. 16",
+            "description_with_var": "Heal X Max. Y"
+        },
+        {
+            "description": "Revenge : +3 Life",
+            "description_with_var": "Revenge : +X Life"
+        },
+        {
+            "description": "-4 Opp. Life Min 0",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "Degrowth: Damage +2 Max. 7",
+            "description_with_var": "Degrowth: Damage +X Max. Y"
+        },
+        {
+            "description": "-11 Opp Attack, Min 0",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Growth: Poison 1, Min 1",
+            "description_with_var": "Growth: Poison X, Min Y"
+        },
+        {
+            "description": "- 2 Opp. Life Min 4",
+            "description_with_var": "- X Opp. Life Min Y"
+        },
+        {
+            "description": "Growth: - 1 Opp. Life Min 3",
+            "description_with_var": "Growth: - X Opp. Life Min Y"
+        },
+        {
+            "description": "Stop: -2 Opp Pow. & Dmg,min 2",
+            "description_with_var": "Stop: -X Opp Pow. & Dmg,min Y"
+        },
+        {
+            "description": "Dope 3, Max. 4",
+            "description_with_var": "Dope X, Max. Y"
+        },
+        {
+            "description": "-2 Opp Pillz. Min 1",
+            "description_with_var": "-X Opp Pillz. Min Y"
+        },
+        {
+            "description": "Toxin 2, Min 2",
+            "description_with_var": "Toxin X, Min Y"
+        },
+        {
+            "description": "-4 Cards Damage, Min 0",
+            "description_with_var": "-X Cards Damage, Min Y"
+        },
+        {
+            "description": "Courage: Stop Opp. Ability",
+            "description_with_var": "Courage: Stop Opp. Ability"
+        },
+        {
+            "description": "-3 Opp Power, Min 5",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "Regen 3, Max. 6",
+            "description_with_var": "Regen X, Max. Y"
+        },
+        {
+            "description": "-12 Opp Attack, Min 8",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Courage: Copy: Opp. Damage",
+            "description_with_var": "Courage: Copy: Opp. Damage"
+        },
+        {
+            "description": "-6 Opp Damage, Min 4",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "-1 Opp Power And Damage, Min 3",
+            "description_with_var": "-X Opp Power And Damage, Min Y"
+        },
+        {
+            "description": "Asymmetry: +3 Life",
+            "description_with_var": "Asymmetry: +X Life"
+        },
+        {
+            "description": "Support: Reanimate: +1 Life",
+            "description_with_var": "Support: Reanimate: +X Life"
+        },
+        {
+            "description": "Equalizer: Attack +2",
+            "description_with_var": "Equalizer: Attack +X"
+        },
+        {
+            "description": "Killshot: +3 Pillz",
+            "description_with_var": "Killshot: +X Pillz"
+        },
+        {
+            "description": "Defeat : Heal 1 Max. 13",
+            "description_with_var": "Defeat : Heal X Max. Y"
+        },
+        {
+            "description": "Degrowth: -1 Opp Pow. And Dam., Min 2",
+            "description_with_var": "Degrowth: -X Opp Pow. And Dam., Min Y"
+        },
+        {
+            "description": "Equalizer: -3 Opp Attack, Min 1",
+            "description_with_var": "Equalizer: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Versus  : -5 Opp Damage, Min 1",
+            "description_with_var": "Versus  : -X Opp Damage, Min Y"
+        },
+        {
+            "description": "Equalizer: -1 Opp Power, Min 3",
+            "description_with_var": "Equalizer: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Revenge: -6 Opp Attack, Min 6",
+            "description_with_var": "Revenge: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Limitless",
+            "description_with_var": "Limitless"
+        },
+        {
+            "description": "Degrowth: -1 Opp Power, Min 4",
+            "description_with_var": "Degrowth: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Growth: -1 Opp Power, Min 0",
+            "description_with_var": "Growth: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Heal 2 Max. 13",
+            "description_with_var": "Heal X Max. Y"
+        },
+        {
+            "description": "Stop: -4 Opp. Dmg, Min 1",
+            "description_with_var": "Stop: -X Opp. Dmg, Min Y"
+        },
+        {
+            "description": "-2 Opp Power, Min 1",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "-2 Opp Damage, Min 4",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "Reprisal: Power And Damage +1",
+            "description_with_var": "Reprisal: Power And Damage +X"
+        },
+        {
+            "description": "Victory Or Defeat: +1 Life Per Damage",
+            "description_with_var": "Victory Or Defeat: +X Life Per Damage"
+        },
+        {
+            "description": "-4 Opp Attack, Min 3",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Stop Opp. Bonus",
+            "description_with_var": "Stop Opp. Bonus"
+        },
+        {
+            "description": "-4 Opp Attack, Min 4",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Day: +1 Pillz Per Damage",
+            "description_with_var": "Day: +X Pillz Per Damage"
+        },
+        {
+            "description": "-2 Opp Power, Min 5",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "Asymmetry: -2 Opp Damage, Min 1",
+            "description_with_var": "Asymmetry: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "Growth: Heal 1 Max. 12",
+            "description_with_var": "Growth: Heal X Max. Y"
+        },
+        {
+            "description": "Asymmetry: Power +2",
+            "description_with_var": "Asymmetry: Power +X"
+        },
+        {
+            "description": "Support: -1 Opp. Life, Min 3",
+            "description_with_var": "Support: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "Backlash: - 3 Life Min 2",
+            "description_with_var": "Backlash: - X Life Min Y"
+        },
+        {
+            "description": "Regen 1, Max. 14",
+            "description_with_var": "Regen X, Max. Y"
+        },
+        {
+            "description": "Confidence : -3 Opp. Power, Min 2",
+            "description_with_var": "Confidence : -X Opp. Power, Min Y"
+        },
+        {
+            "description": "Day: Equalizer: -1 Opp Damage, Min 1",
+            "description_with_var": "Day: Equalizer: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "-3 Opp Power And Damage, Min 0",
+            "description_with_var": "-X Opp Power And Damage, Min Y"
+        },
+        {
+            "description": "-1 Opp Damage Per Pillz Lost, Min 1",
+            "description_with_var": "-X Opp Damage Per Pillz Lost, Min Y"
+        },
+        {
+            "description": "Defeat: Backlash: - 1 Life Min 0",
+            "description_with_var": "Defeat: Backlash: - X Life Min Y"
+        },
+        {
+            "description": "-3 Opp. Life Min 6",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "-5 Opp Pillz. Min 6",
+            "description_with_var": "-X Opp Pillz. Min Y"
+        },
+        {
+            "description": "Asymmetry: Power +6",
+            "description_with_var": "Asymmetry: Power +X"
+        },
+        {
+            "description": "Symmetry: -3 Opp Damage, Min 1",
+            "description_with_var": "Symmetry: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "Stop : -3 Opp Power, Min 4",
+            "description_with_var": "Stop : -X Opp Power, Min Y"
+        },
+        {
+            "description": "Support: -1 Opp Power, Min 2",
+            "description_with_var": "Support: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Stop: Damage +4",
+            "description_with_var": "Stop: Damage +X"
+        },
+        {
+            "description": "-4 Opp. Life Min 4",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "Degrowth: Attack +4",
+            "description_with_var": "Degrowth: Attack +X"
+        },
+        {
+            "description": "-2 Opp Power, Min 6",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "-6 Opp. Life Min 6",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "+2 Life",
+            "description_with_var": "+X Life"
+        },
+        {
+            "description": "-8 Opp Attack, Min 3",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "-6 Opp. Life Min 0",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "Equalizer: Damage +2",
+            "description_with_var": "Equalizer: Damage +X"
+        },
+        {
+            "description": "Revenge : +2 Life",
+            "description_with_var": "Revenge : +X Life"
+        },
+        {
+            "description": "Stop: Atk. +7",
+            "description_with_var": "Stop: Atk. +X"
+        },
+        {
+            "description": "Toxin 1, Min 2",
+            "description_with_var": "Toxin X, Min Y"
+        },
+        {
+            "description": "-2 Opp. Pillz And Life, Min 2",
+            "description_with_var": "-X Opp. Pillz And Life, Min Y"
+        },
+        {
+            "description": "Day: Confidence: +1 Life Per Damage",
+            "description_with_var": "Day: Confidence: +X Life Per Damage"
+        },
+        {
+            "description": "Reprisal: -2 Opp Pow. & Dmg,min 4",
+            "description_with_var": "Reprisal: -X Opp Pow. & Dmg,min Y"
+        },
+        {
+            "description": "Revenge: Stop Bonus",
+            "description_with_var": "Revenge: Stop Bonus"
+        },
+        {
+            "description": "-2 Opp Damage, Min 2",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "Growth: -5 Opp Attack, Min 2",
+            "description_with_var": "Growth: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Revenge: +2 Pillz And Life",
+            "description_with_var": "Revenge: +X Pillz And Life"
+        },
+        {
+            "description": "Poison 3, Min 5",
+            "description_with_var": "Poison X, Min Y"
+        },
+        {
+            "description": "Toxin 2, Min 0",
+            "description_with_var": "Toxin X, Min Y"
+        },
+        {
+            "description": "+3 Pillz Max. 9",
+            "description_with_var": "+X Pillz Max. Y"
+        },
+        {
+            "description": "Asymmetry: +5 Life",
+            "description_with_var": "Asymmetry: +X Life"
+        },
+        {
+            "description": "Support: -2 Opp. Life, Min 1",
+            "description_with_var": "Support: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "+1 Pillz Per Damage",
+            "description_with_var": "+X Pillz Per Damage"
+        },
+        {
+            "description": "Recover 1 Pillz Out Of 2",
+            "description_with_var": "Recover X Pillz Out Of Y"
+        },
+        {
+            "description": "Confidence : -13 Opp. Attack, Min 9",
+            "description_with_var": "Confidence : -X Opp. Attack, Min Y"
+        },
+        {
+            "description": "Reprisal: Damage +3",
+            "description_with_var": "Reprisal: Damage +X"
+        },
+        {
+            "description": "Courage: +1 Atk Per Pillz Left",
+            "description_with_var": "Courage: +X Atk Per Pillz Left"
+        },
+        {
+            "description": "Support: Dope 1, Max. 4",
+            "description_with_var": "Support: Dope X, Max. Y"
+        },
+        {
+            "description": "Damage Impose",
+            "description_with_var": "Damage Impose"
+        },
+        {
+            "description": "Asymmetry: Copy: Opp. Ability",
+            "description_with_var": "Asymmetry: Copy: Opp. Ability"
+        },
+        {
+            "description": "Versus  : -2 Opp Damage, Min 1",
+            "description_with_var": "Versus  : -X Opp Damage, Min Y"
+        },
+        {
+            "description": "-3 Opp. Life Min 2",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "Confidence : +3 Life",
+            "description_with_var": "Confidence : +X Life"
+        },
+        {
+            "description": "Confidence: Damage +2",
+            "description_with_var": "Confidence: Damage +X"
+        },
+        {
+            "description": "-2 Opp Power And Damage, Min 3",
+            "description_with_var": "-X Opp Power And Damage, Min Y"
+        },
+        {
+            "description": "Tie-break",
+            "description_with_var": "Tie-break"
+        },
+        {
+            "description": "Day: Power +5",
+            "description_with_var": "Day: Power +X"
+        },
+        {
+            "description": "Killshot: Regen 1, Max. 15",
+            "description_with_var": "Killshot: Regen X, Max. Y"
+        },
+        {
+            "description": "Damage +6",
+            "description_with_var": "Damage +X"
+        },
+        {
+            "description": "Support: -1 Opp Power, Min 4",
+            "description_with_var": "Support: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Equalizer: -1 Opp Power, Min 0",
+            "description_with_var": "Equalizer: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Support: -3 Opp Attack, Min 11",
+            "description_with_var": "Support: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Consume 1, Min 4",
+            "description_with_var": "Consume X, Min Y"
+        },
+        {
+            "description": "Asymmetry: Attack +9",
+            "description_with_var": "Asymmetry: Attack +X"
+        },
+        {
+            "description": "-4 Opp Power, Min 0",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "+4 Pillz",
+            "description_with_var": "+X Pillz"
+        },
+        {
+            "description": "Stop : - 3 Opp. Life, Min 0",
+            "description_with_var": "Stop : - X Opp. Life, Min Y"
+        },
+        {
+            "description": "Beyond",
+            "description_with_var": "Beyond"
+        },
+        {
+            "description": "Defeat: -3 Opp. Life, Min 1",
+            "description_with_var": "Defeat: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "Defeat: -1 Opp. Pillz, Min 3",
+            "description_with_var": "Defeat: -X Opp. Pillz, Min Y"
+        },
+        {
+            "description": "Growth: -1 Opp Pillz. Min 0",
+            "description_with_var": "Growth: -X Opp Pillz. Min Y"
+        },
+        {
+            "description": "Team: Killshot: -2 Opp. Life Min 2",
+            "description_with_var": "Team: Killshot: -X Opp. Life Min Y"
+        },
+        {
+            "description": "Defeat: -2 Opp. Pillz, Min 5",
+            "description_with_var": "Defeat: -X Opp. Pillz, Min Y"
+        },
+        {
+            "description": "Support: Power +1",
+            "description_with_var": "Support: Power +X"
+        },
+        {
+            "description": "+2 Life Per Damage",
+            "description_with_var": "+X Life Per Damage"
+        },
+        {
+            "description": "-4 Opp Attack, Min 1",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "-1 Opp Damage, Min 3",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "Defeat: Growth: -1 Opp. Life, Min 1",
+            "description_with_var": "Defeat: Growth: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "Victory Or Defeat: Brawl: +1 Life",
+            "description_with_var": "Victory Or Defeat: Brawl: +X Life"
+        },
+        {
+            "description": "Killshot: -3 Opp. Life Min 2",
+            "description_with_var": "Killshot: -X Opp. Life Min Y"
+        },
+        {
+            "description": "Consume 1, Min 2",
+            "description_with_var": "Consume X, Min Y"
+        },
+        {
+            "description": "Defeat: + 2 Life",
+            "description_with_var": "Defeat: + X Life"
+        },
+        {
+            "description": "-3 Opp Power And Damage, Min 6",
+            "description_with_var": "-X Opp Power And Damage, Min Y"
+        },
+        {
+            "description": "Reprisal: Power Exchange",
+            "description_with_var": "Reprisal: Power Exchange"
+        },
+        {
+            "description": "Revenge: -4 Opp. Life, Min 3",
+            "description_with_var": "Revenge: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "Growth: -1 Opp Attack, Min 1",
+            "description_with_var": "Growth: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Victory Or Defeat: Combust 1, Min 0",
+            "description_with_var": "Victory Or Defeat: Combust X, Min Y"
+        },
+        {
+            "description": "Confidence: Damage +6",
+            "description_with_var": "Confidence: Damage +X"
+        },
+        {
+            "description": "Stop: Atk. +15",
+            "description_with_var": "Stop: Atk. +X"
+        },
+        {
+            "description": "Damage Exchange",
+            "description_with_var": "Damage Exchange"
+        },
+        {
+            "description": "Brawl: +1 Life",
+            "description_with_var": "Brawl: +X Life"
+        },
+        {
+            "description": "-9 Opp Attack, Min 4",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "-7 Opp Damage, Min 2",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "Symmetry: -3 Opp Damage, Min 0",
+            "description_with_var": "Symmetry: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "Power And Damage + 7",
+            "description_with_var": "Power And Damage + X"
+        },
+        {
+            "description": "No Ability",
+            "description_with_var": "No Ability"
+        },
+        {
+            "description": "-2 Opp Damage, Min 3",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "Heal 1 Max. 13",
+            "description_with_var": "Heal X Max. Y"
+        },
+        {
+            "description": "-2 Opp Damage, Min 0",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "-5 Opp Power, Min 3",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "+1 Power Per Life Left Max. 8",
+            "description_with_var": "+X Power Per Life Left Max. Y"
+        },
+        {
+            "description": "-6 Opp Attack, Min 6",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Day: Defeat: Recover 2 Pillz Out Of 3",
+            "description_with_var": "Day: Defeat: Recover X Pillz Out Of Y"
+        },
+        {
+            "description": "-6 Opp. Life Min 4",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "-4 Opp. Life Min 1",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "Growth : Power & Damage +1",
+            "description_with_var": "Growth : Power & Damage +X"
+        },
+        {
+            "description": "Power +2",
+            "description_with_var": "Power +X"
+        },
+        {
+            "description": "Brawl: Attack +2",
+            "description_with_var": "Brawl: Attack +X"
+        },
+        {
+            "description": "Growth: Power +1",
+            "description_with_var": "Growth: Power +X"
+        },
+        {
+            "description": "-2 Opp Power And Damage, Min 4",
+            "description_with_var": "-X Opp Power And Damage, Min Y"
+        },
+        {
+            "description": "Defeat: Recover 1 Pillz Out Of 3",
+            "description_with_var": "Defeat: Recover X Pillz Out Of Y"
+        },
+        {
+            "description": "Victory Or Defeat: - 2 Opp. Life Min 0",
+            "description_with_var": "Victory Or Defeat: - X Opp. Life Min Y"
+        },
+        {
+            "description": "+1 Pillz",
+            "description_with_var": "+X Pillz"
+        },
+        {
+            "description": "Equalizer: Attack +3",
+            "description_with_var": "Equalizer: Attack +X"
+        },
+        {
+            "description": "Courage: -2 Opp. Dmg, Min 2",
+            "description_with_var": "Courage: -X Opp. Dmg, Min Y"
+        },
+        {
+            "description": "Support: -1 Opp Attack, Min 0",
+            "description_with_var": "Support: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Support: -1 Opp Damage, Min 2",
+            "description_with_var": "Support: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "Team: Courage: Power +3",
+            "description_with_var": "Team: Courage: Power +X"
+        },
+        {
+            "description": "Growth: -1 Opp Power, Min 4",
+            "description_with_var": "Growth: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Reprisal: +1 Life Per Damage",
+            "description_with_var": "Reprisal: +X Life Per Damage"
+        },
+        {
+            "description": "Rebirth 1, Max. 1",
+            "description_with_var": "Rebirth X, Max. Y"
+        },
+        {
+            "description": "Killshot: Toxin 1, Min 0",
+            "description_with_var": "Killshot: Toxin X, Min Y"
+        },
+        {
+            "description": "Backlash: - 3 Life Min 0",
+            "description_with_var": "Backlash: - X Life Min Y"
+        },
+        {
+            "description": "-6 Opp Attack, Min 4",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Stop: Atk. +16",
+            "description_with_var": "Stop: Atk. +X"
+        },
+        {
+            "description": "Asymmetry: Copy: Opp. Power",
+            "description_with_var": "Asymmetry: Copy: Opp. Power"
+        },
+        {
+            "description": "Support: Attack +4",
+            "description_with_var": "Support: Attack +X"
+        },
+        {
+            "description": "Growth: Damage +1",
+            "description_with_var": "Growth: Damage +X"
+        },
+        {
+            "description": "Revenge: Damage +4",
+            "description_with_var": "Revenge: Damage +X"
+        },
+        {
+            "description": "Reprisal: -3 Opp Power, Min 5",
+            "description_with_var": "Reprisal: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Revenge: -6 Opp Attack, Min 5",
+            "description_with_var": "Revenge: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Reprisal: Copy Opp. Bonus",
+            "description_with_var": "Reprisal: Copy Opp. Bonus"
+        },
+        {
+            "description": "Symmetry: Power +3",
+            "description_with_var": "Symmetry: Power +X"
+        },
+        {
+            "description": "Growth: -5 Opp Attack, Min 6",
+            "description_with_var": "Growth: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Killshot: -2 Opp. Life Min 0",
+            "description_with_var": "Killshot: -X Opp. Life Min Y"
+        },
+        {
+            "description": "Growth: Poison 1, Min 2",
+            "description_with_var": "Growth: Poison X, Min Y"
+        },
+        {
+            "description": "Brawl: Attack +5",
+            "description_with_var": "Brawl: Attack +X"
+        },
+        {
+            "description": "-6 Opp Attack, Min 2",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "+1 Life Per Damage Max. 13",
+            "description_with_var": "+X Life Per Damage Max. Y"
+        },
+        {
+            "description": "Victory Or Defeat: Equalizer: +1 Life",
+            "description_with_var": "Victory Or Defeat: Equalizer: +X Life"
+        },
+        {
+            "description": "Revenge: Poison 2, Min 0",
+            "description_with_var": "Revenge: Poison X, Min Y"
+        },
+        {
+            "description": "Defeat: -1 Opp. Pillz, Min 2",
+            "description_with_var": "Defeat: -X Opp. Pillz, Min Y"
+        },
+        {
+            "description": "-8 Opp Attack, Min 6",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Victory Or Defeat: - 1 Opp. Life Min 0",
+            "description_with_var": "Victory Or Defeat: - X Opp. Life Min Y"
+        },
+        {
+            "description": "Courage: Power +4",
+            "description_with_var": "Courage: Power +X"
+        },
+        {
+            "description": "Protection : Damage",
+            "description_with_var": "Protection : Damage"
+        },
+        {
+            "description": "Reprisal: Damage +4",
+            "description_with_var": "Reprisal: Damage +X"
+        },
+        {
+            "description": "Equalizer: Power +2",
+            "description_with_var": "Equalizer: Power +X"
+        },
+        {
+            "description": "Day: Cancel Opp. Damage Modif.",
+            "description_with_var": "Day: Cancel Opp. Damage Modif."
+        },
+        {
+            "description": "Poison 2, Min 1",
+            "description_with_var": "Poison X, Min Y"
+        },
+        {
+            "description": "Equalizer: Damage +1",
+            "description_with_var": "Equalizer: Damage +X"
+        },
+        {
+            "description": "-5 Opp Attack, Min 2",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Revenge: Copy Opp. Bonus",
+            "description_with_var": "Revenge: Copy Opp. Bonus"
+        },
+        {
+            "description": "Revenge: -4 Opp. Power, Min 5",
+            "description_with_var": "Revenge: -X Opp. Power, Min Y"
+        },
+        {
+            "description": "Day: Backlash: - 2 Life Min 4",
+            "description_with_var": "Day: Backlash: - X Life Min Y"
+        },
+        {
+            "description": "-1 Opp Att. Per Pillz Left, Min 8",
+            "description_with_var": "-X Opp Att. Per Pillz Left, Min Y"
+        },
+        {
+            "description": "Cancel Opp. Pow/dam Mod.",
+            "description_with_var": "Cancel Opp. Pow/dam Mod."
+        },
+        {
+            "description": "Revenge: Power +3",
+            "description_with_var": "Revenge: Power +X"
+        },
+        {
+            "description": "Victory Or Defeat : +4 Life",
+            "description_with_var": "Victory Or Defeat : +X Life"
+        },
+        {
+            "description": "Degrowth: -2 Opp Damage, Min 1",
+            "description_with_var": "Degrowth: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "Reprisal: +1 Atk Per Life Left",
+            "description_with_var": "Reprisal: +X Atk Per Life Left"
+        },
+        {
+            "description": "-3 Opp. Life Min 0",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "Courage: Attack +9",
+            "description_with_var": "Courage: Attack +X"
+        },
+        {
+            "description": "Equalizer: +1 Pillz",
+            "description_with_var": "Equalizer: +X Pillz"
+        },
+        {
+            "description": "-3 Opp. Pillz And Life, Min 4",
+            "description_with_var": "-X Opp. Pillz And Life, Min Y"
+        },
+        {
+            "description": "+2 Life Per Damage Max. 20",
+            "description_with_var": "+X Life Per Damage Max. Y"
+        },
+        {
+            "description": "Courage: Attack +16",
+            "description_with_var": "Courage: Attack +X"
+        },
+        {
+            "description": "Degrowth: Attack +3",
+            "description_with_var": "Degrowth: Attack +X"
+        },
+        {
+            "description": "Hazard",
+            "description_with_var": "Hazard"
+        },
+        {
+            "description": "-1 Opp Power, Min 1",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "-5 Opp Damage, Min 3",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "+5 Attack Per Opp. Damage",
+            "description_with_var": "+X Attack Per Opp. Damage"
+        },
+        {
+            "description": "Growth: -1 Opp Damage, Min 1",
+            "description_with_var": "Growth: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "-8 Opp Attack, Min 11",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Power +4",
+            "description_with_var": "Power +X"
+        },
+        {
+            "description": "-8 Opp Attack, Min 5",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Symmetry: Attack +8",
+            "description_with_var": "Symmetry: Attack +X"
+        },
+        {
+            "description": "Support: -1 Opp. Life, Min 1",
+            "description_with_var": "Support: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "Backlash: Growth: - 1 Life Min 2",
+            "description_with_var": "Backlash: Growth: - X Life Min Y"
+        },
+        {
+            "description": "Stop: -3 Opp. Dmg, Min 3",
+            "description_with_var": "Stop: -X Opp. Dmg, Min Y"
+        },
+        {
+            "description": "Killshot: +2 Pillz And Life",
+            "description_with_var": "Killshot: +X Pillz And Life"
+        },
+        {
+            "description": "Killshot: -3 Opp. Life Min 0",
+            "description_with_var": "Killshot: -X Opp. Life Min Y"
+        },
+        {
+            "description": "Reprisal: -1 Opp Power, Min 6",
+            "description_with_var": "Reprisal: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Backlash: - 3 Life Min 3",
+            "description_with_var": "Backlash: - X Life Min Y"
+        },
+        {
+            "description": "Stop: Power +4",
+            "description_with_var": "Stop: Power +X"
+        },
+        {
+            "description": "-4 Opp Damage, Min 2",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "Reprisal: -4 Opp Damage, Min 2",
+            "description_with_var": "Reprisal: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "Day: Attack +15",
+            "description_with_var": "Day: Attack +X"
+        },
+        {
+            "description": "Brawl: -4 Opp Attack, Min 12",
+            "description_with_var": "Brawl: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Counter-attack",
+            "description_with_var": "Counter-attack"
+        },
+        {
+            "description": "Cancel Opp. Attack Modif.",
+            "description_with_var": "Cancel Opp. Attack Modif."
+        },
+        {
+            "description": "-3 Opp Power, Min 6",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "Victory Or Defeat: Recover 1 Pillz Out Of 3",
+            "description_with_var": "Victory Or Defeat: Recover X Pillz Out Of Y"
+        },
+        {
+            "description": "Team: Cancel Opp. Damage Modif.",
+            "description_with_var": "Team: Cancel Opp. Damage Modif."
+        },
+        {
+            "description": "Brawl: -4 Opp Attack, Min 2",
+            "description_with_var": "Brawl: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Defeat: Dope 1, Max. 12",
+            "description_with_var": "Defeat: Dope X, Max. Y"
+        },
+        {
+            "description": "Growth: Regen 1, Max. 17",
+            "description_with_var": "Growth: Regen X, Max. Y"
+        },
+        {
+            "description": "-5 Opp Damage, Min 2",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "Stop: -3 Opp. Dmg, Min 1",
+            "description_with_var": "Stop: -X Opp. Dmg, Min Y"
+        },
+        {
+            "description": "Symmetry: Damage +4",
+            "description_with_var": "Symmetry: Damage +X"
+        },
+        {
+            "description": "-4 Opp Power, Min 5",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "Courage: Damage +3",
+            "description_with_var": "Courage: Damage +X"
+        },
+        {
+            "description": "Revenge: Attack +12",
+            "description_with_var": "Revenge: Attack +X"
+        },
+        {
+            "description": "Revenge: -3 Opp. Power, Min 5",
+            "description_with_var": "Revenge: -X Opp. Power, Min Y"
+        },
+        {
+            "description": "-3 Opp Power And Damage, Min 3",
+            "description_with_var": "-X Opp Power And Damage, Min Y"
+        },
+        {
+            "description": "Heal 2 Max. 10",
+            "description_with_var": "Heal X Max. Y"
+        },
+        {
+            "description": "Dope 1, Max. 12",
+            "description_with_var": "Dope X, Max. Y"
+        },
+        {
+            "description": "Cancel Opp. Power And Damage Modif.",
+            "description_with_var": "Cancel Opp. Power And Damage Modif."
+        },
+        {
+            "description": "Power Exchange",
+            "description_with_var": "Power Exchange"
+        },
+        {
+            "description": "+1 Life Per Opp. Damage",
+            "description_with_var": "+X Life Per Opp. Damage"
+        },
+        {
+            "description": "Power +3",
+            "description_with_var": "Power +X"
+        },
+        {
+            "description": "Power +7, Max. 8",
+            "description_with_var": "Power +X, Max. Y"
+        },
+        {
+            "description": "+1 Power Per Life Left Max. 7",
+            "description_with_var": "+X Power Per Life Left Max. Y"
+        },
+        {
+            "description": "Attack +14",
+            "description_with_var": "Attack +X"
+        },
+        {
+            "description": "Killshot: -1 Opp Pillz. Min 4",
+            "description_with_var": "Killshot: -X Opp Pillz. Min Y"
+        },
+        {
+            "description": "-4 Opp Power, Min 6",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "Growth: -4 Opp Attack, Min 7",
+            "description_with_var": "Growth: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Degrowth: Damage +1",
+            "description_with_var": "Degrowth: Damage +X"
+        },
+        {
+            "description": "Symmetry: Stop Opp. Bonus",
+            "description_with_var": "Symmetry: Stop Opp. Bonus"
+        },
+        {
+            "description": "-3 Opp Attack, Min 3",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Equalizer: -1 Opp Power, Min 2",
+            "description_with_var": "Equalizer: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Growth: -1 Opp Damage, Min 3",
+            "description_with_var": "Growth: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "Asymmetry: Copy: Opp. Bonus",
+            "description_with_var": "Asymmetry: Copy: Opp. Bonus"
+        },
+        {
+            "description": "Stop: +2 Life",
+            "description_with_var": "Stop: +X Life"
+        },
+        {
+            "description": "Confidence: -3 Opp Damage, Min 2",
+            "description_with_var": "Confidence: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "-8 Opp Attack, Min 2",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "-1 Opp Pow. & Dam., Min 0",
+            "description_with_var": "-X Opp Pow. & Dam., Min Y"
+        },
+        {
+            "description": "+1 Life Per Damage Max. 8",
+            "description_with_var": "+X Life Per Damage Max. Y"
+        },
+        {
+            "description": "Stop : - 5 Opp. Life, Min 5",
+            "description_with_var": "Stop : - X Opp. Life, Min Y"
+        },
+        {
+            "description": "Equalizer: - 1 Opp. Life Min 2",
+            "description_with_var": "Equalizer: - X Opp. Life Min Y"
+        },
+        {
+            "description": "Confidence : -4 Opp. Power, Min 2",
+            "description_with_var": "Confidence : -X Opp. Power, Min Y"
+        },
+        {
+            "description": "-3 Opp. Life Min 3",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "+2 Attack Per Opp. Power",
+            "description_with_var": "+X Attack Per Opp. Power"
+        },
+        {
+            "description": "Equalizer: -1 Opp Power, Min 5",
+            "description_with_var": "Equalizer: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Toxin 1, Min 3",
+            "description_with_var": "Toxin X, Min Y"
+        },
+        {
+            "description": "-2 Opp Damage, Min 1",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "Heal 1 Max. 14",
+            "description_with_var": "Heal X Max. Y"
+        },
+        {
+            "description": "Reprisal: Attack +10",
+            "description_with_var": "Reprisal: Attack +X"
+        },
+        {
+            "description": "Equalizer: Power +1",
+            "description_with_var": "Equalizer: Power +X"
+        },
+        {
+            "description": "Growth: -1 Opp Pillz. Min 1",
+            "description_with_var": "Growth: -X Opp Pillz. Min Y"
+        },
+        {
+            "description": "Stop: +3 Pillz",
+            "description_with_var": "Stop: +X Pillz"
+        },
+        {
+            "description": "Defeat: Poison 1, Min 4",
+            "description_with_var": "Defeat: Poison X, Min Y"
+        },
+        {
+            "description": "Victory Or Defeat : +3 Players Life",
+            "description_with_var": "Victory Or Defeat : +X Players Life"
+        },
+        {
+            "description": "Corrupt 2 Min. 0",
+            "description_with_var": "Corrupt X Min. Y"
+        },
+        {
+            "description": "Confidence: -4 Opp Damage, Min 2",
+            "description_with_var": "Confidence: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "-1 Opp Power And Damage, Min 2",
+            "description_with_var": "-X Opp Power And Damage, Min Y"
+        },
+        {
+            "description": "Stop: -5 Opp. Dmg, Min 1",
+            "description_with_var": "Stop: -X Opp. Dmg, Min Y"
+        },
+        {
+            "description": "-2 Opp Pillz. Min 5",
+            "description_with_var": "-X Opp Pillz. Min Y"
+        },
+        {
+            "description": "Attack +7",
+            "description_with_var": "Attack +X"
+        },
+        {
+            "description": "Day: -1 Opp Power & Damage, Min 1",
+            "description_with_var": "Day: -X Opp Power & Damage, Min Y"
+        },
+        {
+            "description": "Opp. Attack +4",
+            "description_with_var": "Opp. Attack +X"
+        },
+        {
+            "description": "Defeat: + 3 Pillz Max. 10",
+            "description_with_var": "Defeat: + X Pillz Max. Y"
+        },
+        {
+            "description": "-7 Opp. Life Min 1",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "Courage: -2 Opp Power, Min 5",
+            "description_with_var": "Courage: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Defeat : Heal 1 Max. 10",
+            "description_with_var": "Defeat : Heal X Max. Y"
+        },
+        {
+            "description": "Stop: Power +2",
+            "description_with_var": "Stop: Power +X"
+        },
+        {
+            "description": "Equalizer: Attack +5",
+            "description_with_var": "Equalizer: Attack +X"
+        },
+        {
+            "description": "Revenge: Damage +2",
+            "description_with_var": "Revenge: Damage +X"
+        },
+        {
+            "description": "Day: Courage: Canc. Power & Dam. Mod",
+            "description_with_var": "Day: Courage: Canc. Power & Dam. Mod"
+        },
+        {
+            "description": "Stop: Poison 3, Min 2",
+            "description_with_var": "Stop: Poison X, Min Y"
+        },
+        {
+            "description": "-5 Opp Attack, Min 1",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Asymmetry: -2 Opp Power, Min 2",
+            "description_with_var": "Asymmetry: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Symmetry: -3 Opp Power, Min 2",
+            "description_with_var": "Symmetry: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Attack +4",
+            "description_with_var": "Attack +X"
+        },
+        {
+            "description": "-1 Opp Power Per Life Lost, Min 2",
+            "description_with_var": "-X Opp Power Per Life Lost, Min Y"
+        },
+        {
+            "description": "Equalizer: -3 Opp Attack, Min 9",
+            "description_with_var": "Equalizer: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "-5 Opp Attack, Min 5",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "+1 Pillz Per Round",
+            "description_with_var": "+X Pillz Per Round"
+        },
+        {
+            "description": "Growth: Heal 1 Max. 11",
+            "description_with_var": "Growth: Heal X Max. Y"
+        },
+        {
+            "description": "-12 Opp Attack, Min 5",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Versus  : -3 Opp. Life Min 0",
+            "description_with_var": "Versus  : -X Opp. Life Min Y"
+        },
+        {
+            "description": "Growth: Attack +3",
+            "description_with_var": "Growth: Attack +X"
+        },
+        {
+            "description": "-1 Opp Att. Per Life Left, Min 2",
+            "description_with_var": "-X Opp Att. Per Life Left, Min Y"
+        },
+        {
+            "description": "-4 Opp Damage, Min 1",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "-3 Opp Power And Damage, Min 2",
+            "description_with_var": "-X Opp Power And Damage, Min Y"
+        },
+        {
+            "description": "Damage +4",
+            "description_with_var": "Damage +X"
+        },
+        {
+            "description": "Stop: Atk. +12",
+            "description_with_var": "Stop: Atk. +X"
+        },
+        {
+            "description": "+2 Pillz And Life",
+            "description_with_var": "+X Pillz And Life"
+        },
+        {
+            "description": "Day: Cancel Opp. Pillz & Life Modif.",
+            "description_with_var": "Day: Cancel Opp. Pillz & Life Modif."
+        },
+        {
+            "description": "Revenge: Copy: Opp. Damage",
+            "description_with_var": "Revenge: Copy: Opp. Damage"
+        },
+        {
+            "description": "Defeat: + 3 Pillz",
+            "description_with_var": "Defeat: + X Pillz"
+        },
+        {
+            "description": "+1 Players Life",
+            "description_with_var": "+X Players Life"
+        },
+        {
+            "description": "+2 Life Per Opp. Damage",
+            "description_with_var": "+X Life Per Opp. Damage"
+        },
+        {
+            "description": "Defeat: + 3 Life",
+            "description_with_var": "Defeat: + X Life"
+        },
+        {
+            "description": "Courage; -2 Opp Pillz. Min 1",
+            "description_with_var": "Courage; -X Opp Pillz. Min Y"
+        },
+        {
+            "description": "Power And Damage + 2",
+            "description_with_var": "Power And Damage + X"
+        },
+        {
+            "description": "Stop : -3 Opp Power, Min 1",
+            "description_with_var": "Stop : -X Opp Power, Min Y"
+        },
+        {
+            "description": "Growth: +1 Pillz",
+            "description_with_var": "Growth: +X Pillz"
+        },
+        {
+            "description": "Support: -1 Opp Damage, Min 0",
+            "description_with_var": "Support: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "+3 Attack Per Pillz Lost",
+            "description_with_var": "+X Attack Per Pillz Lost"
+        },
+        {
+            "description": "+1 Life Per Damage Max. 15",
+            "description_with_var": "+X Life Per Damage Max. Y"
+        },
+        {
+            "description": "Poison 2, Min 3",
+            "description_with_var": "Poison X, Min Y"
+        },
+        {
+            "description": "Defeat: + 2 Pillz",
+            "description_with_var": "Defeat: + X Pillz"
+        },
+        {
+            "description": "Day: Equalizer: Damage +1",
+            "description_with_var": "Day: Equalizer: Damage +X"
+        },
+        {
+            "description": "-4 Opp Power And Damage, Min 4",
+            "description_with_var": "-X Opp Power And Damage, Min Y"
+        },
+        {
+            "description": "-2 Opp Power, Min 3",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "Courage: Damage +4",
+            "description_with_var": "Courage: Damage +X"
+        },
+        {
+            "description": "Revenge: Power And Damage +3",
+            "description_with_var": "Revenge: Power And Damage +X"
+        },
+        {
+            "description": "+3 Life Per Damage",
+            "description_with_var": "+X Life Per Damage"
+        },
+        {
+            "description": "Revenge: -3 Opp. Power, Min 1",
+            "description_with_var": "Revenge: -X Opp. Power, Min Y"
+        },
+        {
+            "description": "Reprisal: Copy: Opp. Damage",
+            "description_with_var": "Reprisal: Copy: Opp. Damage"
+        },
+        {
+            "description": "Revenge: Protec. Power And Dmg",
+            "description_with_var": "Revenge: Protec. Power And Dmg"
+        },
+        {
+            "description": "Defeat: Recover 2 Pillz Out Of 3",
+            "description_with_var": "Defeat: Recover X Pillz Out Of Y"
+        },
+        {
+            "description": "Poison 2, Min 2",
+            "description_with_var": "Poison X, Min Y"
+        },
+        {
+            "description": "Poison 2, Min 5",
+            "description_with_var": "Poison X, Min Y"
+        },
+        {
+            "description": "Cancel Opp. Pillz & Life Modif.",
+            "description_with_var": "Cancel Opp. Pillz & Life Modif."
+        },
+        {
+            "description": "-2 Opp. Pillz And Life, Min 5",
+            "description_with_var": "-X Opp. Pillz And Life, Min Y"
+        },
+        {
+            "description": "Symmetry: Attack +13",
+            "description_with_var": "Symmetry: Attack +X"
+        },
+        {
+            "description": "Confidence: -3 Opp. Life, Min 3",
+            "description_with_var": "Confidence: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "Team: Victory Or Defeat: +1 Life",
+            "description_with_var": "Team: Victory Or Defeat: +X Life"
+        },
+        {
+            "description": "Asymmetry: Damage +3",
+            "description_with_var": "Asymmetry: Damage +X"
+        },
+        {
+            "description": "Defeat: Equalizer: +1 Life",
+            "description_with_var": "Defeat: Equalizer: +X Life"
+        },
+        {
+            "description": "-2 Opp Att. Per Pillz Left, Min 15",
+            "description_with_var": "-X Opp Att. Per Pillz Left, Min Y"
+        },
+        {
+            "description": "Confidence: +1 Life Per Dmg.",
+            "description_with_var": "Confidence: +X Life Per Dmg."
+        },
+        {
+            "description": "Revenge: +1 Atk Per Life Left",
+            "description_with_var": "Revenge: +X Atk Per Life Left"
+        },
+        {
+            "description": "Growth: Attack +5",
+            "description_with_var": "Growth: Attack +X"
+        },
+        {
+            "description": "Revenge: +1 Pillz And Life",
+            "description_with_var": "Revenge: +X Pillz And Life"
+        },
+        {
+            "description": "+1 Atk Per Pillz Left",
+            "description_with_var": "+X Atk Per Pillz Left"
+        },
+        {
+            "description": "-11 Opp Attack, Min 8",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Defeat: +1 Opp. Life",
+            "description_with_var": "Defeat: +X Opp. Life"
+        },
+        {
+            "description": "Defeat: -2 Opp. Life, Min 5",
+            "description_with_var": "Defeat: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "Symmetry: Damage +3",
+            "description_with_var": "Symmetry: Damage +X"
+        },
+        {
+            "description": "Brawl: -3 Opp Attack, Min 0",
+            "description_with_var": "Brawl: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Stop : -4 Opp Power, Min 3",
+            "description_with_var": "Stop : -X Opp Power, Min Y"
+        },
+        {
+            "description": "Stop: +1 Life Per Dmg.",
+            "description_with_var": "Stop: +X Life Per Dmg."
+        },
+        {
+            "description": "Cancel Opp. Power Modif.",
+            "description_with_var": "Cancel Opp. Power Modif."
+        },
+        {
+            "description": "Day: Confidence: -2 Opp. Pillz & Life, Min 3",
+            "description_with_var": "Day: Confidence: -X Opp. Pillz & Life, Min Y"
+        },
+        {
+            "description": "Killshot: -3 Opp. Life Min 1",
+            "description_with_var": "Killshot: -X Opp. Life Min Y"
+        },
+        {
+            "description": "Growth: -1 Power And Damage, Min 4",
+            "description_with_var": "Growth: -X Power And Damage, Min Y"
+        },
+        {
+            "description": "-6 Opp Attack, Min 1",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Equalizer: +1 Life",
+            "description_with_var": "Equalizer: +X Life"
+        },
+        {
+            "description": "Support: -1 Cards Damage, Min 0",
+            "description_with_var": "Support: -X Cards Damage, Min Y"
+        },
+        {
+            "description": "Support: + 1 Pillz, Max 7",
+            "description_with_var": "Support: + X Pillz, Max Y"
+        },
+        {
+            "description": "-1 Opp Att. Per Life Left, Min 7",
+            "description_with_var": "-X Opp Att. Per Life Left, Min Y"
+        },
+        {
+            "description": "Confidence: Attack +9",
+            "description_with_var": "Confidence: Attack +X"
+        },
+        {
+            "description": "Support: Attack +2",
+            "description_with_var": "Support: Attack +X"
+        },
+        {
+            "description": "Victory Or Defeat: Combust 1, Min 3",
+            "description_with_var": "Victory Or Defeat: Combust X, Min Y"
+        },
+        {
+            "description": "Brawl: -3 Opp Attack, Min 6",
+            "description_with_var": "Brawl: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Confidence: Attack +12",
+            "description_with_var": "Confidence: Attack +X"
+        },
+        {
+            "description": "Revenge: -2 Opp. Power, Min 4",
+            "description_with_var": "Revenge: -X Opp. Power, Min Y"
+        },
+        {
+            "description": "-2 Opp Pow. And Dam., Min 4",
+            "description_with_var": "-X Opp Pow. And Dam., Min Y"
+        },
+        {
+            "description": "+2 Attack Per Life Left",
+            "description_with_var": "+X Attack Per Life Left"
+        },
+        {
+            "description": "Vict. Or Def.: -2 Opp Life & Pillz Min 2",
+            "description_with_var": "Vict. Or Def.: -X Opp Life & Pillz Min Y"
+        },
+        {
+            "description": "Defeat: Poison 1, Min 0",
+            "description_with_var": "Defeat: Poison X, Min Y"
+        },
+        {
+            "description": "Killshot: -6 Opp. Life Min 0",
+            "description_with_var": "Killshot: -X Opp. Life Min Y"
+        },
+        {
+            "description": "Defeat: + 2 Pillz Max. 11",
+            "description_with_var": "Defeat: + X Pillz Max. Y"
+        },
+        {
+            "description": "Defeat : Heal 1 Max. 16",
+            "description_with_var": "Defeat : Heal X Max. Y"
+        },
+        {
+            "description": "Symmetry: - 4 Opp. Life Min 0",
+            "description_with_var": "Symmetry: - X Opp. Life Min Y"
+        },
+        {
+            "description": "Victory Or Defeat: Corrosion 1, Min 0",
+            "description_with_var": "Victory Or Defeat: Corrosion X, Min Y"
+        },
+        {
+            "description": "-3 Opp. Life Min 5",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "Courage: -3 Opp. Dmg, Min 2",
+            "description_with_var": "Courage: -X Opp. Dmg, Min Y"
+        },
+        {
+            "description": "-1 Opp Att. Per Life Left, Min 6",
+            "description_with_var": "-X Opp Att. Per Life Left, Min Y"
+        },
+        {
+            "description": "-4 Opp Attack, Min 2",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "-3 Opp Damage, Min 0",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "+1 Power Per Life Left Max. 9",
+            "description_with_var": "+X Power Per Life Left Max. Y"
+        },
+        {
+            "description": "Support: -2 Opp Damage, Min 2",
+            "description_with_var": "Support: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "-9 Opp Attack, Min 6",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Defeat: Regen 1, Max 15",
+            "description_with_var": "Defeat: Regen X, Max Y"
+        },
+        {
+            "description": "Dope 1, Max. 11",
+            "description_with_var": "Dope X, Max. Y"
+        },
+        {
+            "description": "Confidence : +2 Life",
+            "description_with_var": "Confidence : +X Life"
+        },
+        {
+            "description": "Courage: +3 Life",
+            "description_with_var": "Courage: +X Life"
+        },
+        {
+            "description": "Defeat: +1 Pillz And Life",
+            "description_with_var": "Defeat: +X Pillz And Life"
+        },
+        {
+            "description": "Reprisal: -2 Opp Damage, Min 0",
+            "description_with_var": "Reprisal: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "Power Impose",
+            "description_with_var": "Power Impose"
+        },
+        {
+            "description": "-2 Opp Power And Damage, Min 1",
+            "description_with_var": "-X Opp Power And Damage, Min Y"
+        },
+        {
+            "description": "Courage: Damage +2",
+            "description_with_var": "Courage: Damage +X"
+        },
+        {
+            "description": "-10 Opp Attack, Min 8",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Brawl: - 1 Opp. Life Min 4",
+            "description_with_var": "Brawl: - X Opp. Life Min Y"
+        },
+        {
+            "description": "+2 Attack Per Life Lost",
+            "description_with_var": "+X Attack Per Life Lost"
+        },
+        {
+            "description": "Brawl: Power And Damage + 1",
+            "description_with_var": "Brawl: Power And Damage + X"
+        },
+        {
+            "description": "Power +5",
+            "description_with_var": "Power +X"
+        },
+        {
+            "description": "Symmetry: - 5 Opp. Life Min 0",
+            "description_with_var": "Symmetry: - X Opp. Life Min Y"
+        },
+        {
+            "description": "Victory Or Defeat : +2 Life",
+            "description_with_var": "Victory Or Defeat : +X Life"
+        },
+        {
+            "description": "Equalizer: -1 Opp Pow. & Dam., Min 5",
+            "description_with_var": "Equalizer: -X Opp Pow. & Dam., Min Y"
+        },
+        {
+            "description": "Equalizer: -1 Opp Pow. & Dam., Min 3",
+            "description_with_var": "Equalizer: -X Opp Pow. & Dam., Min Y"
+        },
+        {
+            "description": "Growth: -5 Opp Attack, Min 1",
+            "description_with_var": "Growth: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Courage: -2 Opp Pow. & Dam., Min 3",
+            "description_with_var": "Courage: -X Opp Pow. & Dam., Min Y"
+        },
+        {
+            "description": "-2 Opp. Life Min 1",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "-5 Opp Damage, Min 5",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "-2 Opp Power, Min 4",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "Confidence : -1 Opp. Power, Min 1",
+            "description_with_var": "Confidence : -X Opp. Power, Min Y"
+        },
+        {
+            "description": "-4 Opp Damage, Min 0",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "-1 Opp. Pillz, Per Round, Min 4",
+            "description_with_var": "-X Opp. Pillz, Per Round, Min Y"
+        },
+        {
+            "description": "-3 Opp. Life Min 1",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "Heal 4 Max. 7",
+            "description_with_var": "Heal X Max. Y"
+        },
+        {
+            "description": "Killshot: -4 Opp. Life Min 0",
+            "description_with_var": "Killshot: -X Opp. Life Min Y"
+        },
+        {
+            "description": "Victory Or Defeat : +5 Players Life",
+            "description_with_var": "Victory Or Defeat : +X Players Life"
+        },
+        {
+            "description": "-4 Opp Power, Min 2",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "Confidence: Power Exchange",
+            "description_with_var": "Confidence: Power Exchange"
+        },
+        {
+            "description": "Attack +8",
+            "description_with_var": "Attack +X"
+        },
+        {
+            "description": "-3 Opp Power, Min 1",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "Attack +9",
+            "description_with_var": "Attack +X"
+        },
+        {
+            "description": "Courage: Power +5",
+            "description_with_var": "Courage: Power +X"
+        },
+        {
+            "description": "Illusion",
+            "description_with_var": "Illusion"
+        },
+        {
+            "description": "Defeat : Heal 1 Max. 15",
+            "description_with_var": "Defeat : Heal X Max. Y"
+        },
+        {
+            "description": "Reprisal: -2 Opp Pow. & Dmg,min 1",
+            "description_with_var": "Reprisal: -X Opp Pow. & Dmg,min Y"
+        },
+        {
+            "description": "Defeat: Brawl: +1 Life",
+            "description_with_var": "Defeat: Brawl: +X Life"
+        },
+        {
+            "description": "Symmetry: Damage +2",
+            "description_with_var": "Symmetry: Damage +X"
+        },
+        {
+            "description": "Courage: Attack +12",
+            "description_with_var": "Courage: Attack +X"
+        },
+        {
+            "description": "Revenge: -2 Opp. Power, Min 5",
+            "description_with_var": "Revenge: -X Opp. Power, Min Y"
+        },
+        {
+            "description": "Attack +1",
+            "description_with_var": "Attack +X"
+        },
+        {
+            "description": "Protection: Ability",
+            "description_with_var": "Protection: Ability"
+        },
+        {
+            "description": "Equalizer: - 1 Opp. Life Min 0",
+            "description_with_var": "Equalizer: - X Opp. Life Min Y"
+        },
+        {
+            "description": "Reprisal: Stop Opp. Ability",
+            "description_with_var": "Reprisal: Stop Opp. Ability"
+        },
+        {
+            "description": "Symmetry: +1 Atk Per Life Left",
+            "description_with_var": "Symmetry: +X Atk Per Life Left"
+        },
+        {
+            "description": "Brawl: -1 Opp Pow. And Damage, Min 4",
+            "description_with_var": "Brawl: -X Opp Pow. And Damage, Min Y"
+        },
+        {
+            "description": "Victory Or Defeat: - 1 Opp. Life Min 1",
+            "description_with_var": "Victory Or Defeat: - X Opp. Life Min Y"
+        },
+        {
+            "description": "Equalizer: -2 Opp Damage, Min 3",
+            "description_with_var": "Equalizer: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "Degrowth: +1 Life",
+            "description_with_var": "Degrowth: +X Life"
+        },
+        {
+            "description": "Toxin 1, Min 0",
+            "description_with_var": "Toxin X, Min Y"
+        },
+        {
+            "description": "Day: Confidence: Damage Exchange",
+            "description_with_var": "Day: Confidence: Damage Exchange"
+        },
+        {
+            "description": "Asymmetry: Power And Damage + 3",
+            "description_with_var": "Asymmetry: Power And Damage + X"
+        },
+        {
+            "description": "Stop: Power +3",
+            "description_with_var": "Stop: Power +X"
+        },
+        {
+            "description": "Stop: Atk. +8",
+            "description_with_var": "Stop: Atk. +X"
+        },
+        {
+            "description": "-5 Opp Damage, Min 4",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "Power +6",
+            "description_with_var": "Power +X"
+        },
+        {
+            "description": "Confidence: Power +2",
+            "description_with_var": "Confidence: Power +X"
+        },
+        {
+            "description": "Confidence: Power +3",
+            "description_with_var": "Confidence: Power +X"
+        },
+        {
+            "description": "Confidence: Stop Ability",
+            "description_with_var": "Confidence: Stop Ability"
+        },
+        {
+            "description": "Defeat: -2 Opp. Pillz, Min 4",
+            "description_with_var": "Defeat: -X Opp. Pillz, Min Y"
+        },
+        {
+            "description": "-3 Opp Power, Min 4",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "Attack +20",
+            "description_with_var": "Attack +X"
+        },
+        {
+            "description": "Poison 4, Min 4",
+            "description_with_var": "Poison X, Min Y"
+        },
+        {
+            "description": "-20 Opp Attack, Min 9",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Reprisal: Stop Opp. Bonus",
+            "description_with_var": "Reprisal: Stop Opp. Bonus"
+        },
+        {
+            "description": "Growth: +1 Life",
+            "description_with_var": "Growth: +X Life"
+        },
+        {
+            "description": "Courage: Bonus Protection",
+            "description_with_var": "Courage: Bonus Protection"
+        },
+        {
+            "description": "Support: -3 Opp Attack, Min 3",
+            "description_with_var": "Support: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Support: -3 Opp Attack, Min 8",
+            "description_with_var": "Support: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Killshot: +5 Life Max. 17",
+            "description_with_var": "Killshot: +X Life Max. Y"
+        },
+        {
+            "description": "Versus  : Stop Opp. Ability",
+            "description_with_var": "Versus  : Stop Opp. Ability"
+        },
+        {
+            "description": "Copy: Opp. Damage",
+            "description_with_var": "Copy: Opp. Damage"
+        },
+        {
+            "description": "-2 Opp Pillz. Min 2",
+            "description_with_var": "-X Opp Pillz. Min Y"
+        },
+        {
+            "description": "Confidence : -3 Opp. Power, Min 4",
+            "description_with_var": "Confidence : -X Opp. Power, Min Y"
+        },
+        {
+            "description": "-3 Opp Damage, Min 1",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "Regen 2, Max. 16",
+            "description_with_var": "Regen X, Max. Y"
+        },
+        {
+            "description": "-3 Opp Power And Damage, Min 4",
+            "description_with_var": "-X Opp Power And Damage, Min Y"
+        },
+        {
+            "description": "Confidence: -3 Opp Damage, Min 0",
+            "description_with_var": "Confidence: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "-3 Opp. Life Min 4",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "Reprisal: +2 Pillz",
+            "description_with_var": "Reprisal: +X Pillz"
+        },
+        {
+            "description": "Poison 3, Min 2",
+            "description_with_var": "Poison X, Min Y"
+        },
+        {
+            "description": "-2 Opp Power And Damage, Min 6",
+            "description_with_var": "-X Opp Power And Damage, Min Y"
+        },
+        {
+            "description": "+2 Pillz",
+            "description_with_var": "+X Pillz"
+        },
+        {
+            "description": "-3 Opp Pillz. Min 6",
+            "description_with_var": "-X Opp Pillz. Min Y"
+        },
+        {
+            "description": "-10 Opp Attack, Min 5",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Poison 1, Min 5",
+            "description_with_var": "Poison X, Min Y"
+        },
+        {
+            "description": "Symmetry: -3 Opp Power, Min 4",
+            "description_with_var": "Symmetry: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Revenge: Cancel Opp. Pow. And Dam. Modif.",
+            "description_with_var": "Revenge: Cancel Opp. Pow. And Dam. Modif."
+        },
+        {
+            "description": "+1 Life Per Damage",
+            "description_with_var": "+X Life Per Damage"
+        },
+        {
+            "description": "Vict. Or Def.: -1 Opp Life & Pillz Min 2",
+            "description_with_var": "Vict. Or Def.: -X Opp Life & Pillz Min Y"
+        },
+        {
+            "description": "Backlash: Poison 2, Min 4",
+            "description_with_var": "Backlash: Poison X, Min Y"
+        },
+        {
+            "description": "Support: Damage +1",
+            "description_with_var": "Support: Damage +X"
+        },
+        {
+            "description": "Symmetry: - 2 Opp. Life Min 0",
+            "description_with_var": "Symmetry: - X Opp. Life Min Y"
+        },
+        {
+            "description": "Stop: -3 Opp Pow. & Dmg,min 1",
+            "description_with_var": "Stop: -X Opp Pow. & Dmg,min Y"
+        },
+        {
+            "description": "-2 Opp Pillz. Min 4",
+            "description_with_var": "-X Opp Pillz. Min Y"
+        },
+        {
+            "description": "Day: Courage: Attack +20",
+            "description_with_var": "Day: Courage: Attack +X"
+        },
+        {
+            "description": "Courage: Power +2",
+            "description_with_var": "Courage: Power +X"
+        },
+        {
+            "description": "-10 Opp Attack, Min 3",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Equalizer: -3 Opp Attack, Min 2",
+            "description_with_var": "Equalizer: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Growth: Power +3",
+            "description_with_var": "Growth: Power +X"
+        },
+        {
+            "description": "Attack +12",
+            "description_with_var": "Attack +X"
+        },
+        {
+            "description": "Reprisal: Damage +2",
+            "description_with_var": "Reprisal: Damage +X"
+        },
+        {
+            "description": "Stop : - 2 Opp. Life, Min 0",
+            "description_with_var": "Stop : - X Opp. Life, Min Y"
+        },
+        {
+            "description": "Backlash: - 2 Life Min 4",
+            "description_with_var": "Backlash: - X Life Min Y"
+        },
+        {
+            "description": "Courage: -4 Opp. Dmg, Min 2",
+            "description_with_var": "Courage: -X Opp. Dmg, Min Y"
+        },
+        {
+            "description": "Support: Attack +5",
+            "description_with_var": "Support: Attack +X"
+        },
+        {
+            "description": "Poison 1, Min 1",
+            "description_with_var": "Poison X, Min Y"
+        },
+        {
+            "description": "Courage: Power And Damage + 2",
+            "description_with_var": "Courage: Power And Damage + X"
+        },
+        {
+            "description": "-2 Cards Power, Min 2",
+            "description_with_var": "-X Cards Power, Min Y"
+        },
+        {
+            "description": "-2 Opp Power, Min 2",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "-1 Opp Pow. & Dam., Min 2",
+            "description_with_var": "-X Opp Pow. & Dam., Min Y"
+        },
+        {
+            "description": "Power +9",
+            "description_with_var": "Power +X"
+        },
+        {
+            "description": "Courage: Power And Damage + 1",
+            "description_with_var": "Courage: Power And Damage + X"
+        },
+        {
+            "description": "Courage: +2 Life",
+            "description_with_var": "Courage: +X Life"
+        },
+        {
+            "description": "Reprisal: Cancel Opp Pow & Dam Mod",
+            "description_with_var": "Reprisal: Cancel Opp Pow & Dam Mod"
+        },
+        {
+            "description": "Toxin 2, Min 1",
+            "description_with_var": "Toxin X, Min Y"
+        },
+        {
+            "description": "Regen 1, Max. 16",
+            "description_with_var": "Regen X, Max. Y"
+        },
+        {
+            "description": "Growth: Power +2",
+            "description_with_var": "Growth: Power +X"
+        },
+        {
+            "description": "Backlash: - 2 Life Min 2",
+            "description_with_var": "Backlash: - X Life Min Y"
+        },
+        {
+            "description": "Revenge: Attack +10",
+            "description_with_var": "Revenge: Attack +X"
+        },
+        {
+            "description": "-2 Opp Pillz. Min 3",
+            "description_with_var": "-X Opp Pillz. Min Y"
+        },
+        {
+            "description": "-1 Opp Pillz. Min 1",
+            "description_with_var": "-X Opp Pillz. Min Y"
+        },
+        {
+            "description": "Copy: Power And Damage Opp.",
+            "description_with_var": "Copy: Power And Damage Opp."
+        },
+        {
+            "description": "Equalizer: -4 Opp Attack, Min 5",
+            "description_with_var": "Equalizer: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Regen 1, Max. 12",
+            "description_with_var": "Regen X, Max. Y"
+        },
+        {
+            "description": "Protection: Cards Power And Damage",
+            "description_with_var": "Protection: Cards Power And Damage"
+        },
+        {
+            "description": "Stop: Poison 3, Min 1",
+            "description_with_var": "Stop: Poison X, Min Y"
+        },
+        {
+            "description": "Copy: Opp. Power",
+            "description_with_var": "Copy: Opp. Power"
+        },
+        {
+            "description": "Protection: Power",
+            "description_with_var": "Protection: Power"
+        },
+        {
+            "description": "Growth: Damage +2",
+            "description_with_var": "Growth: Damage +X"
+        },
+        {
+            "description": "Equalizer: +1 Pillz And Life",
+            "description_with_var": "Equalizer: +X Pillz And Life"
+        },
+        {
+            "description": "Killshot: -4 Opp. Life Min 2",
+            "description_with_var": "Killshot: -X Opp. Life Min Y"
+        },
+        {
+            "description": "Victory Or Defeat : +1 Life",
+            "description_with_var": "Victory Or Defeat : +X Life"
+        },
+        {
+            "description": "Stop: Equalizer: - 1 Opp. Life Min 0",
+            "description_with_var": "Stop: Equalizer: - X Opp. Life Min Y"
+        },
+        {
+            "description": "Heal 2 Max. 12",
+            "description_with_var": "Heal X Max. Y"
+        },
+        {
+            "description": "+2 Pillz Max. 9",
+            "description_with_var": "+X Pillz Max. Y"
+        },
+        {
+            "description": "Team: Reprisal: -2 Opp Power, Min 2",
+            "description_with_var": "Team: Reprisal: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Equalizer: -4 Opp Attack, Min 3",
+            "description_with_var": "Equalizer: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Symmetry: +2 Atk Per Life Left",
+            "description_with_var": "Symmetry: +X Atk Per Life Left"
+        },
+        {
+            "description": "Confidence : -13 Opp. Attack, Min 3",
+            "description_with_var": "Confidence : -X Opp. Attack, Min Y"
+        },
+        {
+            "description": "Growth: Poison 1, Min 3",
+            "description_with_var": "Growth: Poison X, Min Y"
+        },
+        {
+            "description": "Stop: +4 Pillz",
+            "description_with_var": "Stop: +X Pillz"
+        },
+        {
+            "description": "+1 Power Per Pillz Left Max. 8",
+            "description_with_var": "+X Power Per Pillz Left Max. Y"
+        },
+        {
+            "description": "Remove Ability Conditions",
+            "description_with_var": "Remove Ability Conditions"
+        },
+        {
+            "description": "Heal 1 Max. 10",
+            "description_with_var": "Heal X Max. Y"
+        },
+        {
+            "description": "Reprisal: -2 Opp Pow. & Dmg,min 2",
+            "description_with_var": "Reprisal: -X Opp Pow. & Dmg,min Y"
+        },
+        {
+            "description": "Defeat: + 5 Life",
+            "description_with_var": "Defeat: + X Life"
+        },
+        {
+            "description": "Stop: -3 Pillz Opp. Min 1",
+            "description_with_var": "Stop: -X Pillz Opp. Min Y"
+        },
+        {
+            "description": "-4 Opp. Life Min 3",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "Poison 2, Min 4",
+            "description_with_var": "Poison X, Min Y"
+        },
+        {
+            "description": "Versus  : Heal 1 Max. 11",
+            "description_with_var": "Versus  : Heal X Max. Y"
+        },
+        {
+            "description": "Revenge: -2 Opp Pow. & Dmg,min 3",
+            "description_with_var": "Revenge: -X Opp Pow. & Dmg,min Y"
+        },
+        {
+            "description": "-3 Opp Pillz. Min 4",
+            "description_with_var": "-X Opp Pillz. Min Y"
+        },
+        {
+            "description": "Growth: -1 Opp Power, Min 1",
+            "description_with_var": "Growth: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Courage: Attack +13",
+            "description_with_var": "Courage: Attack +X"
+        },
+        {
+            "description": "Confidence : -6 Opp. Attack, Min 2",
+            "description_with_var": "Confidence : -X Opp. Attack, Min Y"
+        },
+        {
+            "description": "Brawl: -1 Opp Damage, Min 3",
+            "description_with_var": "Brawl: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "Recover 1 Pillz Out Of 3",
+            "description_with_var": "Recover X Pillz Out Of Y"
+        },
+        {
+            "description": "Courage: +4 Life",
+            "description_with_var": "Courage: +X Life"
+        },
+        {
+            "description": "Degrowth: +1 Pillz",
+            "description_with_var": "Degrowth: +X Pillz"
+        },
+        {
+            "description": "Equalizer: -1 Opp Power, Min 4",
+            "description_with_var": "Equalizer: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Reprisal: -3 Opp Damage, Min 1",
+            "description_with_var": "Reprisal: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "Killshot: +3 Life",
+            "description_with_var": "Killshot: +X Life"
+        },
+        {
+            "description": "Symmetry: +1 Pillz Per Damage",
+            "description_with_var": "Symmetry: +X Pillz Per Damage"
+        },
+        {
+            "description": "Heal 1 Max. 8",
+            "description_with_var": "Heal X Max. Y"
+        },
+        {
+            "description": "-6 Opp Attack, Min 5",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "-1 Opp Att. Per Life Left, Min 8",
+            "description_with_var": "-X Opp Att. Per Life Left, Min Y"
+        },
+        {
+            "description": "-3 Opp Damage, Min 3",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "+5 Life",
+            "description_with_var": "+X Life"
+        },
+        {
+            "description": "-5 Opp. Life Min 4",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "Support: -1 Opp Damage, Min 1",
+            "description_with_var": "Support: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "-1 Opp Power And Damage, Min 0",
+            "description_with_var": "-X Opp Power And Damage, Min Y"
+        },
+        {
+            "description": "Support: -1 Opp Power, Min 5",
+            "description_with_var": "Support: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Revenge: +1 Life Per Damage",
+            "description_with_var": "Revenge: +X Life Per Damage"
+        },
+        {
+            "description": "-4 Opp Damage, Min 3",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "Courage: Stop Bonus",
+            "description_with_var": "Courage: Stop Bonus"
+        },
+        {
+            "description": "Support: -3 Opp Attack, Min 9",
+            "description_with_var": "Support: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Support: -4 Opp Attack, Min 8",
+            "description_with_var": "Support: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "-2 Opp Power And Damage, Min 2",
+            "description_with_var": "-X Opp Power And Damage, Min Y"
+        },
+        {
+            "description": "Defeat: -1 Opp. Life, Min 1",
+            "description_with_var": "Defeat: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "Backlash: - 3 Life Min 1",
+            "description_with_var": "Backlash: - X Life Min Y"
+        },
+        {
+            "description": "Growth: -2 Opp Damage, Min 2",
+            "description_with_var": "Growth: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "Brawl: -1 Opp. Pillz, Min 1",
+            "description_with_var": "Brawl: -X Opp. Pillz, Min Y"
+        },
+        {
+            "description": "Regen 1, Max. 15",
+            "description_with_var": "Regen X, Max. Y"
+        },
+        {
+            "description": "Power And Damage + 3",
+            "description_with_var": "Power And Damage + X"
+        },
+        {
+            "description": "Equalizer: +1 Life, Max. 8",
+            "description_with_var": "Equalizer: +X Life, Max. Y"
+        },
+        {
+            "description": "Heal 1 Max. 6",
+            "description_with_var": "Heal X Max. Y"
+        },
+        {
+            "description": "-5 Opp Damage, Min 1",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "Confidence : +4 Life",
+            "description_with_var": "Confidence : +X Life"
+        },
+        {
+            "description": "Confidence: Attack +10",
+            "description_with_var": "Confidence: Attack +X"
+        },
+        {
+            "description": "-1 Opp Power And Damage, Min 1",
+            "description_with_var": "-X Opp Power And Damage, Min Y"
+        },
+        {
+            "description": "+3 Life",
+            "description_with_var": "+X Life"
+        },
+        {
+            "description": "Brawl: Power +1",
+            "description_with_var": "Brawl: Power +X"
+        },
+        {
+            "description": "Growth: -1 Opp. Life Min 0",
+            "description_with_var": "Growth: -X Opp. Life Min Y"
+        },
+        {
+            "description": "Day: -4 Opp Power, Min 4",
+            "description_with_var": "Day: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Confidence : +5 Life",
+            "description_with_var": "Confidence : +X Life"
+        },
+        {
+            "description": "Brawl: -2 Opp Damage, Min 1",
+            "description_with_var": "Brawl: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "-4 Opp Power, Min 4",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "Poison 3, Min 1",
+            "description_with_var": "Poison X, Min Y"
+        },
+        {
+            "description": "Stop: +3 Life",
+            "description_with_var": "Stop: +X Life"
+        },
+        {
+            "description": "Stop : - 3 Opp. Life, Min 1",
+            "description_with_var": "Stop : - X Opp. Life, Min Y"
+        },
+        {
+            "description": "Reprisal: -2 Opp Pow. & Dmg,min 3",
+            "description_with_var": "Reprisal: -X Opp Pow. & Dmg,min Y"
+        },
+        {
+            "description": "Team: Defeat: Rec. 1 Pillz Out Of 2",
+            "description_with_var": "Team: Defeat: Rec. X Pillz Out Of Y"
+        },
+        {
+            "description": "-5 Opp Power And Damage, Min 5",
+            "description_with_var": "-X Opp Power And Damage, Min Y"
+        },
+        {
+            "description": "Revenge: -2 Opp Pow. & Dmg,min 2",
+            "description_with_var": "Revenge: -X Opp Pow. & Dmg,min Y"
+        },
+        {
+            "description": "Reprisal: Damage Exchange",
+            "description_with_var": "Reprisal: Damage Exchange"
+        },
+        {
+            "description": "Equalizer: -1 Opp Damage, Min 1",
+            "description_with_var": "Equalizer: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "Revenge: Poison 3, Min 4",
+            "description_with_var": "Revenge: Poison X, Min Y"
+        },
+        {
+            "description": "Support: +2 Life",
+            "description_with_var": "Support: +X Life"
+        },
+        {
+            "description": "Revenge: Attack +8",
+            "description_with_var": "Revenge: Attack +X"
+        },
+        {
+            "description": "Heal 1 Max. 18",
+            "description_with_var": "Heal X Max. Y"
+        },
+        {
+            "description": "Degrowth: - 1 Opp. Life Min 0",
+            "description_with_var": "Degrowth: - X Opp. Life Min Y"
+        },
+        {
+            "description": "Day: Cancel Opp. Power Modif.",
+            "description_with_var": "Day: Cancel Opp. Power Modif."
+        },
+        {
+            "description": "-7 Opp Attack, Min 0",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "-8 Opp Attack, Min 8",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Degrowth: -1 Opp Damage, Min 2",
+            "description_with_var": "Degrowth: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "-2 Opp. Pillz And Life, Min 4",
+            "description_with_var": "-X Opp. Pillz And Life, Min Y"
+        },
+        {
+            "description": "Defeat: +2 Life, Max. 12",
+            "description_with_var": "Defeat: +X Life, Max. Y"
+        },
+        {
+            "description": "+3 Attack Per Opp. Damage",
+            "description_with_var": "+X Attack Per Opp. Damage"
+        },
+        {
+            "description": "Growth: - 1 Opp. Life Min 4",
+            "description_with_var": "Growth: - X Opp. Life Min Y"
+        },
+        {
+            "description": "Cancel Opp. Life Modif.",
+            "description_with_var": "Cancel Opp. Life Modif."
+        },
+        {
+            "description": "-7 Cards Attack, Min 0",
+            "description_with_var": "-X Cards Attack, Min Y"
+        },
+        {
+            "description": "Asymmetry: -3 Opp Power, Min 4",
+            "description_with_var": "Asymmetry: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Equalizer: -3 Opp Attack, Min 5",
+            "description_with_var": "Equalizer: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "-1 Opp Power Per Pillz Lost, Min 5",
+            "description_with_var": "-X Opp Power Per Pillz Lost, Min Y"
+        },
+        {
+            "description": "Confidence: Copy: Opp. Power",
+            "description_with_var": "Confidence: Copy: Opp. Power"
+        },
+        {
+            "description": "Growth: -4 Opp Attack, Min 8",
+            "description_with_var": "Growth: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "+4 Life",
+            "description_with_var": "+X Life"
+        },
+        {
+            "description": "+3 Pillz",
+            "description_with_var": "+X Pillz"
+        },
+        {
+            "description": "Protection: Power And Damage",
+            "description_with_var": "Protection: Power And Damage"
+        },
+        {
+            "description": "Team: -1 Opp. Power, Min 5",
+            "description_with_var": "Team: -X Opp. Power, Min Y"
+        },
+        {
+            "description": "Brawl: -1 Opp Power, Min 1",
+            "description_with_var": "Brawl: -X Opp Power, Min Y"
+        },
+        {
+            "description": "+2 Attack Per Opp. Damage",
+            "description_with_var": "+X Attack Per Opp. Damage"
+        },
+        {
+            "description": "Brawl: Damage + 1",
+            "description_with_var": "Brawl: Damage + X"
+        },
+        {
+            "description": "Courage: -2 Opp Pow. & Dam., Min 2",
+            "description_with_var": "Courage: -X Opp Pow. & Dam., Min Y"
+        },
+        {
+            "description": "Degrowth: Power And Damage +1",
+            "description_with_var": "Degrowth: Power And Damage +X"
+        },
+        {
+            "description": "Revenge: -4 Opp. Power, Min 4",
+            "description_with_var": "Revenge: -X Opp. Power, Min Y"
+        },
+        {
+            "description": "Defeat: -2 Opp. Life, Min 1",
+            "description_with_var": "Defeat: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "Confidence: Stop Opp. Bonus",
+            "description_with_var": "Confidence: Stop Opp. Bonus"
+        },
+        {
+            "description": "Defeat: Poison 1, Min 1",
+            "description_with_var": "Defeat: Poison X, Min Y"
+        },
+        {
+            "description": "Victory Or Defeat : +5 Players Pillz",
+            "description_with_var": "Victory Or Defeat : +X Players Pillz"
+        },
+        {
+            "description": "Damage +3",
+            "description_with_var": "Damage +X"
+        },
+        {
+            "description": "Support: -2 Opp Attack, Min 8",
+            "description_with_var": "Support: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Team: -2 Opp. Damage, Min 3",
+            "description_with_var": "Team: -X Opp. Damage, Min Y"
+        },
+        {
+            "description": "Team: +1 Damage",
+            "description_with_var": "Team: +X Damage"
+        },
+        {
+            "description": "Defeat: -3 Opp. Life, Min 3",
+            "description_with_var": "Defeat: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "Poison 2, Min 0",
+            "description_with_var": "Poison X, Min Y"
+        },
+        {
+            "description": "Equalizer: Attack +4",
+            "description_with_var": "Equalizer: Attack +X"
+        },
+        {
+            "description": "Equalizer: -1 Opp Pow. & Dam., Min 1",
+            "description_with_var": "Equalizer: -X Opp Pow. & Dam., Min Y"
+        },
+        {
+            "description": "Victory Or Defeat: - 2 Opp. Life Min 1",
+            "description_with_var": "Victory Or Defeat: - X Opp. Life Min Y"
+        },
+        {
+            "description": "Reprisal: Damage Impose",
+            "description_with_var": "Reprisal: Damage Impose"
+        },
+        {
+            "description": "Day: +2 Pillz",
+            "description_with_var": "Day: +X Pillz"
+        },
+        {
+            "description": "-7 Opp. Life Min 0",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "Xantiax: -3 Life, Min. 0",
+            "description_with_var": "Xantiax: -X Life, Min. Y"
+        },
+        {
+            "description": "Day: -2 Opp Att. Per Pillz Left, Min 1",
+            "description_with_var": "Day: -X Opp Att. Per Pillz Left, Min Y"
+        },
+        {
+            "description": "Defeat: + 2 Pillz Max. 10",
+            "description_with_var": "Defeat: + X Pillz Max. Y"
+        },
+        {
+            "description": "-2 Cards Damage, Min 1",
+            "description_with_var": "-X Cards Damage, Min Y"
+        },
+        {
+            "description": "-12 Opp Attack, Min 6",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "+1 Pillz And Life",
+            "description_with_var": "+X Pillz And Life"
+        },
+        {
+            "description": "Protection: Attack",
+            "description_with_var": "Protection: Attack"
+        },
+        {
+            "description": "Backlash: - 5 Life Min 0",
+            "description_with_var": "Backlash: - X Life Min Y"
+        },
+        {
+            "description": "Courage: Attack +7",
+            "description_with_var": "Courage: Attack +X"
+        },
+        {
+            "description": "-6 Opp Attack, Min 3",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "-5 Opp. Life Min 6",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "Team: +7 Attack",
+            "description_with_var": "Team: +X Attack"
+        },
+        {
+            "description": "-3 Opp Damage, Min 2",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "Attack +10",
+            "description_with_var": "Attack +X"
+        },
+        {
+            "description": "Reprisal: -2 Opp Power, Min 4",
+            "description_with_var": "Reprisal: -X Opp Power, Min Y"
+        },
+        {
+            "description": "-9 Opp Attack, Min 7",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "+1 Power Per Life Left Max. 13",
+            "description_with_var": "+X Power Per Life Left Max. Y"
+        },
+        {
+            "description": "Victory Or Defeat: Regen 1, Max. 20",
+            "description_with_var": "Victory Or Defeat: Regen X, Max. Y"
+        },
+        {
+            "description": "Confidence: -3 Opp Damage, Min 3",
+            "description_with_var": "Confidence: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "-2 Opp. Pillz And Life, Min 1",
+            "description_with_var": "-X Opp. Pillz And Life, Min Y"
+        },
+        {
+            "description": "-8 Opp Attack, Min 7",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Confidence: -4 Opp Damage, Min 1",
+            "description_with_var": "Confidence: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "-5 Opp Power, Min 2",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "Confidence: Power And Damage +2",
+            "description_with_var": "Confidence: Power And Damage +X"
+        },
+        {
+            "description": "Confidence: Power +4",
+            "description_with_var": "Confidence: Power +X"
+        },
+        {
+            "description": "Symmetry: -2 Opp Pow. And Dam., Min 1",
+            "description_with_var": "Symmetry: -X Opp Pow. And Dam., Min Y"
+        },
+        {
+            "description": "Defeat: Recover 1 Pillz Out Of 2",
+            "description_with_var": "Defeat: Recover X Pillz Out Of Y"
+        },
+        {
+            "description": "Regen 3, Max. 4",
+            "description_with_var": "Regen X, Max. Y"
+        },
+        {
+            "description": "Heal 1 Max. 15",
+            "description_with_var": "Heal X Max. Y"
+        },
+        {
+            "description": "-4 Opp Damage, Min 4",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "Growth: Attack +4",
+            "description_with_var": "Growth: Attack +X"
+        },
+        {
+            "description": "Stop: Damage +3",
+            "description_with_var": "Stop: Damage +X"
+        },
+        {
+            "description": "Stop: Heal 3 Max. 14",
+            "description_with_var": "Stop: Heal X Max. Y"
+        },
+        {
+            "description": "Killshot: +2 Pillz",
+            "description_with_var": "Killshot: +X Pillz"
+        },
+        {
+            "description": "Growth: -4 Opp Attack, Min 1",
+            "description_with_var": "Growth: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Confidence: +1 Atk Per Life Left",
+            "description_with_var": "Confidence: +X Atk Per Life Left"
+        },
+        {
+            "description": "Power And Damage Exchange",
+            "description_with_var": "Power And Damage Exchange"
+        },
+        {
+            "description": "Infiltrated",
+            "description_with_var": "Infiltrated"
+        },
+        {
+            "description": "Reprisal: Power +2",
+            "description_with_var": "Reprisal: Power +X"
+        },
+        {
+            "description": "Damage +5",
+            "description_with_var": "Damage +X"
+        },
+        {
+            "description": "+1 Attack Per Opp. Power",
+            "description_with_var": "+X Attack Per Opp. Power"
+        },
+        {
+            "description": "Victory Or Defeat : +1 Pillz",
+            "description_with_var": "Victory Or Defeat : +X Pillz"
+        },
+        {
+            "description": "Vict. Or Def.: -1 Opp Life & Pillz Min 1",
+            "description_with_var": "Vict. Or Def.: -X Opp Life & Pillz Min Y"
+        },
+        {
+            "description": "Revenge: -2 Opp. Power, Min 1",
+            "description_with_var": "Revenge: -X Opp. Power, Min Y"
+        },
+        {
+            "description": "Copy: Opp. Bonus",
+            "description_with_var": "Copy: Opp. Bonus"
+        },
+        {
+            "description": "Growth: Toxin 1, Min 4",
+            "description_with_var": "Growth: Toxin X, Min Y"
+        },
+        {
+            "description": "Reprisal: Protect. Power And Damage",
+            "description_with_var": "Reprisal: Protect. Power And Damage"
+        },
+        {
+            "description": "Reprisal: Copy: Opp. Power",
+            "description_with_var": "Reprisal: Copy: Opp. Power"
+        },
+        {
+            "description": "Support: +1 Life",
+            "description_with_var": "Support: +X Life"
+        },
+        {
+            "description": "Confidence: -1 Opp. Life, Min 1",
+            "description_with_var": "Confidence: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "-5 Opp. Life Min 5",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "Confidence: -9 Cards Damage, Min 0",
+            "description_with_var": "Confidence: -X Cards Damage, Min Y"
+        },
+        {
+            "description": "Equalizer: -1 Opp Damage, Min 2",
+            "description_with_var": "Equalizer: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "Stop: Damage +2",
+            "description_with_var": "Stop: Damage +X"
+        },
+        {
+            "description": "Poison 1, Min 2",
+            "description_with_var": "Poison X, Min Y"
+        },
+        {
+            "description": "Brawl: -6 Opp Attack, Min 6",
+            "description_with_var": "Brawl: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Growth: Regen 1, Max. 15",
+            "description_with_var": "Growth: Regen X, Max. Y"
+        },
+        {
+            "description": "Asymmetry: Power +4",
+            "description_with_var": "Asymmetry: Power +X"
+        },
+        {
+            "description": "Revenge: Damage +3",
+            "description_with_var": "Revenge: Damage +X"
+        },
+        {
+            "description": "-7 Opp Power, Min 1",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "-2 Opp. Pillz And Life, Min 0",
+            "description_with_var": "-X Opp. Pillz And Life, Min Y"
+        },
+        {
+            "description": "Growth: -2 Opp Power, Min 2",
+            "description_with_var": "Growth: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Brawl: -1 Opp Damage, Min 1",
+            "description_with_var": "Brawl: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "Killshot: +4 Life",
+            "description_with_var": "Killshot: +X Life"
+        },
+        {
+            "description": "Revenge: -2 Opp. Pillz And Life, Min 0",
+            "description_with_var": "Revenge: -X Opp. Pillz And Life, Min Y"
+        },
+        {
+            "description": "Cancel Opp. Pillz Modif.",
+            "description_with_var": "Cancel Opp. Pillz Modif."
+        },
+        {
+            "description": "Courage: - 3 Opp. Life Min 0",
+            "description_with_var": "Courage: - X Opp. Life Min Y"
+        },
+        {
+            "description": "Day:  +8 Opp Attack",
+            "description_with_var": "Day:  +X Opp Attack"
+        },
+        {
+            "description": "Attack +6",
+            "description_with_var": "Attack +X"
+        },
+        {
+            "description": "-1 Opp. Pillz And Life, Min 0",
+            "description_with_var": "-X Opp. Pillz And Life, Min Y"
+        },
+        {
+            "description": "Power And Damage + 1",
+            "description_with_var": "Power And Damage + X"
+        },
+        {
+            "description": "Equalizer: -1 Opp Damage, Min 3",
+            "description_with_var": "Equalizer: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "Xantiax: -2 Life, Min. 0",
+            "description_with_var": "Xantiax: -X Life, Min. Y"
+        },
+        {
+            "description": "Revenge : +4 Life",
+            "description_with_var": "Revenge : +X Life"
+        },
+        {
+            "description": "Victory Or Defeat : +2 Pillz",
+            "description_with_var": "Victory Or Defeat : +X Pillz"
+        },
+        {
+            "description": "Defeat: Backlash: - 2 Life Min 2",
+            "description_with_var": "Defeat: Backlash: - X Life Min Y"
+        },
+        {
+            "description": "Confidence : -2 Opp. Power, Min 1",
+            "description_with_var": "Confidence : -X Opp. Power, Min Y"
+        },
+        {
+            "description": "Revenge: -4 Opp. Life, Min 2",
+            "description_with_var": "Revenge: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "Protection: Bonus",
+            "description_with_var": "Protection: Bonus"
+        },
+        {
+            "description": "Growth: -1 Opp Power, Min 5",
+            "description_with_var": "Growth: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Equalizer: Power And Damage +1",
+            "description_with_var": "Equalizer: Power And Damage +X"
+        },
+        {
+            "description": "Reprisal : -5 Opp. Life, Min 2",
+            "description_with_var": "Reprisal : -X Opp. Life, Min Y"
+        },
+        {
+            "description": "Regen 2, Max. 8",
+            "description_with_var": "Regen X, Max. Y"
+        },
+        {
+            "description": "Courage: Prot.: Power & Damage",
+            "description_with_var": "Courage: Prot.: Power & Damage"
+        },
+        {
+            "description": "Degrowth: Power +1",
+            "description_with_var": "Degrowth: Power +X"
+        },
+        {
+            "description": "Revenge: Power Exchange",
+            "description_with_var": "Revenge: Power Exchange"
+        },
+        {
+            "description": "-7 Opp Attack, Min 3",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "-5 Opp. Life Min 0",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "Damage +2",
+            "description_with_var": "Damage +X"
+        },
+        {
+            "description": "Victory Or Defeat : +3 Life",
+            "description_with_var": "Victory Or Defeat : +X Life"
+        },
+        {
+            "description": "Poison 1, Min 0",
+            "description_with_var": "Poison X, Min Y"
+        },
+        {
+            "description": "Conf.: Vict. Or Def.: -2 Opp. Life, Min 0",
+            "description_with_var": "Conf.: Vict. Or Def.: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "Growth: Attack +2",
+            "description_with_var": "Growth: Attack +X"
+        },
+        {
+            "description": "Day: Power And Damage + 1",
+            "description_with_var": "Day: Power And Damage + X"
+        },
+        {
+            "description": "Defeat: + 1 Life",
+            "description_with_var": "Defeat: + X Life"
+        },
+        {
+            "description": "Stop : -2 Opp Power, Min 3",
+            "description_with_var": "Stop : -X Opp Power, Min Y"
+        },
+        {
+            "description": "Defeat: -1 Opp. Life, Min 0",
+            "description_with_var": "Defeat: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "Brawl: -1 Opp Pow. And Damage, Min 3",
+            "description_with_var": "Brawl: -X Opp Pow. And Damage, Min Y"
+        },
+        {
+            "description": "-4 Opp Power, Min 1",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "-3 Opp Attack, Min 1",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Stop: Power And Damage +2",
+            "description_with_var": "Stop: Power And Damage +X"
+        },
+        {
+            "description": "-1 Opp Damage, Min 2",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "Brawl: -3 Opp Attack, Min 5",
+            "description_with_var": "Brawl: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Defeat: Dope 1, Max. 13",
+            "description_with_var": "Defeat: Dope X, Max. Y"
+        },
+        {
+            "description": "Defeat: + 1 Pillz",
+            "description_with_var": "Defeat: + X Pillz"
+        },
+        {
+            "description": "Degrowth: -1 Opp Damage, Min 1",
+            "description_with_var": "Degrowth: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "Cards Damage +2",
+            "description_with_var": "Cards Damage +X"
+        },
+        {
+            "description": "-2 Opp. Life Min 0",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "-4 Opp Power, Min 3",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "Equalizer: -1 Opp Power, Min 1",
+            "description_with_var": "Equalizer: -X Opp Power, Min Y"
+        },
+        {
+            "description": "Cancel Opp. Damage Modif.",
+            "description_with_var": "Cancel Opp. Damage Modif."
+        },
+        {
+            "description": "Cancel Leader",
+            "description_with_var": "Cancel Leader"
+        },
+        {
+            "description": "Poison 3, Min 3",
+            "description_with_var": "Poison X, Min Y"
+        },
+        {
+            "description": "Victory Or Defeat: - 2 Opp. Life Min 4",
+            "description_with_var": "Victory Or Defeat: - X Opp. Life Min Y"
+        },
+        {
+            "description": "-2 Opp. Life Min 2",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "Support: + 1 Pillz",
+            "description_with_var": "Support: + X Pillz"
+        },
+        {
+            "description": "Versus  : Power +2",
+            "description_with_var": "Versus  : Power +X"
+        },
+        {
+            "description": "Poison 1, Min 3",
+            "description_with_var": "Poison X, Min Y"
+        },
+        {
+            "description": "Killshot: +5 Life",
+            "description_with_var": "Killshot: +X Life"
+        },
+        {
+            "description": "Reprisal: -2 Opp Power, Min 5",
+            "description_with_var": "Reprisal: -X Opp Power, Min Y"
+        },
+        {
+            "description": "-4 Opp. Life Min 2",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "Stop Opp. Ability",
+            "description_with_var": "Stop Opp. Ability"
+        },
+        {
+            "description": "Reprisal: Power +3",
+            "description_with_var": "Reprisal: Power +X"
+        },
+        {
+            "description": "Revenge: Stop Opp. Ability",
+            "description_with_var": "Revenge: Stop Opp. Ability"
+        },
+        {
+            "description": "Revenge: Power +2",
+            "description_with_var": "Revenge: Power +X"
+        },
+        {
+            "description": "Defeat: -2 Opp. Life, Min 2",
+            "description_with_var": "Defeat: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "Copy: Opp. Ability",
+            "description_with_var": "Copy: Opp. Ability"
+        },
+        {
+            "description": "Growth: +2 Life",
+            "description_with_var": "Growth: +X Life"
+        },
+        {
+            "description": "Killshot: +4 Life Max. 16",
+            "description_with_var": "Killshot: +X Life Max. Y"
+        },
+        {
+            "description": "Growth: -1 Opp Damage, Min 2",
+            "description_with_var": "Growth: -X Opp Damage, Min Y"
+        },
+        {
+            "description": "-1 Opp. Life Min 0",
+            "description_with_var": "-X Opp. Life Min Y"
+        },
+        {
+            "description": "Courage: Power +3",
+            "description_with_var": "Courage: Power +X"
+        },
+        {
+            "description": "Defeat: -2 Opp. Pillz, Min 3",
+            "description_with_var": "Defeat: -X Opp. Pillz, Min Y"
+        },
+        {
+            "description": "Backlash: - 1 Pillz Min 4",
+            "description_with_var": "Backlash: - X Pillz Min Y"
+        },
+        {
+            "description": "Killshot: -2 Opp. Life Min 2",
+            "description_with_var": "Killshot: -X Opp. Life Min Y"
+        },
+        {
+            "description": "+1 Damage Per Life Left Max. 12",
+            "description_with_var": "+X Damage Per Life Left Max. Y"
+        },
+        {
+            "description": "Defeat: +1 Opp. Pillz",
+            "description_with_var": "Defeat: +X Opp. Pillz"
+        },
+        {
+            "description": "Defeat: +3 Life, Max. 10",
+            "description_with_var": "Defeat: +X Life, Max. Y"
+        },
+        {
+            "description": "Day: Stop Opp. Bonus",
+            "description_with_var": "Day: Stop Opp. Bonus"
+        },
+        {
+            "description": "-2 Players Pillz. Min 4",
+            "description_with_var": "-X Players Pillz. Min Y"
+        },
+        {
+            "description": "+1 Attack Per Opp. Damage",
+            "description_with_var": "+X Attack Per Opp. Damage"
+        },
+        {
+            "description": "Confidence: Power +5",
+            "description_with_var": "Confidence: Power +X"
+        },
+        {
+            "description": "Revenge: Mindwipe 2, Min 0",
+            "description_with_var": "Revenge: Mindwipe X, Min Y"
+        },
+        {
+            "description": "Revenge: -2 Opp. Life, Min 1",
+            "description_with_var": "Revenge: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "Brawl: - 1 Opp. Life Min 0",
+            "description_with_var": "Brawl: - X Opp. Life Min Y"
+        },
+        {
+            "description": "Revenge: + 2 Attack Per Opp. Power",
+            "description_with_var": "Revenge: + X Attack Per Opp. Power"
+        },
+        {
+            "description": "Revenge: -3 Opp. Life, Min 2",
+            "description_with_var": "Revenge: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "Growth: Poison 1, Min 0",
+            "description_with_var": "Growth: Poison X, Min Y"
+        },
+        {
+            "description": "Support: -1 Opp. Life, Min 0",
+            "description_with_var": "Support: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "-3 Opp Pillz. Min 3",
+            "description_with_var": "-X Opp Pillz. Min Y"
+        },
+        {
+            "description": "Courage: +1 Life Per Dmg",
+            "description_with_var": "Courage: +X Life Per Dmg"
+        },
+        {
+            "description": "-3 Opp Damage, Min 4",
+            "description_with_var": "-X Opp Damage, Min Y"
+        },
+        {
+            "description": "Support: Attack +3",
+            "description_with_var": "Support: Attack +X"
+        },
+        {
+            "description": "Courage: Copy: Opp. Bonus",
+            "description_with_var": "Courage: Copy: Opp. Bonus"
+        },
+        {
+            "description": "Attack +16",
+            "description_with_var": "Attack +X"
+        },
+        {
+            "description": "Bypass",
+            "description_with_var": "Bypass"
+        },
+        {
+            "description": "-1 Opp Power, Min 5",
+            "description_with_var": "-X Opp Power, Min Y"
+        },
+        {
+            "description": "-10 Opp Attack, Min 7",
+            "description_with_var": "-X Opp Attack, Min Y"
+        },
+        {
+            "description": "Stop: Heal 2 Max. 20",
+            "description_with_var": "Stop: Heal X Max. Y"
+        },
+        {
+            "description": "+1 Attack Per Life Left",
+            "description_with_var": "+X Attack Per Life Left"
+        },
+        {
+            "description": "Support: -4 Opp Attack, Min 9",
+            "description_with_var": "Support: -X Opp Attack, Min Y"
+        },
+        {
+            "description": "Defeat: -2 Opp. Life, Min 0",
+            "description_with_var": "Defeat: -X Opp. Life, Min Y"
+        },
+        {
+            "description": "Consume 1, Min 0",
+            "description_with_var": "Consume X, Min Y"
+        },
+        {
+            "description": "Confidence: +4 Pillz",
+            "description_with_var": "Confidence: +X Pillz"
+        },
+        {
+            "description": "Revenge: Power And Damage +2",
+            "description_with_var": "Revenge: Power And Damage +X"
+        },
+        {
+            "description": "Day: Vict. Or Defeat : +1 Pillz And Life",
+            "description_with_var": "Day: Vict. Or Defeat : +X Pillz And Life"
+        },
+        {
+            "description": "Asymmetry: Power +3",
+            "description_with_var": "Asymmetry: Power +X"
+        },
+        {
+            "description": "Defeat: -1 Opp. Pillz, Min 1",
+            "description_with_var": "Defeat: -X Opp. Pillz, Min Y"
+        },
+        {
+            "description": "Confidence: Damage +4",
+            "description_with_var": "Confidence: Damage +X"
+        },
+        {
+            "description": "-3 Opp Power, Min 3",
+            "description_with_var": "-X Opp Power, Min Y"
+        }
+    ]
+}
