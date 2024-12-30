@@ -39,3 +39,6 @@ class Game:
             "enemy": self.enemy.to_dict(),
             "history": [round_instance.model_dump() for round_instance in self.history],
         }
+    
+    def __repr__(self):
+        return f"Game(nb_turn={self.nb_turn}, turn={self.turn}, ally={self.ally}, enemy={self.enemy}, history={self.history})"

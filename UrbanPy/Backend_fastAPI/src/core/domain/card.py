@@ -125,3 +125,7 @@ class Card:
             "bonus_fight": self.bonus_fight.to_dict() if self.bonus_fight else None,
             "win": self.win,
         }
+    
+    # print les données de fight + attack
+    def __repr__(self) -> str:
+        return f"Card(name={self.name}, power_fight={self.power_fight}, damage_fight={self.damage_fight}, attack={self.attack}, played={self.played}, win={self.win})"

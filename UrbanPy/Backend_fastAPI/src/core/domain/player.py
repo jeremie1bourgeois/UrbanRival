@@ -39,3 +39,6 @@ class Player:
             "cards": [card.to_dict() for card in self.cards],
             "effect_list": self.effect_list,
         }
+
+    def __repr__(self):
+        return f"Player(name={self.name}, life={self.life}, pillz={self.pillz}, cards={self.cards}, effect_list={self.effect_list})"

@@ -12,6 +12,11 @@ const props = defineProps({
 		default: "",
 		required: false,
 	},
+	isFight: {
+		type: Boolean,
+		default: false,
+		required: false,
+	},
 });
 
 const imageSrc = computed(() => {
@@ -44,14 +49,14 @@ const clanSrc = computed(() => {
 			<div class="cardDescription">
 				<div class="flex h-[30px] items-center">
 					<img src="../assets/Power.png" alt="Power Image" class="w-[22px] h-[22px]" />
-					<div class="cardPH urbanFont">{{ card.power }}</div>
+					<div class="cardPH urbanFont">{{ isFight ? card.power_fight : card.power }}</div>
 					<img src="../assets/Ability.png" alt="Ability Image" class="w-[22px] h-[22px] ml-1" />
 					<div class="vcenterContent">{{ card.ability_description || 'N/A' }}</div>
 				</div>
 
 				<div class="flex h-[30px] items-center">
 					<img src="../assets/Damage.png" alt="Damage Image" class="w-[22px] h-[22px]" />
-					<div class="cardPH urbanFont">{{ card.damage }}</div>
+					<div class="cardPH urbanFont">{{ isFight ? card.damage_fight : card.damage }}</div>
 					<img src="../assets/Bonus.png" alt="Bonus Image" class="w-[22px] h-[22px] ml-1" />
 					<div class="vcenterContent">{{ card.bonus_description || 'N/A' }}</div>
 				</div>

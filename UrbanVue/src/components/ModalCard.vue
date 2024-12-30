@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import CardDisplay from "./CardDisplay.vue";
 import { Card } from "../models/game.interface";
 
@@ -10,7 +10,7 @@ const props = defineProps({
 });
 
 const isFury = ref<boolean>(false);
-const currentPillz = ref(1);
+const selectedPillz = ref<number>(1); // Start at 1 as the initial value
 
 const emit = defineEmits(["close", "combat"]);
 
@@ -18,32 +18,35 @@ const closeModal = () => {
 	emit("close");
 };
 
-const increasePillz = () => {
-	if (isFury.value) {
-		if (currentPillz.value + 3 < props.maxPillz) {
-			currentPillz.value++;
-		}
-	} else {
-		if (currentPillz.value < props.maxPillz) {
-			currentPillz.value++;
-		}
-	}
-};
-
-const decreasePillz = () => {
-	if (currentPillz.value > 1) {
-		currentPillz.value--;
-	}
-};
-
 const confirmCombat = () => {
-	emit("combat", currentPillz.value, isFury.value);
+	emit("combat", selectedPillz.value, isFury.value);
 	closeModal();
 };
 
 const toggleFury = () => {
 	isFury.value = !isFury.value;
 };
+
+const increasePillz = () => {
+	if (selectedPillz.value < props.maxPillz + 1 && (!isFury.value || selectedPillz.value < props.maxPillz - 2)) {
+		// Allow up to maxPillz + 1, but restrict last three when Fury is active
+		selectedPillz.value++;
+	}
+};
+
+const decreasePillz = () => {
+	if (selectedPillz.value > 1) {
+		// Allow minimum value to be 1
+		selectedPillz.value--;
+	}
+};
+
+const isLastThreePillz = (pillz: number) => {
+	return isFury.value && pillz > props.maxPillz + 1 - 3;
+};
+
+// Generate a range of numbers for pillz buttons, starting from 2
+const pillzArray = computed(() => Array.from({ length: props.maxPillz }, (_, i) => i + 2));
 </script>
 
 <template>
@@ -51,19 +54,44 @@ const toggleFury = () => {
 		<div class="flex bg-gray-900 p-4 rounded-md">
 			<CardDisplay :card="card" />
 
-			<div class="flex flex-col items-center justify-center pl-4 space-y-4 w-[350px]">
-				<div class="flex items-center space-x-4">
-					<button :disabled="currentPillz <= 1" @click="decreasePillz()" class="bg-gray-700 p-2 rounded text-white">-</button>
-					<span class="text-white urbanFont">{{ currentPillz }}</span>
-					<button @click="increasePillz" class="bg-gray-700 p-2 rounded text-white">+</button>
-					<div class="text-2xl text-center urbanFont text-white">attaque: {{ currentPillz * card.power }}</div>
+			<div class="flex flex-col items-center justify-center pl-4 space-y-4 w-[470px]">
+				<div class="flex items-center space-x-2">
+					<!-- Decrease Pillz Button -->
+					<button @click="decreasePillz" :disabled="selectedPillz === 1" class="change-nb-pillz-button bg-red-600 hover:bg-red-700">
+						-
+					</button>
+
+					<!-- Pillz Buttons -->
+					<div class="flex flex-wrap justify-center space-x-1.5">
+						<button
+							v-for="pillz in pillzArray"
+							:key="pillz"
+							@click="selectedPillz = pillz"
+							:disabled="isFury && isLastThreePillz(pillz)"
+							:class="`pillz-button ${pillz <= selectedPillz || (isFury && isLastThreePillz(pillz)) ? 'selected-pillz' : 'unselected-pillz'}`"
+						>
+							{{ pillz }}
+							<font-awesome-icon v-if="isLastThreePillz(pillz)" :icon="['fas', 'fire-flame-curved']" class="text-red-500" />
+						</button>
+					</div>
+
+					<!-- Increase Pillz Button -->
+					<button
+						@click="increasePillz"
+						:disabled="selectedPillz === props.maxPillz + 1"
+						class="change-nb-pillz-button bg-green-600 hover:bg-green-700"
+					>
+						+
+					</button>
 				</div>
+
+				<div class="text-2xl text-center urbanFont text-white">Attaque: {{ selectedPillz * card.power }}</div>
 
 				<div>
 					<button
-						:disabled="currentPillz + 3 > maxPillz"
+						:disabled="selectedPillz + 3 > props.maxPillz + 1"
 						@click="toggleFury"
-						:class="`p-2 rounded text-white ${isFury.valueOf() ? 'bg-green-500 hover:bg-green-600' : 'bg-red-700 hover:bg-red-800'}`"
+						:class="`p-2 rounded text-white ${isFury ? 'bg-red-700 hover:bg-red-800' : 'bg-gray-500 hover:bg-gray-600'}`"
 					>
 						Fury
 					</button>
@@ -82,10 +110,64 @@ const toggleFury = () => {
 	</div>
 </template>
 
-<style scoped>
-button:disabled {
-	cursor: not-allowed;
-	opacity: 0.5;
-	background-color: #4a5568;
+<style>
+button {
+	cursor: pointer;
+	transition:
+		background-color 0.3s,
+		transform 0.2s,
+		box-shadow 0.2s;
+}
+
+button:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+button:active {
+	transform: translateY(0);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.pillz-button {
+	width: 1.5rem;
+	height: 3rem;
+	border-radius: 1.5rem;
+	border: 2px solid;
+	font-weight: bold;
+	text-emphasis: true;
+}
+
+.change-nb-pillz-button {
+	width: 2rem;
+	height: 2rem;
+	border-radius: 50%;
+	border: 2px solid;
+	font-weight: bold;
+	text-emphasis: true;
+}
+
+.selected-pillz {
+	background: linear-gradient(to right, #3b82f6, #2563eb);
+	border-color: #1e3a8a;
+	color: white;
+}
+
+.selected-pillz.fury {
+	background: linear-gradient(to right, #3b82f6, #2563eb);
+	border-color: #1e3a8a;
+	color: white;
+}
+
+.unselected-pillz {
+	background: linear-gradient(to right, #d1d5db, #9ca3af);
+	border-color: #6b7280;
+	color: #374151;
+}
+
+.unselected-pillz:hover {
+	background: linear-gradient(to right, #9ca3af, #6b7280);
+	border-color: #4b5563;
+	color: black;
 }
 </style>

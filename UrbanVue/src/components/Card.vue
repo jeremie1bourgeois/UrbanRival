@@ -45,6 +45,7 @@ const cardClasses = computed(() =>
 		<CardDisplay
 			:class="cardClasses"
 			:card="props.card"
+			:isFight="props.card.played"
 			@click="turn && openModal()"
 		/>
 		<div v-if="turn && isModalVisible">

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { Game, RoundData } from "../models/game.interface.ts";
+import { Game, RoundData } from "../models/game.interface";
 import { getInitGameTemplate, processGameRound } from "../api/game";
 import Card from "./Card.vue";
 
@@ -68,7 +68,9 @@ const handleCombat = (pillz: number, isFury: boolean, index: number) => {
 			<div class="w-full flex flex-col items-center p-4 rounded-xl" :class="{ 'bg-gradient-to-b from-blue-800 to-gray-800': !turn }">
 				<div class="flex w-full justify-start space-x-10 pb-4">
 					<h2 class="text-xl font-bold text-yellow-400 mb-2">{{ game.enemy.name }}</h2>
-					<p class="text-sm text-gray-300 mt-2">Life: {{ game.enemy.life }} | Pillz: {{ game.enemy.pillz }}</p>
+					<p class="text-sm text-gray-300 mt-2">
+						{{ game.enemy.life }} <font-awesome-icon :icon="['fas', 'heart']" class="text-red-500" /> | Pillz: {{ game.enemy.pillz }}
+					</p>
 				</div>
 				<div class="flex justify-center space-x-3">
 					<Card
@@ -94,7 +96,9 @@ const handleCombat = (pillz: number, isFury: boolean, index: number) => {
 					/>
 				</div>
 				<div class="flex w-full justify-end space-x-10 pt-4">
-					<p class="text-sm text-gray-300 mt-2">Life: {{ game.ally.life }} | Pillz: {{ game.ally.pillz }}</p>
+					<p class="text-sm text-gray-300 mt-2">
+						{{ game.ally.life }} <font-awesome-icon :icon="['fas', 'heart']" class="text-red-500" /> | Pillz: {{ game.ally.pillz }}
+					</p>
 					<h2 class="text-xl font-bold text-yellow-400 mb-2">{{ game.ally.name }}</h2>
 				</div>
 			</div>
