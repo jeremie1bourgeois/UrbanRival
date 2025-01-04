@@ -34,7 +34,7 @@ const confirmCombat = (pillz: number, isFury: boolean) => {
 // Calculer les classes dynamiques sous forme de chaîne
 const cardClasses = computed(() =>
 	[
-		props.card.played ? "opacity-60" : "",
+		// props.card.played ? "opacity-50" : "",
 		props.turn ? "cursor-pointer" : "cursor-not-allowed",
 	].join(" ")
 );
