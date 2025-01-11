@@ -7,6 +7,7 @@ const props = defineProps({
 	isVisible: { type: Boolean, required: true },
 	card: { type: Object as () => Card, required: true },
 	maxPillz: { type: Number, required: true },
+	turn: { type: Boolean, required: true },
 });
 
 const isFury = ref<boolean>(false);
@@ -54,7 +55,7 @@ const pillzArray = computed(() => Array.from({ length: props.maxPillz }, (_, i) 
 		<div class="flex bg-gray-900 p-4 rounded-md">
 			<CardDisplay :card="card" />
 
-			<div class="flex flex-col items-center justify-center pl-4 space-y-4 w-[470px]">
+			<div v-if="turn && !card.played" class="flex flex-col items-center justify-center pl-4 space-y-4 w-[470px]">
 				<div class="flex items-center space-x-2">
 					<!-- Decrease Pillz Button -->
 					<button @click="decreasePillz" :disabled="selectedPillz === 1" class="change-nb-pillz-button bg-red-600 hover:bg-red-700">

@@ -23,7 +23,9 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> Game:
         init_fight_data(player2_card, round_data.player2_pillz, round_data.player2_fury)
 
         # Appliquer les effets de combat
-        apply_combat_effects(game, game.ally, game.enemy, player1_card.ability, player1_card, player2_card)
+        if check_capacity_condition(game, player1_card.ability, True, round_data.player1_card_index, round_data.player2_card_index):
+            apply_combat_effects(game, game.ally, game.enemy, player1_card.ability, player1_card, player2_card)
+
         apply_combat_effects(game, game.ally, game.enemy, player1_card.bonus, player1_card, player2_card)
         print("card1", player1_card)
         print("card2", player2_card)

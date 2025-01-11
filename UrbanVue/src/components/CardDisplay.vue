@@ -35,6 +35,16 @@ const attack = computed(() => {
 const trophyClass = computed(() => {
 	return props.card.win ? "trophyIcon-clear" : "trophyIcon-gray";
 });
+
+const damageClass = computed(() => {
+	if (!props.isFight) return "";
+	return props.card.damage_fight > props.card.damage ? "text-violet-500" : "text-orange-500";
+});
+
+const powerClass = computed(() => {
+	if (!props.isFight) return "";
+	return props.card.power_fight > props.card.power ? "text-violet-500" : "text-orange-500";
+});
 </script>
 
 <template>
@@ -48,14 +58,12 @@ const trophyClass = computed(() => {
 			<span class="cardName urbanFont">{{ card.name }}</span>
 		</div>
 
-		<div v-if="pillzUsed" class="pillzBanner" :class="[card.played ? 'pillz-active' : '']">
-			<div class="pillzUsed">
+		<div v-if="pillzUsed" class="pillzBanner pillzUsed" :class="[card.played ? 'pillz-active' : '']">
 				<img :class="trophyClass" src="../assets/icons8-trophy-50.png" alt="Trophy Icon" style="opacity: 1; margin-right: 10px;" />
 				{{ pillzUsed }}
 				<img src="../assets/icons8-pill-50.png" alt="Pillz Icon" class="pillzIcon" style="background-color: white; margin-right: 10px;" />
 				{{ attack }}
 				<img src="../assets/epee.png" alt="Sword Icon" class="pillzIcon" style="background-color: white; margin-right: 10px;" />
-			</div>
 		</div>
 
 		<div class="cardBottom">
@@ -66,14 +74,14 @@ const trophyClass = computed(() => {
 			<div class="cardDescription">
 				<div class="flex h-[30px] items-center">
 					<img src="../assets/Power.png" alt="Power Image" class="w-[22px] h-[22px]" />
-					<div class="cardPH urbanFont">{{ isFight ? card.power_fight : card.power }}</div>
+						<div :class="['cardPH urbanFont', powerClass]">{{ isFight ? card.power_fight : card.power }}</div>
 					<img src="../assets/Ability.png" alt="Ability Image" class="w-[22px] h-[22px] ml-1" />
 					<div class="vcenterContent">{{ card.ability_description || "N/A" }}</div>
 				</div>
 
 				<div class="flex h-[30px] items-center">
 					<img src="../assets/Damage.png" alt="Damage Image" class="w-[22px] h-[22px]" />
-					<div class="cardPH urbanFont">{{ isFight ? card.damage_fight : card.damage }}</div>
+						<div :class="['cardPH urbanFont', damageClass]">{{ isFight ? card.damage_fight : card.damage }}</div>
 					<img src="../assets/Bonus.png" alt="Bonus Image" class="w-[22px] h-[22px] ml-1" />
 					<div class="vcenterContent">{{ card.bonus_description || "N/A" }}</div>
 				</div>

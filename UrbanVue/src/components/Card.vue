@@ -32,29 +32,24 @@ const confirmCombat = (pillz: number, isFury: boolean) => {
 };
 
 // Calculer les classes dynamiques sous forme de chaîne
-const cardClasses = computed(() =>
-	[
-		// props.card.played ? "opacity-50" : "",
-		props.turn ? "cursor-pointer" : "cursor-not-allowed",
-	].join(" ")
-);
+const cardClasses = computed(() => "cursor-pointer");
 </script>
-
 <template>
 	<div>
 		<CardDisplay
 			:class="cardClasses"
 			:card="props.card"
 			:isFight="props.card.played"
-			@click="turn && openModal()"
+			@click="openModal"
 		/>
-		<div v-if="turn && isModalVisible">
+		<div v-if="isModalVisible">
 			<ModalCard
 				:isVisible="isModalVisible"
-				:card="card"
+				:card="props.card"
 				@close="isModalVisible = false"
 				:maxPillz="props.pillz"
 				@combat="confirmCombat"
+				:turn="props.turn"
 			/>
 		</div>
 	</div>
