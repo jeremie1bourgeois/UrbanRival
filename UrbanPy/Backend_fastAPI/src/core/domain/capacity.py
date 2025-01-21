@@ -1,12 +1,15 @@
 class Capacity:
     def __init__(self, target: str, type: str, value: int, borne: int, how: str = "", condition_effect: str = "", lvl_priority: int = 0):
-        self.target = target
-        self.type = type
+        self.target = target # ally, enemy
+        self.type = type # power, damage, attack, pillz, life, poison, heal || ability, bonus
         self.value = value
-        self.how = how
+        self.how = how # support, Growth, Degrowth, Equalizer, Brawl || stop, copy, protection, cancel
         self.borne = borne
         self.condition_effect = condition_effect
         self.lvl_priority = lvl_priority
+        
+        # stop: puissance et degat +2
+        # condition_effect: stop ; target: ally ; type = "puissance_dommage" ; value = 2
 
     @classmethod
     def from_dict(cls, data: dict) -> 'Capacity':
