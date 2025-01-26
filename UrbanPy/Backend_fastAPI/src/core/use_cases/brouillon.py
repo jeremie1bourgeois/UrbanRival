@@ -110,3 +110,14 @@ def apply_ability_copy_ability(ability_1: Capacity, ability_2: Capacity, bonus_1
             bonus_2 = None
 
     return ability_1, ability_2, bonus_1, bonus_2
+
+
+
+
+elif capacity.type == "pillz":
+            if capacity.how == "damage":
+                player1.pillz = min(capacity.borne, player1.pillz + (capacity.value * card1.damage))
+        elif capacity.type == "life_pillz":
+            if capacity.how == "damage":
+                player1.life = min(capacity.borne, player1.life + (capacity.value * card1.damage))
+                player1.pillz = min(capacity.borne, player1.pillz + (capacity.value * card1.damage))
