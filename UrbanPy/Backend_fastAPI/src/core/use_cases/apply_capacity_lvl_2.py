@@ -240,3 +240,20 @@ def apply_target_enemy_effects(game: Game, player1: Player, player2: Player, cap
         else:
             return capacity
 
+def apply_target_both_effects(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card):
+    if capacity.target == "both":
+        if capacity.type == "attack":
+            if card1.attack > capacity.borne:
+                card1.attack = max(capacity.borne, card1.attack + capacity.value)
+                card2.attack = max(capacity.borne, card2.attack + capacity.value)
+        elif capacity.type == "damage":
+            if capacity.how == "Support":
+                if capacity.borne != -1:
+                    
+            if card1.damage_fight > capacity.borne:
+                card1.damage_fight = max(capacity.borne, card1.damage_fight + capacity.value)
+                card2.damage_fight = max(capacity.borne, card2.damage_fight + capacity.value)
+        elif capacity.type == "power":
+            if card1.power_fight > capacity.borne:
+                card1.power_fight = max(capacity.borne, card1.power_fight + capacity.value)
+                card2.power_fight = max(capacity.borne, card2.power_fight + capacity.value)

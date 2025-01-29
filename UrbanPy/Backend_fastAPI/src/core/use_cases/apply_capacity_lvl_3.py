@@ -22,10 +22,8 @@ def apply_capacity_lvl_3(game: Game, card1: Card, card2: Card, has_ally_won: boo
     card2.bonus = apply_target_enemy_effects(game, game.enemy, game.ally, card2.bonus, card2, card1)
 
 def check_capacity_condition(capacity: Capacity, has_won: bool) -> Capacity:
-    if capacity.condition_effect is None:
-        return capacity
     if capacity.condition_effect == "":
-            return capacity
+        return capacity if has_won else None
     elif capacity.condition_effect == "Backlash":
         if has_won:
             capacity.target = "ally"
@@ -37,6 +35,9 @@ def check_capacity_condition(capacity: Capacity, has_won: bool) -> Capacity:
             capacity.condition_effect = ""
             return capacity
         return None
+    elif capacity.condition_effect == "victory_defeat":
+        capacity.condition_effect = ""
+        return capacity
     else:
         raise ValueError(f"Invalid condition_effect: {capacity.condition_effect}")
 

@@ -3,11 +3,11 @@ class Capacity:
         self.target = target # ally, enemy
         self.type = type # power, damage, attack, pillz, life, poison, heal || ability, bonus
         self.value = value
-        self.how = how # support, Growth, Degrowth, Equalizer, Brawl || stop, copy, protection, cancel
+        self.how = how # support, Growth, Degrowth, Equalizer, Brawl || stop, copy, protection, cancel || toxin, poison, regen, heal, ??, dope
         self.borne = borne
-        self.condition_effect = condition_effect
+        self.condition_effect = condition_effect # Revenge, Reprisal, Confidence, Courage, Symmetry, Asymmetry, Bet # bool bool bool bool bool bool bool var// une var
         self.lvl_priority = lvl_priority
-        
+
         # stop: puissance et degat +2
         # condition_effect: stop ; target: ally ; type = "puissance_dommage" ; value = 2
 

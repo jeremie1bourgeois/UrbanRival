@@ -131,36 +131,38 @@ def apply_all_protect_data_modif(card1: Card, card2: Card) -> None:
     """
     Applique les capacités qui protègent contre les capacités qui modifient les données de type power/damage/attack
     """
-    (card2.ability, card2.bonus) = apply_protect_data_modif(card1.ability, card1.bonus, card2.ability)
-    (card2.ability, card2.bonus) = apply_protect_data_modif(card1.bonus, card1.ability, card2.bonus)
-    (card1.ability, card1.bonus) = apply_protect_data_modif(card2.ability, card2.bonus, card1.ability)
-    (card1.ability, card1.bonus) = apply_protect_data_modif(card2.bonus, card2.ability, card1.bonus)
+    (card2.ability, card2.bonus) = apply_protect_enemy_data_modif(card1.ability, card1.bonus, card2.ability)
+    (card2.ability, card2.bonus) = apply_protect_enemy_data_modif(card1.bonus, card1.ability, card2.bonus)
+    (card1.ability, card1.bonus) = apply_protect_enemy_data_modif(card2.ability, card2.bonus, card1.ability)
+    (card1.ability, card1.bonus) = apply_protect_enemy_data_modif(card2.bonus, card2.ability, card1.bonus)
 
 
 
-def apply_protect_data_modif(capacity: Capacity, capacity_opp_1: Capacity, capacity_opp_2: Capacity) -> Tuple[Capacity, Capacity]:
+def apply_protect_enemy_data_modif(capacity_1: Capacity, capacity_2: Capacity, capacity_opp_1: Capacity, capacity_opp_2: Capacity) -> Tuple[Capacity, Capacity]:
     """
     Applique les capacités qui protègent contre les capacités qui modifient les données de type power/damage/attack
     """
     # Liste des capacités avec l'attribut "how" qui ne doivent pas être protégées
     list_how_not_protect = ["cancel", "stop", "copy", "Protection"]
-    if capacity.how == "Protection":
-        if capacity.type == "power":
+    if capacity_1.how == "Protection":
+        if capacity_1.type == "power":
             if capacity_opp_1.type == "power" and capacity_opp_1.how not in list_how_not_protect and capacity_opp_1.target == "ennemy":
                 capacity_opp_1 = None
             if capacity_opp_2.type == "power" and capacity_opp_2.how not in list_how_not_protect and capacity_opp_2.target == "ennemy":
                 capacity_opp_2 = None
-        elif capacity.type == "damage":
+            if capacity_opp_1.type == "power_damage" and capacity_opp_1.how not in list_how_not_protect and capacity_opp_1.target == "ennemy":
+                capacity_opp_1 = None
+        elif capacity_1.type == "damage":
             if capacity_opp_1.type == "damage" and capacity_opp_1.how not in list_how_not_protect and capacity_opp_1.target == "ennemy":
                 capacity_opp_1 = None
             if capacity_opp_2.type == "damage" and capacity_opp_2.how not in list_how_not_protect and capacity_opp_2.target == "ennemy":
                 capacity_opp_2 = None
-        elif capacity.type == "attack":
+        elif capacity_1.type == "attack":
             if capacity_opp_1.type == "attack" and capacity_opp_1.how not in list_how_not_protect and capacity_opp_1.target == "ennemy":
                 capacity_opp_1 = None
             if capacity_opp_2.type == "attack" and capacity_opp_2.how not in list_how_not_protect and capacity_opp_2.target == "ennemy":
                 capacity_opp_2 = None
-        elif capacity.type == "power_damage":
+        elif capacity_1.type == "power_damage":
             if (capacity_opp_1.type == "power" or capacity_opp_1.type == "damage" or capacity_opp_1.type == "power_damage") and capacity_opp_1.how not in list_how_not_protect and capacity_opp_1.target == "ennemy":
                 capacity_opp_1 = None
             if (capacity_opp_2.type == "power" or capacity_opp_2.type == "damage" or capacity_opp_2.type == "power_damage") and capacity_opp_2.how not in list_how_not_protect and capacity_opp_2.target == "ennemy":

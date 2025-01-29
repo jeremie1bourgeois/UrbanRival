@@ -119,8 +119,8 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, ally
             return capacity if ally_card_index == enemy_card_index else None
         elif capacity.condition_effect == "Asymmetry":
             return capacity if ally_card_index != enemy_card_index else None
-        elif capacity.condition_effect == "Bet":
-            return capacity if game.ally.cards[ally_card_index].pillz_fight > capacity.borne else None
+        elif capacity.condition_effect.startswith("Bet"):
+            return capacity if game.ally.cards[ally_card_index].pillz_fight > int(capacity.condition_effect[3:]) else None
         else:
             raise ValueError(f"Invalid condition_effect: {capacity.condition_effect}")
     else:
