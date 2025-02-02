@@ -241,19 +241,65 @@ def apply_target_enemy_effects(game: Game, player1: Player, player2: Player, cap
             return capacity
 
 def apply_target_both_effects(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card):
-    if capacity.target == "both":
-        if capacity.type == "attack":
-            if card1.attack > capacity.borne:
-                card1.attack = max(capacity.borne, card1.attack + capacity.value)
-                card2.attack = max(capacity.borne, card2.attack + capacity.value)
-        elif capacity.type == "damage":
-            if capacity.how == "Support":
-                if capacity.borne != -1:
-                    
-            if card1.damage_fight > capacity.borne:
-                card1.damage_fight = max(capacity.borne, card1.damage_fight + capacity.value)
-                card2.damage_fight = max(capacity.borne, card2.damage_fight + capacity.value)
-        elif capacity.type == "power":
-            if card1.power_fight > capacity.borne:
-                card1.power_fight = max(capacity.borne, card1.power_fight + capacity.value)
-                card2.power_fight = max(capacity.borne, card2.power_fight + capacity.value)
+    if capacity.target != "both":
+        return capacity
+
+    # Mapping des attributs à modifier
+    attr_map = {
+        "attack": "attack",
+        "damage": "damage_fight",
+        "power": "power_fight"
+    }
+    attr = attr_map.get(capacity.type)
+    if not attr:
+        return capacity
+
+    # Fonctions de calcul des bonus
+    def bonus_support():
+        return sum(1 for c in player1.cards if c.faction == card1.faction)
+
+    def bonus_equalizer():
+        return card2.stars
+
+    def bonus_brawl():
+        return sum(1 for c in player2.cards if c.faction == card2.faction)
+
+    def bonus_growth():
+        return game.nb_turn
+
+    def bonus_degrowth():
+        return max(0, 5 - game.nb_turn)
+
+    # Mapping des effets
+    bonus_funcs = {
+        "Support": bonus_support,
+        "Equalizer": bonus_equalizer,
+        "Brawl": bonus_brawl,
+        "Growth": bonus_growth,
+        "Degrowth": bonus_degrowth
+    }
+
+    # Calcul du bonus
+    bonus_func = bonus_funcs.get(capacity.how)
+    bonus = capacity.value * (bonus_func() if bonus_func else 1)
+
+    current_value = getattr(card1, attr)
+    current_value2 = getattr(card2, attr)
+
+    # Si une borne est définie
+    if capacity.borne != -1:
+        if capacity.value > 0:  # Valeur positive
+            if current_value < capacity.borne:
+                setattr(card1, attr, min(capacity.borne, current_value + bonus))
+            if current_value2 < capacity.borne:
+                setattr(card2, attr, min(capacity.borne, current_value2 + bonus))
+        else:  # Valeur négative
+            if current_value > capacity.borne:
+                setattr(card1, attr, max(capacity.borne, current_value + bonus))
+            if current_value2 > capacity.borne:
+                setattr(card2, attr, max(capacity.borne, current_value2 + bonus))
+    else:  # Pas de borne
+        setattr(card1, attr, current_value + bonus)
+        setattr(card2, attr, current_value2 + bonus)
+
+    return None
