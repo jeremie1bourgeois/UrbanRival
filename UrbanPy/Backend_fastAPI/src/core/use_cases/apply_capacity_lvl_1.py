@@ -18,69 +18,69 @@ def apply_capacity_lvl_1(game: Game, card1: Card, card2: Card):
 
 
 def apply_copy(card1: Card, card2: Card):
-    if card1.ability.how == "copy" and card1.ability.type == "ability":
-        (card1.ability, card1.bonus, card2.ability, card2.bonus) = apply_ability_copy_ability(card1.ability, card2.ability, card1.bonus, card2.bonus)
-    elif card1.ability.how == "copy" and card1.ability.type == "bonus":
-        (card1.ability, card1.bonus, card2.ability, card2.bonus) = apply_ability_copy_bonus(card1.ability, card2.ability, card1.bonus, card2.bonus)
+    if card1.ability_fight.how == "copy" and card1.ability_fight.type == "ability":
+        (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_ability_copy_ability(card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
+    elif card1.ability_fight.how == "copy" and card1.ability_fight.type == "bonus":
+        (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_ability_copy_bonus(card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
 
-    if card1.bonus.how == "copy" and card1.bonus.type == "ability":
-        (card1.ability, card1.bonus, card2.ability, card2.bonus) = apply_bonus_copy_ability(card1.ability, card2.ability, card1.bonus, card2.bonus)
-    elif card1.bonus.how == "copy" and card1.bonus.type == "bonus":
-        (card1.ability, card1.bonus, card2.ability, card2.bonus) = apply_bonus_copy_bonus(card1.ability, card2.ability, card1.bonus, card2.bonus)
+    if card1.bonus_fight.how == "copy" and card1.bonus_fight.type == "ability":
+        (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_bonus_copy_ability(card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
+    elif card1.bonus_fight.how == "copy" and card1.bonus_fight.type == "bonus":
+        (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_bonus_copy_bonus(card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
     
-    if card2.ability.how == "copy" and card2.ability.type == "ability":
-        (card2.ability, card2.bonus, card1.ability, card1.bonus) = apply_ability_copy_ability(card2.ability, card1.ability, card2.bonus, card1.bonus)
-    elif card2.ability.how == "copy" and card2.ability.type == "bonus":
-        (card2.ability, card2.bonus, card1.ability, card1.bonus) = apply_ability_copy_bonus(card2.ability, card1.ability, card2.bonus, card1.bonus)
+    if card2.ability_fight.how == "copy" and card2.ability_fight.type == "ability":
+        (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_ability_copy_ability(card2.ability_fight, card1.ability_fight, card2.bonus_fight, card1.bonus_fight)
+    elif card2.ability_fight.how == "copy" and card2.ability_fight.type == "bonus":
+        (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_ability_copy_bonus(card2.ability_fight, card1.ability_fight, card2.bonus_fight, card1.bonus_fight)
     
-    if card2.bonus.how == "copy" and card2.bonus.type == "ability":
-        (card2.ability, card2.bonus, card1.ability, card1.bonus) = apply_bonus_copy_ability(card2.ability, card1.ability, card2.bonus, card1.bonus)
-    elif card2.bonus.how == "copy" and card2.bonus.type == "bonus":
-        (card2.ability, card2.bonus, card1.ability, card1.bonus) = apply_bonus_copy_bonus(card2.ability, card1.ability, card2.bonus, card1.bonus)
+    if card2.bonus_fight.how == "copy" and card2.bonus_fight.type == "ability":
+        (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_bonus_copy_ability(card2.ability_fight, card1.ability_fight, card2.bonus_fight, card1.bonus_fight)
+    elif card2.bonus_fight.how == "copy" and card2.bonus_fight.type == "bonus":
+        (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_bonus_copy_bonus(card2.ability_fight, card1.ability_fight, card2.bonus_fight, card1.bonus_fight)
     
 def apply_stop(card1: Card, card2: Card):
-    if card1.ability.how == "stop" and card1.ability.type == "ability":
-        (card1.ability, card1.bonus, card2.ability, card2.bonus) = apply_ability_stop_ability(card1.ability, card1.bonus, card2.bonus)
-    elif card1.ability.how == "stop" and card1.ability.type == "bonus":
-        (card1.ability, card1.bonus, card2.ability, card2.bonus) = apply_ability_stop_bonus(card1.ability, card2.ability, card1.bonus)
+    if card1.ability_fight.how == "stop" and card1.ability_fight.type == "ability":
+        (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_ability_stop_ability(card1.ability_fight, card1.bonus_fight, card2.bonus_fight)
+    elif card1.ability_fight.how == "stop" and card1.ability_fight.type == "bonus":
+        (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_ability_stop_bonus(card1.ability_fight, card2.ability_fight, card1.bonus_fight)
 
-    if card1.bonus.how == "stop" and card1.bonus.type == "ability":
-        (card1.ability, card1.bonus, card2.ability, card2.bonus) = apply_bonus_stop_ability(card1.ability, card1.bonus, card2.bonus)
-    elif card1.bonus.how == "stop" and card1.bonus.type == "bonus":
-        (card1.ability, card1.bonus, card2.ability, card2.bonus) = apply_bonus_stop_bonus(card1.ability, card2.ability, card1.bonus)
+    if card1.bonus_fight.how == "stop" and card1.bonus_fight.type == "ability":
+        (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_bonus_stop_ability(card1.ability_fight, card1.bonus_fight, card2.bonus_fight)
+    elif card1.bonus_fight.how == "stop" and card1.bonus_fight.type == "bonus":
+        (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_bonus_stop_bonus(card1.ability_fight, card2.ability_fight, card1.bonus_fight)
     
-    if card2.ability.how == "stop" and card2.ability.type == "ability":
-        (card2.ability, card2.bonus, card1.ability, card1.bonus) = apply_ability_stop_ability(card2.ability, card2.bonus, card1.bonus)
-    elif card2.ability.how == "stop" and card2.ability.type == "bonus":
-        (card2.ability, card2.bonus, card1.ability, card1.bonus) = apply_ability_stop_bonus(card2.ability, card1.ability, card2.bonus)
+    if card2.ability_fight.how == "stop" and card2.ability_fight.type == "ability":
+        (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_ability_stop_ability(card2.ability_fight, card2.bonus_fight, card1.bonus_fight)
+    elif card2.ability_fight.how == "stop" and card2.ability_fight.type == "bonus":
+        (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_ability_stop_bonus(card2.ability_fight, card1.ability_fight, card2.bonus_fight)
     
-    if card2.bonus.how == "stop" and card2.bonus.type == "ability":
-        (card2.ability, card2.bonus, card1.ability, card1.bonus) = apply_bonus_stop_ability(card2.ability, card1.ability, card2.bonus)
-    elif card2.bonus.how == "stop" and card2.bonus.type == "bonus":
-        (card2.ability, card2.bonus, card1.ability, card1.bonus) = apply_bonus_stop_bonus(card2.ability, card1.ability, card2.bonus)
+    if card2.bonus_fight.how == "stop" and card2.bonus_fight.type == "ability":
+        (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_bonus_stop_ability(card2.ability_fight, card1.ability_fight, card2.bonus_fight)
+    elif card2.bonus_fight.how == "stop" and card2.bonus_fight.type == "bonus":
+        (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_bonus_stop_bonus(card2.ability_fight, card1.ability_fight, card2.bonus_fight)
 
 def delete_capacity_protection(card1: Card, card2: Card) -> None:
     """
     Supprime les capacités qui protègent les autres capacités car les stop ont déjà été appliqués
     """
-    if card1.ability.how == "Protection" and (card1.ability.type == "ability" or card1.ability.type == "bonus"):
-        card1.ability = None
-    if card1.bonus.how == "Protection" and (card1.bonus.type == "ability" or card1.bonus.type == "bonus"):
-        card1.bonus = None
-    if card2.ability.how == "Protection" and (card2.ability.type == "ability" or card2.ability.type == "bonus"):
-        card2.ability = None
-    if card2.bonus.how == "Protection" and (card2.bonus.type == "ability" or card2.bonus.type == "bonus"):
-        card2.bonus = None
+    if card1.ability_fight.how == "Protection" and (card1.ability_fight.type == "ability" or card1.ability_fight.type == "bonus"):
+        card1.ability_fight = None
+    if card1.bonus_fight.how == "Protection" and (card1.bonus_fight.type == "ability" or card1.bonus_fight.type == "bonus"):
+        card1.bonus_fight = None
+    if card2.ability_fight.how == "Protection" and (card2.ability_fight.type == "ability" or card2.ability_fight.type == "bonus"):
+        card2.ability_fight = None
+    if card2.bonus_fight.how == "Protection" and (card2.bonus_fight.type == "ability" or card2.bonus_fight.type == "bonus"):
+        card2.bonus_fight = None
 
 
 def apply_all_cancel_data_modif(card1: Card, card2: Card) -> None:
     """
     Applique les capacités qui annulent les modifications des autres capacités sur les types power/damage/attack
     """
-    (card2.ability, card2.bonus) = apply_cancel_data_modif(card1.ability, card1.bonus, card2.ability)
-    (card2.ability, card2.bonus) = apply_cancel_data_modif(card1.bonus, card1.ability, card2.bonus)
-    (card1.ability, card1.bonus) = apply_cancel_data_modif(card2.ability, card2.bonus, card1.ability)
-    (card1.ability, card1.bonus) = apply_cancel_data_modif(card2.bonus, card2.ability, card1.bonus)
+    (card2.ability_fight, card2.bonus_fight) = apply_cancel_data_modif(card1.ability_fight, card1.bonus_fight, card2.ability_fight)
+    (card2.ability_fight, card2.bonus_fight) = apply_cancel_data_modif(card1.bonus_fight, card1.ability_fight, card2.bonus_fight)
+    (card1.ability_fight, card1.bonus_fight) = apply_cancel_data_modif(card2.ability_fight, card2.bonus_fight, card1.ability_fight)
+    (card1.ability_fight, card1.bonus_fight) = apply_cancel_data_modif(card2.bonus_fight, card2.ability_fight, card1.bonus_fight)
 
 def apply_cancel_data_modif(capacity: Capacity, capacity_opp_1: Capacity, capacity_opp_2: Capacity) -> Tuple[Capacity, Capacity]:
     """
@@ -131,10 +131,10 @@ def apply_all_protect_data_modif(card1: Card, card2: Card) -> None:
     """
     Applique les capacités qui protègent contre les capacités qui modifient les données de type power/damage/attack
     """
-    (card2.ability, card2.bonus) = apply_protect_enemy_data_modif(card1.ability, card1.bonus, card2.ability)
-    (card2.ability, card2.bonus) = apply_protect_enemy_data_modif(card1.bonus, card1.ability, card2.bonus)
-    (card1.ability, card1.bonus) = apply_protect_enemy_data_modif(card2.ability, card2.bonus, card1.ability)
-    (card1.ability, card1.bonus) = apply_protect_enemy_data_modif(card2.bonus, card2.ability, card1.bonus)
+    (card2.ability_fight, card2.bonus_fight) = apply_protect_enemy_data_modif(card1.ability_fight, card1.bonus_fight, card2.ability_fight)
+    (card2.ability_fight, card2.bonus_fight) = apply_protect_enemy_data_modif(card1.bonus_fight, card1.ability_fight, card2.bonus_fight)
+    (card1.ability_fight, card1.bonus_fight) = apply_protect_enemy_data_modif(card2.ability_fight, card2.bonus_fight, card1.ability_fight)
+    (card1.ability_fight, card1.bonus_fight) = apply_protect_enemy_data_modif(card2.bonus_fight, card2.ability_fight, card1.bonus_fight)
 
 
 
@@ -170,25 +170,25 @@ def apply_protect_enemy_data_modif(capacity_1: Capacity, capacity_2: Capacity, c
     return capacity_opp_1, capacity_opp_2
 
 def apply_exchange_or_copy_data(card1: Card, card2: Card) -> None:
-    if card1.ability.type == "power":
-        if card1.ability.how == "exchange":
+    if card1.ability_fight.type == "power":
+        if card1.ability_fight.how == "exchange":
             card1.power_fight = card2.power
             card2.power_fight = card1.power
-        elif card1.ability.how == "copy":
+        elif card1.ability_fight.how == "copy":
             card1.power_fight = card2.power
-    if card1.ability.type == "damage":
-        if card1.ability.how == "exchange":
+    if card1.ability_fight.type == "damage":
+        if card1.ability_fight.how == "exchange":
             card1.damage_fight = card2.damage
             card2.damage_fight = card1.damage
-        elif card1.ability.how == "copy":
+        elif card1.ability_fight.how == "copy":
             card1.damage_fight = card2.damage
-    if card1.ability.type == "power_damage":
-        if card1.ability.how == "exchange":
+    if card1.ability_fight.type == "power_damage":
+        if card1.ability_fight.how == "exchange":
             card1.power_fight = card2.power
             card1.damage_fight = card2.damage
             card2.power_fight = card1.power
             card2.damage_fight = card1.damage
-        elif card1.ability.how == "copy":
+        elif card1.ability_fight.how == "copy":
             card1.power_fight = card2.power
             card1.damage_fight = card2.damage
 

@@ -5,20 +5,20 @@ from src.core.domain.game import Game
 
 
 def apply_capacity_lvl_2(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> None:
-    card1.ability = apply_target_ally_effects(game, player1, player2, card1.ability, card1, card2) if card1.ability else None
-    card1.bonus = apply_target_ally_effects(game, player1, player2, card1.bonus, card1, card2) if card1.bonus else None
-    card2.ability = apply_target_ally_effects(game, player2, player1, card2.ability, card2, card1) if card2.ability else None
-    card2.bonus = apply_target_ally_effects(game, player2, player1, card2.bonus, card2, card1) if card2.bonus else None
+    card1.ability_fight = apply_target_ally_effects(game, player1, player2, card1.ability_fight, card1, card2) if card1.ability_fight else None
+    card1.bonus_fight = apply_target_ally_effects(game, player1, player2, card1.bonus_fight, card1, card2) if card1.bonus_fight else None
+    card2.ability_fight = apply_target_ally_effects(game, player2, player1, card2.ability_fight, card2, card1) if card2.ability_fight else None
+    card2.bonus_fight = apply_target_ally_effects(game, player2, player1, card2.bonus_fight, card2, card1) if card2.bonus_fight else None
     
-    card1.ability = apply_target_both_effects(game, player1, player2, card1.ability, card1, card2) if card1.ability else None
-    card1.bonus = apply_target_both_effects(game, player1, player2, card1.bonus, card1, card2) if card1.bonus else None
-    card2.ability = apply_target_both_effects(game, player2, player1, card2.ability, card2, card1) if card2.ability else None
-    card2.bonus = apply_target_both_effects(game, player2, player1, card2.bonus, card2, card1) if card2.bonus else None
+    card1.ability_fight = apply_target_both_effects(game, player1, player2, card1.ability_fight, card1, card2) if card1.ability_fight else None
+    card1.bonus_fight = apply_target_both_effects(game, player1, player2, card1.bonus_fight, card1, card2) if card1.bonus_fight else None
+    card2.ability_fight = apply_target_both_effects(game, player2, player1, card2.ability_fight, card2, card1) if card2.ability_fight else None
+    card2.bonus_fight = apply_target_both_effects(game, player2, player1, card2.bonus_fight, card2, card1) if card2.bonus_fight else None
     
-    card1.ability = apply_target_enemy_effects(game, player1, player2, card1.ability, card1, card2) if card1.ability else None
-    card1.bonus = apply_target_enemy_effects(game, player1, player2, card1.bonus, card1, card2) if card1.bonus else None
-    card2.ability = apply_target_enemy_effects(game, player2, player1, card2.ability, card2, card1) if card2.ability else None
-    card2.bonus = apply_target_enemy_effects(game, player2, player1, card2.bonus, card2, card1) if card2.bonus else None
+    card1.ability_fight = apply_target_enemy_effects(game, player1, player2, card1.ability_fight, card1, card2) if card1.ability_fight else None
+    card1.bonus_fight = apply_target_enemy_effects(game, player1, player2, card1.bonus_fight, card1, card2) if card1.bonus_fight else None
+    card2.ability_fight = apply_target_enemy_effects(game, player2, player1, card2.ability_fight, card2, card1) if card2.ability_fight else None
+    card2.bonus_fight = apply_target_enemy_effects(game, player2, player1, card2.bonus_fight, card2, card1) if card2.bonus_fight else None
 
 
 # Fonctions de bonus définies en dehors

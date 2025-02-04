@@ -7,18 +7,18 @@ MAX_LIFE = 12  # change le hardcode 12
 MAX_PILLZ = 12  # change le hardcode 12
 
 def apply_capacity_lvl_4(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> None:
-    card1.ability = add_endgame_effects_lvl_1(player1, card1.ability) if card1.ability else None
-    card1.bonus = add_endgame_effects_lvl_1(player1, card1.bonus) if card1.bonus else None
-    card2.ability = add_endgame_effects_lvl_1(player2, card2.ability) if card2.ability else None
-    card2.bonus = add_endgame_effects_lvl_1(player2, card2.bonus) if card2.bonus else None
+    card1.ability_fight = add_endgame_effects_lvl_1(player1, card1.ability_fight) if card1.ability_fight else None
+    card1.bonus_fight = add_endgame_effects_lvl_1(player1, card1.bonus_fight) if card1.bonus_fight else None
+    card2.ability_fight = add_endgame_effects_lvl_1(player2, card2.ability_fight) if card2.ability_fight else None
+    card2.bonus_fight = add_endgame_effects_lvl_1(player2, card2.bonus_fight) if card2.bonus_fight else None
     
     apply_active_effects(game, player1, player2, card1, card2)
     apply_active_effects(game, player2, player1, card2, card1)
     
-    card1.ability = add_endgame_effects_lvl_2(player1, card1.ability) if card1.ability else None
-    card1.bonus = add_endgame_effects_lvl_2(player1, card1.bonus) if card1.bonus else None
-    card2.ability = add_endgame_effects_lvl_2(player2, card2.ability) if card2.ability else None
-    card2.bonus = add_endgame_effects_lvl_2(player2, card2.bonus) if card2.bonus else None
+    card1.ability_fight = add_endgame_effects_lvl_2(player1, card1.ability_fight) if card1.ability_fight else None
+    card1.bonus_fight = add_endgame_effects_lvl_2(player1, card1.bonus_fight) if card1.bonus_fight else None
+    card2.ability_fight = add_endgame_effects_lvl_2(player2, card2.ability_fight) if card2.ability_fight else None
+    card2.bonus_fight = add_endgame_effects_lvl_2(player2, card2.bonus_fight) if card2.bonus_fight else None
 
 
 
