@@ -5,7 +5,7 @@ from src.core.domain.card import Card
 from src.core.domain.game import Game
 
 
-def apply_capacity_lvl_1(game: Game, card1: Card, card2: Card):
+def apply_capacity_lvl_1(card1: Card, card2: Card):
     apply_copy(card1, card2)
     apply_stop(card1, card2)
     delete_capacity_protection(card1, card2)
@@ -19,9 +19,9 @@ def apply_capacity_lvl_1(game: Game, card1: Card, card2: Card):
 
 def apply_copy(card1: Card, card2: Card):
     if card1.ability_fight.how == "copy" and card1.ability_fight.type == "ability":
-        (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_ability_copy_ability(card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
+        (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_ability_copy_ability(card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
     elif card1.ability_fight.how == "copy" and card1.ability_fight.type == "bonus":
-        (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_ability_copy_bonus(card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
+        (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_ability_copy_bonus(card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
 
     if card1.bonus_fight.how == "copy" and card1.bonus_fight.type == "ability":
         (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_bonus_copy_ability(card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
@@ -29,9 +29,9 @@ def apply_copy(card1: Card, card2: Card):
         (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_bonus_copy_bonus(card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
     
     if card2.ability_fight.how == "copy" and card2.ability_fight.type == "ability":
-        (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_ability_copy_ability(card2.ability_fight, card1.ability_fight, card2.bonus_fight, card1.bonus_fight)
+        (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_ability_copy_ability(card1.ability_fight, card2.bonus_fight, card1.bonus_fight)
     elif card2.ability_fight.how == "copy" and card2.ability_fight.type == "bonus":
-        (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_ability_copy_bonus(card2.ability_fight, card1.ability_fight, card2.bonus_fight, card1.bonus_fight)
+        (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_ability_copy_bonus(card1.ability_fight, card2.bonus_fight, card1.bonus_fight)
     
     if card2.bonus_fight.how == "copy" and card2.bonus_fight.type == "ability":
         (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_bonus_copy_ability(card2.ability_fight, card1.ability_fight, card2.bonus_fight, card1.bonus_fight)
@@ -77,10 +77,10 @@ def apply_all_cancel_data_modif(card1: Card, card2: Card) -> None:
     """
     Applique les capacités qui annulent les modifications des autres capacités sur les types power/damage/attack
     """
-    (card2.ability_fight, card2.bonus_fight) = apply_cancel_data_modif(card1.ability_fight, card1.bonus_fight, card2.ability_fight)
-    (card2.ability_fight, card2.bonus_fight) = apply_cancel_data_modif(card1.bonus_fight, card1.ability_fight, card2.bonus_fight)
-    (card1.ability_fight, card1.bonus_fight) = apply_cancel_data_modif(card2.ability_fight, card2.bonus_fight, card1.ability_fight)
-    (card1.ability_fight, card1.bonus_fight) = apply_cancel_data_modif(card2.bonus_fight, card2.ability_fight, card1.bonus_fight)
+    (card2.ability_fight, card2.bonus_fight) = apply_cancel_data_modif(card1.ability_fight, card2.ability_fight, card2.bonus_fight)
+    (card2.ability_fight, card2.bonus_fight) = apply_cancel_data_modif(card1.bonus_fight, card2.ability_fight, card2.bonus_fight)
+    (card1.ability_fight, card1.bonus_fight) = apply_cancel_data_modif(card2.ability_fight, card1.ability_fight, card1.bonus_fight)
+    (card1.ability_fight, card1.bonus_fight) = apply_cancel_data_modif(card2.bonus_fight, card1.ability_fight, card1.bonus_fight)
 
 def apply_cancel_data_modif(capacity: Capacity, capacity_opp_1: Capacity, capacity_opp_2: Capacity) -> Tuple[Capacity, Capacity]:
     """
@@ -131,14 +131,14 @@ def apply_all_protect_data_modif(card1: Card, card2: Card) -> None:
     """
     Applique les capacités qui protègent contre les capacités qui modifient les données de type power/damage/attack
     """
-    (card2.ability_fight, card2.bonus_fight) = apply_protect_enemy_data_modif(card1.ability_fight, card1.bonus_fight, card2.ability_fight)
-    (card2.ability_fight, card2.bonus_fight) = apply_protect_enemy_data_modif(card1.bonus_fight, card1.ability_fight, card2.bonus_fight)
-    (card1.ability_fight, card1.bonus_fight) = apply_protect_enemy_data_modif(card2.ability_fight, card2.bonus_fight, card1.ability_fight)
-    (card1.ability_fight, card1.bonus_fight) = apply_protect_enemy_data_modif(card2.bonus_fight, card2.ability_fight, card1.bonus_fight)
+    (card2.ability_fight, card2.bonus_fight) = apply_protect_enemy_data_modif(card1.ability_fight, card2.ability_fight, card2.bonus_fight)
+    (card2.ability_fight, card2.bonus_fight) = apply_protect_enemy_data_modif(card1.bonus_fight, card2.ability_fight, card2.bonus_fight)
+    (card1.ability_fight, card1.bonus_fight) = apply_protect_enemy_data_modif(card2.ability_fight, card1.ability_fight, card1.bonus_fight)
+    (card1.ability_fight, card1.bonus_fight) = apply_protect_enemy_data_modif(card2.bonus_fight, card1.ability_fight, card1.bonus_fight)
 
 
 
-def apply_protect_enemy_data_modif(capacity_1: Capacity, capacity_2: Capacity, capacity_opp_1: Capacity, capacity_opp_2: Capacity) -> Tuple[Capacity, Capacity]:
+def apply_protect_enemy_data_modif(capacity_1: Capacity, capacity_opp_1: Capacity, capacity_opp_2: Capacity) -> Tuple[Capacity, Capacity]:
     """
     Applique les capacités qui protègent contre les capacités qui modifient les données de type power/damage/attack
     """
@@ -146,26 +146,26 @@ def apply_protect_enemy_data_modif(capacity_1: Capacity, capacity_2: Capacity, c
     list_how_not_protect = ["cancel", "stop", "copy", "Protection"]
     if capacity_1.how == "Protection":
         if capacity_1.type == "power":
-            if capacity_opp_1.type == "power" and capacity_opp_1.how not in list_how_not_protect and capacity_opp_1.target == "ennemy":
+            if capacity_opp_1.type == "power" and capacity_opp_1.how not in list_how_not_protect and capacity_opp_1.target == "enemy":
                 capacity_opp_1 = None
-            if capacity_opp_2.type == "power" and capacity_opp_2.how not in list_how_not_protect and capacity_opp_2.target == "ennemy":
+            if capacity_opp_2.type == "power" and capacity_opp_2.how not in list_how_not_protect and capacity_opp_2.target == "enemy":
                 capacity_opp_2 = None
-            if capacity_opp_1.type == "power_damage" and capacity_opp_1.how not in list_how_not_protect and capacity_opp_1.target == "ennemy":
+            if capacity_opp_1.type == "power_damage" and capacity_opp_1.how not in list_how_not_protect and capacity_opp_1.target == "enemy":
                 capacity_opp_1 = None
         elif capacity_1.type == "damage":
-            if capacity_opp_1.type == "damage" and capacity_opp_1.how not in list_how_not_protect and capacity_opp_1.target == "ennemy":
+            if capacity_opp_1.type == "damage" and capacity_opp_1.how not in list_how_not_protect and capacity_opp_1.target == "enemy":
                 capacity_opp_1 = None
-            if capacity_opp_2.type == "damage" and capacity_opp_2.how not in list_how_not_protect and capacity_opp_2.target == "ennemy":
+            if capacity_opp_2.type == "damage" and capacity_opp_2.how not in list_how_not_protect and capacity_opp_2.target == "enemy":
                 capacity_opp_2 = None
         elif capacity_1.type == "attack":
-            if capacity_opp_1.type == "attack" and capacity_opp_1.how not in list_how_not_protect and capacity_opp_1.target == "ennemy":
+            if capacity_opp_1.type == "attack" and capacity_opp_1.how not in list_how_not_protect and capacity_opp_1.target == "enemy":
                 capacity_opp_1 = None
-            if capacity_opp_2.type == "attack" and capacity_opp_2.how not in list_how_not_protect and capacity_opp_2.target == "ennemy":
+            if capacity_opp_2.type == "attack" and capacity_opp_2.how not in list_how_not_protect and capacity_opp_2.target == "enemy":
                 capacity_opp_2 = None
         elif capacity_1.type == "power_damage":
-            if (capacity_opp_1.type == "power" or capacity_opp_1.type == "damage" or capacity_opp_1.type == "power_damage") and capacity_opp_1.how not in list_how_not_protect and capacity_opp_1.target == "ennemy":
+            if (capacity_opp_1.type == "power" or capacity_opp_1.type == "damage" or capacity_opp_1.type == "power_damage") and capacity_opp_1.how not in list_how_not_protect and capacity_opp_1.target == "enemy":
                 capacity_opp_1 = None
-            if (capacity_opp_2.type == "power" or capacity_opp_2.type == "damage" or capacity_opp_2.type == "power_damage") and capacity_opp_2.how not in list_how_not_protect and capacity_opp_2.target == "ennemy":
+            if (capacity_opp_2.type == "power" or capacity_opp_2.type == "damage" or capacity_opp_2.type == "power_damage") and capacity_opp_2.how not in list_how_not_protect and capacity_opp_2.target == "enemy":
                 capacity_opp_2 = None
     return capacity_opp_1, capacity_opp_2
 
@@ -193,7 +193,7 @@ def apply_exchange_or_copy_data(card1: Card, card2: Card) -> None:
             card1.damage_fight = card2.damage
 
 
-def apply_ability_stop_ability(ability_2: Capacity, bonus_1: Capacity, bonus_2: Capacity) -> Tuple[Capacity, Capacity, Capacity]:
+def apply_ability_stop_ability(ability_2: Capacity, bonus_1: Capacity, bonus_2: Capacity) -> Tuple[None, Capacity, Capacity ,Capacity]:
     """
     Applique une l'ability : "Stop Opp. Ability"
     """
@@ -213,9 +213,9 @@ def apply_ability_stop_ability(ability_2: Capacity, bonus_1: Capacity, bonus_2: 
     else:
         ability_2 = None
 
-    return ability_2, bonus_1, bonus_2
+    return None, ability_2, bonus_1, bonus_2
 
-def apply_bonus_stop_ability(ability_1: Capacity, ability_2: Capacity, bonus_2: Capacity) -> Tuple[Capacity, Capacity, Capacity]:
+def apply_bonus_stop_ability(ability_1: Capacity, ability_2: Capacity, bonus_2: Capacity) -> Tuple[None, Capacity, Capacity, Capacity]:
     """
     Applique le bonus : "Stop Opp. Ability"
     """
@@ -235,9 +235,9 @@ def apply_bonus_stop_ability(ability_1: Capacity, ability_2: Capacity, bonus_2: 
     else:
         ability_2 = None
     
-    return ability_1, ability_2, bonus_2
+    return None, ability_1, ability_2, bonus_2
 
-def apply_ability_stop_bonus(ability_2: Capacity, bonus_1: Capacity, bonus_2: Capacity) -> Tuple[Capacity, Capacity, Capacity]:
+def apply_ability_stop_bonus(ability_2: Capacity, bonus_1: Capacity, bonus_2: Capacity) -> Tuple[None, Capacity, Capacity ,Capacity]:
     """
     Applique une l'ability : "Stop Opp. Bonus"
     """
@@ -257,9 +257,9 @@ def apply_ability_stop_bonus(ability_2: Capacity, bonus_1: Capacity, bonus_2: Ca
     else:
         bonus_2 = None
     
-    return ability_2, bonus_1, bonus_2
+    return None, ability_2, bonus_1, bonus_2
 
-def apply_bonus_stop_bonus(ability_1: Capacity, ability_2: Capacity, bonus_2: Capacity) -> Tuple[Capacity, Capacity, Capacity]:
+def apply_bonus_stop_bonus(ability_1: Capacity, ability_2: Capacity, bonus_2: Capacity) -> Tuple[None, Capacity, Capacity, Capacity]:
     """
     Applique le bonus : "Stop Opp. Bonus"
     """
@@ -279,10 +279,10 @@ def apply_bonus_stop_bonus(ability_1: Capacity, ability_2: Capacity, bonus_2: Ca
     else:
         bonus_2 = None
     
-    return ability_1, ability_2, bonus_2
+    return None, ability_1, ability_2, bonus_2
 
 
-def apply_ability_copy_ability(ability_1: Capacity, ability_2: Capacity, bonus_1: Capacity, bonus_2: Capacity) -> Tuple[Capacity, Capacity, Capacity, Capacity]:
+def apply_ability_copy_ability(ability_2: Capacity, bonus_1: Capacity, bonus_2: Capacity) -> Tuple[Capacity, Capacity, Capacity, Capacity]:
     """
     Applique l'ability : "Copy Opp. Ability"
     """
@@ -342,7 +342,7 @@ def apply_bonus_copy_ability(ability_1: Capacity, ability_2: Capacity, bonus_1: 
 
     return ability_1, copy.deepcopy(ability_2), bonus_1, bonus_2
 
-def apply_ability_copy_bonus(ability_1: Capacity, ability_2: Capacity, bonus_1: Capacity, bonus_2: Capacity) -> Tuple[Capacity, Capacity, Capacity, Capacity]:
+def apply_ability_copy_bonus(ability_2: Capacity, bonus_1: Capacity, bonus_2: Capacity) -> Tuple[Capacity, Capacity, Capacity, Capacity]:
     """
     Applique l'ability : "Copy Opp. Bonus"
     """

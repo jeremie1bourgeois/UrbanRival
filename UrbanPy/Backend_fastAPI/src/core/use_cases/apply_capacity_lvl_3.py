@@ -5,20 +5,20 @@ from src.core.domain.game import Game
 
 
 def apply_capacity_lvl_3(game: Game, card1: Card, card2: Card, has_ally_won: bool) -> None:
-    card1.ability_fight = apply_target_ally_effects(game, game.ally, game.enemy, card1.ability_fight, card1, card2)
-    card1.bonus = apply_target_ally_effects(game, game.ally, game.enemy, card1.bonus, card1, card2)
-    card2.ability_fight = apply_target_ally_effects(game, game.enemy, game.ally, card2.ability_fight, card2, card1)
-    card2.bonus_fight = apply_target_ally_effects(game, game.enemy, game.ally, card2.bonus_fight, card2, card1)
+    card1.ability_fight = apply_target_ally_effects(game, game.ally, game.enemy, card1.ability_fight, card1, card2) if card1.ability_fight else None
+    card1.bonus = apply_target_ally_effects(game, game.ally, game.enemy, card1.bonus, card1, card2) if card1.bonus else None
+    card2.ability_fight = apply_target_ally_effects(game, game.enemy, game.ally, card2.ability_fight, card2, card1) if card2.ability_fight else None
+    card2.bonus_fight = apply_target_ally_effects(game, game.enemy, game.ally, card2.bonus_fight, card2, card1) if card2.bonus_fight else None
     
-    card1.ability_fight = apply_target_both_effects(game, game.ally, game.enemy, card1.ability_fight, card1, card2)
-    card1.bonus = apply_target_both_effects(game, game.ally, game.enemy, card1.bonus, card1, card2)
-    card2.ability_fight = apply_target_both_effects(game, game.enemy, game.ally, card2.ability_fight, card2, card1)
-    card2.bonus_fight = apply_target_both_effects(game, game.enemy, game.ally, card2.bonus_fight, card2, card1)
+    card1.ability_fight = apply_target_both_effects(game, game.ally, game.enemy, card1.ability_fight, card1, card2) if card1.ability_fight else None
+    card1.bonus = apply_target_both_effects(game, game.ally, game.enemy, card1.bonus, card1, card2) if card1.bonus else None
+    card2.ability_fight = apply_target_both_effects(game, game.enemy, game.ally, card2.ability_fight, card2, card1) if card2.ability_fight else None
+    card2.bonus_fight = apply_target_both_effects(game, game.enemy, game.ally, card2.bonus_fight, card2, card1) if card2.bonus_fight else None
     
-    card1.ability_fight = apply_target_enemy_effects(game, game.ally, game.enemy, card1.ability_fight, card1, card2)
-    card1.bonus = apply_target_enemy_effects(game, game.ally, game.enemy, card1.bonus, card1, card2)
-    card2.ability_fight = apply_target_enemy_effects(game, game.enemy, game.ally, card2.ability_fight, card2, card1)
-    card2.bonus_fight = apply_target_enemy_effects(game, game.enemy, game.ally, card2.bonus_fight, card2, card1)
+    card1.ability_fight = apply_target_enemy_effects(game, game.ally, game.enemy, card1.ability_fight, card1, card2) if card1.ability_fight else None
+    card1.bonus = apply_target_enemy_effects(game, game.ally, game.enemy, card1.bonus, card1, card2) if card1.bonus else None
+    card2.ability_fight = apply_target_enemy_effects(game, game.enemy, game.ally, card2.ability_fight, card2, card1) if card2.ability_fight else None
+    card2.bonus_fight = apply_target_enemy_effects(game, game.enemy, game.ally, card2.bonus_fight, card2, card1) if card2.bonus_fight else None
 
 def check_capacity_condition(capacity: Capacity, has_won: bool) -> Capacity:
     if capacity.condition_effect == "":
