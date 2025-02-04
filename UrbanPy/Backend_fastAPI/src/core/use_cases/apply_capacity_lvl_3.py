@@ -1,4 +1,3 @@
-import math
 from src.core.domain.player import Player
 from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card
@@ -41,150 +40,180 @@ def check_capacity_condition(capacity: Capacity, has_won: bool) -> Capacity:
     else:
         raise ValueError(f"Invalid condition_effect: {capacity.condition_effect}")
 
+
+# Fonctions de bonus définies en dehors
+def _bonus_growth(game, player1, player2, card1, card2):
+    return game.nb_turn
+
+def _bonus_degrowth(game, player1, player2, card1, card2):
+    return 5 - game.nb_turn
+
+def _bonus_support(game, player1, player2, card1, card2):
+    return sum(1 for c in player1.cards if c.faction == card1.faction)
+
+def _bonus_equalizer(game, player1, player2, card1, card2):
+    return card2.stars
+
+def _bonus_brawl(game, player1, player2, card1, card2):
+    return sum(1 for c in player2.cards if c.faction == card2.faction)
+
+def _bonus_nb_life_lost(game, player1, player2, card1, card2):
+    return 12 - player1.life # change le hardcode 12
+
+def _bonus_nb_pillz_lost(game, player1, player2, card1, card2):
+    return 12 - player1.pillz # change le hardcode 12
+
+def _bonus_nb_pillz_left(game, player1, player2, card1, card2):
+    return player1.pillz
+
+def _bonus_nb_life_left(game, player1, player2, card1, card2):
+    return player1.life
+
+def _bonus_empty(game, player1, player2, card1, card2):
+    return 1
+
+# Mapping des fonctions de bonus
+_BONUS_FUNCS = {
+    "": _bonus_empty,
+    "Growth": _bonus_growth,
+    "Degrowth": _bonus_degrowth,
+    "Support": _bonus_support,
+    "Equalizer": _bonus_equalizer,
+    "Brawl": _bonus_brawl,
+    "nb_life_lost": _bonus_nb_life_lost,
+    "nb_pillz_lost": _bonus_nb_pillz_lost,
+    "nb_pillz_left": _bonus_nb_pillz_left,
+    "nb_life_left": _bonus_nb_life_left
+}
+
+# Mapping des types de capacité aux attributs à modifier
+_TYPE_MAP = {
+    "life": "life",
+    "pillz": "pillz"
+}
+
 def apply_target_ally_effects(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card) -> Capacity:
-    if capacity.target == "ally":
-        if capacity.type == "life":
-            if capacity.how == "Growth": # "Growth: +X Life"
-                if capacity.value < 0:
-                    if card1.life > capacity.borne:
-                        card1.life = max(card1.life + capacity.value * game.nb_turn, capacity.borne)
-                else:
-                    card1.life += (capacity.value * game.nb_turn)
-            elif capacity.how == "Degrowth": # "Degrowth: +X Life"
-                card1.life += (capacity.value * (5 - game.nb_turn))
-            elif capacity.how == "Support": # "Support: +X Life"
-                card1.life += (capacity.value * sum(1 for card in game.ally.cards if card.faction == card1.faction))
-            elif capacity.how == "Equalizer": # "Equalizer: +X Life"
-                card1.life += (capacity.value * card2.stars)
-            elif capacity.how == "Brawl": # "Brawl: +X Life"
-                card1.life += (capacity.value * sum(1 for card in player2.cards if card.faction == card2.faction))
-            elif capacity.how == "Damage": # "+X Life Per Damage Max. Y"
-                if capacity.borne != -1:
-                    if card1.life < capacity.borne:
-                        card1.life = min(card1.life + capacity.value * card1.damage_fight, capacity.borne)
-                else:
-                    card1.life += (capacity.value * card1.damage_fight)
-            elif capacity.how == "": # "+X Life Max. Y"
-                if capacity.value > 0:
-                    if capacity.borne != -1:
-                        if card1.life < capacity.borne:
-                            card1.life = min(card1.life + capacity.value, capacity.borne)
-                    else:
-                        card1.life += capacity.value
-                else: # "Backlash: -X Life Min. Y"
-                    if card1.life > capacity.borne:
-                        card1.life = max(card1.life + capacity.value, capacity.borne)
-            else:
-                raise ValueError(f"Invalid how: {capacity.how} for life")
-            return None
-        elif capacity.type == "pillz":
-            if capacity.how == "":
-                if capacity.value > 0: # "+X Pillz Max. Y":
-                    if capacity.borne != -1:
-                        if player1.pillz < capacity.borne:
-                            player1.pillz = min(player1.pillz + capacity.value, capacity.borne)
-                    else:
-                        player1.pillz += capacity.value
-                elif player1.pillz > capacity.borne: # "Backlash: -X Pillz Min Y"
-                    player1.pillz = max(player1.pillz + capacity.value, capacity.borne)
-            elif capacity.how == "Damage": # "+X Pillz Per Damage":
-                player1.pillz += (capacity.value * card1.damage_fight)
-            elif capacity.how == "Degrowth": # "Degrowth: +X Pillz"
-                player1.pillz += (capacity.value * (5 - game.nb_turn))
-            elif capacity.how == "Growth": # "Growth: +X Pillz"
-                player1.pillz += (capacity.value * game.nb_turn)
-            elif capacity.how == "Support": # "Support: +X Pillz, Max. Y"
-                if capacity.value != -1:
-                    if player1.pillz < capacity.borne:
-                        player1.pillz = min(player1.pillz + capacity.value, capacity.borne)
-                else:
-                    player1.pillz += capacity.value
-            elif capacity.how == "Equalizer": # "Equalizer: +X Pillz"
-                player1.pillz += (capacity.value * card2.stars)
-            elif capacity.how == "Recover": # "Recover X Pillz Out Of Y"
-                player1.pillz += max(1, math.floor(card1.pillz_fight * capacity.value / capacity.borne))
-            else:
-                raise ValueError(f"Invalid how: {capacity.how} for pillz")
-            return None
-        elif capacity.type == "pillz_life":
-            if capacity.how == "": # "+X Pillz And Life"
-                player1.pillz += capacity.value
-                player1.life += capacity.value
-            else:
-                raise ValueError(f"Invalid how: {capacity.how} for pillz_life")
-            return None
+    # Vérifier si la capacité cible un allié
+    if capacity.target != "ally":
+        return capacity
+
+    # Récupérer les attributs correspondants aux types de capacité
+    attrs = [_TYPE_MAP.get(type_) for type_ in capacity.type if _TYPE_MAP.get(type_)]
+
+    # Si aucun attribut n'est trouvé, on retourne la capacité sans modification
+    if not attrs:
+        return capacity
+
+    # Récupérer la fonction de bonus correspondante
+    bonus_func = _BONUS_FUNCS.get(capacity.how)
+    if not bonus_func:
+        raise ValueError(f"Invalid how: {capacity.how} for {capacity.type}")
+
+    # Calculer le bonus en utilisant la fonction de bonus
+    bonus = capacity.value * bonus_func(game, player1, player2, card1, card2)
+
+    # Appliquer le bonus aux attributs de la carte alliée
+    if capacity.borne is not None and capacity.borne != -1:
+        if capacity.value > 0:  # Augmentation avec borne max
+            for attr in attrs:
+                current_value = getattr(card1, attr)
+                if current_value < capacity.borne:
+                    setattr(card1, attr, min(capacity.borne, current_value + bonus))
+        else:  # Diminution avec borne min
+            for attr in attrs:
+                current_value = getattr(card1, attr)
+                if current_value > capacity.borne:
+                    setattr(card1, attr, max(capacity.borne, current_value + bonus))
+    else:  # Pas de borne
+        for attr in attrs:
+            current_value = getattr(card1, attr)
+            setattr(card1, attr, current_value + bonus)
+
     return capacity
 
-def apply_target_enemy_effects(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card):
-    """
-    Apply the capacity to the enemy player
-    """
-    if capacity.target == "enemy":
-        if capacity.type == "life":
-            if capacity.how == "": # "-X Opp. Life, Min Y"
-                if player2.life > capacity.borne:
-                    player2.life = max(capacity.borne, player2.life + capacity.value)
-            elif capacity.how == "Growth": # "Growth: -X Opp. Life, Min Y"
-                if player2.life > capacity.borne:
-                    player2.life = max(capacity.borne, player2.life + capacity.value * game.nb_turn)
-            elif capacity.how == "Degrowth": # "Degrowth: -X Opp. Life, Min Y"
-                if player2.life > capacity.borne:
-                    player2.life = max(capacity.borne, player2.life + capacity.value * (5 - game.nb_turn))
-            elif capacity.how == "Support": # "Support: -X Opp. Life, Min Y"
-                if player2.life > capacity.borne:
-                    player2.life = max(capacity.borne, player2.life + capacity.value * sum(1 for card in player1.cards if card.faction == card1.faction))
-            elif capacity.how == "Equalizer": # "Equalizer: -X Opp. Life, Min Y"
-                if player2.life > capacity.borne:
-                    player2.life = max(capacity.borne, player2.life + capacity.value * card1.stars)
-            elif capacity.how == "Brawl": # "Brawl: -X Opp. Life, Min Y"
-                if player2.life > capacity.borne:
-                    player2.life = max(capacity.borne, player2.life + capacity.value * sum(1 for card in player2.cards if card.faction == card2.faction))
-            else:
-                raise ValueError(f"Invalid how: {capacity.how} for life")
-            return None
-        elif capacity.type == "pillz":
-            if capacity.how == "": # "-X Opp Pillz. Min Y"
-                if player2.pillz > capacity.borne:
-                    player2.pillz = max(capacity.borne, player2.pillz + capacity.value)
-            elif capacity.how == "Growth": # "Growth: -X Opp Pillz. Min Y"
-                if player2.pillz > capacity.borne:
-                    player2.pillz = max(capacity.borne, player2.pillz + capacity.value * game.nb_turn)
-            elif capacity.how == "Brawl": # "Brawl: -X Opp. Pillz, Min Y"
-                if player2.pillz > capacity.borne:
-                    player2.pillz = max(capacity.borne, player2.pillz + capacity.value * sum(1 for card in player2.cards if card.faction == card2.faction))
-            else:
-                raise ValueError(f"Invalid how: {capacity.how} for pillz")
-            return None
-        elif capacity.type == "pillz_life":
-            if capacity.how == "": # "-X Opp. Pillz And Life, Min Y"
-                if player2.pillz > capacity.borne:
-                    player2.pillz = max(capacity.borne, player2.pillz + capacity.value)
-                if player2.life > capacity.borne:
-                    player2.life = max(capacity.borne, player2.life + capacity.value)
-            else:
-                raise ValueError(f"Invalid how: {capacity.how} for pillz_life")
-            return None
+def apply_target_enemy_effects(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card) -> Capacity:
+    # Vérifier si la capacité cible un ennemi
+    if capacity.target != "enemy":
+        return capacity
+
+    # Récupérer les attributs correspondants aux types de capacité
+    attrs = [_TYPE_MAP.get(type_) for type_ in capacity.type if _TYPE_MAP.get(type_)]
+
+    # Si aucun attribut n'est trouvé, on retourne la capacité sans modification
+    if not attrs:
+        return capacity
+
+    # Récupérer la fonction de bonus correspondante
+    bonus_func = _BONUS_FUNCS.get(capacity.how)
+    if not bonus_func:
+        raise ValueError(f"Invalid how: {capacity.how} for {capacity.type}")
+
+    # Calculer le bonus en utilisant la fonction de bonus
+    bonus = capacity.value * bonus_func(game, player1, player2, card1, card2)
+
+    # Appliquer le bonus aux attributs de la carte ennemie
+    if capacity.borne is not None and capacity.borne != -1:
+        if capacity.value > 0:  # Augmentation avec borne max
+            for attr in attrs:
+                current_value = getattr(card2, attr)
+                if current_value < capacity.borne:
+                    setattr(card2, attr, min(capacity.borne, current_value + bonus))
+        else:  # Diminution avec borne min
+            for attr in attrs:
+                current_value = getattr(card2, attr)
+                if current_value > capacity.borne:
+                    setattr(card2, attr, max(capacity.borne, current_value + bonus))
+    else:  # Pas de borne
+        for attr in attrs:
+            current_value = getattr(card2, attr)
+            setattr(card2, attr, current_value + bonus)
+
     return capacity
 
-def apply_target_both_effects(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card):
-    """
-    Apply the capacity to both players
-    """
-    if capacity.target == "both":
-        if capacity.type == "life":
-            if capacity.how == "": # "+X Players Life"
-                player1.life += capacity.value
-                player2.life += capacity.value
-            else:
-                raise ValueError(f"Invalid how: {capacity.how} for life")
-            return None
-        elif capacity.type == "pillz":
-            if capacity.how == "": # "-X Players Pillz. Min Y"
-                if player1.pillz > capacity.borne:
-                    player1.pillz = max(capacity.borne, player1.pillz + capacity.value)
-                if player2.pillz > capacity.borne:
-                    player2.pillz = max(capacity.borne, player2.pillz + capacity.value)
-            else:
-                raise ValueError(f"Invalid how: {capacity.how} for pillz")
-            return None
+
+def apply_target_both_effects(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card) -> Capacity:
+    # Vérifier si la capacité cible les deux cartes (alliée et ennemie)
+    if capacity.target != "both":
+        return capacity
+
+    # Récupérer les attributs correspondants aux types de capacité
+    attrs = [_TYPE_MAP.get(type_) for type_ in capacity.type if _TYPE_MAP.get(type_)]
+
+    # Si aucun attribut n'est trouvé, on retourne la capacité sans modification
+    if not attrs:
+        return capacity
+
+    # Récupérer la fonction de bonus correspondante
+    bonus_func = _BONUS_FUNCS.get(capacity.how)
+    if not bonus_func:
+        raise ValueError(f"Invalid how: {capacity.how} for {capacity.type}")
+
+    # Calculer le bonus en utilisant la fonction de bonus
+    bonus = capacity.value * bonus_func(game, player1, player2, card1, card2)
+
+    # Appliquer le bonus aux attributs des deux cartes (alliée et ennemie)
+    if capacity.borne is not None and capacity.borne != -1:
+        if capacity.value > 0:  # Augmentation avec borne max
+            for attr in attrs:
+                current_value1 = getattr(card1, attr)
+                current_value2 = getattr(card2, attr)
+                if current_value1 < capacity.borne:  # Vérification pour card1
+                    setattr(card1, attr, min(capacity.borne, current_value1 + bonus))
+                if current_value2 < capacity.borne:  # Vérification pour card2
+                    setattr(card2, attr, min(capacity.borne, current_value2 + bonus))
+        else:  # Diminution avec borne min
+            for attr in attrs:
+                current_value1 = getattr(card1, attr)
+                current_value2 = getattr(card2, attr)
+                if current_value1 > capacity.borne:  # Vérification pour card1
+                    setattr(card1, attr, max(capacity.borne, current_value1 + bonus))
+                if current_value2 > capacity.borne:  # Vérification pour card2
+                    setattr(card2, attr, max(capacity.borne, current_value2 + bonus))
+    else:  # Pas de borne
+        for attr in attrs:
+            current_value1 = getattr(card1, attr)
+            current_value2 = getattr(card2, attr)
+            setattr(card1, attr, current_value1 + bonus)
+            setattr(card2, attr, current_value2 + bonus)
+
     return capacity

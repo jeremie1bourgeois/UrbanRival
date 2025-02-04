@@ -1,11 +1,11 @@
 class Capacity:
-    def __init__(self, target: str, type: str, value: int, borne: int, how: str = "", condition_effect: str = "", lvl_priority: int = 0):
+    def __init__(self, target: str, type: list[str], value: int, borne: int, how: str = "", condition_effect: str = "", lvl_priority: int = 0):
         self.target = target # ally, enemy
-        self.type = type # power, damage, attack, pillz, life, poison, heal || ability, bonus
+        self.type = type # [ power, damage, power_damage, attack, pillz, life, pillz_life || ability, bonus ]
         self.value = value
         self.how = how # support, Growth, Degrowth, Equalizer, Brawl || stop, copy, protection, cancel || toxin, poison, regen, heal, ??, dope
         self.borne = borne
-        self.condition_effect = condition_effect # Revenge, Reprisal, Confidence, Courage, Symmetry, Asymmetry, Bet # bool bool bool bool bool bool bool var// une var
+        self.condition_effect = condition_effect # [ Revenge, Reprisal, Confidence, Courage, Symmetry, Asymmetry, Bet ] # bool bool bool bool bool bool bool var// une var
         self.lvl_priority = lvl_priority
 
         # stop: puissance et degat +2

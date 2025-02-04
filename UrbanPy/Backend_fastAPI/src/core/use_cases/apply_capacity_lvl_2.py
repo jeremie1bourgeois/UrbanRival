@@ -1,4 +1,3 @@
-from typing import Tuple
 from src.core.domain.player import Player
 from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card
@@ -6,15 +5,20 @@ from src.core.domain.game import Game
 
 
 def apply_capacity_lvl_2(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> None:
-    card1.ability = apply_target_ally_effects(game, player1, player2, card1.ability, card1, card2)
-    card1.bonus = apply_target_ally_effects(game, player1, player2, card1.bonus, card1, card2)
-    card2.ability = apply_target_ally_effects(game, player2, player1, card2.ability, card2, card1)
-    card2.bonus = apply_target_ally_effects(game, player2, player1, card2.bonus, card2, card1)
+    card1.ability = apply_target_ally_effects(game, player1, player2, card1.ability, card1, card2) if card1.ability else None
+    card1.bonus = apply_target_ally_effects(game, player1, player2, card1.bonus, card1, card2) if card1.bonus else None
+    card2.ability = apply_target_ally_effects(game, player2, player1, card2.ability, card2, card1) if card2.ability else None
+    card2.bonus = apply_target_ally_effects(game, player2, player1, card2.bonus, card2, card1) if card2.bonus else None
     
-    card1.ability = apply_target_enemy_effects(game, player1, player2, card1.ability, card1, card2)
-    card1.bonus = apply_target_enemy_effects(game, player1, player2, card1.bonus, card1, card2)
-    card2.ability = apply_target_enemy_effects(game, player2, player1, card2.ability, card2, card1)
-    card2.bonus = apply_target_enemy_effects(game, player2, player1, card2.bonus, card2, card1)
+    card1.ability = apply_target_both_effects(game, player1, player2, card1.ability, card1, card2) if card1.ability else None
+    card1.bonus = apply_target_both_effects(game, player1, player2, card1.bonus, card1, card2) if card1.bonus else None
+    card2.ability = apply_target_both_effects(game, player2, player1, card2.ability, card2, card1) if card2.ability else None
+    card2.bonus = apply_target_both_effects(game, player2, player1, card2.bonus, card2, card1) if card2.bonus else None
+    
+    card1.ability = apply_target_enemy_effects(game, player1, player2, card1.ability, card1, card2) if card1.ability else None
+    card1.bonus = apply_target_enemy_effects(game, player1, player2, card1.bonus, card1, card2) if card1.bonus else None
+    card2.ability = apply_target_enemy_effects(game, player2, player1, card2.ability, card2, card1) if card2.ability else None
+    card2.bonus = apply_target_enemy_effects(game, player2, player1, card2.bonus, card2, card1) if card2.bonus else None
 
 
 # Fonctions de bonus définies en dehors
@@ -50,6 +54,7 @@ def _bonus_empty(game, player1, player2, card1, card2):
 
 # Mapping défini une seule fois
 _BONUS_FUNCS = {
+    "": _bonus_empty,
     "Growth": _bonus_growth,
     "Degrowth": _bonus_degrowth,
     "Support": _bonus_support,
@@ -59,37 +64,48 @@ _BONUS_FUNCS = {
     "nb_pillz_lost": _bonus_nb_pillz_lost,
     "nb_pillz_left": _bonus_nb_pillz_left,
     "nb_life_left": _bonus_nb_life_left,
-    "": _bonus_empty
 }
 
 # Mapping des attributs aussi défini une seule fois
 _ATTR_MAP = {
-    "attack": ["attack"],
-    "damage": ["damage_fight"],
-    "power": ["power_fight"],
-    "power_and_damage": ["power_fight", "damage_fight"]
+    "attack": "attack",
+    "damage": "damage_fight",
+    "power": "power_fight"
 }
 
 def apply_target_ally_effects(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card) -> Capacity:
     if capacity.target != "ally":
         return capacity
 
-    attrs = _ATTR_MAP.get(capacity.type, [])  # Récupère les attributs associés
+    # Récupérer tous les attributs correspondants aux types dans capacity.type
+    attrs = [_ATTR_MAP.get(type_) for type_ in capacity.type if _ATTR_MAP.get(type_)]
+
+    # Si aucun attribut n'est trouvé, on retourne None
     if not attrs:
         return capacity
 
-    bonus_func = _BONUS_FUNCS.get(capacity.how, _bonus_empty)  # Récupère la fonction de bonus
+    # Récupérer la fonction de bonus
+    bonus_func = _BONUS_FUNCS.get(capacity.how)
+    if not bonus_func:
+        raise ValueError(f"Invalid how: {capacity.how} for {capacity.type}")
+
+    # Calculer le bonus une seule fois
     bonus = capacity.value * bonus_func(game, player1, player2, card1, card2)
 
-    for attr in attrs:
-        current_value = getattr(card1, attr, 0)  # Valeur actuelle
-
-        if capacity.borne is not None and capacity.borne != -1:
-            if capacity.value > 0:  # Augmentation avec borne max
-                setattr(card1, attr, min(capacity.borne, current_value + bonus))
-            else:  # Diminution avec borne min
-                setattr(card1, attr, max(capacity.borne, current_value + bonus))
-        else:  # Pas de borne
+    if capacity.borne is not None and capacity.borne != -1:
+        if capacity.value > 0:  # Augmentation avec borne max
+            for attr in attrs:
+                current_value = getattr(card1, attr)
+                if getattr(card1, attr) < capacity.borne:
+                    setattr(card1, attr, min(capacity.borne, current_value + bonus))
+        else:  # Diminution avec borne min
+            for attr in attrs:
+                current_value = getattr(card1, attr)
+                if getattr(card1, attr) > capacity.borne:
+                    setattr(card1, attr, max(capacity.borne, current_value + bonus))
+    else:  # Pas de borne
+        for attr in attrs:
+            current_value = getattr(card1, attr)
             setattr(card1, attr, current_value + bonus)
 
     return None
@@ -99,30 +115,36 @@ def apply_target_enemy_effects(game: Game, player1: Player, player2: Player, cap
     if capacity.target != "enemy":
         return capacity
 
-    attrs = _ATTR_MAP.get(capacity.type)
+    # Récupérer tous les attributs correspondants aux types dans capacity.type
+    attrs = [_ATTR_MAP.get(type_) for type_ in capacity.type if _ATTR_MAP.get(type_)]
+
+    # Si aucun attribut n'est trouvé, on retourne capacity
     if not attrs:
         return capacity
 
-    # Récupération de la fonction de bonus
-    bonus_func = _BONUS_FUNCS.get(capacity.how, _bonus_empty)
+    # Récupérer la fonction de bonus
+    bonus_func = _BONUS_FUNCS.get(capacity.how)
     if not bonus_func:
         raise ValueError(f"Invalid how: {capacity.how} for {capacity.type}")
-    
-    # Calcul du bonus
+
+    # Calculer le bonus une seule fois
     bonus = capacity.value * bonus_func(game, player1, player2, card1, card2)
 
-    # Application des modifications
-    for attr in attrs:
-        current_value = getattr(card2, attr)
-        
-        if capacity.borne != -1:
-            if capacity.value > 0:  # Valeur positive
+    # Appliquer les effets en tenant compte des bornes
+    if capacity.borne is not None and capacity.borne != -1:
+        if capacity.value > 0:  # Augmentation avec borne max
+            for attr in attrs:
+                current_value = getattr(card2, attr)
                 if current_value < capacity.borne:
                     setattr(card2, attr, min(capacity.borne, current_value + bonus))
-            else:  # Valeur négative
+        else:  # Diminution avec borne min
+            for attr in attrs:
+                current_value = getattr(card2, attr)
                 if current_value > capacity.borne:
                     setattr(card2, attr, max(capacity.borne, current_value + bonus))
-        else:  # Pas de borne
+    else:  # Pas de borne
+        for attr in attrs:
+            current_value = getattr(card2, attr)
             setattr(card2, attr, current_value + bonus)
 
     return None
@@ -132,30 +154,44 @@ def apply_target_both_effects(game: Game, player1: Player, player2: Player, capa
     if capacity.target != "both":
         return capacity
 
-    attrs = _ATTR_MAP.get(capacity.type, [])  # S'assure que c'est une liste
+    # Récupérer tous les attributs correspondants aux types dans capacity.type
+    attrs = [_ATTR_MAP.get(type_) for type_ in capacity.type if _ATTR_MAP.get(type_)]
 
-    if not attrs:  # Vérification pour éviter un plantage
+    # Si aucun attribut n'est trouvé, on retourne capacity
+    if not attrs:
         return capacity
 
-    # Récupération de la fonction de bonus
-    bonus_func = _BONUS_FUNCS.get(capacity.how, _bonus_empty)
+    # Récupérer la fonction de bonus
+    bonus_func = _BONUS_FUNCS.get(capacity.how)
+    if not bonus_func:
+        raise ValueError(f"Invalid how: {capacity.how} for {capacity.type}")
 
+    # Calculer le bonus une seule fois
     bonus = capacity.value * bonus_func(game, player1, player2, card1, card2)
 
-    for attr in attrs:
-        current_value = getattr(card1, attr)
-        current_value2 = getattr(card2, attr)
-
-        # Gestion des bornes
-        if capacity.borne is not None and capacity.borne != -1:
-            if capacity.value > 0:  # Augmentation
-                setattr(card1, attr, min(capacity.borne, current_value + bonus))
-                setattr(card2, attr, min(capacity.borne, current_value2 + bonus))
-            else:  # Diminution
-                setattr(card1, attr, max(capacity.borne, current_value + bonus))
-                setattr(card2, attr, max(capacity.borne, current_value2 + bonus))
-        else:  # Pas de borne
-            setattr(card1, attr, current_value + bonus)
+    # Appliquer les effets en tenant compte des bornes
+    if capacity.borne is not None and capacity.borne != -1:
+        if capacity.value > 0:  # Augmentation avec borne max
+            for attr in attrs:
+                current_value1 = getattr(card1, attr)
+                current_value2 = getattr(card2, attr)
+                if current_value1 < capacity.borne:  # Vérification pour card1
+                    setattr(card1, attr, min(capacity.borne, current_value1 + bonus))
+                if current_value2 < capacity.borne:  # Vérification pour card2
+                    setattr(card2, attr, min(capacity.borne, current_value2 + bonus))
+        else:  # Diminution avec borne min
+            for attr in attrs:
+                current_value1 = getattr(card1, attr)
+                current_value2 = getattr(card2, attr)
+                if current_value1 > capacity.borne:  # Vérification pour card1
+                    setattr(card1, attr, max(capacity.borne, current_value1 + bonus))
+                if current_value2 > capacity.borne:  # Vérification pour card2
+                    setattr(card2, attr, max(capacity.borne, current_value2 + bonus))
+    else:  # Pas de borne
+        for attr in attrs:
+            current_value1 = getattr(card1, attr)
+            current_value2 = getattr(card2, attr)
+            setattr(card1, attr, current_value1 + bonus)
             setattr(card2, attr, current_value2 + bonus)
 
     return None
