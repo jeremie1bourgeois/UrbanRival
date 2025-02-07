@@ -50,8 +50,8 @@ class Card:
         
         self.power_fight: int = 0
         self.damage_fight: int = 0
-        self.ability_fight: str = ""
-        self.bonus_fight: str = ""
+        self.ability_fight: Capacity = None
+        self.bonus_fight: Capacity = None
         self.pillz_fight: int = 0
         self.fury: bool = False
         
