@@ -9,13 +9,8 @@ url = "https://iclintz.com/characters/clan.php?ID="
 url_dim = "https://iclintz.com"
 
 def recup():
-    
-    list_all_cards_by_faction = []
-    list_all_cards = []
     for ID in list_ID:
-
         url_faction = url + str(ID)
-
         res = requests.get(url_faction)
         soup = BeautifulSoup(res.text, "html.parser")
 
@@ -24,17 +19,20 @@ def recup():
         if img_tag and 'src' in img_tag.attrs:
             img_url = img_tag['src']
             match = re.search(r"/clan/([A-Z]+)_", img_url)
-            name = match.group(1)
-            download_image(img_url, f"{name}")
-    return list_all_cards
+            if match:
+                name = match.group(1)
+                download_image(img_url, name)
 
 def download_image(imgUrl, name): 
     response = requests.get(imgUrl)
     if response.status_code == 200:  
-        img_path = os.path.join('Clan', f"{name}.jpg") 
+        # ✅ Créer le dossier "Clan" s'il n'existe pas
+        os.makedirs("Clan", exist_ok=True)
+
+        img_path = os.path.join("Clan", f"{name}.jpg") 
         
         with open(img_path, 'wb') as f:
             f.write(response.content)
-        print(f"Image téléchargée : {name}")
+        print(f"✅ Image téléchargée : {name}")
 
 recup()

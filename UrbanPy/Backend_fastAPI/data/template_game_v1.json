@@ -12,11 +12,11 @@
                 "starOff": 2,
 				"bonus":{
 					"target": "enemy",
-					"type": "power",
+					"type": ["power"],
 					"value": -2,
 					"how": "",
 					"borne": 1,
-					"condition_effect": "",
+					"condition_effect": [],
 					"lvl_priority": 0
 				},
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -25,11 +25,11 @@
                 "damage": 2,
 				"ability":{
 					"target": "enemy",
-					"type": "power",
+					"type": ["power"],
 					"value": -1,
 					"how": "Growth",
 					"borne": 4,
-					"condition_effect": "",
+					"condition_effect": [],
 					"lvl_priority": 0
 				},
                 "ability_description": "Growth: -1 Opp Power, Min 4",
@@ -48,11 +48,11 @@
                 "starOff": 3,
 				"bonus":{
 					"target": "enemy",
-					"type": "power",
+					"type": ["power"],
 					"value": -2,
 					"how": "",
 					"borne": 1,
-					"condition_effect": "",
+					"condition_effect": [],
 					"lvl_priority": 0
 				},
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -61,11 +61,11 @@
                 "damage": 3,
 				"ability": {
 					"target": "ally",
-					"type": "damage",
+					"type": ["damage"],
 					"value": 3,
 					"how": "",
 					"borne": 0,
-					"condition_effect": "Courage",
+					"condition_effect": ["Courage"],
 					"lvl_priority": 0
 				},
                 "ability_description": "Courage: Damage +3",
@@ -84,11 +84,11 @@
                 "starOff": 3,
 				"bonus": {
 					"target": "enemy",
-					"type": "power",
+					"type": ["power"],
 					"value": -2,
 					"how": "",
 					"borne": 1,
-					"condition_effect": "",
+					"condition_effect": [],
 					"lvl_priority": 0
 				},
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -97,11 +97,11 @@
                 "damage": 5,
 				"ability": {
 					"target": "ally",
-					"type": "power",
+					"type": ["power"],
 					"value": 4,
 					"how": "",
 					"borne": 0,
-					"condition_effect": "",
+					"condition_effect": [],
 					"lvl_priority": 0
 				},
                 "ability_description": "Power +4",
@@ -124,11 +124,11 @@
                 "damage": 1,
 				"bonus": {
 					"target": "enemy",
-					"type": "power",
+					"type": ["power"],
 					"value": -2,
 					"how": "",
 					"borne": 1,
-					"condition_effect": "",
+					"condition_effect": [],
 					"lvl_priority": 0
 				},
                 "ability_description": "-3 Opp Damage, Min 2",
@@ -136,11 +136,11 @@
                 "damage_fight": 0,
 				"ability": {
 					"target": "enemy",
-					"type": "damage",
+					"type": ["damage"],
 					"value": -3,
 					"how": "",
 					"borne": 2,
-					"condition_effect": "",
+					"condition_effect": [],
 					"lvl_priority": 0
             	},
                 "ability_fight": null,
@@ -164,11 +164,11 @@
                 "starOff": 4,
 				"bonus": {
 					"target": "enemy",
-					"type": "power",
+					"type": ["power"],
 					"value": -2,
 					"how": "",
 					"borne": 1,
-					"condition_effect": "",
+					"condition_effect": [],
 					"lvl_priority": 0
 				},
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -180,11 +180,11 @@
                 "damage_fight": 0,
 				"ability": {
 					"target": "ally",
-					"type": "damage",
+					"type": ["damage"],
 					"value": 1,
 					"how": "Support",
 					"borne": 0,
-					"condition_effect": "",
+					"condition_effect": [],
 					"lvl_priority": 0
 				},
                 "ability_fight": null,
@@ -200,11 +200,11 @@
                 "starOff": 5,
 				"bonus": {
 					"target": "enemy",
-					"type": "power",
+					"type": ["power"],
 					"value": -2,
 					"how": "",
 					"borne": 1,
-					"condition_effect": "",
+					"condition_effect": [],
 					"lvl_priority": 0
 				},
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -216,11 +216,11 @@
                 "damage_fight": 0,
 				"ability": {
 					"target": "enemy",
-					"type": "power_and_damage",
+					"type": ["power", "damage"],
 					"value": -1,
 					"how": "Equalizer",
 					"borne": 1,
-					"condition_effect": "",
+					"condition_effect": [],
 					"lvl_priority": 0
 				},
                 "ability_fight": null,
@@ -236,11 +236,11 @@
                 "starOff": 3,
 				"bonus": {
 					"target": "enemy",
-					"type": "power",
+					"type": ["power"],
 					"value": -2,
 					"how": "",
 					"borne": 1,
-					"condition_effect": "",
+					"condition_effect": [],
 					"lvl_priority": 0
 				},
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -249,11 +249,11 @@
                 "damage": 2,
 				"ability": {
 					"target": "enemy",
-					"type": "damage",
+					"type": ["damage"],
 					"value": 5,
 					"how": "",
 					"borne": 0,
-					"condition_effect": "",
+					"condition_effect": [],
 					"lvl_priority": 0
 				},
                 "ability_description": "Stop Opp. Bonus",
@@ -272,11 +272,11 @@
                 "starOff": 2,
 				"bonus": {
 					"target": "enemy",
-					"type": "power",
+					"type": ["power"],
 					"value": -2,
 					"how": "",
 					"borne": 1,
-					"condition_effect": "",
+					"condition_effect": [],
 					"lvl_priority": 0
 				},
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -285,11 +285,11 @@
                 "damage": 3,
 				"ability": {
 					"target": "ally",
-					"type": "attack",
+					"type": ["attack"],
 					"value": 2,
 					"how": "nb_dam_opp",
 					"borne": 0,
-					"condition_effect": "",
+					"condition_effect": [],
 					"lvl_priority": 0
 				},
                 "ability_description": "+2 Attack Per Opp. Damage",

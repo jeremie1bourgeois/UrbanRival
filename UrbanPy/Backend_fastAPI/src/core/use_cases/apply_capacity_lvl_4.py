@@ -70,7 +70,7 @@ _CALCUL_FUNCS = {
 def _apply_poison_or_toxine(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card) -> None:
     calcul_func: function = _CALCUL_FUNCS[capacity.how]
     if not calcul_func:
-        raise ValueError(f"Invalid how: {capacity.how} for {capacity.type}")
+        raise ValueError(f"Invalid how: {capacity.how} for {capacity.types}")
     
     effect_value = calcul_func(game, player1, player2, card1, card2)
     
@@ -83,7 +83,7 @@ def _apply_poison_or_toxine(game: Game, player1: Player, player2: Player, capaci
 def _apply_heal_or_regen(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card) -> None:
     calcul_func: function = _CALCUL_FUNCS[capacity.how]
     if not calcul_func:
-        raise ValueError(f"Invalid how: {capacity.how} for {capacity.type}")
+        raise ValueError(f"Invalid how: {capacity.how} for {capacity.types}")
     
     effect_value = calcul_func(game, player1, player2, card1, card2)
     
@@ -97,7 +97,7 @@ def _apply_heal_or_regen(game: Game, player1: Player, player2: Player, capacity:
 def _apply_dope_or_repair(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card) -> None:
     calcul_func: function = _CALCUL_FUNCS[capacity.how]
     if not calcul_func:
-        raise ValueError(f"Invalid how: {capacity.how} for {capacity.type}")
+        raise ValueError(f"Invalid how: {capacity.how} for {capacity.types}")
     
     effect_value = calcul_func(game, player1, player2, card1, card2)
     
@@ -120,52 +120,52 @@ _EFFECTS_FUNCS = {
 }
 
 def add_endgame_effects_lvl_1(player: Player, capacity: Capacity) -> Capacity:
-    if len(capacity.type) != 1:
+    if len(capacity.types) != 1:
         raise ValueError("Only one type is allowed for endgame effects.")
     nb = len(player.effect_list)
-    capacity_type = capacity.type[0]
+    capacity_type = capacity.types[0]
     if capacity_type == "toxine":
         for i in range (nb):
-            if player.effect_list[i].type[0] in ["poison", "toxine"]:
+            if player.effect_list[i].types[0] in ["poison", "toxine"]:
                 player.effect_list[i] = capacity
                 return None
     elif capacity_type == "regen":
         for i in range (nb):
-            if player.effect_list[i].type[0] in ["regen", "heal"]:
+            if player.effect_list[i].types[0] in ["regen", "heal"]:
                 player.effect_list[i] = capacity
                 return None
     elif capacity_type == "repair":
         for i in range (nb):
-            if player.effect_list[i].type[0] == "repair":
+            if player.effect_list[i].types[0] == "repair":
                 player.effect_list[i] = capacity
                 return None
     return capacity
 
 def add_endgame_effects_lvl_2(player: Player, capacity: Capacity) -> Capacity:
-    if len(capacity.type) != 1:
+    if len(capacity.types) != 1:
         raise ValueError("Only one type is allowed for endgame effects.")
     
     nb = len(player.effect_list)
-    capacity_type = capacity.type[0]
+    capacity_type = capacity.types[0]
     if capacity_type == "poison":
         for i in range (nb):
-            if player.effect_list[i].type[0] in ["poison", "toxine"]:
+            if player.effect_list[i].types[0] in ["poison", "toxine"]:
                 player.effect_list[i] = capacity
                 return None
     elif capacity_type == "heal":
         for i in range (nb):
-            if player.effect_list[i].type[0] in ["regen", "heal"]:
+            if player.effect_list[i].types[0] in ["regen", "heal"]:
                 player.effect_list[i] = capacity
                 return None
     elif capacity_type == "dope":
         for i in range (nb):
-            if player.effect_list[i].type[0] == "dope":
+            if player.effect_list[i].types[0] == "dope":
                 player.effect_list[i] = capacity
                 return None
     return capacity
     
 def apply_active_effects(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> None:
     for effect in player1.effect_list:
-        _EFFECTS_FUNCS[effect.type[0]](game, player1, player2, effect, card1, card2)
+        _EFFECTS_FUNCS[effect.types[0]](game, player1, player2, effect, card1, card2)
     for effect in player2.effect_list:
-        _EFFECTS_FUNCS[effect.type[0]](game, player2, player1, effect, card2, card1)
+        _EFFECTS_FUNCS[effect.types[0]](game, player2, player1, effect, card2, card1)

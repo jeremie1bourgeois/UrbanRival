@@ -125,42 +125,63 @@
 
 import time
 
-uno = "tata"
+# uno = "tata"
+
+# start = time.time()
+# for i in range(10000000):
+#     if uno in ["toto", "tutu", "titi"]:
+#         pass
+# print(time.time() - start)
+
+# liste = ["toto", "tutu", "titi"]
+# start = time.time()
+# for i in range(10000000):
+#     if uno in liste:
+#         pass
+# print(time.time() - start)
+
+# start = time.time()
+# for i in range(10000000):
+#     if uno == "toto" or uno == "tutu" or uno == "titi":
+#         pass
+
+# print(time.time() - start)
+
+
+# import time
+
+# # Liste de test
+# effect_list = [{"type": ["toxine"]} for _ in range(1000000)]
+
+# # Test avec for i in range(nb)
+# start = time.time()
+# for i in range(len(effect_list)):
+#     effect = effect_list[i]
+# print("Temps avec range:", time.time() - start)
+
+# # Test avec enumerate
+# start = time.time()
+# for i, effect in enumerate(effect_list):
+#     pass
+# print("Temps avec enumerate:", time.time() - start)
+
+liste = ["ability", "bonus"]
+liste2 = ["caca", "pipi"]
 
 start = time.time()
-for i in range(10000000):
-    if uno in ["toto", "tutu", "titi"]:
+for i in range(1000000):
+    if any(x in ["caca", "pipi"] for x in ["ability", "bonus"]):
         pass
 print(time.time() - start)
 
-liste = ["toto", "tutu", "titi"]
 start = time.time()
-for i in range(10000000):
-    if uno in liste:
+for i in range(1000000):
+    if any(x in liste2 for x in liste):
         pass
 print(time.time() - start)
 
 start = time.time()
 for i in range(10000000):
-    if uno == "toto" or uno == "tutu" or uno == "titi":
+    if "ability" in liste2 or "bonus" in liste2:
         pass
-
 print(time.time() - start)
-
-
-import time
-
-# Liste de test
-effect_list = [{"type": ["toxine"]} for _ in range(1000000)]
-
-# Test avec for i in range(nb)
-start = time.time()
-for i in range(len(effect_list)):
-    effect = effect_list[i]
-print("Temps avec range:", time.time() - start)
-
-# Test avec enumerate
-start = time.time()
-for i, effect in enumerate(effect_list):
-    pass
-print("Temps avec enumerate:", time.time() - start)

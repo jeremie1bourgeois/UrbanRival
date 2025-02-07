@@ -4,7 +4,14 @@ from src.core.domain.card import Card
 from src.core.domain.game import Game
 
 
-def apply_capacity_lvl_3(game: Game, card1: Card, card2: Card, has_ally_won: bool) -> None:
+def apply_capacity_lvl_3(game: Game, card1: Card, card2: Card) -> None:
+    has_ally_won: bool = card1.win
+
+    card1.ability_fight = check_capacity_condition(card1.ability_fight, has_ally_won) if card1.ability_fight else None
+    card1.bonus_fight = check_capacity_condition(card1.bonus_fight, has_ally_won) if card1.bonus_fight else None
+    card2.ability_fight = check_capacity_condition(card2.ability_fight, not has_ally_won) if card2.ability_fight else None
+    card2.bonus_fight = check_capacity_condition(card2.bonus_fight, not has_ally_won) if card2.bonus_fight else None
+    
     card1.ability_fight = apply_target_ally_effects(game, game.ally, game.enemy, card1.ability_fight, card1, card2) if card1.ability_fight else None
     card1.bonus = apply_target_ally_effects(game, game.ally, game.enemy, card1.bonus, card1, card2) if card1.bonus else None
     card2.ability_fight = apply_target_ally_effects(game, game.enemy, game.ally, card2.ability_fight, card2, card1) if card2.ability_fight else None
@@ -98,7 +105,7 @@ def apply_target_ally_effects(game: Game, player1: Player, player2: Player, capa
         return capacity
 
     # Récupérer les attributs correspondants aux types de capacité
-    attrs = [_TYPE_MAP.get(type_) for type_ in capacity.type if _TYPE_MAP.get(type_)]
+    attrs = [_TYPE_MAP.get(type_) for type_ in capacity.types if _TYPE_MAP.get(type_)]
 
     # Si aucun attribut n'est trouvé, on retourne la capacité sans modification
     if not attrs:
@@ -107,7 +114,7 @@ def apply_target_ally_effects(game: Game, player1: Player, player2: Player, capa
     # Récupérer la fonction de bonus correspondante
     bonus_func = _BONUS_FUNCS.get(capacity.how)
     if not bonus_func:
-        raise ValueError(f"Invalid how: {capacity.how} for {capacity.type}")
+        raise ValueError(f"Invalid how: {capacity.how} for {capacity.types}")
 
     # Calculer le bonus en utilisant la fonction de bonus
     bonus = capacity.value * bonus_func(game, player1, player2, card1, card2)
@@ -137,7 +144,7 @@ def apply_target_enemy_effects(game: Game, player1: Player, player2: Player, cap
         return capacity
 
     # Récupérer les attributs correspondants aux types de capacité
-    attrs = [_TYPE_MAP.get(type_) for type_ in capacity.type if _TYPE_MAP.get(type_)]
+    attrs = [_TYPE_MAP.get(type_) for type_ in capacity.types if _TYPE_MAP.get(type_)]
 
     # Si aucun attribut n'est trouvé, on retourne la capacité sans modification
     if not attrs:
@@ -146,7 +153,7 @@ def apply_target_enemy_effects(game: Game, player1: Player, player2: Player, cap
     # Récupérer la fonction de bonus correspondante
     bonus_func = _BONUS_FUNCS.get(capacity.how)
     if not bonus_func:
-        raise ValueError(f"Invalid how: {capacity.how} for {capacity.type}")
+        raise ValueError(f"Invalid how: {capacity.how} for {capacity.types}")
 
     # Calculer le bonus en utilisant la fonction de bonus
     bonus = capacity.value * bonus_func(game, player1, player2, card1, card2)
@@ -177,7 +184,7 @@ def apply_target_both_effects(game: Game, player1: Player, player2: Player, capa
         return capacity
 
     # Récupérer les attributs correspondants aux types de capacité
-    attrs = [_TYPE_MAP.get(type_) for type_ in capacity.type if _TYPE_MAP.get(type_)]
+    attrs = [_TYPE_MAP.get(type_) for type_ in capacity.types if _TYPE_MAP.get(type_)]
 
     # Si aucun attribut n'est trouvé, on retourne la capacité sans modification
     if not attrs:
@@ -186,7 +193,7 @@ def apply_target_both_effects(game: Game, player1: Player, player2: Player, capa
     # Récupérer la fonction de bonus correspondante
     bonus_func = _BONUS_FUNCS.get(capacity.how)
     if not bonus_func:
-        raise ValueError(f"Invalid how: {capacity.how} for {capacity.type}")
+        raise ValueError(f"Invalid how: {capacity.how} for {capacity.types}")
 
     # Calculer le bonus en utilisant la fonction de bonus
     bonus = capacity.value * bonus_func(game, player1, player2, card1, card2)

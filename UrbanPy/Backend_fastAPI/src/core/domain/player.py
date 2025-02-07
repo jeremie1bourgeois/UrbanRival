@@ -1,10 +1,11 @@
 # src/core/domain/player.py
-from typing import List, Tuple, Any
+from typing import List
+from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card
 
 class Player:
     def __init__(self, name: str = "", life: int = -1, pillz: int = -1,
-                 cards: List[Card] = None, effect_list: List[Tuple[Any, int, int]] = None):
+                 cards: List[Card] = None, effect_list: List[Capacity] = None):
         self.name = name
         self.life = life
         self.pillz = pillz

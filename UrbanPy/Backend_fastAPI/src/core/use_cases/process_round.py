@@ -1,11 +1,13 @@
 import copy
 from src.core.domain.round import Round
 from src.core.domain.capacity import Capacity
-from src.core.domain.player import Player
 from src.core.domain.card import Card
 from src.schemas.game_schemas import ProcessRoundInput
 from src.core.domain.game import Game
-from src.core.use_cases.apply_capacity_lvl_1 import *
+import src.core.use_cases.apply_capacity_lvl_1 as fct_lvl_1
+import src.core.use_cases.apply_capacity_lvl_2 as fct_lvl_2
+import src.core.use_cases.apply_capacity_lvl_3 as fct_lvl_3
+import src.core.use_cases.apply_capacity_lvl_4 as fct_lvl_4
 
 def process_round(game: Game, round_data: ProcessRoundInput) -> Game:
     try:
@@ -25,14 +27,9 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> Game:
         list_capacity.sort(key=lambda x: x.lvl_priority)
 
         # Appliquer les effets de combat
-        apply_combat_effects(game, game.ally, game.enemy, player1_card.ability, player1_card, player2_card)
-        apply_combat_effects(game, game.ally, game.enemy, player1_card.bonus, player1_card, player2_card)
-        print("card1", player1_card)
-        print("card2", player2_card)
-        apply_combat_effects(game, game.enemy, game.ally, player2_card.ability, player2_card, player1_card)
-        apply_combat_effects(game, game.enemy, game.ally, player2_card.bonus, player2_card, player1_card)
-        print("card1", player1_card)
-        print("card2", player2_card)
+        fct_lvl_1.apply_capacity_lvl_1(player1_card, player2_card)
+        fct_lvl_2.apply_capacity_lvl_2(game, player1_card, player2_card)
+
         # Appliquer les fury
         if player1_card.fury:
             player1_card.damage_fight += 2
@@ -49,42 +46,11 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> Game:
         round_result.enemy.card_index = round_data.player2_card_index  # Stocker l'index de la carte
 
         # Résoudre le combat
-        if player1_card.attack > player2_card.attack:
-            game.enemy.life = max(0, game.enemy.life - player1_card.damage)
-            round_result.ally.win = True
-            round_result.enemy.win = False
-            player1_card.win = True
-            player2_card.win = False
-        elif player2_card.attack > player1_card.attack:
-            game.ally.life = max(0, game.ally.life - player2_card.damage)
-            round_result.ally.win = False
-            round_result.enemy.win = True
-            player1_card.win = False
-            player2_card.win = True
-        elif player1_card.stars < player2_card.stars:
-            game.enemy.life = max(0, game.enemy.life - player1_card.damage)
-            round_result.ally.win = True
-            round_result.enemy.win = False
-            player1_card.win = True
-            player2_card.win = False
-        elif player2_card.stars < player1_card.stars:
-            game.ally.life = max(0, game.ally.life - player2_card.damage)
-            round_result.ally.win = False
-            round_result.enemy.win = True
-            player1_card.win = False
-            player2_card.win = True
-        elif game.turn:
-            game.enemy.life = max(0, game.enemy.life - player1_card.damage)
-            round_result.ally.win = True
-            round_result.enemy.win = False
-            player1_card.win = True
-            player2_card.win = False
-        else:
-            game.ally.life = max(0, game.ally.life - player2_card.damage)
-            round_result.ally.win = False
-            round_result.enemy.win = True
-            player1_card.win = False
-            player2_card.win = True
+        resolve_combat(game, player1_card, player2_card, round_result)
+        
+        # Appliquer les effets de combat
+        fct_lvl_3.apply_capacity_lvl_3(game, player1_card, player2_card)
+        fct_lvl_4.apply_capacity_lvl_4(game, game.ally, game.enemy, player1_card, player2_card)
 
         # Ajouter le round au history
         game.history.append(round_result)
@@ -101,6 +67,44 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> Game:
         print(f"Exception in process_round: {e}")
         raise e
 
+
+def resolve_combat(game: Game, player1_card, player2_card, round_result):
+    if player1_card.attack > player2_card.attack:
+        game.enemy.life = max(0, game.enemy.life - player1_card.damage)
+        round_result.ally.win = True
+        round_result.enemy.win = False
+        player1_card.win = True
+        player2_card.win = False
+    elif player2_card.attack > player1_card.attack:
+        game.ally.life = max(0, game.ally.life - player2_card.damage)
+        round_result.ally.win = False
+        round_result.enemy.win = True
+        player1_card.win = False
+        player2_card.win = True
+    elif player1_card.stars < player2_card.stars:
+        game.enemy.life = max(0, game.enemy.life - player1_card.damage)
+        round_result.ally.win = True
+        round_result.enemy.win = False
+        player1_card.win = True
+        player2_card.win = False
+    elif player2_card.stars < player1_card.stars:
+        game.ally.life = max(0, game.ally.life - player2_card.damage)
+        round_result.ally.win = False
+        round_result.enemy.win = True
+        player1_card.win = False
+        player2_card.win = True
+    elif game.turn:
+        game.enemy.life = max(0, game.enemy.life - player1_card.damage)
+        round_result.ally.win = True
+        round_result.enemy.win = False
+        player1_card.win = True
+        player2_card.win = False
+    else:
+        game.ally.life = max(0, game.ally.life - player2_card.damage)
+        round_result.ally.win = False
+        round_result.enemy.win = True
+        player1_card.win = False
+        player2_card.win = True
 
 
 def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, ally_card_index: int, enemy_card_index: int) -> Capacity:
