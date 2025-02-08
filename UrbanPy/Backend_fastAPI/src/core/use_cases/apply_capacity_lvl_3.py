@@ -6,46 +6,46 @@ from src.core.domain.game import Game
 
 def apply_capacity_lvl_3(game: Game, card1: Card, card2: Card) -> None:
     has_ally_won: bool = card1.win
+    
+    if card1.ability_fight: card1.ability_fight = check_capacity_condition_lvl_3(card1.ability_fight, has_ally_won)
+    if card1.bonus_fight: card1.bonus_fight = check_capacity_condition_lvl_3(card1.bonus_fight, has_ally_won)
+    if card2.ability_fight: card2.ability_fight = check_capacity_condition_lvl_3(card2.ability_fight, not has_ally_won)
+    if card2.bonus_fight: card2.bonus_fight = check_capacity_condition_lvl_3(card2.bonus_fight, not has_ally_won)
+    
+    if card1.ability_fight: card1.ability_fight = apply_target_ally_effects(game, game.ally, game.enemy, card1.ability_fight, card1, card2)
+    if card1.bonus_fight: card1.bonus_fight = apply_target_ally_effects(game, game.ally, game.enemy, card1.bonus_fight, card1, card2)
+    if card2.ability_fight: card2.ability_fight = apply_target_enemy_effects(game, game.enemy, game.ally, card2.ability_fight, card2, card1)
+    if card2.bonus_fight: card2.bonus_fight = apply_target_enemy_effects(game, game.enemy, game.ally, card2.bonus_fight, card2, card1)
 
-    card1.ability_fight = check_capacity_condition(card1.ability_fight, has_ally_won) if card1.ability_fight else None
-    card1.bonus_fight = check_capacity_condition(card1.bonus_fight, has_ally_won) if card1.bonus_fight else None
-    card2.ability_fight = check_capacity_condition(card2.ability_fight, not has_ally_won) if card2.ability_fight else None
-    card2.bonus_fight = check_capacity_condition(card2.bonus_fight, not has_ally_won) if card2.bonus_fight else None
-    
-    card1.ability_fight = apply_target_ally_effects(game, game.ally, game.enemy, card1.ability_fight, card1, card2) if card1.ability_fight else None
-    card1.bonus = apply_target_ally_effects(game, game.ally, game.enemy, card1.bonus, card1, card2) if card1.bonus else None
-    card2.ability_fight = apply_target_ally_effects(game, game.enemy, game.ally, card2.ability_fight, card2, card1) if card2.ability_fight else None
-    card2.bonus_fight = apply_target_ally_effects(game, game.enemy, game.ally, card2.bonus_fight, card2, card1) if card2.bonus_fight else None
-    
-    card1.ability_fight = apply_target_both_effects(game, game.ally, game.enemy, card1.ability_fight, card1, card2) if card1.ability_fight else None
-    card1.bonus = apply_target_both_effects(game, game.ally, game.enemy, card1.bonus, card1, card2) if card1.bonus else None
-    card2.ability_fight = apply_target_both_effects(game, game.enemy, game.ally, card2.ability_fight, card2, card1) if card2.ability_fight else None
-    card2.bonus_fight = apply_target_both_effects(game, game.enemy, game.ally, card2.bonus_fight, card2, card1) if card2.bonus_fight else None
-    
-    card1.ability_fight = apply_target_enemy_effects(game, game.ally, game.enemy, card1.ability_fight, card1, card2) if card1.ability_fight else None
-    card1.bonus = apply_target_enemy_effects(game, game.ally, game.enemy, card1.bonus, card1, card2) if card1.bonus else None
-    card2.ability_fight = apply_target_enemy_effects(game, game.enemy, game.ally, card2.ability_fight, card2, card1) if card2.ability_fight else None
-    card2.bonus_fight = apply_target_enemy_effects(game, game.enemy, game.ally, card2.bonus_fight, card2, card1) if card2.bonus_fight else None
+    if card1.ability_fight: card1.ability_fight = apply_target_both_effects(game, game.ally, game.enemy, card1.ability_fight, card1, card2)
+    if card1.bonus_fight: card1.bonus_fight = apply_target_both_effects(game, game.ally, game.enemy, card1.bonus_fight, card1, card2)
+    if card2.ability_fight: card2.ability_fight = apply_target_both_effects(game, game.enemy, game.ally, card2.ability_fight, card2, card1)
+    if card2.bonus_fight: card2.bonus_fight = apply_target_both_effects(game, game.enemy, game.ally, card2.bonus_fight, card2, card1)
 
-def check_capacity_condition(capacity: Capacity, has_won: bool) -> Capacity:
-    if capacity.condition_effect == "":
+    if card1.ability_fight: card1.ability_fight = apply_target_enemy_effects(game, game.ally, game.enemy, card1.ability_fight, card1, card2)
+    if card1.bonus_fight: card1.bonus_fight = apply_target_enemy_effects(game, game.ally, game.enemy, card1.bonus_fight, card1, card2)
+    if card2.ability_fight: card2.ability_fight = apply_target_enemy_effects(game, game.enemy, game.ally, card2.ability_fight, card2, card1)
+    if card2.bonus_fight: card2.bonus_fight = apply_target_enemy_effects(game, game.enemy, game.ally, card2.bonus_fight, card2, card1)
+
+def check_capacity_condition_lvl_3(capacity: Capacity, has_won: bool) -> Capacity:
+    if capacity.condition_effect == []:
         return capacity if has_won else None
-    elif capacity.condition_effect == "Backlash":
+    elif "Backlash" in capacity.condition_effect:
         if has_won:
             capacity.target = "ally"
             capacity.condition_effect = ""
             return capacity
         return None
-    elif capacity.condition_effect == "Defeat":
+    elif "Defeat" in capacity.condition_effect:
         if not has_won:
             capacity.condition_effect = ""
             return capacity
         return None
-    elif capacity.condition_effect == "victory_defeat":
+    elif "victory_defeat" in capacity.condition_effect:
         capacity.condition_effect = ""
         return capacity
     else:
-        raise ValueError(f"Invalid condition_effect: {capacity.condition_effect}")
+        raise ValueError(f"Invalid condition_effect (check_capacity_condition_lvl_3): {capacity.condition_effect}")
 
 
 # Fonctions de bonus définies en dehors
@@ -114,7 +114,7 @@ def apply_target_ally_effects(game: Game, player1: Player, player2: Player, capa
     # Récupérer la fonction de bonus correspondante
     bonus_func = _BONUS_FUNCS.get(capacity.how)
     if not bonus_func:
-        raise ValueError(f"Invalid how: {capacity.how} for {capacity.types}")
+        raise ValueError(f"Invalid how (apply_target_ally_effects): {capacity.how} for {capacity.types}")
 
     # Calculer le bonus en utilisant la fonction de bonus
     bonus = capacity.value * bonus_func(game, player1, player2, card1, card2)
@@ -153,7 +153,7 @@ def apply_target_enemy_effects(game: Game, player1: Player, player2: Player, cap
     # Récupérer la fonction de bonus correspondante
     bonus_func = _BONUS_FUNCS.get(capacity.how)
     if not bonus_func:
-        raise ValueError(f"Invalid how: {capacity.how} for {capacity.types}")
+        raise ValueError(f"Invalid how (apply_target_enemy_effects): {capacity.how} for {capacity.types}")
 
     # Calculer le bonus en utilisant la fonction de bonus
     bonus = capacity.value * bonus_func(game, player1, player2, card1, card2)
@@ -193,7 +193,7 @@ def apply_target_both_effects(game: Game, player1: Player, player2: Player, capa
     # Récupérer la fonction de bonus correspondante
     bonus_func = _BONUS_FUNCS.get(capacity.how)
     if not bonus_func:
-        raise ValueError(f"Invalid how: {capacity.how} for {capacity.types}")
+        raise ValueError(f"Invalid how (apply_target_both_effects): {capacity.how} for {capacity.types}")
 
     # Calculer le bonus en utilisant la fonction de bonus
     bonus = capacity.value * bonus_func(game, player1, player2, card1, card2)

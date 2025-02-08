@@ -22,9 +22,6 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> Game:
         # Initialiser les données de combat
         init_fight_data(player1_card, round_data.player1_pillz, round_data.player1_fury)
         init_fight_data(player2_card, round_data.player2_pillz, round_data.player2_fury)
-        
-        list_capacity = [player1_card.ability, player1_card.bonus, player2_card.ability, player2_card.bonus]
-        list_capacity.sort(key=lambda x: x.lvl_priority)
 
         # Appliquer les effets de combat
         fct_lvl_1.apply_capacity_lvl_1(player1_card, player2_card)
@@ -47,14 +44,14 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> Game:
 
         # Résoudre le combat
         resolve_combat(game, player1_card, player2_card, round_result)
-        
+
         # Appliquer les effets de combat
         fct_lvl_3.apply_capacity_lvl_3(game, player1_card, player2_card)
         fct_lvl_4.apply_capacity_lvl_4(game, game.ally, game.enemy, player1_card, player2_card)
 
         # Ajouter le round au history
         game.history.append(round_result)
-
+    
         # Mettre à jour le tour
         player1_card.played = True
         player2_card.played = True
@@ -68,7 +65,7 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> Game:
         raise e
 
 
-def resolve_combat(game: Game, player1_card, player2_card, round_result):
+def resolve_combat(game: Game, player1_card: Card, player2_card: Card, round_result: Round):
     if player1_card.attack > player2_card.attack:
         game.enemy.life = max(0, game.enemy.life - player1_card.damage)
         round_result.ally.win = True
@@ -126,7 +123,7 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, ally
         elif capacity.condition_effect.startswith("Bet"):
             return capacity if game.ally.cards[ally_card_index].pillz_fight > int(capacity.condition_effect[3:]) else None
         else:
-            raise ValueError(f"Invalid condition_effect: {capacity.condition_effect}")
+            raise ValueError(f"Invalid condition_effect (check_capacity_condition): {capacity.condition_effect}")
     else:
         if capacity.condition_effect == "Revenge":
             return capacity if game.history and game.history[-1].enemy.win == False else None
@@ -143,7 +140,7 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, ally
         elif capacity.condition_effect == "Bet":
             return capacity if game.enemy.cards[enemy_card_index].pillz_fight > capacity.borne else None
         else:
-            raise ValueError(f"Invalid condition_effect: {capacity.condition_effect}")
+            raise ValueError(f"Invalid condition_effect (check_capacity_condition): {capacity.condition_effect}")
 
 
 

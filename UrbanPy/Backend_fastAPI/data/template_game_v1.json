@@ -64,7 +64,7 @@
 					"type": ["damage"],
 					"value": 3,
 					"how": "",
-					"borne": 0,
+					"borne": -1,
 					"condition_effect": ["Courage"],
 					"lvl_priority": 0
 				},
@@ -100,7 +100,7 @@
 					"type": ["power"],
 					"value": 4,
 					"how": "",
-					"borne": 0,
+					"borne": -1,
 					"condition_effect": [],
 					"lvl_priority": 0
 				},
@@ -183,7 +183,7 @@
 					"type": ["damage"],
 					"value": 1,
 					"how": "Support",
-					"borne": 0,
+					"borne": -1,
 					"condition_effect": [],
 					"lvl_priority": 0
 				},
@@ -249,10 +249,10 @@
                 "damage": 2,
 				"ability": {
 					"target": "enemy",
-					"type": ["damage"],
+					"type": ["bonus"],
 					"value": 5,
-					"how": "",
-					"borne": 0,
+					"how": "stop",
+					"borne": -1,
 					"condition_effect": [],
 					"lvl_priority": 0
 				},
@@ -288,7 +288,7 @@
 					"type": ["attack"],
 					"value": 2,
 					"how": "nb_dam_opp",
-					"borne": 0,
+					"borne": -1,
 					"condition_effect": [],
 					"lvl_priority": 0
 				},

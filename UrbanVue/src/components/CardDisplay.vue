@@ -38,6 +38,7 @@ const trophyClass = computed(() => {
 
 const damageClass = computed(() => {
 	if (!props.isFight) return "";
+	if (props.card.damage_fight === props.card.damage) return "text-white";
 	return props.card.damage_fight > props.card.damage ? "text-violet-500" : "text-orange-500";
 });
 

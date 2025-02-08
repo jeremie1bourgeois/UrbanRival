@@ -7,19 +7,18 @@ MAX_LIFE = 12  # change le hardcode 12
 MAX_PILLZ = 12  # change le hardcode 12
 
 def apply_capacity_lvl_4(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> None:
-    card1.ability_fight = add_endgame_effects_lvl_1(player1, card1.ability_fight) if card1.ability_fight else None
-    card1.bonus_fight = add_endgame_effects_lvl_1(player1, card1.bonus_fight) if card1.bonus_fight else None
-    card2.ability_fight = add_endgame_effects_lvl_1(player2, card2.ability_fight) if card2.ability_fight else None
-    card2.bonus_fight = add_endgame_effects_lvl_1(player2, card2.bonus_fight) if card2.bonus_fight else None
-    
+    if card1.ability_fight: card1.ability_fight = add_endgame_effects_lvl_1(player1, card1.ability_fight)
+    if card1.bonus_fight: card1.bonus_fight = add_endgame_effects_lvl_1(player1, card1.bonus_fight)
+    if card2.ability_fight: card2.ability_fight = add_endgame_effects_lvl_1(player2, card2.ability_fight)
+    if card2.bonus_fight: card2.bonus_fight = add_endgame_effects_lvl_1(player2, card2.bonus_fight)
+
     apply_active_effects(game, player1, player2, card1, card2)
     apply_active_effects(game, player2, player1, card2, card1)
-    
-    card1.ability_fight = add_endgame_effects_lvl_2(player1, card1.ability_fight) if card1.ability_fight else None
-    card1.bonus_fight = add_endgame_effects_lvl_2(player1, card1.bonus_fight) if card1.bonus_fight else None
-    card2.ability_fight = add_endgame_effects_lvl_2(player2, card2.ability_fight) if card2.ability_fight else None
-    card2.bonus_fight = add_endgame_effects_lvl_2(player2, card2.bonus_fight) if card2.bonus_fight else None
 
+    if card1.ability_fight: card1.ability_fight = add_endgame_effects_lvl_2(player1, card1.ability_fight)
+    if card1.bonus_fight: card1.bonus_fight = add_endgame_effects_lvl_2(player1, card1.bonus_fight)
+    if card2.ability_fight: card2.ability_fight = add_endgame_effects_lvl_2(player2, card2.ability_fight)
+    if card2.bonus_fight: card2.bonus_fight = add_endgame_effects_lvl_2(player2, card2.bonus_fight)
 
 
 # Fonctions de bonus définies en dehors
@@ -70,7 +69,7 @@ _CALCUL_FUNCS = {
 def _apply_poison_or_toxine(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card) -> None:
     calcul_func: function = _CALCUL_FUNCS[capacity.how]
     if not calcul_func:
-        raise ValueError(f"Invalid how: {capacity.how} for {capacity.types}")
+        raise ValueError(f"Invalid how (_apply_poison_or_toxine): {capacity.how} for {capacity.types}")
     
     effect_value = calcul_func(game, player1, player2, card1, card2)
     
@@ -83,7 +82,7 @@ def _apply_poison_or_toxine(game: Game, player1: Player, player2: Player, capaci
 def _apply_heal_or_regen(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card) -> None:
     calcul_func: function = _CALCUL_FUNCS[capacity.how]
     if not calcul_func:
-        raise ValueError(f"Invalid how: {capacity.how} for {capacity.types}")
+        raise ValueError(f"Invalid how (_apply_heal_or_regen): {capacity.how} for {capacity.types}")
     
     effect_value = calcul_func(game, player1, player2, card1, card2)
     
@@ -97,7 +96,7 @@ def _apply_heal_or_regen(game: Game, player1: Player, player2: Player, capacity:
 def _apply_dope_or_repair(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card) -> None:
     calcul_func: function = _CALCUL_FUNCS[capacity.how]
     if not calcul_func:
-        raise ValueError(f"Invalid how: {capacity.how} for {capacity.types}")
+        raise ValueError(f"Invalid how (_apply_dope_or_repair): {capacity.how} for {capacity.types}")
     
     effect_value = calcul_func(game, player1, player2, card1, card2)
     
