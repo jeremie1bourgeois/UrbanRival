@@ -20,14 +20,17 @@ def process_round_service(game_id: str, round_data: ProcessRoundInput):
     check_round_correct(game, round_data)
 
     # Jouer un round en passant l'objet round_data
-    updated_game = process_round(game, round_data)
+    process_round(game, round_data)
+    
+    # print("\n\n --- GAME STATE ---")
+    # print("updated_game: ", game)
 
     # Sauvegarder la partie mise à jour
-    save_game_to_json(updated_game, game_id)
+    save_game_to_json(game, game_id)
  
-    state = check_end(updated_game)
+    state = check_end(game)
 
-    return (updated_game, state)
+    return (game, state)
 
 
 

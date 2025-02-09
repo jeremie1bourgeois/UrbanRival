@@ -10,8 +10,8 @@ def apply_capacity_lvl_2(game: Game, card1: Card, card2: Card) -> None:
     
     if card1.ability_fight: card1.ability_fight = apply_target_ally_effects(game, player1, player2, card1.ability_fight, card1, card2)
     if card1.bonus_fight: card1.bonus_fight = apply_target_ally_effects(game, player1, player2, card1.bonus_fight, card1, card2)
-    if card2.ability_fight: card2.ability_fight = apply_target_enemy_effects(game, player2, player1, card2.ability_fight, card2, card1)
-    if card2.bonus_fight: card2.bonus_fight = apply_target_enemy_effects(game, player2, player1, card2.bonus_fight, card2, card1)
+    if card2.ability_fight: card2.ability_fight = apply_target_ally_effects(game, player2, player1, card2.ability_fight, card2, card1)
+    if card2.bonus_fight: card2.bonus_fight = apply_target_ally_effects(game, player2, player1, card2.bonus_fight, card2, card1)
     
     if card1.ability_fight: card1.ability_fight = apply_target_both_effects(game, player1, player2, card1.ability_fight, card1, card2)
     if card1.bonus_fight: card1.bonus_fight = apply_target_both_effects(game, player1, player2, card1.bonus_fight, card1, card2)
@@ -32,7 +32,6 @@ def _bonus_degrowth(game: Game, player1: Player, player2: Player, card1: Card, c
     return 5 - game.nb_turn
 
 def _bonus_support(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> int:
-    print("card1.faction: ",  sum(1 for c in player1.cards if c.faction == card1.faction))
     return sum(1 for c in player1.cards if c.faction == card1.faction)
 
 def _bonus_equalizer(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> int:

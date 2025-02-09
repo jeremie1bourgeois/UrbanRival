@@ -9,7 +9,7 @@ import src.core.use_cases.apply_capacity_lvl_2 as fct_lvl_2
 import src.core.use_cases.apply_capacity_lvl_3 as fct_lvl_3
 import src.core.use_cases.apply_capacity_lvl_4 as fct_lvl_4
 
-def process_round(game: Game, round_data: ProcessRoundInput) -> Game:
+def process_round(game: Game, round_data: ProcessRoundInput) -> None:
     try:
         # Mise à jour des pillz
         game.ally.pillz -= ((round_data.player1_pillz - 1) + 3 * round_data.player1_fury) # -1 car 1 pillz est toujours consommée
@@ -59,7 +59,6 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> Game:
         game.nb_turn += 1
         game.turn = not game.turn
 
-        return game
     except Exception as e:
         print(f"Exception in process_round: {e}")
         raise e
