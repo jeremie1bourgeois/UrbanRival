@@ -10,6 +10,9 @@ class Capacity:
 
         # stop: puissance et degat +2
         # condition_effect: stop ; target: ally ; type = "puissance_dommage" ; value = 2
+    
+    def __str__(self) -> str:
+        return f"Capacity(target={self.target}, types={self.types}, value={self.value}, how={self.how}, borne={self.borne}, condition_effect={self.condition_effect}, lvl_priority={self.lvl_priority})"
 
     @classmethod
     def from_dict(cls, data: dict) -> 'Capacity':
@@ -18,7 +21,7 @@ class Capacity:
         """
         return cls(
             target=str(data.get("target", "")),
-            types=data.get("type", []),
+            types=data.get("types", []),
             value=int(data.get("value", 0)),
             how=str(data.get("how", "")),
             borne=int(data.get("borne", 0)) if data.get("borne") is not None else 0,
@@ -29,7 +32,7 @@ class Capacity:
     def to_dict(self) -> dict:
         return {
             "target": self.target,
-            "type": self.types,
+            "types": self.types,
             "value": self.value,
             "how": self.how,
             "borne": self.borne,

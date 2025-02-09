@@ -12,7 +12,7 @@
                 "starOff": 2,
 				"bonus":{
 					"target": "enemy",
-					"type": ["power"],
+					"types": ["power"],
 					"value": -2,
 					"how": "",
 					"borne": 1,
@@ -25,9 +25,9 @@
                 "damage": 2,
 				"ability":{
 					"target": "enemy",
-					"type": ["power"],
+					"types": ["power"],
 					"value": -1,
-					"how": "Growth",
+					"how": "growth",
 					"borne": 4,
 					"condition_effect": [],
 					"lvl_priority": 0
@@ -48,7 +48,7 @@
                 "starOff": 3,
 				"bonus":{
 					"target": "enemy",
-					"type": ["power"],
+					"types": ["power"],
 					"value": -2,
 					"how": "",
 					"borne": 1,
@@ -61,11 +61,11 @@
                 "damage": 3,
 				"ability": {
 					"target": "ally",
-					"type": ["damage"],
+					"types": ["damage"],
 					"value": 3,
 					"how": "",
 					"borne": -1,
-					"condition_effect": ["Courage"],
+					"condition_effect": ["courage"],
 					"lvl_priority": 0
 				},
                 "ability_description": "Courage: Damage +3",
@@ -84,7 +84,7 @@
                 "starOff": 3,
 				"bonus": {
 					"target": "enemy",
-					"type": ["power"],
+					"types": ["power"],
 					"value": -2,
 					"how": "",
 					"borne": 1,
@@ -97,7 +97,7 @@
                 "damage": 5,
 				"ability": {
 					"target": "ally",
-					"type": ["power"],
+					"types": ["power"],
 					"value": 4,
 					"how": "",
 					"borne": -1,
@@ -124,7 +124,7 @@
                 "damage": 1,
 				"bonus": {
 					"target": "enemy",
-					"type": ["power"],
+					"types": ["power"],
 					"value": -2,
 					"how": "",
 					"borne": 1,
@@ -136,7 +136,7 @@
                 "damage_fight": 0,
 				"ability": {
 					"target": "enemy",
-					"type": ["damage"],
+					"types": ["damage"],
 					"value": -3,
 					"how": "",
 					"borne": 2,
@@ -164,7 +164,7 @@
                 "starOff": 4,
 				"bonus": {
 					"target": "enemy",
-					"type": ["power"],
+					"types": ["power"],
 					"value": -2,
 					"how": "",
 					"borne": 1,
@@ -180,9 +180,9 @@
                 "damage_fight": 0,
 				"ability": {
 					"target": "ally",
-					"type": ["damage"],
+					"types": ["damage"],
 					"value": 1,
-					"how": "Support",
+					"how": "support",
 					"borne": -1,
 					"condition_effect": [],
 					"lvl_priority": 0
@@ -200,7 +200,7 @@
                 "starOff": 5,
 				"bonus": {
 					"target": "enemy",
-					"type": ["power"],
+					"types": ["power"],
 					"value": -2,
 					"how": "",
 					"borne": 1,
@@ -216,9 +216,9 @@
                 "damage_fight": 0,
 				"ability": {
 					"target": "enemy",
-					"type": ["power", "damage"],
+					"types": ["power", "damage"],
 					"value": -1,
-					"how": "Equalizer",
+					"how": "equalizer",
 					"borne": 1,
 					"condition_effect": [],
 					"lvl_priority": 0
@@ -236,7 +236,7 @@
                 "starOff": 3,
 				"bonus": {
 					"target": "enemy",
-					"type": ["power"],
+					"types": ["power"],
 					"value": -2,
 					"how": "",
 					"borne": 1,
@@ -249,7 +249,7 @@
                 "damage": 2,
 				"ability": {
 					"target": "enemy",
-					"type": ["bonus"],
+					"types": ["bonus"],
 					"value": 5,
 					"how": "stop",
 					"borne": -1,
@@ -272,7 +272,7 @@
                 "starOff": 2,
 				"bonus": {
 					"target": "enemy",
-					"type": ["power"],
+					"types": ["power"],
 					"value": -2,
 					"how": "",
 					"borne": 1,
@@ -285,7 +285,7 @@
                 "damage": 3,
 				"ability": {
 					"target": "ally",
-					"type": ["attack"],
+					"types": ["attack"],
 					"value": 2,
 					"how": "nb_dam_opp",
 					"borne": -1,

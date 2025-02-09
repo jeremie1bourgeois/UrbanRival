@@ -62,11 +62,11 @@ def _bonus_empty(game: Game, player1: Player, player2: Player, card1: Card, card
 # Mapping défini une seule fois
 _BONUS_FUNCS = {
     "": _bonus_empty,
-    "Growth": _bonus_growth,
-    "Degrowth": _bonus_degrowth,
-    "Support": _bonus_support,
-    "Equalizer": _bonus_equalizer,
-    "Brawl": _bonus_brawl,
+    "growth": _bonus_growth,
+    "degrowth": _bonus_degrowth,
+    "support": _bonus_support,
+    "equalizer": _bonus_equalizer,
+    "brawl": _bonus_brawl,
     "nb_dam_opp": _bonus_nb_damage_opp,
     "nb_life_lost": _bonus_nb_life_lost,
     "nb_pillz_lost": _bonus_nb_pillz_lost,

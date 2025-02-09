@@ -197,6 +197,7 @@ def apply_protect_enemy_data_modif(capacity_1: Capacity, capacity_opp_1: Capacit
             if capacity_opp_2 and "attack" in capacity_opp_2.types and capacity_opp_2.how not in list_how_not_protect and capacity_opp_2.target == "enemy":
                 if not capacity_opp_1: return (None, None)
                 capacity_opp_2 = None
+                
     return capacity_opp_1, capacity_opp_2
 
 def apply_exchange_or_copy_data(card1: Card, card2: Card, capacity: Capacity) -> Capacity:

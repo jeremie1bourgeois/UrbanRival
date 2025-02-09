@@ -108,37 +108,37 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, ally
     if capacity.condition_effect is None:
         return capacity
     if is_ally:
-        if capacity.condition_effect == "Revenge":
+        if capacity.condition_effect == "revenge":
             return capacity if game.history and game.history[-1].ally.win == False else None
-        elif capacity.condition_effect == "Reprisal":
+        elif capacity.condition_effect == "reprisal":
             return capacity if game.turn == False else None
-        elif capacity.condition_effect == "Confidence":
+        elif capacity.condition_effect == "confidence":
             return capacity if game.history and game.history[-1].ally.win == True else None
-        elif capacity.condition_effect == "Courage":
+        elif capacity.condition_effect == "courage":
             return capacity if game.turn == True else None
-        elif capacity.condition_effect == "Symmetry":
+        elif capacity.condition_effect == "symmetry":
             return capacity if ally_card_index == enemy_card_index else None
-        elif capacity.condition_effect == "Asymmetry":
+        elif capacity.condition_effect == "asymmetry":
             return capacity if ally_card_index != enemy_card_index else None
-        elif capacity.condition_effect.startswith("Bet"):
+        elif capacity.condition_effect.startswith("bet"):
             return capacity if game.ally.cards[ally_card_index].pillz_fight > int(capacity.condition_effect[3:]) else None
         else:
             raise ValueError(f"Invalid condition_effect (check_capacity_condition): {capacity.condition_effect}")
     else:
-        if capacity.condition_effect == "Revenge":
+        if capacity.condition_effect == "revenge":
             return capacity if game.history and game.history[-1].enemy.win == False else None
-        elif capacity.condition_effect == "Reprisal":
+        elif capacity.condition_effect == "reprisal":
             return capacity if game.turn == True else None
-        elif capacity.condition_effect == "Confidence":
+        elif capacity.condition_effect == "confidence":
             return capacity if game.history and game.history[-1].enemy.win == True else None
-        elif capacity.condition_effect == "Courage":
+        elif capacity.condition_effect == "courage":
             return capacity if game.turn == False else None
-        elif capacity.condition_effect == "Symmetry":
+        elif capacity.condition_effect == "symmetry":
             return capacity if ally_card_index == enemy_card_index else None
-        elif capacity.condition_effect == "Asymmetry":
+        elif capacity.condition_effect == "asymmetry":
             return capacity if ally_card_index != enemy_card_index else None
-        elif capacity.condition_effect == "Bet":
-            return capacity if game.enemy.cards[enemy_card_index].pillz_fight > capacity.borne else None
+        elif capacity.condition_effect.startswith("bet"):
+            return capacity if game.enemy.cards[enemy_card_index].pillz_fight > int(capacity.condition_effect[3:]) else None
         else:
             raise ValueError(f"Invalid condition_effect (check_capacity_condition): {capacity.condition_effect}")
 

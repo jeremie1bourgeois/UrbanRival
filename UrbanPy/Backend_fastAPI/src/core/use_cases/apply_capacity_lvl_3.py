@@ -30,13 +30,13 @@ def apply_capacity_lvl_3(game: Game, card1: Card, card2: Card) -> None:
 def check_capacity_condition_lvl_3(capacity: Capacity, has_won: bool) -> Capacity:
     if capacity.condition_effect == []:
         return capacity if has_won else None
-    elif "Backlash" in capacity.condition_effect:
+    elif "backlash" in capacity.condition_effect:
         if has_won:
             capacity.target = "ally"
             capacity.condition_effect = ""
             return capacity
         return None
-    elif "Defeat" in capacity.condition_effect:
+    elif "defeat" in capacity.condition_effect:
         if not has_won:
             capacity.condition_effect = ""
             return capacity
@@ -82,11 +82,11 @@ def _bonus_empty(game, player1, player2, card1, card2):
 # Mapping des fonctions de bonus
 _BONUS_FUNCS = {
     "": _bonus_empty,
-    "Growth": _bonus_growth,
-    "Degrowth": _bonus_degrowth,
-    "Support": _bonus_support,
-    "Equalizer": _bonus_equalizer,
-    "Brawl": _bonus_brawl,
+    "growth": _bonus_growth,
+    "degrowth": _bonus_degrowth,
+    "support": _bonus_support,
+    "equalizer": _bonus_equalizer,
+    "brawl": _bonus_brawl,
     "nb_life_lost": _bonus_nb_life_lost,
     "nb_pillz_lost": _bonus_nb_pillz_lost,
     "nb_pillz_left": _bonus_nb_pillz_left,

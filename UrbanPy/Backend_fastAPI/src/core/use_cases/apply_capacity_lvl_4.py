@@ -55,11 +55,11 @@ def _bonus_empty(game, player1, player2, card1, card2):
 # Mapping des fonctions de bonus
 _CALCUL_FUNCS = {
     "": _bonus_empty,
-    "Growth": _bonus_growth,
-    "Degrowth": _bonus_degrowth,
-    "Support": _bonus_support,
-    "Equalizer": _bonus_equalizer,
-    "Brawl": _bonus_brawl,
+    "growth": _bonus_growth,
+    "degrowth": _bonus_degrowth,
+    "support": _bonus_support,
+    "equalizer": _bonus_equalizer,
+    "brawl": _bonus_brawl,
     "nb_life_lost": _bonus_nb_life_lost,
     "nb_pillz_lost": _bonus_nb_pillz_lost,
     "nb_pillz_left": _bonus_nb_pillz_left,
@@ -119,8 +119,9 @@ _EFFECTS_FUNCS = {
 }
 
 def add_endgame_effects_lvl_1(player: Player, capacity: Capacity) -> Capacity:
-    if len(capacity.types) != 1:
-        raise ValueError("Only one type is allowed for endgame effects.")
+    # if len(capacity.types) != 1:
+    #     raise ValueError("Only one type is allowed for endgame effects.")
+    print("capacity: ", capacity)
     nb = len(player.effect_list)
     capacity_type = capacity.types[0]
     if capacity_type == "toxine":
@@ -141,8 +142,8 @@ def add_endgame_effects_lvl_1(player: Player, capacity: Capacity) -> Capacity:
     return capacity
 
 def add_endgame_effects_lvl_2(player: Player, capacity: Capacity) -> Capacity:
-    if len(capacity.types) != 1:
-        raise ValueError("Only one type is allowed for endgame effects.")
+    # if len(capacity.types) != 1:
+    #     raise ValueError("Only one type is allowed for endgame effects.")
     
     nb = len(player.effect_list)
     capacity_type = capacity.types[0]
