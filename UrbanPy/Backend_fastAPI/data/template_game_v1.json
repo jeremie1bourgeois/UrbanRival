@@ -16,7 +16,7 @@
 					"value": -2,
 					"how": "",
 					"borne": 1,
-					"condition_effect": [],
+					"effect_conditions": [],
 					"lvl_priority": 0
 				},
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -29,7 +29,7 @@
 					"value": -1,
 					"how": "growth",
 					"borne": 4,
-					"condition_effect": [],
+					"effect_conditions": [],
 					"lvl_priority": 0
 				},
                 "ability_description": "Growth: -1 Opp Power, Min 4",
@@ -52,7 +52,7 @@
 					"value": -2,
 					"how": "",
 					"borne": 1,
-					"condition_effect": [],
+					"effect_conditions": [],
 					"lvl_priority": 0
 				},
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -65,7 +65,7 @@
 					"value": 3,
 					"how": "",
 					"borne": -1,
-					"condition_effect": ["courage"],
+					"effect_conditions": ["courage"],
 					"lvl_priority": 0
 				},
                 "ability_description": "Courage: Damage +3",
@@ -88,7 +88,7 @@
 					"value": -2,
 					"how": "",
 					"borne": 1,
-					"condition_effect": [],
+					"effect_conditions": [],
 					"lvl_priority": 0
 				},
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -101,7 +101,7 @@
 					"value": 4,
 					"how": "",
 					"borne": -1,
-					"condition_effect": [],
+					"effect_conditions": [],
 					"lvl_priority": 0
 				},
                 "ability_description": "Power +4",
@@ -128,7 +128,7 @@
 					"value": -2,
 					"how": "",
 					"borne": 1,
-					"condition_effect": [],
+					"effect_conditions": [],
 					"lvl_priority": 0
 				},
                 "ability_description": "-3 Opp Damage, Min 2",
@@ -140,7 +140,7 @@
 					"value": -3,
 					"how": "",
 					"borne": 2,
-					"condition_effect": [],
+					"effect_conditions": [],
 					"lvl_priority": 0
             	},
                 "ability_fight": null,
@@ -168,7 +168,7 @@
 					"value": -2,
 					"how": "",
 					"borne": 1,
-					"condition_effect": [],
+					"effect_conditions": [],
 					"lvl_priority": 0
 				},
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -184,7 +184,7 @@
 					"value": 1,
 					"how": "support",
 					"borne": -1,
-					"condition_effect": [],
+					"effect_conditions": [],
 					"lvl_priority": 0
 				},
                 "ability_fight": null,
@@ -204,7 +204,7 @@
 					"value": -2,
 					"how": "",
 					"borne": 1,
-					"condition_effect": [],
+					"effect_conditions": [],
 					"lvl_priority": 0
 				},
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -220,7 +220,7 @@
 					"value": -1,
 					"how": "equalizer",
 					"borne": 1,
-					"condition_effect": [],
+					"effect_conditions": [],
 					"lvl_priority": 0
 				},
                 "ability_fight": null,
@@ -240,7 +240,7 @@
 					"value": -2,
 					"how": "",
 					"borne": 1,
-					"condition_effect": [],
+					"effect_conditions": [],
 					"lvl_priority": 0
 				},
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -253,7 +253,7 @@
 					"value": 5,
 					"how": "stop",
 					"borne": -1,
-					"condition_effect": [],
+					"effect_conditions": [],
 					"lvl_priority": 0
 				},
                 "ability_description": "Stop Opp. Bonus",
@@ -276,7 +276,7 @@
 					"value": -2,
 					"how": "",
 					"borne": 1,
-					"condition_effect": [],
+					"effect_conditions": [],
 					"lvl_priority": 0
 				},
                 "bonus_description": "-2 Opp Power, Min 1",
@@ -289,7 +289,7 @@
 					"value": 2,
 					"how": "nb_dam_opp",
 					"borne": -1,
-					"condition_effect": [],
+					"effect_conditions": [],
 					"lvl_priority": 0
 				},
                 "ability_description": "+2 Attack Per Opp. Damage",

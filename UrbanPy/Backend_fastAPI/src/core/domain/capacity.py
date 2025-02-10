@@ -5,14 +5,14 @@ class Capacity:
         self.value = value
         self.how = how # support, Growth, Degrowth, Equalizer, Brawl || stop, copy, protection, cancel || toxin, poison, regen, heal, ??, dope
         self.borne = borne
-        self.condition_effect = condition_effect # [ Revenge, Reprisal, Confidence, Courage, Symmetry, Asymmetry, Bet ] # bool bool bool bool bool bool bool var// une var
+        self.effect_conditions = condition_effect # [ Revenge, Reprisal, Confidence, Courage, Symmetry, Asymmetry, Bet ] # bool bool bool bool bool bool bool var// une var
         self.lvl_priority = lvl_priority
 
         # stop: puissance et degat +2
         # condition_effect: stop ; target: ally ; type = "puissance_dommage" ; value = 2
     
     def __str__(self) -> str:
-        return f"Capacity(target={self.target}, types={self.types}, value={self.value}, how={self.how}, borne={self.borne}, condition_effect={self.condition_effect}, lvl_priority={self.lvl_priority})"
+        return f"Capacity(target={self.target}, types={self.types}, value={self.value}, how={self.how}, borne={self.borne}, condition_effect={self.effect_conditions}, lvl_priority={self.lvl_priority})"
 
     @classmethod
     def from_dict(cls, data: dict) -> 'Capacity':
@@ -25,7 +25,7 @@ class Capacity:
             value=int(data.get("value", 0)),
             how=str(data.get("how", "")),
             borne=int(data.get("borne", 0)) if data.get("borne") is not None else 0,
-            condition_effect=data.get("condition_effect", []),
+            condition_effect=data.get("effect_conditions", []),
             lvl_priority=int(data.get("lvl_priority", 0)),
         )
 
@@ -36,6 +36,6 @@ class Capacity:
             "value": self.value,
             "how": self.how,
             "borne": self.borne,
-            "condition_effect": self.condition_effect,
+            "effect_conditions": self.effect_conditions,
             "lvl_priority": self.lvl_priority,
         }

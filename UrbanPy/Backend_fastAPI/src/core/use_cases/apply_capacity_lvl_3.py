@@ -28,24 +28,24 @@ def apply_capacity_lvl_3(game: Game, card1: Card, card2: Card) -> None:
     if card2.bonus_fight: card2.bonus_fight = apply_target_enemy_effects(game, game.enemy, game.ally, card2.bonus_fight, card2, card1)
 
 def check_capacity_condition_lvl_3(capacity: Capacity, has_won: bool) -> Capacity:
-    if capacity.condition_effect == []:
+    if capacity.effect_conditions == []:
         return capacity if has_won else None
-    elif "backlash" in capacity.condition_effect:
+    elif "backlash" in capacity.effect_conditions:
         if has_won:
             capacity.target = "ally"
-            capacity.condition_effect = ""
+            capacity.effect_conditions = ""
             return capacity
         return None
-    elif "defeat" in capacity.condition_effect:
+    elif "defeat" in capacity.effect_conditions:
         if not has_won:
-            capacity.condition_effect = ""
+            capacity.effect_conditions = ""
             return capacity
         return None
-    elif "victory_defeat" in capacity.condition_effect:
-        capacity.condition_effect = ""
+    elif "victory_defeat" in capacity.effect_conditions:
+        capacity.effect_conditions = ""
         return capacity
     else:
-        raise ValueError(f"Invalid condition_effect (check_capacity_condition_lvl_3): {capacity.condition_effect}")
+        raise ValueError(f"Invalid condition_effect (check_capacity_condition_lvl_3): {capacity.effect_conditions}")
 
 
 # Fonctions de bonus définies en dehors

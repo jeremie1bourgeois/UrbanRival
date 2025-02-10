@@ -226,15 +226,15 @@ def apply_ability_stop_ability(ability_2: Capacity, bonus_1: Capacity, bonus_2: 
         if bonus_1 and bonus_1.how == "stop" and "bonus" in bonus_1.types:
             bonus_1 = None
             if ability_2:
-                if ability_2.condition_effect == "stop":
-                    ability_2.condition_effect = ""
+                if ability_2.effect_conditions == "stop":
+                    ability_2.effect_conditions = ""
                 else:
                     ability_2 = None
-        elif ability_2 and ability_2.condition_effect == "stop":
+        elif ability_2 and ability_2.effect_conditions == "stop":
             ability_2 = None
     elif ability_2: 
-        if ability_2.condition_effect == "stop":
-            ability_2.condition_effect = ""
+        if ability_2.effect_conditions == "stop":
+            ability_2.effect_conditions = ""
         else:
             ability_2 = None
     return None, ability_2, bonus_1, bonus_2
@@ -248,15 +248,15 @@ def apply_bonus_stop_ability(ability_1: Capacity, ability_2: Capacity, bonus_2: 
         if ability_1 and ability_1.how == "stop" and "bonus" in ability_1.types:
             ability_1 = None
             if ability_2:
-                if ability_2.condition_effect == "stop":
-                    ability_2.condition_effect = ""
+                if ability_2.effect_conditions == "stop":
+                    ability_2.effect_conditions = ""
                 else:
                     ability_2 = None
-        elif ability_2 and ability_2.condition_effect == "stop":
+        elif ability_2 and ability_2.effect_conditions == "stop":
             ability_2 = None
     elif ability_2:
-        if ability_2.condition_effect == "stop":
-            ability_2.condition_effect = ""
+        if ability_2.effect_conditions == "stop":
+            ability_2.effect_conditions = ""
         else:
             ability_2 = None
     
@@ -271,15 +271,15 @@ def apply_ability_stop_bonus(ability_2: Capacity, bonus_1: Capacity, bonus_2: Ca
         if bonus_1 and bonus_1.how == "stop" and "bonus" in bonus_1.types:
             bonus_1 = None
             if bonus_2:
-                if bonus_2.condition_effect == "stop":
-                    bonus_2.condition_effect = ""
+                if bonus_2.effect_conditions == "stop":
+                    bonus_2.effect_conditions = ""
                 else:
                     bonus_2 = None
-        elif bonus_2 and bonus_2.condition_effect == "stop":
+        elif bonus_2 and bonus_2.effect_conditions == "stop":
             bonus_2 = None
     elif bonus_2:
-        if bonus_2.condition_effect == "stop":
-            bonus_2.condition_effect = ""
+        if bonus_2.effect_conditions == "stop":
+            bonus_2.effect_conditions = ""
         else:
             bonus_2 = None
     
@@ -294,15 +294,15 @@ def apply_bonus_stop_bonus(ability_1: Capacity, ability_2: Capacity, bonus_2: Ca
         if ability_1 and ability_1.how == "stop" and "ability" in ability_1.types:
             ability_1 = None
             if bonus_2:
-                if bonus_2.condition_effect == "stop":
-                    bonus_2.condition_effect = ""
+                if bonus_2.effect_conditions == "stop":
+                    bonus_2.effect_conditions = ""
                 else:
                     bonus_2 = None
-        elif bonus_2 and bonus_2.condition_effect == "stop":
+        elif bonus_2 and bonus_2.effect_conditions == "stop":
             bonus_2 = None
     elif bonus_2:
-        if bonus_2.condition_effect == "stop":
-            bonus_2.condition_effect = ""
+        if bonus_2.effect_conditions == "stop":
+            bonus_2.effect_conditions = ""
         else:
             bonus_2 = None
     

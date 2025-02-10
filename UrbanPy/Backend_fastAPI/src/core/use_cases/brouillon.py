@@ -104,8 +104,8 @@
 #         ability_1 = None
 #         ability_2 = None
 #         bonus_1 = None
-#         if bonus_2.condition_effect == "stop":
-#             bonus_2.condition_effect = ""
+#         if bonus_2.effect_conditions == "stop":
+#             bonus_2.effect_conditions = ""
 #         else:
 #             bonus_2 = None
 
