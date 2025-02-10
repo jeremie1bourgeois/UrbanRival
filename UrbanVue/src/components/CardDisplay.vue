@@ -44,6 +44,7 @@ const damageClass = computed(() => {
 
 const powerClass = computed(() => {
 	if (!props.isFight) return "";
+	if (props.card.power_fight === props.card.power) return "text-white";
 	return props.card.power_fight > props.card.power ? "text-violet-500" : "text-orange-500";
 });
 </script>

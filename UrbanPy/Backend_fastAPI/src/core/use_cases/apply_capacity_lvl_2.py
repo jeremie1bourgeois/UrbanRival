@@ -86,7 +86,7 @@ def apply_target_ally_effects(game: Game, player1: Player, player2: Player, capa
 
     # Récupérer tous les attributs correspondants aux types dans capacity.types
     attrs = [_ATTR_MAP.get(type_) for type_ in capacity.types if _ATTR_MAP.get(type_)]
-    print("attrs: ", attrs)
+
     # Si aucun attribut n'est trouvé, on retourne None
     if not attrs:
         return capacity
@@ -95,7 +95,7 @@ def apply_target_ally_effects(game: Game, player1: Player, player2: Player, capa
     bonus_func = _BONUS_FUNCS.get(capacity.how)
     if not bonus_func:
         raise ValueError(f"Invalid how (apply_target_ally_effects): {capacity.how} for {capacity.types}")
-    print("bonus_func: ", bonus_func)
+
     # Calculer le bonus une seule fois
     bonus = capacity.value * bonus_func(game, player1, player2, card1, card2)
 
@@ -114,7 +114,7 @@ def apply_target_ally_effects(game: Game, player1: Player, player2: Player, capa
         for attr in attrs:
             current_value = getattr(card1, attr)
             setattr(card1, attr, current_value + bonus)
-    print("card.damage_fight: ", card1.damage_fight)
+
     return None
 
 

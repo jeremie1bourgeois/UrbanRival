@@ -22,6 +22,18 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
         # Initialiser les données de combat
         init_fight_data(player1_card, round_data.player1_pillz, round_data.player1_fury)
         init_fight_data(player2_card, round_data.player2_pillz, round_data.player2_fury)
+        
+        print(f"player1_card: {player1_card}")
+        print(f"player2_card: {player2_card}")
+        
+        if not check_capacity_condition(game, player1_card.ability, True, round_data.player1_card_index, round_data.player2_card_index):
+            player1_card.ability_fight = None
+        if not check_capacity_condition(game, player1_card.bonus, True, round_data.player1_card_index, round_data.player2_card_index):
+            player1_card.bonus_fight = None
+        if not check_capacity_condition(game, player2_card.ability, False, round_data.player2_card_index, round_data.player1_card_index):
+            player2_card.ability_fight = None
+        if not check_capacity_condition(game, player2_card.bonus, False, round_data.player2_card_index, round_data.player1_card_index):
+            player2_card.bonus_fight = None
 
         # Appliquer les effets de combat
         fct_lvl_1.apply_capacity_lvl_1(player1_card, player2_card)
@@ -34,8 +46,8 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
             player2_card.damage_fight += 2
 
         # Calculer les attaques
-        player1_card.attack = player1_card.power_fight * round_data.player1_pillz
-        player2_card.attack = player2_card.power_fight * round_data.player2_pillz
+        player1_card.attack += (player1_card.power_fight * round_data.player1_pillz)
+        player2_card.attack += (player2_card.power_fight * round_data.player2_pillz)
 
         # Créer une nouvelle instance de Round
         round_result = Round()
@@ -103,41 +115,84 @@ def resolve_combat(game: Game, player1_card: Card, player2_card: Card, round_res
         player2_card.win = True
 
 
-def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, ally_card_index: int, enemy_card_index: int) -> Capacity:
-    if capacity.condition_effect is None:
-        return capacity
+def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, ally_card_index: int, enemy_card_index: int) -> bool:
+    if not capacity.condition_effect:
+        return True
     if is_ally:
-        if capacity.condition_effect == "revenge":
-            return capacity if game.history and game.history[-1].ally.win == False else None
-        elif capacity.condition_effect == "reprisal":
-            return capacity if game.turn == False else None
-        elif capacity.condition_effect == "confidence":
-            return capacity if game.history and game.history[-1].ally.win == True else None
-        elif capacity.condition_effect == "courage":
-            return capacity if game.turn == True else None
-        elif capacity.condition_effect == "symmetry":
-            return capacity if ally_card_index == enemy_card_index else None
-        elif capacity.condition_effect == "asymmetry":
-            return capacity if ally_card_index != enemy_card_index else None
-        elif capacity.condition_effect.startswith("bet"):
-            return capacity if game.ally.cards[ally_card_index].pillz_fight > int(capacity.condition_effect[3:]) else None
+        if "revenge" in capacity.condition_effect:
+            if game.history and game.history[-1].ally.win == False:
+                capacity.condition_effect.remove("revenge")
+                if not capacity.condition_effect: return True
+            else: return False
+        elif "confidence" in capacity.condition_effect:
+            if game.history and game.history[-1].ally.win == True:
+                capacity.condition_effect.remove("confidence")
+                if not capacity.condition_effect: return True
+            else: return False
+        if "courage" in capacity.condition_effect:
+            print("on  est la, game.turn : ", game.turn)
+            if game.turn == True:
+                capacity.condition_effect.remove("courage")
+                if not capacity.condition_effect: return True
+            else: return False
+        elif "reprisal" in capacity.condition_effect:
+            if game.turn == False:
+                capacity.condition_effect.remove("reprisal")
+                if not capacity.condition_effect: return True
+            else: return False
+        if "symmetry" in capacity.condition_effect:
+            if ally_card_index == enemy_card_index:
+                capacity.condition_effect.remove("symmetry")
+                if not capacity.condition_effect: return True
+            else: return False
+        elif "asymmetry" in capacity.condition_effect:
+            if ally_card_index != enemy_card_index:
+                capacity.condition_effect.remove("asymmetry")
+                if not capacity.condition_effect: return True
+            else: return False
+        if "bet" in capacity.condition_effect:
+            if game.ally.cards[ally_card_index].pillz_fight > int(capacity.condition_effect[3:]):
+                capacity.condition_effect.remove("bet")
+                if not capacity.condition_effect: return True
+            else: return False
         else:
             raise ValueError(f"Invalid condition_effect (check_capacity_condition): {capacity.condition_effect}")
     else:
-        if capacity.condition_effect == "revenge":
-            return capacity if game.history and game.history[-1].enemy.win == False else None
-        elif capacity.condition_effect == "reprisal":
-            return capacity if game.turn == True else None
-        elif capacity.condition_effect == "confidence":
-            return capacity if game.history and game.history[-1].enemy.win == True else None
-        elif capacity.condition_effect == "courage":
-            return capacity if game.turn == False else None
-        elif capacity.condition_effect == "symmetry":
-            return capacity if ally_card_index == enemy_card_index else None
-        elif capacity.condition_effect == "asymmetry":
-            return capacity if ally_card_index != enemy_card_index else None
-        elif capacity.condition_effect.startswith("bet"):
-            return capacity if game.enemy.cards[enemy_card_index].pillz_fight > int(capacity.condition_effect[3:]) else None
+        if "revenge" in capacity.condition_effect:
+            if game.history and game.history[-1].enemy.win == False:
+                capacity.condition_effect.remove("revenge")
+                if not capacity.condition_effect: return True
+            else: return False
+        elif "confidence" in capacity.condition_effect:
+            if game.history and game.history[-1].enemy.win == True:
+                capacity.condition_effect.remove("confidence")
+                if not capacity.condition_effect: return True
+            else: return False
+        if "courage" in capacity.condition_effect:
+            if game.turn == False:
+                capacity.condition_effect.remove("courage")
+                if not capacity.condition_effect: return True
+            else: return False
+        elif "reprisal" in capacity.condition_effect:
+            if game.turn == True:
+                capacity.condition_effect.remove("reprisal")
+                if not capacity.condition_effect: return True
+            else: return False
+        if "symmetry" in capacity.condition_effect:
+            if ally_card_index == enemy_card_index:
+                capacity.condition_effect.remove("symmetry")
+                if not capacity.condition_effect: return True
+            else: return False
+        elif "asymmetry" in capacity.condition_effect:
+            if ally_card_index != enemy_card_index:
+                capacity.condition_effect.remove("asymmetry")
+                if not capacity.condition_effect: return True
+            else: return False
+        if "bet" in capacity.condition_effect:
+            if game.enemy.cards[enemy_card_index].pillz_fight > int(capacity.condition_effect[3:]):
+                capacity.condition_effect.remove("bet")
+                if not capacity.condition_effect: return True
+            else: return False
         else:
             raise ValueError(f"Invalid condition_effect (check_capacity_condition): {capacity.condition_effect}")
 
