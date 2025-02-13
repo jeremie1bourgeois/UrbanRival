@@ -8,10 +8,21 @@ from src.core.domain.game import Game
 from src.utils.config import BASE_DIR
 
 def process_round_service(game_id: str, round_data: ProcessRoundInput):
+    # Charger le chemin du dossier de la partie
+    game_directory = os.path.join(BASE_DIR, "data/game/", f"game_{game_id}")
 
-    # Charger le chemin du fichier de la partie
-    game_file_path = os.path.join(BASE_DIR, "data/game/", f"game_data_{game_id}.json")
-    os.makedirs(os.path.dirname(game_file_path), exist_ok=True)
+    # Vérifier si le dossier existe
+    if not os.path.exists(game_directory):
+        raise FileNotFoundError(f"Game directory not found: {game_directory}")
+
+    # Trouver le fichier avec le nb_turn le plus élevé
+    game_files = [f for f in os.listdir(game_directory) if f.startswith(f"game_data_{game_id}_") and f.endswith(".json")]
+    if not game_files:
+        raise FileNotFoundError(f"No game files found in directory: {game_directory}")
+
+    # Extraire le nb_turn de chaque fichier et trouver le maximum
+    max_turn_file = max(game_files, key=lambda x: int(x.split("_")[3].split(".")[0]))
+    game_file_path = os.path.join(game_directory, max_turn_file)
 
     # Charger la partie
     game = load_game_from_json(game_file_path)
@@ -21,13 +32,11 @@ def process_round_service(game_id: str, round_data: ProcessRoundInput):
 
     # Jouer un round en passant l'objet round_data
     process_round(game, round_data)
-    
-    # print("\n\n --- GAME STATE ---")
-    # print("updated_game: ", game)
 
-    # Sauvegarder la partie mise à jour
-    save_game_to_json(game, game_id)
- 
+    # Sauvegarder la partie mise à jour dans le dossier correspondant
+    save_game_to_json(game, game_id, game_directory)
+
+    # Vérifier l'état de la partie (fin de partie ou non)
     state = check_end(game)
 
     return (game, state)
@@ -76,13 +85,20 @@ def create_game(players_cards: PlayerCards) -> Game:
 
     new_id = get_new_game_id()
 
-    # Appeler la fonction pour sauvegarder la partie en JSON
-    save_game_to_json(game, new_id)
+    # Créer un dossier spécifique pour cette partie
+    game_directory = os.path.join("data", "game", f"game_{new_id}")
+    os.makedirs(game_directory, exist_ok=True)
+
+    # Appeler la fonction pour sauvegarder la partie en JSON dans le dossier créé
+    save_game_to_json(game, new_id, game_directory)
 
     return game
 
 
 def init_game_from_template():
+    """
+    Initialise une nouvelle partie à partir d'un template et sauvegarde le fichier JSON avec le nombre de tours.
+    """
     # Charger le chemin du fichier de la partie
     game_file_path = os.path.join(BASE_DIR, "data/", f"template_game_v1.json")
     os.makedirs(os.path.dirname(game_file_path), exist_ok=True)
@@ -93,7 +109,11 @@ def init_game_from_template():
     # Générer un nouvel ID pour le jeu
     new_id = get_new_game_id()
 
-    # Sauvegarder la partie en JSON
-    save_game_to_json(game, new_id)
+    # Créer un dossier spécifique pour cette partie
+    game_directory = os.path.join("data", "game", f"game_{new_id}")
+    os.makedirs(game_directory, exist_ok=True)
+
+    # Appeler la fonction pour sauvegarder la partie en JSON dans le dossier créé
+    save_game_to_json(game, new_id, game_directory)
 
     return (game, new_id)

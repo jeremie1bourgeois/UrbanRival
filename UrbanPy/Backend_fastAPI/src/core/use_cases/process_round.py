@@ -130,7 +130,6 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, ally
                 if not capacity.effect_conditions: return True
             else: return False
         if "courage" in capacity.effect_conditions:
-            print("on  est la, game.turn : ", game.turn)
             if game.turn == True:
                 capacity.effect_conditions.remove("courage")
                 if not capacity.effect_conditions: return True

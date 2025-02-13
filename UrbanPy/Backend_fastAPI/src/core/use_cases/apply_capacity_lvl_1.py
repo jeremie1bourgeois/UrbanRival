@@ -5,7 +5,7 @@ from src.core.domain.card import Card
 
 def apply_capacity_lvl_1(card1: Card, card2: Card):
     apply_copy(card1, card2)
-    apply_stop(card1, card2)    
+    apply_stop(card1, card2)
     delete_capacity_protection(card1, card2)
 
     apply_all_cancel_data_modif(card1, card2)

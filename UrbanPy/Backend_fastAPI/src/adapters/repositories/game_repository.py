@@ -4,13 +4,17 @@ import json
 import os
 
 def get_new_game_id(directory="data/game") -> int:
-	os.makedirs(directory, exist_ok=True)
-	files = [f for f in os.listdir(directory) if f.startswith("game_data_") and f.endswith(".json")]
-	next_id = max([int(f.split("_")[2].split(".")[0]) for f in files] + [0]) + 1
-	return next_id
+    os.makedirs(directory, exist_ok=True)
+    dirs = [f for f in os.listdir(directory) if f.startswith("game_")]
+    next_id = max([int(f.split("_")[1]) for f in dirs] + [0]) + 1
+    return next_id
 
-def save_game_to_json(game: Game, game_id: int):
-    filepath = os.path.join("data", "game", f"game_data_{game_id}.json")
+def save_game_to_json(game: Game, game_id: int, game_directory: str):
+    # Créer le nom du fichier avec le nombre de tours
+    filename = f"game_data_{game_id}_{game.nb_turn}.json"
+    filepath = os.path.join(game_directory, filename)
+
+    # Créer le dossier s'il n'existe pas
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
 
     with open(filepath, "w") as file:
