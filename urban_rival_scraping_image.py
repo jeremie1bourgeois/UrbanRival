@@ -1,3 +1,5 @@
+# permet de récupérer toutes les images des cartes Urban Rivals sur le site iclintz.com
+
 import requests
 from bs4 import BeautifulSoup
 import os

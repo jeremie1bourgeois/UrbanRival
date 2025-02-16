@@ -78,37 +78,37 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
 
 def resolve_combat(game: Game, player1_card: Card, player2_card: Card, round_result: Round):
     if player1_card.attack > player2_card.attack:
-        game.enemy.life = max(0, game.enemy.life - player1_card.damage)
+        game.enemy.life = max(0, game.enemy.life - player1_card.damage_fight)
         round_result.ally.win = True
         round_result.enemy.win = False
         player1_card.win = True
         player2_card.win = False
     elif player2_card.attack > player1_card.attack:
-        game.ally.life = max(0, game.ally.life - player2_card.damage)
+        game.ally.life = max(0, game.ally.life - player2_card.damage_fight)
         round_result.ally.win = False
         round_result.enemy.win = True
         player1_card.win = False
         player2_card.win = True
     elif player1_card.stars < player2_card.stars:
-        game.enemy.life = max(0, game.enemy.life - player1_card.damage)
+        game.enemy.life = max(0, game.enemy.life - player1_card.damage_fight)
         round_result.ally.win = True
         round_result.enemy.win = False
         player1_card.win = True
         player2_card.win = False
     elif player2_card.stars < player1_card.stars:
-        game.ally.life = max(0, game.ally.life - player2_card.damage)
+        game.ally.life = max(0, game.ally.life - player2_card.damage_fight)
         round_result.ally.win = False
         round_result.enemy.win = True
         player1_card.win = False
         player2_card.win = True
     elif game.turn:
-        game.enemy.life = max(0, game.enemy.life - player1_card.damage)
+        game.enemy.life = max(0, game.enemy.life - player1_card.damage_fight)
         round_result.ally.win = True
         round_result.enemy.win = False
         player1_card.win = True
         player2_card.win = False
     else:
-        game.ally.life = max(0, game.ally.life - player2_card.damage)
+        game.ally.life = max(0, game.ally.life - player2_card.damage_fight)
         round_result.ally.win = False
         round_result.enemy.win = True
         player1_card.win = False
@@ -221,3 +221,5 @@ def check_round_correct(game: Game, round_data: ProcessRoundInput):
         raise ValueError("Player 1: card already played.")
     if game.enemy.cards[round_data.player2_card_index].played:
         raise ValueError("Player 2: card already played.")
+    if game.nb_turn == 4:
+        raise ValueError("Game is already finished.")

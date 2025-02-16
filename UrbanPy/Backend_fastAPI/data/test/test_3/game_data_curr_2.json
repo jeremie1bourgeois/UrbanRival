@@ -1,0 +1,355 @@
+{
+    "nb_turn": 2,
+    "turn": true,
+    "ally": {
+        "name": "ally",
+        "life": 10,
+        "pillz": 12,
+        "cards": [
+            {
+                "name": "Agustino",
+                "faction": "All Stars",
+                "starOff": 2,
+                "bonus": {
+                    "target": "enemy",
+                    "types": [
+                        "power"
+                    ],
+                    "value": -2,
+                    "how": "",
+                    "borne": 1,
+                    "effect_conditions": [],
+                    "lvl_priority": 0
+                },
+                "stars": 2,
+                "power": 6,
+                "damage": 2,
+                "ability": {
+                    "target": "enemy",
+                    "types": [
+                        "power"
+                    ],
+                    "value": -1,
+                    "how": "growth",
+                    "borne": 4,
+                    "effect_conditions": [],
+                    "lvl_priority": 0
+                },
+                "bonus_description": "-2 Opp Power, Min 1",
+                "ability_description": "Growth: -1 Opp Power, Min 4",
+                "pillz_fight": 0,
+                "attack": 0,
+                "played": 0,
+                "power_fight": 0,
+                "damage_fight": 0,
+                "ability_fight": null,
+                "bonus_fight": null,
+                "win": false
+            },
+            {
+                "name": "Allison",
+                "faction": "All Stars",
+                "starOff": 3,
+                "bonus": {
+                    "target": "enemy",
+                    "types": [
+                        "power"
+                    ],
+                    "value": -2,
+                    "how": "",
+                    "borne": 1,
+                    "effect_conditions": [],
+                    "lvl_priority": 0
+                },
+                "stars": 3,
+                "power": 5,
+                "damage": 3,
+                "ability": {
+                    "target": "ally",
+                    "types": [
+                        "damage"
+                    ],
+                    "value": 3,
+                    "how": "",
+                    "borne": -1,
+                    "effect_conditions": [
+                        "courage"
+                    ],
+                    "lvl_priority": 0
+                },
+                "bonus_description": "-2 Opp Power, Min 1",
+                "ability_description": "Courage: Damage +3",
+                "pillz_fight": 0,
+                "attack": 0,
+                "played": 0,
+                "power_fight": 0,
+                "damage_fight": 0,
+                "ability_fight": null,
+                "bonus_fight": null,
+                "win": false
+            },
+            {
+                "name": "Amelia",
+                "faction": "All Stars",
+                "starOff": 3,
+                "bonus": {
+                    "target": "enemy",
+                    "types": [
+                        "power"
+                    ],
+                    "value": -2,
+                    "how": "",
+                    "borne": 1,
+                    "effect_conditions": [],
+                    "lvl_priority": 0
+                },
+                "stars": 3,
+                "power": 3,
+                "damage": 5,
+                "ability": {
+                    "target": "ally",
+                    "types": [
+                        "power"
+                    ],
+                    "value": 4,
+                    "how": "",
+                    "borne": -1,
+                    "effect_conditions": [],
+                    "lvl_priority": 0
+                },
+                "bonus_description": "-2 Opp Power, Min 1",
+                "ability_description": "Power +4",
+                "pillz_fight": 0,
+                "attack": 0,
+                "played": 0,
+                "power_fight": 0,
+                "damage_fight": 0,
+                "ability_fight": null,
+                "bonus_fight": null,
+                "win": false
+            },
+            {
+                "name": "Ashley",
+                "faction": "All Stars",
+                "starOff": 2,
+                "bonus": {
+                    "target": "enemy",
+                    "types": [
+                        "power"
+                    ],
+                    "value": -2,
+                    "how": "",
+                    "borne": 1,
+                    "effect_conditions": [],
+                    "lvl_priority": 0
+                },
+                "stars": 2,
+                "power": 5,
+                "damage": 1,
+                "ability": {
+                    "target": "enemy",
+                    "types": [
+                        "damage"
+                    ],
+                    "value": -3,
+                    "how": "",
+                    "borne": 2,
+                    "effect_conditions": [],
+                    "lvl_priority": 0
+                },
+                "bonus_description": "-2 Opp Power, Min 1",
+                "ability_description": "-3 Opp Damage, Min 2",
+                "pillz_fight": 1,
+                "attack": 3,
+                "played": true,
+                "power_fight": 3,
+                "damage_fight": 1,
+                "ability_fight": null,
+                "bonus_fight": null,
+                "win": false
+            }
+        ],
+        "effect_list": []
+    },
+    "enemy": {
+        "name": "enemy",
+        "life": 12,
+        "pillz": 8,
+        "cards": [
+            {
+                "name": "Asporov",
+                "faction": "All Stars",
+                "starOff": 4,
+                "bonus": {
+                    "target": "enemy",
+                    "types": [
+                        "power"
+                    ],
+                    "value": -2,
+                    "how": "",
+                    "borne": 1,
+                    "effect_conditions": [],
+                    "lvl_priority": 0
+                },
+                "stars": 4,
+                "power": 7,
+                "damage": 3,
+                "ability": {
+                    "target": "ally",
+                    "types": [
+                        "damage"
+                    ],
+                    "value": 1,
+                    "how": "support",
+                    "borne": -1,
+                    "effect_conditions": [],
+                    "lvl_priority": 0
+                },
+                "bonus_description": "-2 Opp Power, Min 1",
+                "ability_description": "Support: Damage +1",
+                "pillz_fight": 0,
+                "attack": 0,
+                "played": 0,
+                "power_fight": 0,
+                "damage_fight": 0,
+                "ability_fight": null,
+                "bonus_fight": null,
+                "win": false
+            },
+            {
+                "name": "B Mappe Mt",
+                "faction": "All Stars",
+                "starOff": 5,
+                "bonus": {
+                    "target": "enemy",
+                    "types": [
+                        "power"
+                    ],
+                    "value": -2,
+                    "how": "",
+                    "borne": 1,
+                    "effect_conditions": [],
+                    "lvl_priority": 0
+                },
+                "stars": 5,
+                "power": 3,
+                "damage": 8,
+                "ability": {
+                    "target": "enemy",
+                    "types": [
+                        "power",
+                        "damage"
+                    ],
+                    "value": -1,
+                    "how": "equalizer",
+                    "borne": 1,
+                    "effect_conditions": [],
+                    "lvl_priority": 0
+                },
+                "bonus_description": "-2 Opp Power, Min 1",
+                "ability_description": "Equalizer: -1 Opp Pow. & Dam., Min 1",
+                "pillz_fight": 0,
+                "attack": 0,
+                "played": 0,
+                "power_fight": 0,
+                "damage_fight": 0,
+                "ability_fight": null,
+                "bonus_fight": null,
+                "win": false
+            },
+            {
+                "name": "Bhudd",
+                "faction": "All Stars",
+                "starOff": 3,
+                "bonus": {
+                    "target": "enemy",
+                    "types": [
+                        "power"
+                    ],
+                    "value": -2,
+                    "how": "",
+                    "borne": 1,
+                    "effect_conditions": [],
+                    "lvl_priority": 0
+                },
+                "stars": 3,
+                "power": 4,
+                "damage": 2,
+                "ability": {
+                    "target": "enemy",
+                    "types": [
+                        "bonus"
+                    ],
+                    "value": 5,
+                    "how": "stop",
+                    "borne": -1,
+                    "effect_conditions": [],
+                    "lvl_priority": 0
+                },
+                "bonus_description": "-2 Opp Power, Min 1",
+                "ability_description": "Stop Opp. Bonus",
+                "pillz_fight": 0,
+                "attack": 0,
+                "played": 0,
+                "power_fight": 0,
+                "damage_fight": 0,
+                "ability_fight": null,
+                "bonus_fight": null,
+                "win": false
+            },
+            {
+                "name": "Bixente",
+                "faction": "All Stars",
+                "starOff": 2,
+                "bonus": {
+                    "target": "enemy",
+                    "types": [
+                        "power"
+                    ],
+                    "value": -2,
+                    "how": "",
+                    "borne": 1,
+                    "effect_conditions": [],
+                    "lvl_priority": 0
+                },
+                "stars": 2,
+                "power": 6,
+                "damage": 3,
+                "ability": {
+                    "target": "ally",
+                    "types": [
+                        "attack"
+                    ],
+                    "value": 2,
+                    "how": "nb_dam_opp",
+                    "borne": -1,
+                    "effect_conditions": [],
+                    "lvl_priority": 0
+                },
+                "bonus_description": "-2 Opp Power, Min 1",
+                "ability_description": "+2 Attack Per Opp. Damage",
+                "pillz_fight": 5,
+                "attack": 22,
+                "played": true,
+                "power_fight": 4,
+                "damage_fight": 2,
+                "ability_fight": null,
+                "bonus_fight": null,
+                "win": true
+            }
+        ],
+        "effect_list": []
+    },
+    "history": [
+        {
+            "ally": {
+                "card_index": 3,
+                "win": false
+            },
+            "enemy": {
+                "card_index": 3,
+                "win": true
+            }
+        }
+    ]
+}
