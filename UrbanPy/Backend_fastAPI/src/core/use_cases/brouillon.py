@@ -185,3 +185,15 @@ for i in range(10000000):
     if "ability" in liste2 or "bonus" in liste2:
         pass
 print(time.time() - start)
+
+
+    # Créer une instance ProcessRoundInput
+    round_data = ProcessRoundInput(
+        player1_card_index = last_round_data.ally.card_index,
+        player1_pillz = curr_game_round.ally.cards[last_round_data.ally.card_index].pillz,
+        player1_fury = curr_game_round.ally.cards[last_round_data.ally.card_index].fury,
+        
+        player2_card_index = last_round_data.enemy.card_index,
+        player2_pillz = curr_game_round.enemy.cards[last_round_data.enemy.card_index].pillz,
+        player2_fury = curr_game_round.enemy.cards[last_round_data.enemy.card_index].fury
+    )

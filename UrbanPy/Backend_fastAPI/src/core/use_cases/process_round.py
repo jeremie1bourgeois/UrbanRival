@@ -155,7 +155,7 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, ally
                 if not capacity.effect_conditions: return True
             else: return False
         else:
-            raise ValueError(f"Invalid condition_effect (check_capacity_condition): {capacity.effect_conditions}")
+            raise ValueError(f"Invalid effect_conditions (check_capacity_condition): {capacity.effect_conditions}")
     else:
         if "revenge" in capacity.effect_conditions:
             if game.history and game.history[-1].enemy.win == False:
@@ -193,7 +193,7 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, ally
                 if not capacity.effect_conditions: return True
             else: return False
         else:
-            raise ValueError(f"Invalid condition_effect (check_capacity_condition): {capacity.effect_conditions}")
+            raise ValueError(f"Invalid effect_conditions (check_capacity_condition): {capacity.effect_conditions}")
 
 
 

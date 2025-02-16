@@ -1,0 +1,6 @@
+- finir de gerer les pouvoirs
+- re scraper toutes les cartes (il nous en manque)
+- tester le jeu en faisant une big test suite
+- front: pouvoir creer n'importe quelle game avec n'importe quelle carte
+
+- big boss: creer un IA (apprentissage par renforcement)

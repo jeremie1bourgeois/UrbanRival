@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { Game, RoundData } from "../models/game.interface";
-import { getInitGameTemplate, processGameRound } from "../api/game";
+import { getInitGameTemplate, processGameRound, SavePlayForTest } from "../api/game";
 import Card from "./Card.vue";
 
+const isSaveButtonClicked = ref<boolean>(false);
 const game = ref<Game | null>(null);
 const status = ref<string | null>(null);
 const gameId = ref<string>("");
@@ -28,6 +29,15 @@ const fetchGame = async () => {
 	}
 };
 
+const savePlayForTest = async () => {
+	try {
+		await SavePlayForTest(gameId.value);
+		isSaveButtonClicked.value = true;
+	} catch (error) {
+		console.error('Error saving play for test:', error);
+	}
+};
+
 const handleCombat = (pillz: number, isFury: boolean, index: number) => {
 	if (turn.value) {
 		roundData.value.player1_card_index = index;
@@ -49,6 +59,7 @@ const handleCombat = (pillz: number, isFury: boolean, index: number) => {
 				player2_pillz: -1,
 				player2_fury: false,
 			};
+			isSaveButtonClicked.value = false;
 		});
 	} else {
 		turn.value = !turn.value;
@@ -102,6 +113,14 @@ const handleCombat = (pillz: number, isFury: boolean, index: number) => {
 					<h2 class="text-xl font-bold text-yellow-400 mb-2">{{ game.ally.name }}</h2>
 				</div>
 			</div>
+			<!-- Bouton pour sauvegarder le jeu pour les tests -->
+			<button
+				:disabled="isSaveButtonClicked || game.nb_turn <= 1"
+				@click="savePlayForTest"
+				class="bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600 mt-4"
+			>
+				Sauvegarder le jeu pour les tests
+			</button>
 		</div>
 	</div>
 </template>

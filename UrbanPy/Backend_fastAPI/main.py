@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from src.schemas.game_schemas import PlayerCards, ProcessRoundInput
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException, Body, Request
-from src.core.services.game_service import create_game, process_round_service, init_game_from_template
+from src.core.services.game_service import create_game, process_round_service, init_game_from_template, save_for_test_service
 from src.utils.config import BASE_DIR
 
 # logging.basicConfig(level=logging.DEBUG)
@@ -97,5 +97,24 @@ def init_game_template() -> Dict[str, Any]:
 
         # Retourner la partie initialisée
         return {"status": "success", "game": game.to_dict(), "game_id": new_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/save_for_test")
+def save_for_test(game_id: int) -> Dict[str, Any]:
+    """
+    Crée une sauvegarde d'une situation A d'une partie, d'un play des joueurs et de la situation B qui en découle.
+    (Est appelé lorsque un round s'est déroulé comme prévue et que l'on souhaite sauvegarder les données pour les tests.)
+    """
+    try:
+        # Sauvegarder les données pour les tests
+        save_for_test_service(game_id)
+        
+        return {"status": "success"}
+    except ValueError as e:
+        print("DEBUG: Erreur dans save_for_test_service:", e)
+        raise HTTPException(status_code=400, detail=str(e))
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail=f"Game ID '{game_id}' not found.")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

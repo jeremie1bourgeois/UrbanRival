@@ -45,7 +45,7 @@ def check_capacity_condition_lvl_3(capacity: Capacity, has_won: bool) -> Capacit
         capacity.effect_conditions = ""
         return capacity
     else:
-        raise ValueError(f"Invalid condition_effect (check_capacity_condition_lvl_3): {capacity.effect_conditions}")
+        raise ValueError(f"Invalid effect_conditions (check_capacity_condition_lvl_3): {capacity.effect_conditions}")
 
 
 # Fonctions de bonus définies en dehors

@@ -31,7 +31,7 @@ export const processGameRound = async (
 	try {
 		const response = await apiClient.post(`/process_round/${gameId}`, roundData);
 		console.log('processGameRound response:', (response.data));
-		console.log("game before", game);
+		console.log("game before", game);	
 		game.nb_turn = response.data.game.nb_turn || game.nb_turn;
 		game.turn = response.data.game.turn || game.turn;
 		game.ally = response.data.game.ally || game.ally;
@@ -45,6 +45,18 @@ export const processGameRound = async (
 		};
 	} catch (error) {
 		console.error('Error processing game round:', error);
+		throw error;
+	}
+};
+
+export const SavePlayForTest = async (gameId: string): Promise<{ status: string }> => {
+	try {
+		const response = await apiClient.get('/save_for_test', { params: { game_id: gameId } });
+		return {
+			status: response.data.status,
+		};
+	} catch (error) {
+		console.error('Error saving play for test:', error);
 		throw error;
 	}
 };

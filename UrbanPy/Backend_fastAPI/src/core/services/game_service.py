@@ -3,7 +3,7 @@ from src.core.use_cases.process_round import check_round_correct, process_round
 from src.core.domain.player import Player
 from src.schemas.game_schemas import GameResult, PlayerCards, ProcessRoundInput
 from src.core.domain.card import Card
-from src.adapters.repositories.game_repository import get_new_game_id, load_game_from_json, save_game_to_json
+from src.adapters.repositories.game_repository import get_new_game_id, get_new_test_id, load_game_from_json, save_game_to_json
 from src.core.domain.game import Game
 from src.utils.config import BASE_DIR
 
@@ -117,3 +117,54 @@ def init_game_from_template():
     save_game_to_json(game, new_id, game_directory)
 
     return (game, new_id)
+
+def save_for_test_service(game_id: int):
+    """
+    Crée une sauvegarde d'une situation A d'une partie, d'un play des joueurs et de la situation B qui en découle.
+    (Est appelé lorsque un round s'est déroulé comme prévue et que l'on souhaite sauvegarder les données pour les tests.)
+    """
+    # Charger le chemin du dossier de la partie
+    game_directory = os.path.join(BASE_DIR, "data/game/", f"game_{game_id}")
+
+    # Vérifier si le dossier existe
+    if not os.path.exists(game_directory):
+        raise FileNotFoundError(f"Game directory not found: {game_directory}")
+
+    # Trouver le fichier avec le nb_turn le plus élevé
+    game_files = [f for f in os.listdir(game_directory) if f.startswith(f"game_data_{game_id}_") and f.endswith(".json")]
+
+    if not game_files:
+        raise FileNotFoundError(f"No game files found in directory: {game_directory}")
+
+    # Extraire le nb_turn de chaque fichier et trouver le maximum
+    curr_turn_file = max(game_files, key=lambda x: int(x.split("_")[3].split(".")[0]))
+    
+    curr_nb_round: int = int(curr_turn_file.split('_')[3].split('.')[0])
+    if curr_nb_round < 2:
+        raise ValueError("Not enough turns to save for test.")
+
+    prev_turn_file = f"game_data_{game_id}_{curr_nb_round}.json"
+
+    curr_game_file_path = os.path.join(game_directory, curr_turn_file)
+    prev_game_file_path = os.path.join(game_directory, prev_turn_file)
+
+    # Charger la partie
+    curr_game_round = load_game_from_json(curr_game_file_path)
+    prev_game_round = load_game_from_json(prev_game_file_path)
+
+    save_play_on_json(curr_game_round, prev_game_round)
+    
+def save_play_on_json(curr_game_round: Game, prev_game_round: Game):
+    """
+    Sauvegarde les données d'une partie, d'un play des joueurs et de la situation B qui en découle.
+    L'id du test est le plus grand id des tests qui existe + 1.
+    """
+    # Créer un dossier spécifique pour cette sauvegarde
+    save_directory = os.path.join(BASE_DIR, "data/test/", f"test_{get_new_test_id()}")
+    os.makedirs(save_directory, exist_ok=True)
+    
+    # Sauvegarder la partie actuelle
+    save_game_to_json(curr_game_round, "curr", save_directory)
+    
+    # Sauvegarder la partie précédente
+    save_game_to_json(prev_game_round, "prev", save_directory)

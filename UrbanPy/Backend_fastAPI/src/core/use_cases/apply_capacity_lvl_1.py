@@ -20,15 +20,15 @@ def apply_capacity_lvl_1(card1: Card, card2: Card):
 def apply_copy(card1: Card, card2: Card):
     if card1.ability_fight and card1.ability_fight.how == "copy":
         if "ability" in card1.ability_fight.types:
-            (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_ability_copy_ability(card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
+            (card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight) = apply_ability_copy_ability(card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
         elif "bonus" in card1.ability_fight.types:
-            (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_ability_copy_bonus(card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
+            (card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight) = apply_ability_copy_bonus(card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
 
     if card1.bonus_fight and card1.bonus_fight.how == "copy":
         if "ability" in card1.bonus_fight.types:
-            (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_bonus_copy_ability(card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
+            (card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight) = apply_bonus_copy_ability(card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
         elif "bonus" in card1.bonus_fight.types:
-            (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_bonus_copy_bonus(card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
+            (card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight) = apply_bonus_copy_bonus(card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
     
     if card2.ability_fight and card2.ability_fight.how == "copy":
         if "ability" in card2.ability_fight.types:
@@ -45,27 +45,28 @@ def apply_copy(card1: Card, card2: Card):
 def apply_stop(card1: Card, card2: Card):
     if card1.ability_fight and card1.ability_fight.how == "stop":
         if "ability" in card1.ability_fight.types:
-            (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_ability_stop_ability(card1.ability_fight, card1.bonus_fight, card2.bonus_fight)
+            (card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight) = apply_ability_stop_ability(card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
         elif "bonus" in card1.ability_fight.types:
-            (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_ability_stop_bonus(card1.ability_fight, card2.ability_fight, card1.bonus_fight)
+            (card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight) = apply_ability_stop_bonus(card2.ability_fight, card1.bonus_fight,  card2.bonus_fight)
 
     if card1.bonus_fight and card1.bonus_fight.how == "stop":
         if "ability" in card1.bonus_fight.types:
-            (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_bonus_stop_ability(card1.ability_fight, card1.bonus_fight, card2.bonus_fight)
+            (card1.bonus_fight, card1.ability_fight, card2.ability_fight, card2.bonus_fight) = apply_bonus_stop_ability(card1.ability_fight, card2.ability_fight, card1.bonus_fight)
         elif "bonus" in card1.bonus_fight.types:
-            (card1.ability_fight, card1.bonus_fight, card2.ability_fight, card2.bonus_fight) = apply_bonus_stop_bonus(card1.ability_fight, card2.ability_fight, card1.bonus_fight)
+            (card1.bonus_fight, card1.ability_fight, card2.ability_fight, card2.bonus_fight) = apply_bonus_stop_bonus(card1.ability_fight, card2.ability_fight, card1.bonus_fight)
 
     if card2.ability_fight and card2.ability_fight.how == "stop":
         if "ability" in card2.ability_fight.types:
-            (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_ability_stop_ability(card2.ability_fight, card2.bonus_fight, card1.bonus_fight)
+            (card2.ability_fight, card1.ability_fight, card2.bonus_fight, card1.bonus_fight) = apply_ability_stop_ability(card1.ability_fight, card2.bonus_fight, card1.bonus_fight)
         elif "bonus" in card2.ability_fight.types:
-            (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_ability_stop_bonus(card2.ability_fight, card1.ability_fight, card2.bonus_fight)
+            (card2.ability_fight, card1.ability_fight, card2.bonus_fight, card1.bonus_fight) = apply_ability_stop_bonus(card1.ability_fight, card2.bonus_fight, card1.bonus_fight)
 
     if card2.bonus_fight and card2.bonus_fight.how == "stop":
         if "ability" in card2.bonus_fight.types:
-            (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_bonus_stop_ability(card2.ability_fight, card1.ability_fight, card2.bonus_fight)
+            (card2.bonus_fight, card2.ability_fight, card1.ability_fight, card1.bonus_fight) = apply_bonus_stop_ability(card2.ability_fight, card1.ability_fight, card1.bonus_fight)
         elif "bonus" in card2.bonus_fight.types:
-            (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_bonus_stop_bonus(card2.ability_fight, card1.ability_fight, card2.bonus_fight)
+            (card2.bonus_fight, card2.ability_fight, card1.ability_fight, card1.bonus_fight) = apply_bonus_stop_bonus(card2.ability_fight, card1.ability_fight, card1.bonus_fight)
+    
 
 def delete_capacity_protection(card1: Card, card2: Card) -> None:
     """
@@ -282,7 +283,7 @@ def apply_ability_stop_bonus(ability_2: Capacity, bonus_1: Capacity, bonus_2: Ca
             bonus_2.effect_conditions = ""
         else:
             bonus_2 = None
-    
+
     return None, ability_2, bonus_1, bonus_2
 
 def apply_bonus_stop_bonus(ability_1: Capacity, ability_2: Capacity, bonus_2: Capacity) -> Tuple[None, Capacity, Capacity, Capacity]:

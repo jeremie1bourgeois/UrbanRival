@@ -9,6 +9,12 @@ def get_new_game_id(directory="data/game") -> int:
     next_id = max([int(f.split("_")[1]) for f in dirs] + [0]) + 1
     return next_id
 
+def get_new_test_id(directory="data/test") -> int:
+    os.makedirs(directory, exist_ok=True)
+    dirs = [f for f in os.listdir(directory) if f.startswith("test_")]
+    next_id = max([int(f.split("_")[1]) for f in dirs] + [0]) + 1
+    return next_id
+
 def save_game_to_json(game: Game, game_id: int, game_directory: str):
     # Créer le nom du fichier avec le nombre de tours
     filename = f"game_data_{game_id}_{game.nb_turn}.json"
@@ -20,6 +26,17 @@ def save_game_to_json(game: Game, game_id: int, game_directory: str):
     with open(filepath, "w") as file:
         res = game.to_dict()
         json.dump(res, file, indent=4)
+
+def save_test_to_json(test_data: Dict, name: str, test_directory: str):
+    # Créer le nom du fichier avec le nombre de tours
+    filename = "test_data_" + name + ".json"
+    filepath = os.path.join(test_directory, filename)
+
+    # Créer le dossier s'il n'existe pas
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+
+    with open(filepath, "w") as file:
+        json.dump(test_data, file, indent=4)
 
 def load_game_from_json(file_path: str) -> Game:
     if not os.path.exists(file_path):
