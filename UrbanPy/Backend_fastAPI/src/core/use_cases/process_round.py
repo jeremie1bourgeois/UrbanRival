@@ -56,10 +56,20 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
 
         # Résoudre le combat
         resolve_combat(game, player1_card, player2_card, round_result)
-
-        # Appliquer les effets de combat
-        fct_lvl_3.apply_capacity_lvl_3(game, player1_card, player2_card)
-        fct_lvl_4.apply_capacity_lvl_4(game, game.ally, game.enemy, player1_card, player2_card)
+        
+        if game.ally.life <= 0 or game.enemy.life <= 0:
+            print("Game is finished.")
+            # Appliquer les effets de reanimate (qui permet de regagner de la vie malgré que le joueur est mort ca: 0 de vie)
+            fct_lvl_3.apply_reanimate(game, game.ally, game.enemy, player1_card, player2_card)
+            if game.ally.life > 0 and game.enemy.life > 0:
+                print("Game is not finished.")
+                # Appliquer les effets de combat
+                fct_lvl_4.apply_capacity_lvl_4(game, game.ally, game.enemy, player1_card, player2_card)
+                fct_lvl_4.apply_capacity_lvl_4(game, game.enemy, game.ally, player2_card, player1_card)
+        else:
+            # Appliquer les effets de combat
+            fct_lvl_3.apply_capacity_lvl_3(game, player1_card, player2_card)
+            fct_lvl_4.apply_capacity_lvl_4(game, game.ally, game.enemy, player1_card, player2_card)
 
         # Ajouter le round au history
         game.history.append(round_result)
@@ -108,7 +118,7 @@ def resolve_combat(game: Game, player1_card: Card, player2_card: Card, round_res
         player1_card.win = True
         player2_card.win = False
     else:
-        game.ally.life = max(0, game.ally.life - player2_card.damage_fight)
+        game.ally.life = min(0, game.ally.life - player2_card.damage_fight)
         round_result.ally.win = False
         round_result.enemy.win = True
         player1_card.win = False

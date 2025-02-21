@@ -27,6 +27,16 @@ def apply_capacity_lvl_3(game: Game, card1: Card, card2: Card) -> None:
     if card2.ability_fight: card2.ability_fight = apply_target_enemy_effects(game, game.enemy, game.ally, card2.ability_fight, card2, card1)
     if card2.bonus_fight: card2.bonus_fight = apply_target_enemy_effects(game, game.enemy, game.ally, card2.bonus_fight, card2, card1)
 
+def apply_reanimate(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> None:
+    if card1.ability_fight and "reanimate" in card1.ability_fight.types:
+        card1.ability_fight = apply_target_ally_effects(game, player1, player2, card1.ability_fight, card1, card2)
+    if card1.bonus_fight and "reanimate" in card1.bonus_fight.types:
+        card1.bonus_fight = apply_target_ally_effects(game, player1, player2, card1.bonus_fight, card1, card2)
+    if card2.ability_fight and "reanimate" in card2.ability_fight.types:
+        card2.ability_fight = apply_target_ally_effects(game, player2, player1, card2.ability_fight, card2, card1)
+    if card2.bonus_fight and "reanimate" in card2.bonus_fight.types:
+        card2.bonus_fight = apply_target_ally_effects(game, player2, player1, card2.bonus_fight, card2, card1)
+
 def check_capacity_condition_lvl_3(capacity: Capacity, has_won: bool) -> Capacity:
     if capacity.effect_conditions == []:
         return capacity if has_won else None
@@ -96,7 +106,8 @@ _BONUS_FUNCS = {
 # Mapping des types de capacité aux attributs à modifier
 _TYPE_MAP = {
     "life": "life",
-    "pillz": "pillz"
+    "pillz": "pillz",
+    "reanimate": "life",
 }
 
 def apply_target_ally_effects(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card) -> Capacity:
@@ -123,18 +134,18 @@ def apply_target_ally_effects(game: Game, player1: Player, player2: Player, capa
     if capacity.borne is not None and capacity.borne != -1:
         if capacity.value > 0:  # Augmentation avec borne max
             for attr in attrs:
-                current_value = getattr(card1, attr)
+                current_value = getattr(player1, attr)
                 if current_value < capacity.borne:
-                    setattr(card1, attr, min(capacity.borne, current_value + bonus))
+                    setattr(player1, attr, min(capacity.borne, current_value + bonus))
         else:  # Diminution avec borne min
             for attr in attrs:
-                current_value = getattr(card1, attr)
+                current_value = getattr(player1, attr)
                 if current_value > capacity.borne:
-                    setattr(card1, attr, max(capacity.borne, current_value + bonus))
+                    setattr(player1, attr, max(capacity.borne, current_value + bonus))
     else:  # Pas de borne
         for attr in attrs:
-            current_value = getattr(card1, attr)
-            setattr(card1, attr, current_value + bonus)
+            current_value = getattr(player1, attr)
+            setattr(player1, attr, current_value + bonus)
 
     return capacity
 
@@ -162,18 +173,18 @@ def apply_target_enemy_effects(game: Game, player1: Player, player2: Player, cap
     if capacity.borne is not None and capacity.borne != -1:
         if capacity.value > 0:  # Augmentation avec borne max
             for attr in attrs:
-                current_value = getattr(card2, attr)
+                current_value = getattr(player2, attr)
                 if current_value < capacity.borne:
-                    setattr(card2, attr, min(capacity.borne, current_value + bonus))
+                    setattr(player2, attr, min(capacity.borne, current_value + bonus))
         else:  # Diminution avec borne min
             for attr in attrs:
-                current_value = getattr(card2, attr)
+                current_value = getattr(player2, attr)
                 if current_value > capacity.borne:
-                    setattr(card2, attr, max(capacity.borne, current_value + bonus))
+                    setattr(player2, attr, max(capacity.borne, current_value + bonus))
     else:  # Pas de borne
         for attr in attrs:
-            current_value = getattr(card2, attr)
-            setattr(card2, attr, current_value + bonus)
+            current_value = getattr(player2, attr)
+            setattr(player2, attr, current_value + bonus)
 
     return capacity
 
@@ -202,25 +213,25 @@ def apply_target_both_effects(game: Game, player1: Player, player2: Player, capa
     if capacity.borne is not None and capacity.borne != -1:
         if capacity.value > 0:  # Augmentation avec borne max
             for attr in attrs:
-                current_value1 = getattr(card1, attr)
-                current_value2 = getattr(card2, attr)
+                current_value1 = getattr(player1, attr)
+                current_value2 = getattr(player2, attr)
                 if current_value1 < capacity.borne:  # Vérification pour card1
-                    setattr(card1, attr, min(capacity.borne, current_value1 + bonus))
+                    setattr(player1, attr, min(capacity.borne, current_value1 + bonus))
                 if current_value2 < capacity.borne:  # Vérification pour card2
-                    setattr(card2, attr, min(capacity.borne, current_value2 + bonus))
+                    setattr(player2, attr, min(capacity.borne, current_value2 + bonus))
         else:  # Diminution avec borne min
             for attr in attrs:
-                current_value1 = getattr(card1, attr)
-                current_value2 = getattr(card2, attr)
+                current_value1 = getattr(player1, attr)
+                current_value2 = getattr(player2, attr)
                 if current_value1 > capacity.borne:  # Vérification pour card1
-                    setattr(card1, attr, max(capacity.borne, current_value1 + bonus))
+                    setattr(player1, attr, max(capacity.borne, current_value1 + bonus))
                 if current_value2 > capacity.borne:  # Vérification pour card2
-                    setattr(card2, attr, max(capacity.borne, current_value2 + bonus))
+                    setattr(player2, attr, max(capacity.borne, current_value2 + bonus))
     else:  # Pas de borne
         for attr in attrs:
             current_value1 = getattr(card1, attr)
             current_value2 = getattr(card2, attr)
-            setattr(card1, attr, current_value1 + bonus)
-            setattr(card2, attr, current_value2 + bonus)
+            setattr(player1, attr, current_value1 + bonus)
+            setattr(player2, attr, current_value2 + bonus)
 
     return capacity

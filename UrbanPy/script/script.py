@@ -101,6 +101,8 @@ def extract_capacities(input_file, output_file):
 
     print(f"Les capacités ont été extraites et sauvegardées dans '{output_file}'.")
 
+extract_capacities("jsonData_officiel.json", "all_capacities_v2.json")
+
 
 def extract_and_replace_numbers(input_file, output_file):
     '''Extrait les capacités du fichier JSON, remplace les nombres par X et Y, et sauvegarde dans un nouveau fichier JSON.'''
