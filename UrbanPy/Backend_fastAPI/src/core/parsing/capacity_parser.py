@@ -25,8 +25,10 @@ _WORD_SYNONYMS = {
     "atk": "attack", "att": "attack",
     "mod": "modif",
     "prot": "protection", "protec": "protection", "protect": "protection",
-    "canc": "cancel", "rec": "recover",
+    "canc": "cancel", "rec": "recover", "recov": "recover",
     "conf": "confidence", "vict": "victory", "def": "defeat",
+    "rev": "revenge", "repris": "reprisal", "asy": "asymmetry", "asym": "asymmetry", "asymm": "asymmetry",
+    "brwl": "brawl",
 }
 
 
@@ -35,6 +37,7 @@ def normalize(text: str) -> str:
     t = text.lower().strip()
     t = t.replace("&", " and ").replace(";", ":")
     t = t.replace("pow/dam", "power and damage")
+    t = t.replace("/", " per ")                          # "+1 Dam./ Life Lost" = par vie perdue
     t = re.sub(r"([+-])\s+(\d)", r"\1\2", t)          # "- 2" -> "-2"
     t = t.replace(",", " ")
     t = re.sub(r"\s*:\s*", " : ", t)                   # ':' devient un mot à part entière
@@ -65,15 +68,18 @@ _CONDITION_PREFIXES = {
     "victory or defeat": "victory_defeat",
     "stop": "stop",           # l'ability n'agit que si elle a été stoppée (évalué au niveau 1)
     "killshot": "killshot",   # attaque >= 2 x attaque adverse (évalué après le calcul des attaques)
+    "team": "team",           # ability de Leader : s'applique à chaque carte jouée de l'équipe (voir process_round)
 }
 _MULTIPLIER_PREFIXES = ("support", "growth", "degrowth", "equalizer", "brawl")
-_IGNORED_PREFIXES = ("day",)   # cycle jour/nuit non modélisé : considéré toujours valide
-_UNSUPPORTED_PREFIXES = ("team", "versus", "xantiax")
+_IGNORED_PREFIXES = ("day",)   # cycle jour/nuit non modélisé : Day toujours valide, donc Night jamais
+_UNSUPPORTED_PREFIXES = ("versus", "xantiax", "night")
+_R_BET = re.compile(r"^bet ([<>]) (\d+) pillz$")   # « Bet > 4 pillz » : pillz misées ce round
 _CORE_STARTERS = ("copy", "protection", "reanimate")   # mots qui ouvrent un cœur contenant ':'
 
 # Cœurs connus mais hors moteur : testés avant les regex, raison groupable dans le rapport
 _UNSUPPORTED_CORE_KEYWORDS = (
     "remove ability conditions", "cancel leader", "counter-attack", "tie-break",
+    "fatal killshot", "sinister symmetry", "tune out", "overdose", "perfection",
     "cards", "impose", "consume", "corrupt", "combust", "corrosion", "mindwipe", "rebirth", "recover",
     "beyond", "bypass", "hazard", "illusion", "infiltrated", "limitless",
 )
@@ -99,11 +105,11 @@ _R_PROTECTION = re.compile(r"^protection (ability|bonus|power and damage|power|d
 _R_PROTECTION_SUFFIX = re.compile(r"^(ability|bonus) protection$")
 _R_CANCEL = re.compile(r"^cancel (?:opp )?(power and damage|pillz and life|power|damage|attack|life|pillz) modif$")
 _R_EXCHANGE = re.compile(r"^(power and damage|power|damage) exchange$")
-_R_PERSISTENT = re.compile(r"^(poison|toxin|heal|regen|dope) (\d+) (?:min|max) (\d+)$")
+_R_PERSISTENT = re.compile(r"^(poison|toxin|heal|regen|dope|repair) (\d+) (?:min|max) (\d+)$")
 _R_REANIMATE = re.compile(r"^reanimate \+(\d+) life$")
 
-_PERSISTENT_TYPES = {"poison": "poison", "toxin": "toxine", "heal": "heal", "regen": "regen", "dope": "dope"}
-_PERSISTENT_TARGETS = {"poison": "enemy", "toxin": "enemy", "heal": "ally", "regen": "ally", "dope": "ally"}
+_PERSISTENT_TYPES = {"poison": "poison", "toxin": "toxine", "heal": "heal", "regen": "regen", "dope": "dope", "repair": "repair"}
+_PERSISTENT_TARGETS = {"poison": "enemy", "toxin": "enemy", "heal": "ally", "regen": "ally", "dope": "ally", "repair": "ally"}
 
 
 def _types(stat: str) -> list:
@@ -190,8 +196,27 @@ def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacit
     return _unsupported("unknown core")
 
 
+_R_VERSUS = re.compile(r"(^|:)\s*versus\s+([^:]+?)\s*:", re.IGNORECASE)   # « Versus Freaks, Oculus: … »
+
+
+def _extract_versus(text: str):
+    """
+    Retire un préfixe « Versus <clans>: » (en tête ou après un autre préfixe) et renvoie
+    (texte restant, condition « versus:Clan|Clan » ou None). Les clans gardent leur casse (comparés à card.faction).
+    Sans clan (ancien scraping où le clan était une image) le texte est laissé tel quel.
+    """
+    match = _R_VERSUS.search(text)
+    if not match:
+        return text, None
+    clans = [clan.strip() for clan in match.group(2).split(",") if clan.strip()]
+    if not clans:
+        return text, None
+    return text[:match.start()] + match.group(1) + text[match.end():], "versus:" + "|".join(clans)
+
+
 def parse_capacity(text: str) -> ParsedCapacity:
-    normalized = normalize(text or "")
+    text, versus = _extract_versus(text or "")
+    normalized = normalize(text)
     if normalized in ("", "no ability") or re.fullmatch(r"ability at level \d+", normalized):
         return NO_ABILITY
 
@@ -200,8 +225,11 @@ def parse_capacity(text: str) -> ParsedCapacity:
     index = 0
     while index < len(segments) - 1:          # le dernier segment est toujours (la fin du) cœur
         segment = segments[index]
+        bet = _R_BET.match(segment)
         if segment in _CONDITION_PREFIXES:
             conditions.append(_CONDITION_PREFIXES[segment])
+        elif bet:
+            conditions.append(f"bet{bet.group(1)}{bet.group(2)}")
         elif segment in _MULTIPLIER_PREFIXES:
             prefix_hows.append(segment)
         elif segment in _IGNORED_PREFIXES:
@@ -213,5 +241,7 @@ def parse_capacity(text: str) -> ParsedCapacity:
         else:
             return _unsupported(f"unknown prefix: {segment}")
         index += 1
+    if versus is not None:
+        conditions.append(versus)
     core = " ".join(segments[index:])
     return _parse_core(core, conditions, prefix_hows)

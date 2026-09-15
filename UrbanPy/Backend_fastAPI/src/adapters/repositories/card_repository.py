@@ -55,6 +55,7 @@ def official_card_catalogue() -> list:
                 "damage": int(str(star_data.get("damage", 0)).strip()),
                 "ability": ability,
                 "ability_supported": parse_capacity(ability).supported,
+                "image": star_data.get("image", ""),
             })
         bonus = data.get("bonus", "").strip()
         catalogue.append({
@@ -63,6 +64,7 @@ def official_card_catalogue() -> list:
             "starOff": data.get("starOff", 0),
             "bonus": bonus,
             "bonus_supported": parse_capacity(bonus).supported,
+            "clan_image": data.get("clan_image", ""),
             "levels": levels,
         })
     return catalogue

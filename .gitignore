@@ -3,3 +3,4 @@ __pycache__/
 UrbanPy/Backend_fastAPI/data/game
 .claude/launch.json
 
+UrbanPy/Backend_fastAPI/data/.scrape_cache

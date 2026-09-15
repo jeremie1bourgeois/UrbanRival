@@ -1,7 +1,7 @@
 import copy
 from src.core.domain.round import Round
 from src.core.domain.capacity import Capacity
-from src.core.domain.card import Card
+from src.core.domain.card import Card, FIGHT_SLOTS
 from src.core.domain.player import Player
 from src.schemas.game_schemas import ProcessRoundInput
 from src.core.domain.game import Game, NB_ROUNDS
@@ -29,18 +29,16 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
             player1_card.bonus_fight = None
         if not is_clan_bonus_active(game.enemy, player2_card):
             player2_card.bonus_fight = None
-        
-        print(f"player1_card: {player1_card}")
-        print(f"player2_card: {player2_card}")
-        
-        if not check_capacity_condition(game, player1_card.ability_fight, True, round_data.player1_card_index, round_data.player2_card_index):
-            player1_card.ability_fight = None
-        if not check_capacity_condition(game, player1_card.bonus_fight, True, round_data.player1_card_index, round_data.player2_card_index):
-            player1_card.bonus_fight = None
-        if not check_capacity_condition(game, player2_card.ability_fight, False, round_data.player2_card_index, round_data.player1_card_index):
-            player2_card.ability_fight = None
-        if not check_capacity_condition(game, player2_card.bonus_fight, False, round_data.player2_card_index, round_data.player1_card_index):
-            player2_card.bonus_fight = None
+
+        # L'ability « Team: » d'un Leader unique s'applique à la carte jouée
+        player1_card.leader_fight = leader_team_capacity(game.ally)
+        player2_card.leader_fight = leader_team_capacity(game.enemy)
+
+        for card, is_ally, own_index, opp_index in ((player1_card, True, round_data.player1_card_index, round_data.player2_card_index),
+                                                    (player2_card, False, round_data.player2_card_index, round_data.player1_card_index)):
+            for slot in FIGHT_SLOTS:
+                if not check_capacity_condition(game, getattr(card, slot), is_ally, own_index, opp_index):
+                    setattr(card, slot, None)
 
         # Appliquer les effets de combat
         fct_lvl_1.apply_capacity_lvl_1(player1_card, player2_card)
@@ -142,8 +140,10 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, own_
     """
     if capacity is None or not capacity.effect_conditions:
         return True
+    if "team" in capacity.effect_conditions:      # ability de Leader : jamais jouée comme ability de carte (voir leader_team_capacity)
+        return False
 
-    own_player = game.ally if is_ally else game.enemy
+    own_player, opp_player = (game.ally, game.enemy) if is_ally else (game.enemy, game.ally)
     last_round = game.history[-1] if game.history else None
     own_won_last_round = None if last_round is None else (last_round.ally.win if is_ally else last_round.enemy.win)
     plays_first = game.turn if is_ally else not game.turn
@@ -162,8 +162,12 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, own_
             if not checks[condition]():
                 return False
             capacity.effect_conditions.remove(condition)
+        elif condition.startswith("versus:"):                # « Versus <clans> » : le clan de la carte adverse
+            if opp_player.cards[opp_card_index].faction not in condition[len("versus:"):].split("|"):
+                return False
+            capacity.effect_conditions.remove(condition)
         elif condition.startswith("bet"):
-            if own_player.cards[own_card_index].pillz_fight <= _bet_threshold(condition):
+            if not _bet_condition_met(condition, own_player.cards[own_card_index].pillz_fight):
                 return False
             capacity.effect_conditions.remove(condition)
         elif condition not in DEFERRED_CONDITIONS:
@@ -171,10 +175,23 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, own_
     return True
 
 
+def leader_team_capacity(player: Player) -> Capacity:
+    """
+    Copie de l'ability « Team: X » du Leader de la main, à appliquer à la carte jouée — seulement si la main
+    compte exactement un Leader (deux Leaders s'annulent : bonus « Cancel Leader »). None sinon.
+    """
+    leaders = [card for card in player.cards if card.faction == "Leader"]
+    if len(leaders) != 1 or leaders[0].ability is None or "team" not in leaders[0].ability.effect_conditions:
+        return None
+    capacity = copy.deepcopy(leaders[0].ability)
+    capacity.effect_conditions.remove("team")
+    return capacity
+
+
 def apply_killshot_condition(card: Card, opp_card: Card) -> None:
     """Consomme la condition « killshot » (attaque >= 2 x attaque adverse) ou désactive la capacité."""
     is_killshot = card.attack > 0 and card.attack >= 2 * opp_card.attack
-    for slot in ("ability_fight", "bonus_fight"):
+    for slot in FIGHT_SLOTS:
         capacity = getattr(card, slot)
         if capacity is not None and "killshot" in capacity.effect_conditions:
             if is_killshot:
@@ -183,9 +200,16 @@ def apply_killshot_condition(card: Card, opp_card: Card) -> None:
                 setattr(card, slot, None)
 
 
-def _bet_threshold(bet: str) -> int:
-    """Extrait le seuil X d'une condition "bet X"."""
-    return int(bet[3:].strip())
+def _bet_condition_met(condition: str, pillz_fight: int) -> bool:
+    """
+    « bet>N » / « bet<N » (et la forme historique « bet N » = « bet>N ») comparent les pillz réellement misées.
+    pillz_fight vaut 1 sans mise (attaque = puissance x pillz_fight), donc pillz misées = pillz_fight - 1.
+    """
+    bet = pillz_fight - 1
+    rest = condition[3:].strip()
+    if rest.startswith("<"):
+        return bet < int(rest[1:])
+    return bet > int(rest.lstrip(">").strip())
 
 
 MIN_CLAN_CARDS_FOR_BONUS = 2
@@ -201,6 +225,7 @@ def init_fight_data(card: Card, nb_pillz: int, fury: bool):
     card.damage_fight = card.damage
     card.ability_fight = copy.deepcopy(card.ability)
     card.bonus_fight = copy.deepcopy(card.bonus)
+    card.leader_fight = None
     card.pillz_fight = nb_pillz
     card.fury = fury
     card.attack = 0

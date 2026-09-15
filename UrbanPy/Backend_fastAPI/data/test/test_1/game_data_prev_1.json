@@ -35,6 +35,8 @@
                     "effect_conditions": [],
                     "lvl_priority": 0
                 },
+                "image": "",
+                "clan_image": "",
                 "bonus_description": "-2 Opp Power, Min 1",
                 "ability_description": "Growth: -1 Opp Power, Min 4",
                 "pillz_fight": 0,
@@ -45,6 +47,7 @@
                 "damage_fight": 0,
                 "ability_fight": null,
                 "bonus_fight": null,
+                "leader_fight": null,
                 "win": false
             },
             {
@@ -78,6 +81,8 @@
                     ],
                     "lvl_priority": 0
                 },
+                "image": "",
+                "clan_image": "",
                 "bonus_description": "-2 Opp Power, Min 1",
                 "ability_description": "Courage: Damage +3",
                 "pillz_fight": 0,
@@ -88,6 +93,7 @@
                 "damage_fight": 0,
                 "ability_fight": null,
                 "bonus_fight": null,
+                "leader_fight": null,
                 "win": false
             },
             {
@@ -119,6 +125,8 @@
                     "effect_conditions": [],
                     "lvl_priority": 0
                 },
+                "image": "",
+                "clan_image": "",
                 "bonus_description": "-2 Opp Power, Min 1",
                 "ability_description": "Power +4",
                 "pillz_fight": 0,
@@ -129,6 +137,7 @@
                 "damage_fight": 0,
                 "ability_fight": null,
                 "bonus_fight": null,
+                "leader_fight": null,
                 "win": false
             },
             {
@@ -160,6 +169,8 @@
                     "effect_conditions": [],
                     "lvl_priority": 0
                 },
+                "image": "",
+                "clan_image": "",
                 "bonus_description": "-2 Opp Power, Min 1",
                 "ability_description": "-3 Opp Damage, Min 2",
                 "pillz_fight": 0,
@@ -170,6 +181,7 @@
                 "damage_fight": 0,
                 "ability_fight": null,
                 "bonus_fight": null,
+                "leader_fight": null,
                 "win": false
             }
         ],
@@ -209,6 +221,8 @@
                     "effect_conditions": [],
                     "lvl_priority": 0
                 },
+                "image": "",
+                "clan_image": "",
                 "bonus_description": "-2 Opp Power, Min 1",
                 "ability_description": "Support: Damage +1",
                 "pillz_fight": 0,
@@ -219,6 +233,7 @@
                 "damage_fight": 0,
                 "ability_fight": null,
                 "bonus_fight": null,
+                "leader_fight": null,
                 "win": false
             },
             {
@@ -251,6 +266,8 @@
                     "effect_conditions": [],
                     "lvl_priority": 0
                 },
+                "image": "",
+                "clan_image": "",
                 "bonus_description": "-2 Opp Power, Min 1",
                 "ability_description": "Equalizer: -1 Opp Pow. & Dam., Min 1",
                 "pillz_fight": 0,
@@ -261,6 +278,7 @@
                 "damage_fight": 0,
                 "ability_fight": null,
                 "bonus_fight": null,
+                "leader_fight": null,
                 "win": false
             },
             {
@@ -286,12 +304,14 @@
                     "types": [
                         "bonus"
                     ],
-                    "value": 5,
+                    "value": 0,
                     "how": "stop",
                     "borne": -1,
                     "effect_conditions": [],
                     "lvl_priority": 0
                 },
+                "image": "",
+                "clan_image": "",
                 "bonus_description": "-2 Opp Power, Min 1",
                 "ability_description": "Stop Opp. Bonus",
                 "pillz_fight": 0,
@@ -302,6 +322,7 @@
                 "damage_fight": 0,
                 "ability_fight": null,
                 "bonus_fight": null,
+                "leader_fight": null,
                 "win": false
             },
             {
@@ -333,6 +354,8 @@
                     "effect_conditions": [],
                     "lvl_priority": 0
                 },
+                "image": "",
+                "clan_image": "",
                 "bonus_description": "Support: Attack +3",
                 "ability_description": "Support: Reanimate: +1 Life",
                 "pillz_fight": 0,
@@ -343,6 +366,7 @@
                 "damage_fight": 0,
                 "ability_fight": null,
                 "bonus_fight": null,
+                "leader_fight": null,
                 "win": false
             }
         ],

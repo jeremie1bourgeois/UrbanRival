@@ -97,3 +97,37 @@ def test_courage_life_ability_applies_and_leaves_the_original_untouched(template
     assert allison.win is True
     assert template_game.ally.life == 14
     assert allison.ability.effect_conditions == ["courage"]
+
+
+def test_versus_condition_is_met_against_a_listed_clan(template_game):
+    capacity = Capacity(target="ally", types=["power"], value=2, borne=-1, effect_conditions=["versus:All Stars|Rescue"])
+
+    assert check_capacity_condition(template_game, capacity, True, 0, 0) is True   # Asporov : All Stars
+    assert capacity.effect_conditions == []
+
+
+def test_versus_condition_fails_against_another_clan(template_game):
+    template_game.enemy.cards[0].faction = "Junkz"
+    capacity = Capacity(target="ally", types=["power"], value=2, borne=-1, effect_conditions=["versus:All Stars"])
+
+    assert check_capacity_condition(template_game, capacity, True, 0, 0) is False
+
+
+def test_versus_condition_for_the_enemy_side_looks_at_the_ally_card(template_game):
+    capacity = Capacity(target="ally", types=["power"], value=2, borne=-1, effect_conditions=["versus:Rescue"])
+
+    assert check_capacity_condition(template_game, capacity, False, 3, 2) is False  # Amelia (All Stars) n'est pas Rescue
+
+
+@pytest.mark.parametrize("condition, pillz_fight, expected", [
+    ("bet>4", 6, True),    # 5 pillz misées (pillz_fight - 1) > 4
+    ("bet>4", 5, False),   # 4 misées : pas strictement plus
+    ("bet<6", 6, True),    # 5 misées < 6
+    ("bet<6", 7, False),
+    ("bet 3", 5, True),    # forme historique = « bet > 3 »
+])
+def test_bet_conditions_compare_the_pillz_actually_bet(template_game, condition, pillz_fight, expected):
+    template_game.ally.cards[0].pillz_fight = pillz_fight
+    capacity = Capacity(target="ally", types=["power"], value=2, borne=-1, effect_conditions=[condition])
+
+    assert check_capacity_condition(template_game, capacity, True, 0, 0) is expected

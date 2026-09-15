@@ -4,9 +4,9 @@ class PersistentEffect:
     """
     Effet actif sur un joueur à la fin de chaque round suivant son activation :
     poison / toxine (vie -value, pas en dessous de borne), heal / regen (vie +value, pas au-dessus de borne),
-    dope (pillz +value, pas au-dessus de borne). Un effet remplace l'effet de même sorte déjà actif.
+    dope / repair (pillz +value, pas au-dessus de borne). Un effet remplace l'effet de même sorte déjà actif.
     """
-    KINDS = ("poison", "toxine", "heal", "regen", "dope")
+    KINDS = ("poison", "toxine", "heal", "regen", "dope", "repair")
 
     def __init__(self, kind: str, value: int, borne: int):
         if kind not in self.KINDS:

@@ -50,3 +50,31 @@ def test_card_with_no_ability_round_trips_through_json():
 
     assert restored.ability is None
     assert restored.to_dict() == card.to_dict()
+
+
+import src.adapters.repositories.card_repository as card_repository
+
+OFFICIAL_WITH_IMAGES = {
+    "Aamir": {
+        "id": 1334, "faction": "All Stars", "starOff": 3, "bonus": "-2 Opp Power, Min 1",
+        "clan_image": "https://cdn.example/clan/ALLSTARS.png",
+        "3": {"power": 5, "damage": 4, "ability": "Growth: -1 Opp Power, Min 4", "image": "https://cdn.example/aamir_3.png"},
+    }
+}
+
+
+def test_card_carries_its_images_when_the_data_has_them(monkeypatch):
+    monkeypatch.setattr(card_repository, "_official_cards", lambda: OFFICIAL_WITH_IMAGES)
+
+    card = Card("Aamir", 3)
+
+    assert (card.image, card.clan_image) == ("https://cdn.example/aamir_3.png", "https://cdn.example/clan/ALLSTARS.png")
+    restored = Card.from_dict_template(card.to_dict())
+    assert (restored.image, restored.clan_image) == (card.image, card.clan_image)
+
+
+def test_official_data_provides_card_and_clan_images():
+    card = Card("Aamir", 3)
+
+    assert card.image.startswith("https://") and card.image.endswith(".png")
+    assert card.clan_image == "https://s.acdn.ur-img.com/urimages/clan/ALLSTARS_42.png"

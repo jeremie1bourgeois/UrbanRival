@@ -101,7 +101,11 @@ def extract_capacities(input_file, output_file):
 
     print(f"Les capacités ont été extraites et sauvegardées dans '{output_file}'.")
 
-extract_capacities("jsonData_officiel.json", "all_capacities_v2.json")
+# Les données officielles vivent dans le backend (une seule source de vérité, régénérée par
+# UrbanPy/Backend_fastAPI/scripts/scrape_official_cards.py).
+OFFICIAL_CARDS = "../Backend_fastAPI/data/jsonData_officiel.json"
+
+# extract_capacities(OFFICIAL_CARDS, "all_capacities_v2.json")
 
 
 def extract_and_replace_numbers(input_file, output_file):

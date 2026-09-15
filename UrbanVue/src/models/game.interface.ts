@@ -33,6 +33,8 @@ export interface RawCard {
 	power?: number;
 	damage?: number;
 	ability?: RawCapacity | null;
+	image?: string;
+	clan_image?: string;
 	bonus_description?: string;
 	ability_description?: string;
 	pillz_fight?: number;
@@ -103,6 +105,9 @@ export class Card {
 	power: number;
 	damage: number;
 	ability: Capacity | null;
+	/** Illustration de la carte à ce niveau (URL CDN) ; vide pour les anciennes données. */
+	image: string;
+	clan_image: string;
 	bonus_description: string;
 	ability_description: string;
 	pillz_fight: number;
@@ -124,6 +129,8 @@ export class Card {
 		this.power = data.power ?? 0;
 		this.damage = data.damage ?? 0;
 		this.ability = data.ability ? new Capacity(data.ability) : null;
+		this.image = data.image ?? "";
+		this.clan_image = data.clan_image ?? "";
 		this.bonus_description = data.bonus_description ?? "";
 		this.ability_description = data.ability_description ?? "";
 		this.pillz_fight = data.pillz_fight ?? 0;
@@ -198,6 +205,7 @@ export interface CatalogueLevel {
 	damage: number;
 	ability: string;
 	ability_supported: boolean;
+	image: string;
 }
 
 export interface CatalogueCard {
@@ -206,6 +214,7 @@ export interface CatalogueCard {
 	starOff: number;
 	bonus: string;
 	bonus_supported: boolean;
+	clan_image: string;
 	levels: CatalogueLevel[];
 }
 

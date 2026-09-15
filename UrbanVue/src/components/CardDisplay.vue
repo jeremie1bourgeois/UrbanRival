@@ -14,12 +14,15 @@ const props = defineProps({
 	},
 });
 
+// Images servies par le CDN d'Urban Rivals (données scrapées) ; repli sur les anciens fichiers locaux
 const imageSrc = computed(() => {
+	if (props.card.image) return props.card.image;
 	if (!props.card.name) return "src/assets/default-card.jpg";
 	return "src/assets/imageCard/" + `${props.card.name.replace(/\s+/g, "_")}_${props.card.stars}.jpg`;
 });
 
 const clanSrc = computed(() => {
+	if (props.card.clan_image) return props.card.clan_image;
 	if (!props.card.faction) return "src/assets/default-clan.jpg";
 	return "src/assets/Clan/" + props.card.faction.replace(/\s+/g, "").toUpperCase() + ".jpg";
 });

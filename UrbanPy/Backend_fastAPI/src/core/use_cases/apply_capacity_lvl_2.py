@@ -1,28 +1,18 @@
 from src.core.domain.player import Player
 from src.core.domain.capacity import Capacity
-from src.core.domain.card import Card
+from src.core.domain.card import Card, FIGHT_SLOTS
 from src.core.domain.game import Game
 from src.core.use_cases.multipliers import MULTIPLIERS
 
 
 def apply_capacity_lvl_2(game: Game, card1: Card, card2: Card) -> None:
-    player1 = game.ally
-    player2 = game.enemy
-    
-    if card1.ability_fight: card1.ability_fight = apply_target_ally_effects(game, player1, player2, card1.ability_fight, card1, card2)
-    if card1.bonus_fight: card1.bonus_fight = apply_target_ally_effects(game, player1, player2, card1.bonus_fight, card1, card2)
-    if card2.ability_fight: card2.ability_fight = apply_target_ally_effects(game, player2, player1, card2.ability_fight, card2, card1)
-    if card2.bonus_fight: card2.bonus_fight = apply_target_ally_effects(game, player2, player1, card2.bonus_fight, card2, card1)
-    
-    if card1.ability_fight: card1.ability_fight = apply_target_both_effects(game, player1, player2, card1.ability_fight, card1, card2)
-    if card1.bonus_fight: card1.bonus_fight = apply_target_both_effects(game, player1, player2, card1.bonus_fight, card1, card2)
-    if card2.ability_fight: card2.ability_fight = apply_target_both_effects(game, player2, player1, card2.ability_fight, card2, card1)
-    if card2.bonus_fight: card2.bonus_fight = apply_target_both_effects(game, player2, player1, card2.bonus_fight, card2, card1)
-
-    if card1.ability_fight: card1.ability_fight = apply_target_enemy_effects(game, player1, player2, card1.ability_fight, card1, card2)
-    if card1.bonus_fight: card1.bonus_fight = apply_target_enemy_effects(game, player1, player2, card1.bonus_fight, card1, card2)
-    if card2.ability_fight: card2.ability_fight = apply_target_enemy_effects(game, player2, player1, card2.ability_fight, card2, card1)
-    if card2.bonus_fight: card2.bonus_fight = apply_target_enemy_effects(game, player2, player1, card2.bonus_fight, card2, card1)
+    """Modificateurs de power / damage / attack : cible ally, puis both, puis enemy, pour chaque emplacement de combat."""
+    for apply in (apply_target_ally_effects, apply_target_both_effects, apply_target_enemy_effects):
+        for card, opp_card, own, opp in ((card1, card2, game.ally, game.enemy), (card2, card1, game.enemy, game.ally)):
+            for slot in FIGHT_SLOTS:
+                capacity = getattr(card, slot)
+                if capacity is not None:
+                    setattr(card, slot, apply(game, own, opp, capacity, card, opp_card))
 
 
 # Multiplicateurs (champ how) partagés avec le niveau 3
