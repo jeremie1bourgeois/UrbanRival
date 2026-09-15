@@ -240,3 +240,40 @@ def test_growth_poison_keeps_multiplier():
 
 def test_reanimate_golden():
     assert parsed("Support: Reanimate: +1 Life") == cap("ally", ["reanimate"], 1, how="support")
+
+
+from src.adapters.repositories.card_repository import all_capacity_descriptions
+
+
+@pytest.mark.parametrize("text, keyword", [
+    ("-2 Cards Damage, Min 1", "cards"), ("Protection: Cards Power And Damage", "cards"),
+    ("Damage Impose", "impose"), ("Cancel Leader", "cancel leader"), ("Consume 2, Min 1", "consume"),
+    ("Corrupt 2 Min. 1", "corrupt"), ("Victory Or Defeat: Combust 2, Min 1", "combust"),
+    ("Victory Or Defeat: Corrosion 1, Min 2", "corrosion"), ("Revenge: Mindwipe 2, Min 1", "mindwipe"),
+    ("Rebirth 2, Max. 10", "rebirth"), ("Recover 2 Pillz Out Of 3", "recover"),
+    ("Remove Ability Conditions", "remove ability conditions"), ("Beyond", "beyond"), ("Tie-break", "tie-break"),
+    ("Counter-attack", "counter-attack"), ("Limitless", "limitless"),
+])
+def test_explicitly_unsupported_cores(text, keyword):
+    result = parse_capacity(text)
+
+    assert (result.capacity, result.supported, result.reason) == (None, False, f"unsupported core: {keyword}")
+
+
+def test_gibberish_is_unknown_core():
+    assert parse_capacity("Blorp the flurb").reason == "unknown core"
+
+
+# --- Couverture sur les 906 descriptions officielles -----------------------------------------
+
+SUPPORTED_DESCRIPTIONS_FLOOR = 743  # mesuré le 2026-09-15 ; à relever quand la couverture progresse
+
+
+def test_every_official_description_parses_without_raising():
+    descriptions = all_capacity_descriptions()
+    results = {text: parse_capacity(text) for text in descriptions}   # ne doit pas lever
+
+    assert len(descriptions) == 906
+    assert all(r.reason for r in results.values() if not r.supported)
+    supported = sum(1 for r in results.values() if r.supported)
+    assert supported >= SUPPORTED_DESCRIPTIONS_FLOOR, f"couverture en baisse : {supported} < {SUPPORTED_DESCRIPTIONS_FLOOR}"

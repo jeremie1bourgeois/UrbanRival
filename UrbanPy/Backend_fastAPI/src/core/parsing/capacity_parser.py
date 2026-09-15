@@ -68,6 +68,13 @@ _MULTIPLIER_PREFIXES = ("support", "growth", "degrowth", "equalizer", "brawl")
 _UNSUPPORTED_PREFIXES = ("stop", "killshot", "day", "team", "versus", "xantiax")
 _CORE_STARTERS = ("copy", "protection", "reanimate")   # mots qui ouvrent un cœur contenant ':'
 
+# Cœurs connus mais hors moteur : testés avant les regex, raison groupable dans le rapport
+_UNSUPPORTED_CORE_KEYWORDS = (
+    "remove ability conditions", "cancel leader", "counter-attack", "tie-break",
+    "cards", "impose", "consume", "corrupt", "combust", "corrosion", "mindwipe", "rebirth", "recover",
+    "beyond", "bypass", "hazard", "illusion", "infiltrated", "limitless",
+)
+
 # --- Cœurs ------------------------------------------------------------------------------------
 
 _STAT = r"power and damage|pillz and life|life and pillz|power|damage|attack|life|pillz"
@@ -116,6 +123,10 @@ def _resolve_how(prefix_hows: list, per: Optional[str]):
 
 
 def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacity:
+    for keyword in _UNSUPPORTED_CORE_KEYWORDS:
+        if re.search(rf"(?<![\w-]){re.escape(keyword)}(?![\w-])", core):
+            return _unsupported(f"unsupported core: {keyword}")
+
     how, error = _resolve_how(prefix_hows, None)   # les cœurs ci-dessous n'ont pas de suffixe "per"
 
     match = _R_STOP.match(core)
