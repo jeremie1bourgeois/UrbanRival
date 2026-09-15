@@ -4,12 +4,12 @@ from src.core.domain.round import Round
 from src.core.domain.player import Player
 
 class Game:
-    def __init__(self, nb_turn: int = 0, turn: bool = True, ally: Player = Player(), enemy: Player = Player(), history: List[Round] = []):
+    def __init__(self, nb_turn: int = 0, turn: bool = True, ally: Player = None, enemy: Player = None, history: List[Round] = None):
         self.nb_turn: int = nb_turn
         self.turn: bool = turn
-        self.ally: Player = ally
-        self.enemy: Player = enemy
-        self.history: List[Round] = history
+        self.ally: Player = ally if ally is not None else Player()
+        self.enemy: Player = enemy if enemy is not None else Player()
+        self.history: List[Round] = history if history is not None else []
 
     @staticmethod
     def from_dict(data):
