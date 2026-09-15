@@ -84,3 +84,20 @@ def test_init_game_with_unknown_card_is_a_client_error(client):
     response = client.post("/init_game/", json=deck)
 
     assert (response.status_code, response.json()["detail"]) == (400, "No card found with name: Zorglub")
+
+
+def test_cards_catalogue_lists_every_official_card_with_its_levels(client):
+    response = client.get("/cards")
+
+    assert response.status_code == 200
+    cards = response.json()
+    assert len(cards) == 2160
+    aamir = next(card for card in cards if card["name"] == "Aamir")
+    assert (aamir["faction"], aamir["starOff"], aamir["bonus"], aamir["bonus_supported"]) == ("All Stars", 3, "-2 Opp Power, Min 1", True)
+    assert aamir["levels"] == [
+        {"stars": 1, "power": 3, "damage": 4, "ability": "Ability at Level 3", "ability_supported": True},
+        {"stars": 2, "power": 4, "damage": 4, "ability": "Ability at Level 3", "ability_supported": True},
+        {"stars": 3, "power": 5, "damage": 4, "ability": "Growth: -1 Opp Power, Min 4", "ability_supported": True},
+    ]
+    mr_kitty = next(card for card in cards if card["name"] == "Mr Kitty")
+    assert next(level for level in mr_kitty["levels"] if level["stars"] == 4)["ability_supported"] is False

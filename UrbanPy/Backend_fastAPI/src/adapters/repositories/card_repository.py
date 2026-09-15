@@ -33,3 +33,36 @@ def all_capacity_descriptions() -> Set[str]:
             if level.isdigit():
                 descriptions.add(star_data.get("ability", "").strip())
     return descriptions
+
+
+@lru_cache(maxsize=1)
+def official_card_catalogue() -> list:
+    """
+    Catalogue destiné au front : une entrée par carte avec ses niveaux jouables, et pour chaque
+    capacité un drapeau indiquant si le moteur la gère (parseur) — importé ici pour éviter un import circulaire.
+    """
+    from src.core.parsing.capacity_parser import parse_capacity
+
+    catalogue = []
+    for name, data in _official_cards().items():
+        levels = []
+        for level in sorted((key for key in data if key.isdigit()), key=int):
+            star_data = data[level]
+            ability = star_data.get("ability", "").strip()
+            levels.append({
+                "stars": int(level),
+                "power": int(str(star_data.get("power", 0)).strip()),
+                "damage": int(str(star_data.get("damage", 0)).strip()),
+                "ability": ability,
+                "ability_supported": parse_capacity(ability).supported,
+            })
+        bonus = data.get("bonus", "").strip()
+        catalogue.append({
+            "name": name,
+            "faction": data.get("faction", ""),
+            "starOff": data.get("starOff", 0),
+            "bonus": bonus,
+            "bonus_supported": parse_capacity(bonus).supported,
+            "levels": levels,
+        })
+    return catalogue
