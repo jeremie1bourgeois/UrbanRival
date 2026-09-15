@@ -229,8 +229,8 @@ def apply_target_both_effects(game: Game, player1: Player, player2: Player, capa
                     setattr(player2, attr, max(capacity.borne, current_value2 + bonus))
     else:  # Pas de borne
         for attr in attrs:
-            current_value1 = getattr(card1, attr)
-            current_value2 = getattr(card2, attr)
+            current_value1 = getattr(player1, attr)
+            current_value2 = getattr(player2, attr)
             setattr(player1, attr, current_value1 + bonus)
             setattr(player2, attr, current_value2 + bonus)
 
