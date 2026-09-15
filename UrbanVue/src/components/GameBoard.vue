@@ -1,125 +1,139 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { Game, RoundData } from "../models/game.interface";
-import { getInitGameTemplate, processGameRound, SavePlayForTest } from "../api/game";
+import { computed, ref } from "vue";
+import { errorMessage, processGameRound, savePlayForTest, type StartedGame } from "../api/game";
+import { RoundPicker, type Side } from "../logic/round";
+import type { Game, GameState, Player } from "../models/game.interface";
 import Card from "./Card.vue";
 
-const isSaveButtonClicked = ref<boolean>(false);
-const game = ref<Game | null>(null);
-const status = ref<string | null>(null);
-const gameId = ref<string>("");
-const turn = ref<boolean>(game.value?.turn || false);
-const roundData = ref<RoundData>({
-	player1_card_index: -1,
-	player1_pillz: -1,
-	player1_fury: false,
-	player2_card_index: -1,
-	player2_pillz: -1,
-	player2_fury: false,
-});
+const props = defineProps<{ started: StartedGame }>();
+const emit = defineEmits<{ newGame: [] }>();
 
-const fetchGame = async () => {
+const game = ref<Game>(props.started.game);
+const gameId = props.started.gameId;
+const state = ref<GameState>("Game Not Finished");
+const error = ref<string | null>(null);
+const saved = ref(false);
+let picker = new RoundPicker(game.value);
+const current = ref<Side | null>(picker.current);
+
+const finished = computed(() => state.value !== "Game Not Finished");
+const banner = computed(
+	() => ({ "Ally Wins": "Victoire de l'allié !", "Enemy Wins": "Victoire de l'ennemi !", Draw: "Égalité.", "Game Not Finished": "" })[state.value],
+);
+
+const effectLabel = (kind: string, value: number, borne: number) =>
+	({
+		poison: `Poison ${value} (min ${borne})`,
+		toxine: `Toxin ${value} (min ${borne})`,
+		heal: `Heal ${value} (max ${borne})`,
+		regen: `Regen ${value} (max ${borne})`,
+		dope: `Dope ${value} (max ${borne})`,
+	})[kind] ?? kind;
+
+function effects(player: Player) {
+	return player.effect_list.map((effect) => effectLabel(effect.kind, effect.value, effect.borne));
+}
+
+async function handleCombat(pillz: number, fury: boolean, index: number) {
+	const roundData = picker.pick({ index, pillz, fury });
+	current.value = picker.current;
+	if (roundData === null) return;
+	error.value = null;
 	try {
-		const { status: fetchedStatus, game: fetchedGame, gameId: fetchedGameId } = await getInitGameTemplate();
-		status.value = fetchedStatus;
-		game.value = fetchedGame;
-		gameId.value = fetchedGameId;
-	} catch (error) {
-		console.error("Error loading game:", error);
+		const result = await processGameRound(gameId, roundData);
+		game.value = result.game;
+		state.value = result.state;
+		saved.value = false;
+	} catch (err) {
+		error.value = errorMessage(err);
 	}
-};
+	picker = new RoundPicker(game.value);
+	current.value = finished.value ? null : picker.current;
+}
 
-const savePlayForTest = async () => {
+async function save() {
 	try {
-		await SavePlayForTest(gameId.value);
-		isSaveButtonClicked.value = true;
-	} catch (error) {
-		console.error('Error saving play for test:', error);
+		await savePlayForTest(gameId);
+		saved.value = true;
+	} catch (err) {
+		error.value = errorMessage(err);
 	}
-};
-
-const handleCombat = (pillz: number, isFury: boolean, index: number) => {
-	if (turn.value) {
-		roundData.value.player1_card_index = index;
-		roundData.value.player1_pillz = pillz;
-		roundData.value.player1_fury = isFury;
-	} else {
-		roundData.value.player2_card_index = index;
-		roundData.value.player2_pillz = pillz;
-		roundData.value.player2_fury = isFury;
-	}
-	if (roundData.value.player1_card_index !== -1 && roundData.value.player2_card_index !== -1 && game.value) {
-		processGameRound(gameId.value, roundData.value, game.value).then((response) => {
-			game.value = response.game;
-			roundData.value = {
-				player1_card_index: -1,
-				player1_pillz: -1,
-				player1_fury: false,
-				player2_card_index: -1,
-				player2_pillz: -1,
-				player2_fury: false,
-			};
-			isSaveButtonClicked.value = false;
-		});
-	} else {
-		turn.value = !turn.value;
-	}
-};
+}
 </script>
 
 <template>
-	<div class="flex justify-center items-center bg-gray-900">
-		<div class="text-white">
-			<button @click="fetchGame" class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 mb-4">Charger la game</button>
-			<p><strong>Status:</strong> {{ status }}</p>
-			<p><strong>Game ID:</strong> {{ gameId }}</p>
-		</div>
+	<div class="flex min-h-screen flex-col items-center gap-4 p-4">
+		<header class="flex w-full max-w-5xl items-center justify-between text-sm text-gray-300">
+			<span>Partie #{{ gameId }} · round {{ Math.min(game.nb_turn, 4) }} / 4</span>
+			<span v-if="!finished"
+				>Au tour de : <strong class="text-yellow-400">{{ current === "ally" ? "l'allié" : "l'ennemi" }}</strong></span
+			>
+			<button class="rounded bg-gray-700 px-3 py-1 hover:bg-gray-600" @click="emit('newGame')">Nouvelle partie</button>
+		</header>
 
-		<div id="GameBoard" class="flex flex-col items-center gap-8 bg-gray-800 text-white rounded-xl" style="transform-origin: top left" v-if="game">
-			<div class="w-full flex flex-col items-center p-4 rounded-xl" :class="{ 'bg-gradient-to-b from-blue-800 to-gray-800': !turn }">
-				<div class="flex w-full justify-start space-x-10 pb-4">
-					<h2 class="text-xl font-bold text-yellow-400 mb-2">{{ game.enemy.name }}</h2>
-					<p class="text-sm text-gray-300 mt-2">
-						{{ game.enemy.life }} <font-awesome-icon :icon="['fas', 'heart']" class="text-red-500" /> | Pillz: {{ game.enemy.pillz }}
+		<p v-if="error" class="w-full max-w-5xl rounded border border-red-500 bg-red-900/40 p-3 text-red-200">{{ error }}</p>
+		<p
+			v-if="finished"
+			class="w-full max-w-5xl rounded border border-yellow-400 bg-yellow-900/40 p-3 text-center text-xl font-bold text-yellow-200"
+		>
+			{{ banner }}
+		</p>
+
+		<div id="GameBoard" class="flex w-full max-w-5xl flex-col items-center gap-8 rounded-xl bg-gray-800">
+			<section
+				class="flex w-full flex-col items-center rounded-xl p-4"
+				:class="{ 'bg-gradient-to-b from-blue-800 to-gray-800': current === 'enemy' }"
+			>
+				<div class="flex w-full items-center justify-start gap-6 pb-4">
+					<h2 class="text-xl font-bold text-yellow-400">{{ game.enemy.name }}</h2>
+					<p class="text-sm text-gray-300">
+						{{ game.enemy.life }} <font-awesome-icon :icon="['fas', 'heart']" class="text-red-500" /> | Pillz : {{ game.enemy.pillz }}
 					</p>
+					<span v-for="label in effects(game.enemy)" :key="label" class="rounded bg-purple-800 px-2 py-0.5 text-xs">{{ label }}</span>
 				</div>
-				<div class="flex justify-center space-x-3">
+				<div class="flex justify-center gap-3">
 					<Card
 						v-for="(card, index) in game.enemy.cards"
 						:key="'enemy-' + index"
 						:card="card"
 						:pillz="game.enemy.pillz"
-						:turn="!turn"
-						@combat="(pillz, isFury) => handleCombat(pillz, isFury, index)"
+						:turn="current === 'enemy'"
+						@combat="(pillz, fury) => handleCombat(pillz, fury, index)"
 					/>
 				</div>
-			</div>
-			<div class="w-[95%] border-t border-gray-600 my-4"></div>
-			<div class="w-full flex flex-col items-center p-4 rounded-xl" :class="{ 'bg-gradient-to-b from-gray-800 to-blue-900': turn }">
-				<div class="flex justify-center space-x-3">
+			</section>
+
+			<div class="my-2 w-[95%] border-t border-gray-600"></div>
+
+			<section
+				class="flex w-full flex-col items-center rounded-xl p-4"
+				:class="{ 'bg-gradient-to-b from-gray-800 to-blue-900': current === 'ally' }"
+			>
+				<div class="flex justify-center gap-3">
 					<Card
 						v-for="(card, index) in game.ally.cards"
 						:key="'ally-' + index"
 						:card="card"
 						:pillz="game.ally.pillz"
-						:turn="turn"
-						@combat="(pillz, isFury) => handleCombat(pillz, isFury, index)"
+						:turn="current === 'ally'"
+						@combat="(pillz, fury) => handleCombat(pillz, fury, index)"
 					/>
 				</div>
-				<div class="flex w-full justify-end space-x-10 pt-4">
-					<p class="text-sm text-gray-300 mt-2">
-						{{ game.ally.life }} <font-awesome-icon :icon="['fas', 'heart']" class="text-red-500" /> | Pillz: {{ game.ally.pillz }}
+				<div class="flex w-full items-center justify-end gap-6 pt-4">
+					<span v-for="label in effects(game.ally)" :key="label" class="rounded bg-purple-800 px-2 py-0.5 text-xs">{{ label }}</span>
+					<p class="text-sm text-gray-300">
+						{{ game.ally.life }} <font-awesome-icon :icon="['fas', 'heart']" class="text-red-500" /> | Pillz : {{ game.ally.pillz }}
 					</p>
-					<h2 class="text-xl font-bold text-yellow-400 mb-2">{{ game.ally.name }}</h2>
+					<h2 class="text-xl font-bold text-yellow-400">{{ game.ally.name }}</h2>
 				</div>
-			</div>
-			<!-- Bouton pour sauvegarder le jeu pour les tests -->
+			</section>
+
 			<button
-				:disabled="isSaveButtonClicked || game.nb_turn <= 1"
-				@click="savePlayForTest"
-				class="bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600 mt-4"
+				:disabled="saved || game.nb_turn <= 1"
+				class="mb-4 rounded bg-green-600 px-4 py-2 text-white hover:bg-green-500 disabled:opacity-40"
+				@click="save"
 			>
-				Sauvegarder le jeu pour les tests
+				{{ saved ? "Round sauvegardé pour les tests" : "Sauvegarder le dernier round pour les tests" }}
 			</button>
 		</div>
 	</div>

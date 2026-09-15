@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { Card } from "../models/game.interface";
+import { Card, hasUnsupportedPower } from "../models/game.interface";
 
 const props = defineProps({
 	card: {
@@ -32,6 +32,9 @@ const attack = computed(() => {
 	return props.card.played ? `${props.card.attack}` : "";
 });
 
+const abilityUnsupported = computed(() => hasUnsupportedPower(props.card, "ability"));
+const bonusUnsupported = computed(() => hasUnsupportedPower(props.card, "bonus"));
+
 const trophyClass = computed(() => {
 	return props.card.win ? "trophyIcon-clear" : "trophyIcon-gray";
 });
@@ -61,11 +64,11 @@ const powerClass = computed(() => {
 		</div>
 
 		<div v-if="pillzUsed" class="pillzBanner pillzUsed" :class="[card.played ? 'pillz-active' : '']">
-				<img :class="trophyClass" src="../assets/icons8-trophy-50.png" alt="Trophy Icon" style="opacity: 1; margin-right: 10px;" />
-				{{ pillzUsed }}
-				<img src="../assets/icons8-pill-50.png" alt="Pillz Icon" class="pillzIcon" style="background-color: white; margin-right: 10px;" />
-				{{ attack }}
-				<img src="../assets/epee.png" alt="Sword Icon" class="pillzIcon" style="background-color: white; margin-right: 10px;" />
+			<img :class="trophyClass" src="../assets/icons8-trophy-50.png" alt="Trophy Icon" style="opacity: 1; margin-right: 10px" />
+			{{ pillzUsed }}
+			<img src="../assets/icons8-pill-50.png" alt="Pillz Icon" class="pillzIcon" style="background-color: white; margin-right: 10px" />
+			{{ attack }}
+			<img src="../assets/epee.png" alt="Sword Icon" class="pillzIcon" style="background-color: white; margin-right: 10px" />
 		</div>
 
 		<div class="cardBottom">
@@ -76,16 +79,28 @@ const powerClass = computed(() => {
 			<div class="cardDescription">
 				<div class="flex h-[30px] items-center">
 					<img src="../assets/Power.png" alt="Power Image" class="w-[22px] h-[22px]" />
-						<div :class="['cardPH urbanFont', powerClass]">{{ isFight ? card.power_fight : card.power }}</div>
+					<div :class="['cardPH urbanFont', powerClass]">{{ isFight ? card.power_fight : card.power }}</div>
 					<img src="../assets/Ability.png" alt="Ability Image" class="w-[22px] h-[22px] ml-1" />
-					<div class="vcenterContent">{{ card.ability_description || "N/A" }}</div>
+					<div
+						class="vcenterContent"
+						:class="{ 'text-orange-300 line-through': abilityUnsupported }"
+						:title="abilityUnsupported ? 'Pouvoir non géré par le moteur' : ''"
+					>
+						{{ card.ability_description || "N/A" }}
+					</div>
 				</div>
 
 				<div class="flex h-[30px] items-center">
 					<img src="../assets/Damage.png" alt="Damage Image" class="w-[22px] h-[22px]" />
-						<div :class="['cardPH urbanFont', damageClass]">{{ isFight ? card.damage_fight : card.damage }}</div>
+					<div :class="['cardPH urbanFont', damageClass]">{{ isFight ? card.damage_fight : card.damage }}</div>
 					<img src="../assets/Bonus.png" alt="Bonus Image" class="w-[22px] h-[22px] ml-1" />
-					<div class="vcenterContent">{{ card.bonus_description || "N/A" }}</div>
+					<div
+						class="vcenterContent"
+						:class="{ 'text-orange-300 line-through': bonusUnsupported }"
+						:title="bonusUnsupported ? 'Pouvoir non géré par le moteur' : ''"
+					>
+						{{ card.bonus_description || "N/A" }}
+					</div>
 				</div>
 			</div>
 		</div>
@@ -202,7 +217,6 @@ const powerClass = computed(() => {
 	z-index: 11; /* Permet de s'assurer que le contenu est visible au-dessus */
 	top: 35%; /* Ajuste la position verticale pour être plus haut sur la carte */
 }
-
 
 .pillzBanner {
 	position: absolute;

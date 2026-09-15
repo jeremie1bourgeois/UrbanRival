@@ -19,7 +19,7 @@ const props = defineProps({
 	},
 });
 
-let isModalVisible = ref(false);
+const isModalVisible = ref(false);
 
 const openModal = () => {
 	isModalVisible.value = true;
@@ -36,12 +36,7 @@ const cardClasses = computed(() => "cursor-pointer");
 </script>
 <template>
 	<div>
-		<CardDisplay
-			:class="cardClasses"
-			:card="props.card"
-			:isFight="props.card.played"
-			@click="openModal"
-		/>
+		<CardDisplay :class="cardClasses" :card="props.card" :isFight="props.card.played" @click="openModal" />
 		<div v-if="isModalVisible">
 			<ModalCard
 				:isVisible="isModalVisible"

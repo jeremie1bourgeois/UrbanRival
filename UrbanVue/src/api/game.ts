@@ -1,62 +1,46 @@
-import axios from 'axios';
-import { Game, RoundData } from '../models/game.interface.ts';
+import axios from "axios";
+import { Game, type CatalogueCard, type Deck, type GameState, type RoundData } from "../models/game.interface";
 
 const apiClient = axios.create({
-	baseURL: 'http://127.0.0.1:8000',
-	headers: {
-		'Content-Type': 'application/json',
-	},
+	baseURL: "http://127.0.0.1:8000",
+	headers: { "Content-Type": "application/json" },
 });
 
-export const getInitGameTemplate = async (): Promise<{ status: string; game: Game; gameId: string }> => {
-	try {
-		const response = await apiClient.get('/init_game/template');
-		return {
-			status: response.data.status,
-			game: new Game(response.data.game),
-			gameId: response.data.game_id,
-		};
-	} catch (error) {
-		console.error('Error fetching init game template:', error);
-		throw error;
-	}
-};
+export interface StartedGame {
+	game: Game;
+	gameId: string;
+}
 
-// Fonction pour traiter un round
-export const processGameRound = async (
-	gameId: string,
-	roundData: RoundData,
-	game: Game
-): Promise<{ status: string; game: Game; state: any }> => {
-	try {
-		const response = await apiClient.post(`/process_round/${gameId}`, roundData);
-		console.log('processGameRound response:', (response.data));
-		console.log("game before", game);	
-		game.nb_turn = response.data.game.nb_turn || game.nb_turn;
-		game.turn = response.data.game.turn || game.turn;
-		game.ally = response.data.game.ally || game.ally;
-		game.enemy = response.data.game.enemy || game.enemy;
-		game.history = response.data.game.history || game.history;
-		console.log("game after", game);
-		return {
-			status: response.data.status,
-			game: new Game(response.data.game),
-			state: response.data.state,
-		};
-	} catch (error) {
-		console.error('Error processing game round:', error);
-		throw error;
-	}
-};
+export async function getCatalogue(): Promise<CatalogueCard[]> {
+	const response = await apiClient.get<CatalogueCard[]>("/cards");
+	return response.data;
+}
 
-export const SavePlayForTest = async (gameId: string): Promise<{ status: string }> => {
-	try {
-		const response = await apiClient.get('/save_for_test', { params: { game_id: gameId } });
-		return {
-			status: response.data.status,
-		};
-	} catch (error) {
-		console.error('Error saving play for test:', error);
-		throw error;
+export async function getInitGameTemplate(): Promise<StartedGame> {
+	const response = await apiClient.get("/init_game/template");
+	return { game: new Game(response.data.game), gameId: String(response.data.game_id) };
+}
+
+export async function initGame(deck: Deck): Promise<StartedGame> {
+	const response = await apiClient.post("/init_game/", deck);
+	return { game: new Game(response.data.game), gameId: String(response.data.game_id) };
+}
+
+export async function processGameRound(gameId: string, roundData: RoundData): Promise<{ game: Game; state: GameState }> {
+	const response = await apiClient.post(`/process_round/${gameId}`, roundData);
+	return { game: new Game(response.data.game), state: response.data.state };
+}
+
+export async function savePlayForTest(gameId: string): Promise<void> {
+	await apiClient.get("/save_for_test", { params: { game_id: gameId } });
+}
+
+/** Message d'erreur renvoyé par le backend (detail) ou message générique. */
+export function errorMessage(error: unknown): string {
+	if (axios.isAxiosError(error)) {
+		const detail = error.response?.data?.detail;
+		if (typeof detail === "string") return detail;
+		if (error.response === undefined) return "Backend injoignable (http://127.0.0.1:8000).";
 	}
-};
+	return error instanceof Error ? error.message : String(error);
+}
