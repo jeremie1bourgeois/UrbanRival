@@ -1,399 +1,176 @@
-from typing import Tuple, Optional, Set
+"""
+Niveau 1 : capacités « méta » qui agissent sur les autres capacités ou sur les valeurs imprimées, avant tout
+modificateur de stats. Quatre phases, puis les capacités méta sont consommées (None) :
+  1. Copy: Opp. Ability / Bonus  — l'emplacement copieur devient une copie de l'emplacement adverse
+  2. Protection: Ability / Bonus puis Stop Opp. Ability / Bonus — résolution simultanée (voir _stopped_kinds)
+  3. Copy / Exchange de power et damage — sur les valeurs imprimées
+  4. Cancel Opp. X Modif. (retire X des modifications adverses, quelle que soit leur cible) et
+     Protection: X (retire X des modifications adverses qui ciblent ma carte)
+Règles retenues là où Urban Rivals est ambigu : les Stops s'appliquent tous en même temps (SoA vs SoA :
+les deux abilities tombent ; SoA vs SoB : l'un perd son ability, l'autre son bonus) ; une protection tombe
+si l'adversaire stoppe l'emplacement où elle se trouve, sauf si une autre protection non tombée la couvre ;
+en cas de cycle (les deux protections face aux deux stops), les stops gagnent.
+"""
 import copy
+from typing import Optional, Set
+
 from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card
 
-def apply_capacity_lvl_1(card1: Card, card2: Card):
-    apply_copy(card1, card2)
-    apply_stop(card1, card2)
-    delete_capacity_protection(card1, card2)
-
-    apply_all_cancel_data_modif(card1, card2)
-    apply_all_protect_data_modif(card1, card2)
-
-    if card1.ability_fight: card1.ability_fight = apply_exchange_or_copy_data(card1, card2, card1.ability_fight)
-    if card1.bonus_fight: card1.bonus_fight = apply_exchange_or_copy_data(card1, card2, card1.bonus_fight)
-    if card2.ability_fight: card2.ability_fight = apply_exchange_or_copy_data(card2, card1, card2.ability_fight)
-    if card2.bonus_fight: card2.bonus_fight = apply_exchange_or_copy_data(card2, card1, card2.bonus_fight)
+META_HOWS = {"stop", "copy", "Protection", "cancel", "exchange"}
+SLOT_OF_KIND = {"ability": "ability_fight", "bonus": "bonus_fight"}
+KIND_OF_SLOT = {"ability_fight": "ability", "bonus_fight": "bonus"}
+STAT_TYPES = ("power", "damage", "attack")
 
 
-def apply_copy(card1: Card, card2: Card):
-    if card1.ability_fight and card1.ability_fight.how == "copy":
-        if "ability" in card1.ability_fight.types:
-            (card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight) = apply_ability_copy_ability(card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
-        elif "bonus" in card1.ability_fight.types:
-            (card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight) = apply_ability_copy_bonus(card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
+def apply_capacity_lvl_1(card1: Card, card2: Card) -> None:
+    _apply_copies(card1, card2)
+    _apply_stops(card1, card2)
+    _apply_value_copies_and_exchanges(card1, card2)
+    _apply_cancels(card1, card2)
+    _apply_stat_protections(card1, card2)
+    _consume_meta_capacities(card1, card2)
 
-    if card1.bonus_fight and card1.bonus_fight.how == "copy":
-        if "ability" in card1.bonus_fight.types:
-            (card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight) = apply_bonus_copy_ability(card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
-        elif "bonus" in card1.bonus_fight.types:
-            (card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight) = apply_bonus_copy_bonus(card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
-    
-    if card2.ability_fight and card2.ability_fight.how == "copy":
-        if "ability" in card2.ability_fight.types:
-            (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_ability_copy_ability(card1.ability_fight, card2.bonus_fight, card1.bonus_fight)
-        elif "bonus" in card2.ability_fight.types:
-            (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_ability_copy_bonus(card1.ability_fight, card2.bonus_fight, card1.bonus_fight)
-    
-    if card2.bonus_fight and card2.bonus_fight.how == "copy":
-        if "ability" in card2.bonus_fight.types:
-            (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_bonus_copy_ability(card2.ability_fight, card1.ability_fight, card2.bonus_fight, card1.bonus_fight)
-        elif "bonus" in card2.bonus_fight.types:
-            (card2.ability_fight, card2.bonus_fight, card1.ability_fight, card1.bonus_fight) = apply_bonus_copy_bonus(card2.ability_fight, card1.ability_fight, card2.bonus_fight, card1.bonus_fight)
 
-def apply_stop(card1: Card, card2: Card):
-    if card1.ability_fight and card1.ability_fight.how == "stop":
-        if "ability" in card1.ability_fight.types:
-            (card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight) = apply_ability_stop_ability(card2.ability_fight, card1.bonus_fight, card2.bonus_fight)
-        elif "bonus" in card1.ability_fight.types:
-            (card1.ability_fight, card2.ability_fight, card1.bonus_fight, card2.bonus_fight) = apply_ability_stop_bonus(card2.ability_fight, card1.bonus_fight,  card2.bonus_fight)
+# --- Utilitaires ------------------------------------------------------------------------------
 
-    if card1.bonus_fight and card1.bonus_fight.how == "stop":
-        if "ability" in card1.bonus_fight.types:
-            (card1.bonus_fight, card1.ability_fight, card2.ability_fight, card2.bonus_fight) = apply_bonus_stop_ability(card1.ability_fight, card2.ability_fight, card1.bonus_fight)
-        elif "bonus" in card1.bonus_fight.types:
-            (card1.bonus_fight, card1.ability_fight, card2.ability_fight, card2.bonus_fight) = apply_bonus_stop_bonus(card1.ability_fight, card2.ability_fight, card1.bonus_fight)
+def _is(capacity: Optional[Capacity], how: str) -> bool:
+    return capacity is not None and capacity.how == how
 
-    if card2.ability_fight and card2.ability_fight.how == "stop":
-        if "ability" in card2.ability_fight.types:
-            (card2.ability_fight, card1.ability_fight, card2.bonus_fight, card1.bonus_fight) = apply_ability_stop_ability(card1.ability_fight, card2.bonus_fight, card1.bonus_fight)
-        elif "bonus" in card2.ability_fight.types:
-            (card2.ability_fight, card1.ability_fight, card2.bonus_fight, card1.bonus_fight) = apply_ability_stop_bonus(card1.ability_fight, card2.bonus_fight, card1.bonus_fight)
 
-    if card2.bonus_fight and card2.bonus_fight.how == "stop":
-        if "ability" in card2.bonus_fight.types:
-            (card2.bonus_fight, card2.ability_fight, card1.ability_fight, card1.bonus_fight) = apply_bonus_stop_ability(card2.ability_fight, card1.ability_fight, card1.bonus_fight)
-        elif "bonus" in card2.bonus_fight.types:
-            (card2.bonus_fight, card2.ability_fight, card1.ability_fight, card1.bonus_fight) = apply_bonus_stop_bonus(card2.ability_fight, card1.ability_fight, card1.bonus_fight)
-    
+def _kind_targeted(capacity: Optional[Capacity]) -> Optional[str]:
+    """« ability » ou « bonus » si la capacité méta vise un emplacement, sinon None (ex. Copy: Opp. Power)."""
+    if capacity is None:
+        return None
+    return next((kind for kind in ("ability", "bonus") if kind in capacity.types), None)
 
-def delete_capacity_protection(card1: Card, card2: Card) -> None:
+
+def _pairs(card1: Card, card2: Card):
+    return ((card1, card2), (card2, card1))
+
+
+# --- Phase 1 : Copy: Opp. Ability / Bonus -----------------------------------------------------
+
+def _apply_copies(card1: Card, card2: Card) -> None:
+    planned = []
+    for own, opp in _pairs(card1, card2):
+        for slot in SLOT_OF_KIND.values():
+            capacity = getattr(own, slot)
+            kind = _kind_targeted(capacity) if _is(capacity, "copy") else None
+            if kind is None:
+                continue
+            source = getattr(opp, SLOT_OF_KIND[kind])
+            copied = None if _is(source, "copy") and _kind_targeted(source) else copy.deepcopy(source)
+            planned.append((own, slot, copied))
+    for own, slot, copied in planned:     # simultané : les deux copies lisent l'état d'origine
+        setattr(own, slot, copied)
+
+
+# --- Phase 2 : Protection: Ability / Bonus et Stop Opp. Ability / Bonus -----------------------
+
+def _stop_kinds(card: Card) -> Set[str]:
+    """Emplacements adverses (« ability » / « bonus ») que les Stops de cette carte visent."""
+    kinds = set()
+    for slot in SLOT_OF_KIND.values():
+        capacity = getattr(card, slot)
+        if _is(capacity, "stop") and _kind_targeted(capacity):
+            kinds.add(_kind_targeted(capacity))
+    return kinds
+
+
+def _protection_slots(card: Card) -> dict:
+    """kind protégé -> emplacement (« ability_fight » / « bonus_fight ») qui porte la Protection."""
+    slots = {}
+    for slot in SLOT_OF_KIND.values():
+        capacity = getattr(card, slot)
+        if _is(capacity, "Protection") and _kind_targeted(capacity):
+            slots[_kind_targeted(capacity)] = slot
+    return slots
+
+
+def _stopped_kinds(card: Card, opp_stops: Set[str]) -> Set[str]:
     """
-    Supprime les capacités qui protègent les autres capacités car les stop ont déjà été appliqués
+    Emplacements de `card` réellement stoppés : visés par un Stop adverse et non couverts par une Protection
+    qui tient encore. Une Protection tient si l'emplacement qui la porte n'est pas lui-même stoppé ;
+    la récursion s'arrête sur un cycle en faveur des Stops.
     """
-    capacity_types = ["ability", "bonus"]
+    protections = _protection_slots(card)
 
-    if card1.ability_fight and card1.ability_fight.how == "Protection" and (any(x in card1.ability_fight.types for x in capacity_types)):
-        card1.ability_fight = None
-    if card1.bonus_fight and card1.bonus_fight.how == "Protection" and (any(x in card1.bonus_fight.types for x in capacity_types)):
-        card1.bonus_fight = None
-    if card2.ability_fight and card2.ability_fight.how == "Protection" and (any(x in card2.ability_fight.types for x in capacity_types)):
-        card2.ability_fight = None
-    if card2.bonus_fight and card2.bonus_fight.how == "Protection" and (any(x in card2.bonus_fight.types for x in capacity_types)):
-        card2.bonus_fight = None
+    def stopped(kind: str, visiting: Set[str]) -> bool:
+        if kind not in opp_stops:
+            return False
+        protecting_slot = protections.get(kind)
+        if protecting_slot is None:
+            return True
+        protecting_kind = KIND_OF_SLOT[protecting_slot]
+        if protecting_kind in visiting:
+            return True                      # cycle : les Stops gagnent
+        return stopped(protecting_kind, visiting | {kind})
 
-
-def apply_all_cancel_data_modif(card1: Card, card2: Card) -> None:
-    """
-    Applique les capacités qui annulent les modifications des autres capacités sur les types power/damage/attack
-    """
-    if card1.ability_fight:
-        if card2.ability_fight or card2.bonus_fight:
-            (card2.ability_fight, card2.bonus_fight) = apply_cancel_data_modif(card1.ability_fight, card2.ability_fight, card2.bonus_fight)
-    if card1.bonus_fight:
-        if card2.ability_fight or card2.bonus_fight:
-            (card2.ability_fight, card2.bonus_fight) = apply_cancel_data_modif(card1.bonus_fight, card2.ability_fight, card2.bonus_fight)
-    if card2.ability_fight:
-        if card1.ability_fight or card1.bonus_fight:
-            (card1.ability_fight, card1.bonus_fight) = apply_cancel_data_modif(card2.ability_fight, card1.ability_fight, card1.bonus_fight)
-    if card2.bonus_fight:
-        if card1.ability_fight or card1.bonus_fight:
-            (card1.ability_fight, card1.bonus_fight) = apply_cancel_data_modif(card2.bonus_fight, card1.ability_fight, card1.bonus_fight)
+    return {kind for kind in ("ability", "bonus") if stopped(kind, set())}
 
 
-# Constantes globales
-LIST_HOW_NOT_CANCEL: Set[str] = {"cancel", "stop", "copy", "Protection"}
-TYPES_TO_CHECK: list[str] = ["power", "damage", "attack", "life", "pillz"]
-
-def should_cancel_capacity(opp_capacity: Optional[Capacity], type_: str) -> bool:
-    """
-    Vérifie si une capacité adverse doit être annulée pour un type donné.
-    """
-    return (opp_capacity and 
-            type_ in opp_capacity.types and 
-            opp_capacity.how not in LIST_HOW_NOT_CANCEL)
-
-def process_type(capacity: Capacity, 
-                capacity_opp_1: Optional[Capacity], 
-                capacity_opp_2: Optional[Capacity],
-                type_: str) -> Tuple[Optional[Capacity], Optional[Capacity]]:
-    if type_ not in capacity.types:
-        return capacity_opp_1, capacity_opp_2
-        
-    if should_cancel_capacity(capacity_opp_1, type_):
-        if not capacity_opp_2:
-            return None, None
-        capacity_opp_1 = None
-        
-    if should_cancel_capacity(capacity_opp_2, type_):
-        if not capacity_opp_1:
-            return None, None
-        capacity_opp_2 = None
-        
-    capacity.types.remove(type_)
-    if not capacity.types:
-        return capacity_opp_1, capacity_opp_2
-        
-    return capacity_opp_1, capacity_opp_2
-
-def apply_cancel_data_modif(capacity: Capacity, 
-                          capacity_opp_1: Optional[Capacity], 
-                          capacity_opp_2: Optional[Capacity]) -> Tuple[Optional[Capacity], Optional[Capacity]]:
-    """
-    Applique les capacités qui annulent les modifications des autres capacités sur les types
-    power/damage/attack/life/pillz.
-    """
-    if capacity.how != "cancel":
-        return capacity_opp_1, capacity_opp_2
-    
-    # Traiter chaque type séquentiellement
-    for type_ in TYPES_TO_CHECK:
-        capacity_opp_1, capacity_opp_2 = process_type(capacity, capacity_opp_1, capacity_opp_2, type_)
-        if capacity_opp_1 is None and capacity_opp_2 is None:
-            return None, None
-            
-    return capacity_opp_1, capacity_opp_2
+def _apply_stops(card1: Card, card2: Card) -> None:
+    stopped = {id(own): _stopped_kinds(own, _stop_kinds(opp)) for own, opp in _pairs(card1, card2)}
+    for card in (card1, card2):           # simultané : calculé avant toute suppression
+        for kind in stopped[id(card)]:
+            setattr(card, SLOT_OF_KIND[kind], None)
 
 
-def apply_all_protect_data_modif(card1: Card, card2: Card) -> None:
-    """
-    Applique les capacités qui protègent contre les capacités qui modifient les données de type power/damage/attack
-    """
-    if card1.ability_fight: (card2.ability_fight, card2.bonus_fight) = apply_protect_enemy_data_modif(card1.ability_fight, card2.ability_fight, card2.bonus_fight)
-    if card1.bonus_fight: (card2.ability_fight, card2.bonus_fight) = apply_protect_enemy_data_modif(card1.bonus_fight, card2.ability_fight, card2.bonus_fight)
-    if card2.ability_fight: (card1.ability_fight, card1.bonus_fight) = apply_protect_enemy_data_modif(card2.ability_fight, card1.ability_fight, card1.bonus_fight)
-    if card2.bonus_fight: (card1.ability_fight, card1.bonus_fight) = apply_protect_enemy_data_modif(card2.bonus_fight, card1.ability_fight, card1.bonus_fight)
+# --- Phase 3 : Copy / Exchange de power et damage ---------------------------------------------
+
+def _apply_value_copies_and_exchanges(card1: Card, card2: Card) -> None:
+    for own, opp in _pairs(card1, card2):
+        for slot in SLOT_OF_KIND.values():
+            capacity = getattr(own, slot)
+            if capacity is None or capacity.how not in ("copy", "exchange"):
+                continue
+            for stat in ("power", "damage"):
+                if stat not in capacity.types:
+                    continue
+                setattr(own, f"{stat}_fight", getattr(opp, stat))
+                if capacity.how == "exchange":
+                    setattr(opp, f"{stat}_fight", getattr(own, stat))
 
 
-def apply_protect_enemy_data_modif(capacity_1: Capacity, capacity_opp_1: Capacity, capacity_opp_2: Capacity) -> Tuple[Capacity, Capacity]:
-    """
-    Applique les capacités qui protègent contre les capacités qui modifient les données de type power/damage/attack
-    """
-    # Liste des capacités avec l'attribut "how" qui ne doivent pas être protégées
-    list_how_not_protect = ["cancel", "stop", "copy", "Protection"]
+# --- Phase 4 : Cancel Opp. X Modif. et Protection: X ------------------------------------------
 
-    if capacity_1.how == "Protection":
-        if "power" in capacity_1.types:
-            if capacity_opp_1 and "power" in capacity_opp_1.types and capacity_opp_1.how not in list_how_not_protect and capacity_opp_1.target == "enemy":
-                if not capacity_opp_2: return (None, None)
-                capacity_opp_1 = None
-            if capacity_opp_2 and "power" in capacity_opp_2.types and capacity_opp_2.how not in list_how_not_protect and capacity_opp_2.target == "enemy":
-                if not capacity_opp_1: return (None, None)
-                capacity_opp_2 = None
-            if capacity_opp_1 and all(x in capacity_opp_1.types for x in ["power", "damage"]) and capacity_opp_1.how not in list_how_not_protect and capacity_opp_1.target == "enemy":
-                if not capacity_opp_2: return (None, None)
-                capacity_opp_1 = None
-        if "damage" in capacity_1.types:
-            if capacity_opp_1 and "damage" in capacity_opp_1.types and capacity_opp_1.how not in list_how_not_protect and capacity_opp_1.target == "enemy":
-                if not capacity_opp_2: return (None, None)
-                capacity_opp_1 = None
-            if capacity_opp_2 and "damage" in capacity_opp_2.types and capacity_opp_2.how not in list_how_not_protect and capacity_opp_2.target == "enemy":
-                if not capacity_opp_1: return (None, None)
-                capacity_opp_2 = None
-        elif "attack" in capacity_1.types:
-            if capacity_opp_1 and "attack" in capacity_opp_1.types and capacity_opp_1.how not in list_how_not_protect and capacity_opp_1.target == "enemy":
-                if not capacity_opp_2: return (None, None)
-                capacity_opp_1 = None
-            if capacity_opp_2 and "attack" in capacity_opp_2.types and capacity_opp_2.how not in list_how_not_protect and capacity_opp_2.target == "enemy":
-                if not capacity_opp_1: return (None, None)
-                capacity_opp_2 = None
-                
-    return capacity_opp_1, capacity_opp_2
-
-def apply_exchange_or_copy_data(card1: Card, card2: Card, capacity: Capacity) -> Capacity:
-    if "power" in capacity.types:
-        if capacity.how == "exchange":
-            card1.power_fight, card2.power_fight = card2.power, card1.power
-            capacity = None
-        elif capacity.how == "copy":
-            card1.power_fight = card2.power
-            capacity = None
-    if "damage" in capacity.types:
-        if capacity.how == "exchange":
-            card1.damage_fight, card2.damage_fight = card2.damage, card1.damage
-            capacity = None
-        elif capacity.how == "copy":
-            card1.damage_fight = card2.damage
-            capacity = None
-    return capacity
-
-def apply_ability_stop_ability(ability_2: Capacity, bonus_1: Capacity, bonus_2: Capacity) -> Tuple[None, Capacity, Capacity ,Capacity]:
-    """
-    Applique une l'ability : "Stop Opp. Ability"
-    """
-    if bonus_2 and ((bonus_2.how == "Protection" and "ability" in bonus_2.types) or (bonus_2.how == "stop" and "ability" in bonus_2.types)):
-        bonus_2 = None
-        if bonus_1 and bonus_1.how == "stop" and "bonus" in bonus_1.types:
-            bonus_1 = None
-            if ability_2:
-                if ability_2.effect_conditions == "stop":
-                    ability_2.effect_conditions = ""
-                else:
-                    ability_2 = None
-        elif ability_2 and ability_2.effect_conditions == "stop":
-            ability_2 = None
-    elif ability_2: 
-        if ability_2.effect_conditions == "stop":
-            ability_2.effect_conditions = ""
-        else:
-            ability_2 = None
-    return None, ability_2, bonus_1, bonus_2
-
-def apply_bonus_stop_ability(ability_1: Capacity, ability_2: Capacity, bonus_2: Capacity) -> Tuple[None, Capacity, Capacity, Capacity]:
-    """
-    Applique le bonus : "Stop Opp. Ability"
-    """
-    if bonus_2 and ((bonus_2.how == "Protection" and "ability" in bonus_2.types) or (bonus_2.how == "stop" and "bonus" in bonus_2.types)):
-        bonus_2 = None
-        if ability_1 and ability_1.how == "stop" and "bonus" in ability_1.types:
-            ability_1 = None
-            if ability_2:
-                if ability_2.effect_conditions == "stop":
-                    ability_2.effect_conditions = ""
-                else:
-                    ability_2 = None
-        elif ability_2 and ability_2.effect_conditions == "stop":
-            ability_2 = None
-    elif ability_2:
-        if ability_2.effect_conditions == "stop":
-            ability_2.effect_conditions = ""
-        else:
-            ability_2 = None
-    
-    return None, ability_1, ability_2, bonus_2
-
-def apply_ability_stop_bonus(ability_2: Capacity, bonus_1: Capacity, bonus_2: Capacity) -> Tuple[None, Capacity, Capacity ,Capacity]:
-    """
-    Applique une l'ability : "Stop Opp. Bonus"
-    """
-    if ability_2 and ((ability_2.how == "Protection" and "bonus" in ability_2.types) or (ability_2.how == "stop" and "ability" in ability_2.types)):
-        ability_2 = None
-        if bonus_1 and bonus_1.how == "stop" and "bonus" in bonus_1.types:
-            bonus_1 = None
-            if bonus_2:
-                if bonus_2.effect_conditions == "stop":
-                    bonus_2.effect_conditions = ""
-                else:
-                    bonus_2 = None
-        elif bonus_2 and bonus_2.effect_conditions == "stop":
-            bonus_2 = None
-    elif bonus_2:
-        if bonus_2.effect_conditions == "stop":
-            bonus_2.effect_conditions = ""
-        else:
-            bonus_2 = None
-
-    return None, ability_2, bonus_1, bonus_2
-
-def apply_bonus_stop_bonus(ability_1: Capacity, ability_2: Capacity, bonus_2: Capacity) -> Tuple[None, Capacity, Capacity, Capacity]:
-    """
-    Applique le bonus : "Stop Opp. Bonus"
-    """
-    if ability_2 and ((ability_2.how == "Protection" and "bonus" in ability_2.types) or (ability_2.how == "stop" and "bonus" in ability_2.types)):
-        ability_2 = None
-        if ability_1 and ability_1.how == "stop" and "ability" in ability_1.types:
-            ability_1 = None
-            if bonus_2:
-                if bonus_2.effect_conditions == "stop":
-                    bonus_2.effect_conditions = ""
-                else:
-                    bonus_2 = None
-        elif bonus_2 and bonus_2.effect_conditions == "stop":
-            bonus_2 = None
-    elif bonus_2:
-        if bonus_2.effect_conditions == "stop":
-            bonus_2.effect_conditions = ""
-        else:
-            bonus_2 = None
-    
-    return None, ability_1, ability_2, bonus_2
+def _strip_types(card: Card, types: Set[str], only_targeting_opponent: bool) -> None:
+    """Retire `types` des capacités d'effet de `card` ; une capacité sans type restant disparaît."""
+    for slot in SLOT_OF_KIND.values():
+        capacity = getattr(card, slot)
+        if capacity is None or capacity.how in META_HOWS:
+            continue
+        if only_targeting_opponent and capacity.target != "enemy":
+            continue
+        capacity.types = [type_ for type_ in capacity.types if type_ not in types]
+        if not capacity.types:
+            setattr(card, slot, None)
 
 
-def apply_ability_copy_ability(ability_2: Capacity, bonus_1: Capacity, bonus_2: Capacity) -> Tuple[Capacity, Capacity, Capacity, Capacity]:
-    """
-    Applique l'ability : "Copy Opp. Ability"
-    """
-    if ability_2:
-        if ability_2.how == "copy" and "ability" in ability_2.types:
-            return None, None, bonus_1, bonus_2
+def _apply_cancels(card1: Card, card2: Card) -> None:
+    for own, opp in _pairs(card1, card2):
+        for slot in SLOT_OF_KIND.values():
+            capacity = getattr(own, slot)
+            if _is(capacity, "cancel"):
+                _strip_types(opp, set(capacity.types), only_targeting_opponent=False)
 
-        if ability_2.how == "copy" and "bonus" in ability_2.types:
-            if bonus_1:
-                if bonus_1.how == "copy" and "ability" in bonus_1.types:
-                    return None, None, None, bonus_2
 
-                if bonus_1.how == "copy" and "bonus" in bonus_1.types:
-                    if bonus_2 and bonus_2.how == "copy" and ("ability" in bonus_2.types or "bonus" in bonus_2.types):
-                        return None, None, None, None
-                    return copy.deepcopy(bonus_2), copy.deepcopy(bonus_2), copy.deepcopy(bonus_2), bonus_2
+def _apply_stat_protections(card1: Card, card2: Card) -> None:
+    for own, opp in _pairs(card1, card2):
+        for slot in SLOT_OF_KIND.values():
+            capacity = getattr(own, slot)
+            if _is(capacity, "Protection"):
+                protected = set(capacity.types) & set(STAT_TYPES)
+                if protected:
+                    _strip_types(opp, protected, only_targeting_opponent=True)
 
-            return copy.deepcopy(bonus_1), copy.deepcopy(bonus_1), bonus_1, bonus_2
 
-    return copy.deepcopy(ability_2), ability_2, bonus_1, bonus_2
+# --- Consommation -----------------------------------------------------------------------------
 
-def apply_bonus_copy_bonus(ability_1: Capacity, ability_2: Capacity, bonus_1: Capacity, bonus_2: Capacity) -> Tuple[Capacity, Capacity, Capacity, Capacity]:
-    """
-    Applique le bonus : "Copy Opp. Bonus"
-    """
-    if bonus_2:
-        if bonus_2.how == "copy" and "bonus" in bonus_2.types:
-            return ability_1, ability_2, None, None
-
-        if bonus_2.how == "copy" and "ability" in bonus_2.types:
-            if ability_1:
-                if ability_1.how == "copy" and "bonus" in ability_1.types:
-                    return None, ability_2, None, None
-
-                if ability_1.how == "copy" and "ability" in ability_1.types:
-                    if ability_2 and ability_2.how == "copy" and ("ability" in ability_2.types or "bonus" in ability_2.types):
-                        return None, None, None, None
-                    return copy.deepcopy(ability_2), copy.deepcopy(ability_2), copy.deepcopy(ability_2), bonus_2
-
-            return copy.deepcopy(ability_1), copy.deepcopy(ability_1), bonus_1, bonus_2
-
-    return ability_1, ability_2, copy.deepcopy(bonus_2), bonus_2
-
-def apply_bonus_copy_ability(ability_1: Capacity, ability_2: Capacity, bonus_1: Capacity, bonus_2: Capacity) -> Tuple[Capacity, Capacity, Capacity, Capacity]:
-    """
-    Applique le bonus : "Copy Opp. Ability"
-    """
-    if ability_2:
-        if ability_2.how == "copy" and "bonus" in ability_2.types:
-            return ability_1, None, None, bonus_2
-
-        if ability_2.how == "copy" and "ability" in ability_2.types:
-            if ability_1:
-                if ability_1.how == "copy" and "ability" in ability_1.types:
-                    return None, None, None, bonus_2
-
-                if ability_1.how == "copy" and "bonus" in ability_1.types:
-                    if bonus_2 and bonus_2.how == "copy" and ("ability" in bonus_2.types or "bonus" in bonus_2.types):
-                        return None, None, None, None
-                    return copy.deepcopy(bonus_2), copy.deepcopy(bonus_2), copy.deepcopy(bonus_2), bonus_2
-
-            return copy.deepcopy(ability_1), copy.deepcopy(ability_1), bonus_1, bonus_2
-
-    return ability_1, copy.deepcopy(ability_2), bonus_1, bonus_2
-
-def apply_ability_copy_bonus(ability_2: Capacity, bonus_1: Capacity, bonus_2: Capacity) -> Tuple[Capacity, Capacity, Capacity, Capacity]:
-    """
-    Applique l'ability : "Copy Opp. Bonus"
-    """
-    if bonus_2:
-        if bonus_2.how == "copy" and "ability" in bonus_2.types:
-            return copy.deepcopy(bonus_2), ability_2, None, None
-
-        if bonus_2.how == "copy" and "bonus" in bonus_2.types:
-            if bonus_1:
-                if bonus_1.how == "copy" and "bonus" in bonus_1.types:
-                    return None, ability_2, None, None
-
-                if bonus_1.how == "copy" and "ability" in bonus_1.types:
-                    if ability_2 and ability_2.how == "copy" and ("ability" in ability_2.types or "bonus" in ability_2.types):
-                        return None, None, None, None
-                    return copy.deepcopy(ability_2), copy.deepcopy(ability_2), copy.deepcopy(ability_2), bonus_2
-
-            return copy.deepcopy(bonus_1), ability_2, copy.deepcopy(bonus_1), bonus_2
-
-    return copy.deepcopy(bonus_2), ability_2, bonus_1, bonus_2
+def _consume_meta_capacities(card1: Card, card2: Card) -> None:
+    for card in (card1, card2):
+        for slot in SLOT_OF_KIND.values():
+            capacity = getattr(card, slot)
+            if capacity is not None and capacity.how in META_HOWS:
+                setattr(card, slot, None)
