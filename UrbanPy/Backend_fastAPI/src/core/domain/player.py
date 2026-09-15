@@ -13,16 +13,6 @@ class Player:
         self.effect_list = effect_list if effect_list is not None else []
 
     @staticmethod
-    def from_dict(data: dict) -> "Player":
-        player = Player()
-        player.name = data.get("name", "")
-        player.life = data.get("life", 0)
-        player.pillz = data.get("pillz", 0)
-        player.cards = [Card.from_dict(card) for card in data.get("cards", [])]
-        player.effect_list = data.get("effect_list", [])
-        return player
-    
-    @staticmethod
     def from_dict_template(data: dict) -> "Player":
         player = Player()
         player.name = data.get("name", "")

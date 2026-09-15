@@ -14,16 +14,6 @@ class Game:
         self.history: List[Round] = history if history is not None else []
 
     @staticmethod
-    def from_dict(data):
-        game = Game()
-        game.nb_turn = data.get("nb_turn", 0)
-        game.turn = data.get("turn", True)
-        game.ally = Player.from_dict(data["ally"])
-        game.enemy = Player.from_dict(data["enemy"])
-        game.history = [Round(**round_data) for round_data in data.get("history", [])]
-        return game
-    
-    @staticmethod
     def from_dict_template(data):
         game = Game()
         game.nb_turn = data.get("nb_turn", 0)
