@@ -143,7 +143,7 @@ def save_for_test_service(game_id: int):
     if curr_nb_round < 2:
         raise ValueError("Not enough turns to save for test.")
 
-    prev_turn_file = f"game_data_{game_id}_{curr_nb_round}.json"
+    prev_turn_file = f"game_data_{game_id}_{curr_nb_round - 1}.json"
 
     curr_game_file_path = os.path.join(game_directory, curr_turn_file)
     prev_game_file_path = os.path.join(game_directory, prev_turn_file)
@@ -159,8 +159,9 @@ def save_play_on_json(curr_game_round: Game, prev_game_round: Game):
     Sauvegarde les données d'une partie, d'un play des joueurs et de la situation B qui en découle.
     L'id du test est le plus grand id des tests qui existe + 1.
     """
-    # Créer un dossier spécifique pour cette sauvegarde
-    save_directory = os.path.join(BASE_DIR, "data/test/", f"test_{get_new_test_id()}")
+    # Créer un dossier spécifique pour cette sauvegarde (l'id est calculé dans le même dossier que celui où l'on écrit)
+    test_root = os.path.join(BASE_DIR, "data", "test")
+    save_directory = os.path.join(test_root, f"test_{get_new_test_id(test_root)}")
     os.makedirs(save_directory, exist_ok=True)
     
     # Sauvegarder la partie actuelle
