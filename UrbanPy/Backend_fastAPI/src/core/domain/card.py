@@ -27,6 +27,9 @@ class Card:
         self.power: int = int(str(star_data.get("power", 0)).strip())
         self.damage: int = int(str(star_data.get("damage", 0)).strip())
 
+        self.image: str = star_data.get("image", "")          # illustration de la carte à ce niveau (URL CDN)
+        self.clan_image: str = card_data.get("clan_image", "")
+
         self.bonus_description: str = card_data.get("bonus", "").strip()
         self.ability_description: str = star_data.get("ability", "").strip()
         self.bonus: Capacity = parse_capacity(self.bonus_description).capacity
@@ -57,6 +60,9 @@ class Card:
         card.damage = data.get("damage")
         card.ability = Capacity.from_dict(data["ability"]) if data.get("ability") else None
 
+        card.image = data.get("image", "")
+        card.clan_image = data.get("clan_image", "")
+
         card.bonus_description = data.get("bonus_description")
         card.ability_description = data.get("ability_description")
 
@@ -86,6 +92,8 @@ class Card:
             "power": self.power,
             "damage": self.damage,
             "ability": self.ability.to_dict() if self.ability else None,
+            "image": self.image,
+            "clan_image": self.clan_image,
             "bonus_description": self.bonus_description,
             "ability_description": self.ability_description,
             "pillz_fight": self.pillz_fight,

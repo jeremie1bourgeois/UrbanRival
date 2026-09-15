@@ -111,6 +111,7 @@ async function startTemplate() {
 			/>
 			<ul v-if="results.length" class="divide-y divide-gray-700 rounded-xl bg-gray-800">
 				<li v-for="card in results" :key="card.name" class="flex flex-wrap items-center gap-3 px-4 py-2">
+					<img v-if="card.clan_image" :src="card.clan_image" :alt="card.faction" class="h-6 w-6" />
 					<div class="w-48">
 						<div class="font-semibold">{{ card.name }}</div>
 						<div class="text-xs text-gray-400">
@@ -125,6 +126,13 @@ async function startTemplate() {
 						:title="level.ability"
 						@click="add(card, level)"
 					>
+						<img
+							v-if="level.image"
+							:src="level.image"
+							:alt="`${card.name} ${level.stars}★`"
+							class="mx-auto h-16 rounded"
+							loading="lazy"
+						/>
 						<div class="text-yellow-400">{{ "★".repeat(level.stars) }}</div>
 						<div>P{{ level.power }} D{{ level.damage }}</div>
 						<div class="max-w-[10rem] truncate text-gray-300">{{ level.ability }}</div>

@@ -50,6 +50,16 @@ describe("Card", () => {
 	});
 });
 
+describe("Card images", () => {
+	it("maps the CDN image urls and defaults to empty strings", () => {
+		expect(new Card({ ...rawCard, image: "https://cdn/x.png", clan_image: "https://cdn/c.png" })).toMatchObject({
+			image: "https://cdn/x.png",
+			clan_image: "https://cdn/c.png",
+		});
+		expect(new Card(rawCard)).toMatchObject({ image: "", clan_image: "" });
+	});
+});
+
 describe("Player", () => {
 	it("maps persistent effects", () => {
 		const player = new Player({ name: "ally", life: 9, pillz: 7, cards: [], effect_list: [{ kind: "poison", value: 2, borne: 1 }] });
