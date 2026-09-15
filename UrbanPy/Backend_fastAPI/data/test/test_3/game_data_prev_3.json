@@ -45,6 +45,7 @@
                 "damage_fight": 0,
                 "ability_fight": null,
                 "bonus_fight": null,
+                "leader_fight": null,
                 "win": false
             },
             {
@@ -88,6 +89,7 @@
                 "damage_fight": 6,
                 "ability_fight": null,
                 "bonus_fight": null,
+                "leader_fight": null,
                 "win": false
             },
             {
@@ -129,6 +131,7 @@
                 "damage_fight": 5,
                 "ability_fight": null,
                 "bonus_fight": null,
+                "leader_fight": null,
                 "win": true
             },
             {
@@ -170,6 +173,7 @@
                 "damage_fight": 0,
                 "ability_fight": null,
                 "bonus_fight": null,
+                "leader_fight": null,
                 "win": false
             }
         ],
@@ -219,6 +223,7 @@
                 "damage_fight": 6,
                 "ability_fight": null,
                 "bonus_fight": null,
+                "leader_fight": null,
                 "win": true
             },
             {
@@ -261,6 +266,7 @@
                 "damage_fight": 0,
                 "ability_fight": null,
                 "bonus_fight": null,
+                "leader_fight": null,
                 "win": false
             },
             {
@@ -286,7 +292,7 @@
                     "types": [
                         "bonus"
                     ],
-                    "value": 5,
+                    "value": 0,
                     "how": "stop",
                     "borne": -1,
                     "effect_conditions": [],
@@ -302,6 +308,7 @@
                 "damage_fight": 2,
                 "ability_fight": null,
                 "bonus_fight": null,
+                "leader_fight": null,
                 "win": false
             },
             {
@@ -343,6 +350,7 @@
                 "damage_fight": 0,
                 "ability_fight": null,
                 "bonus_fight": null,
+                "leader_fight": null,
                 "win": false
             }
         ],

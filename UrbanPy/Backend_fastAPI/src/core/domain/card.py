@@ -4,6 +4,10 @@ from src.core.domain.capacity import Capacity
 from src.core.parsing.capacity_parser import parse_capacity
 
 
+# Emplacements de combat d'une carte jouée : son ability, son bonus, et l'ability « Team: » du Leader de l'équipe
+FIGHT_SLOTS = ("ability_fight", "bonus_fight", "leader_fight")
+
+
 class Card:
 
     def __init__(self, card_name: str, nb_stars: int = 1):
@@ -32,6 +36,7 @@ class Card:
         self.damage_fight: int = 0
         self.ability_fight: Capacity = None
         self.bonus_fight: Capacity = None
+        self.leader_fight: Capacity = None
         self.pillz_fight: int = 0
         self.fury: bool = False
 
@@ -64,6 +69,7 @@ class Card:
         card.damage_fight = data.get("damage_fight")
         card.ability_fight = Capacity.from_dict(data.get("ability_fight")) if data.get("ability_fight") else None
         card.bonus_fight = Capacity.from_dict(data.get("bonus_fight")) if data.get("bonus_fight") else None
+        card.leader_fight = Capacity.from_dict(data.get("leader_fight")) if data.get("leader_fight") else None
         card.win = data.get("win")
         return card
 
@@ -90,6 +96,7 @@ class Card:
             "damage_fight": self.damage_fight,
             "ability_fight": self.ability_fight.to_dict() if self.ability_fight else None,
             "bonus_fight": self.bonus_fight.to_dict() if self.bonus_fight else None,
+            "leader_fight": self.leader_fight.to_dict() if self.leader_fight else None,
             "win": self.win,
         }
 

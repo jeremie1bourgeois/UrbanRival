@@ -1,6 +1,6 @@
 from src.core.domain.player import Player
 from src.core.domain.capacity import Capacity
-from src.core.domain.card import Card
+from src.core.domain.card import Card, FIGHT_SLOTS
 from src.core.domain.game import Game
 from src.core.use_cases.multipliers import multiplier
 
@@ -17,7 +17,7 @@ def apply_capacity_lvl_3(game: Game, card1: Card, card2: Card) -> None:
     Chaque capacité restante est filtrée par sa condition de fin de round puis appliquée une seule fois.
     """
     for card, opp_card, own, opp in ((card1, card2, game.ally, game.enemy), (card2, card1, game.enemy, game.ally)):
-        for slot in ("ability_fight", "bonus_fight"):
+        for slot in FIGHT_SLOTS:
             capacity = getattr(card, slot)
             if capacity is None:
                 continue
@@ -40,7 +40,7 @@ def apply_reanimate(game: Game, card1: Card, card2: Card) -> None:
 
 
 def _reanimate(game: Game, own: Player, opp: Player, card: Card, opp_card: Card) -> None:
-    for slot in ("ability_fight", "bonus_fight"):
+    for slot in FIGHT_SLOTS:
         capacity = getattr(card, slot)
         if capacity is not None and "reanimate" in capacity.types:
             own.life += capacity.value * multiplier(capacity.how, game, own, opp, card, opp_card)

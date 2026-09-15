@@ -65,10 +65,11 @@ _CONDITION_PREFIXES = {
     "victory or defeat": "victory_defeat",
     "stop": "stop",           # l'ability n'agit que si elle a été stoppée (évalué au niveau 1)
     "killshot": "killshot",   # attaque >= 2 x attaque adverse (évalué après le calcul des attaques)
+    "team": "team",           # ability de Leader : s'applique à chaque carte jouée de l'équipe (voir process_round)
 }
 _MULTIPLIER_PREFIXES = ("support", "growth", "degrowth", "equalizer", "brawl")
 _IGNORED_PREFIXES = ("day",)   # cycle jour/nuit non modélisé : considéré toujours valide
-_UNSUPPORTED_PREFIXES = ("team", "versus", "xantiax")
+_UNSUPPORTED_PREFIXES = ("versus", "xantiax")
 _CORE_STARTERS = ("copy", "protection", "reanimate")   # mots qui ouvrent un cœur contenant ':'
 
 # Cœurs connus mais hors moteur : testés avant les regex, raison groupable dans le rapport

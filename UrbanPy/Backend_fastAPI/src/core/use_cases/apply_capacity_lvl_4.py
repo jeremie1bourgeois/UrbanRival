@@ -8,7 +8,7 @@ Niveau 4 : effets persistants (poison / toxine / heal / regen / dope).
      heal et regen aussi).
 Un poison peut amener un joueur à 0 vie : la fin de partie est constatée par check_end.
 """
-from src.core.domain.card import Card
+from src.core.domain.card import Card, FIGHT_SLOTS
 from src.core.domain.effect import PersistentEffect
 from src.core.domain.game import Game
 from src.core.domain.player import Player
@@ -23,7 +23,7 @@ def apply_capacity_lvl_4(game: Game, card1: Card, card2: Card) -> None:
     tick_persistent_effects(game.ally)
     tick_persistent_effects(game.enemy)
     for card, opp_card, own, opp in ((card1, card2, game.ally, game.enemy), (card2, card1, game.enemy, game.ally)):
-        for slot in ("ability_fight", "bonus_fight"):
+        for slot in FIGHT_SLOTS:
             capacity = getattr(card, slot)
             if capacity is None:
                 continue

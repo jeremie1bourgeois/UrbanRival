@@ -16,7 +16,7 @@ import copy
 from typing import Optional, Set
 
 from src.core.domain.capacity import Capacity
-from src.core.domain.card import Card
+from src.core.domain.card import Card, FIGHT_SLOTS
 
 META_HOWS = {"stop", "copy", "Protection", "cancel", "exchange"}
 SLOT_OF_KIND = {"ability": "ability_fight", "bonus": "bonus_fight"}
@@ -131,7 +131,7 @@ def _apply_stops(card1: Card, card2: Card) -> None:
 
 def _apply_value_copies_and_exchanges(card1: Card, card2: Card) -> None:
     for own, opp in _pairs(card1, card2):
-        for slot in SLOT_OF_KIND.values():
+        for slot in FIGHT_SLOTS:
             capacity = getattr(own, slot)
             if capacity is None or capacity.how not in ("copy", "exchange"):
                 continue
@@ -147,7 +147,7 @@ def _apply_value_copies_and_exchanges(card1: Card, card2: Card) -> None:
 
 def _strip_types(card: Card, types: Set[str], only_targeting_opponent: bool) -> None:
     """Retire `types` des capacités d'effet de `card` ; une capacité sans type restant disparaît."""
-    for slot in SLOT_OF_KIND.values():
+    for slot in FIGHT_SLOTS:
         capacity = getattr(card, slot)
         if capacity is None or capacity.how in META_HOWS:
             continue
@@ -160,7 +160,7 @@ def _strip_types(card: Card, types: Set[str], only_targeting_opponent: bool) -> 
 
 def _apply_cancels(card1: Card, card2: Card) -> None:
     for own, opp in _pairs(card1, card2):
-        for slot in SLOT_OF_KIND.values():
+        for slot in FIGHT_SLOTS:
             capacity = getattr(own, slot)
             if _is(capacity, "cancel"):
                 _strip_types(opp, set(capacity.types), only_targeting_opponent=False)
@@ -168,7 +168,7 @@ def _apply_cancels(card1: Card, card2: Card) -> None:
 
 def _apply_stat_protections(card1: Card, card2: Card) -> None:
     for own, opp in _pairs(card1, card2):
-        for slot in SLOT_OF_KIND.values():
+        for slot in FIGHT_SLOTS:
             capacity = getattr(own, slot)
             if _is(capacity, "Protection"):
                 protected = set(capacity.types) & set(STAT_TYPES)
@@ -180,7 +180,7 @@ def _apply_stat_protections(card1: Card, card2: Card) -> None:
 
 def _consume_meta_capacities(card1: Card, card2: Card) -> None:
     for card in (card1, card2):
-        for slot in SLOT_OF_KIND.values():
+        for slot in FIGHT_SLOTS:
             capacity = getattr(card, slot)
             if capacity is not None and capacity.how in META_HOWS:
                 setattr(card, slot, None)

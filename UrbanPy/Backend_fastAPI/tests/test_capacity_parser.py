@@ -169,7 +169,7 @@ def test_versus_without_clan_is_unsupported():
     assert (result.supported, result.reason) == (False, "unsupported prefix: versus")
 
 
-@pytest.mark.parametrize("prefix", ["Team", "Xantiax"])
+@pytest.mark.parametrize("prefix", ["Xantiax"])
 def test_unsupported_prefixes(prefix):
     result = parse_capacity(f"{prefix}: Power +2")
 
@@ -330,3 +330,8 @@ def test_every_official_description_parses_without_raising():
     assert all(r.reason for r in results.values() if not r.supported)
     supported = sum(1 for r in results.values() if r.supported)
     assert supported >= SUPPORTED_DESCRIPTIONS_FLOOR, f"couverture en baisse : {supported} < {SUPPORTED_DESCRIPTIONS_FLOOR}"
+
+
+def test_team_prefix_is_a_leader_condition():
+    assert parsed("Team: Courage: Power +3") == cap("ally", ["power"], 3, conditions=["team", "courage"])
+    assert parsed("Team: +7 Attack") == cap("ally", ["attack"], 7, conditions=["team"])
