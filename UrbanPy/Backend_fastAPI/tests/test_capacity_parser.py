@@ -60,9 +60,18 @@ def parsed(text):
     ("Support: Damage +1", cap("ally", ["damage"], 1, how="support")),
     ("Equalizer: -1 Opp Pow. & Dam., Min 1", cap("enemy", ["power", "damage"], -1, how="equalizer", borne=1)),
     ("Support: Attack +3", cap("ally", ["attack"], 3, how="support")),
+    ("Stop Opp. Bonus", cap("enemy", ["bonus"], 0, how="stop")),
+    ("Support: Reanimate: +1 Life", cap("ally", ["reanimate"], 1, how="support")),
 ])
 def test_golden_template_encodings(text, expected):
     assert parsed(text) == expected
+
+
+def test_template_capacities_match_the_parser(template_data):
+    for side in ("ally", "enemy"):
+        for card in template_data[side]["cards"]:
+            assert parse_capacity(card["ability_description"]).capacity.to_dict() == card["ability"], card["name"]
+            assert parse_capacity(card["bonus_description"]).capacity.to_dict() == card["bonus"], card["name"]
 
 
 # --- Formes de cœur : modificateurs -----------------------------------------------------------

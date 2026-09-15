@@ -250,7 +250,7 @@
 				"ability": {
 					"target": "enemy",
 					"types": ["bonus"],
-					"value": 5,
+					"value": 0,
 					"how": "stop",
 					"borne": -1,
 					"effect_conditions": [],
