@@ -34,3 +34,10 @@ def test_fifth_round_is_refused(template_game):
 
     with pytest.raises(ValueError, match="already finished"):
         check_round_correct(template_game, _round_input())
+
+
+def test_round_is_refused_once_a_player_has_no_life_left(template_game):
+    template_game.enemy.life = 0
+
+    with pytest.raises(ValueError, match="already finished"):
+        check_round_correct(template_game, _round_input())

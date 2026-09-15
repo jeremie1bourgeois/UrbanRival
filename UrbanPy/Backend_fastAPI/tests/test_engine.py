@@ -88,10 +88,29 @@ def test_support_counts_every_card_of_the_clan_in_hand(template_game):
     assert asporov.damage_fight == 3 + 1 * 3  # Asporov, B Mappe, Bhudd sont All Stars
 
 
-def test_support_attack_bonus_is_added_to_the_attack(template_game):
+# --- Activation du bonus de clan (>= 2 cartes du clan en main) --------------------------------
+
+def test_clan_bonus_is_inactive_when_the_card_is_alone_in_its_clan(template_game):
+    _, serafina = play(template_game, ASHLEY, SERAFINA, enemy_pillz=2)   # Serafina : seule Rescue de la main
+
+    assert serafina.attack == (8 - 2) * 2                                # pas de "Support: Attack +3"
+
+
+def test_clan_bonus_is_active_with_two_cards_of_the_clan_in_hand(template_game):
+    template_game.enemy.cards[0].faction = "Rescue"                       # Asporov devient Rescue (jamais joué ici)
+
     _, serafina = play(template_game, ASHLEY, SERAFINA, enemy_pillz=2)
 
-    assert serafina.attack == (8 - 2) * 2 + 3 * 1  # bonus d'Ashley -2 power ; une seule carte Rescue en main
+    assert serafina.attack == (8 - 2) * 2 + 3 * 2                        # support compte les 2 Rescue
+
+
+def test_clan_bonus_counts_already_played_clan_mates(template_game):
+    template_game.enemy.cards[0].faction = "Rescue"
+    play(template_game, AGUSTINO, ASPOROV)                                # le second Rescue est joué au round 1
+
+    _, serafina = play(template_game, ASHLEY, SERAFINA, enemy_pillz=2)
+
+    assert serafina.attack == (8 - 2) * 2 + 3 * 2                        # la main reste la référence, pas les cartes en jeu
 
 
 def test_equalizer_scales_with_opponent_stars_and_respects_its_minimum(template_game):
@@ -210,7 +229,7 @@ def test_full_game_life_trajectory_and_final_result(template_game):
         trajectory.append((template_game.ally.life, template_game.enemy.life))
 
     # R1 Amelia 10 > Bhudd 8 : -5 | R2 Allison 6 < Asporov 10 : -6 | R3 Agustino 4 > B Mappe 2 : -1
-    # R4 Ashley 5x2 = 10 < Serafina 6x2 + 3 = 15, dégâts (8 - 3) + 2 fury = 7 -> allié à 0
+    # R4 Ashley 5x2 = 10 < Serafina 6x2 = 12 (bonus inactif : seule Rescue), dégâts (8 - 3) + 2 fury = 7 -> allié à 0
     assert [(ally, enemy) for ally, enemy in trajectory[:3]] == [(12, 7), (6, 7), (6, 6)]
     assert trajectory[3][0] == 0
     assert check_end(template_game) is GameResult.ENEMY

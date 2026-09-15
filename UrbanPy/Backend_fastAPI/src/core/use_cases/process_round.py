@@ -2,6 +2,7 @@ import copy
 from src.core.domain.round import Round
 from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card
+from src.core.domain.player import Player
 from src.schemas.game_schemas import ProcessRoundInput
 from src.core.domain.game import Game, NB_ROUNDS
 import src.core.use_cases.apply_capacity_lvl_1 as fct_lvl_1
@@ -22,6 +23,12 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
         # Initialiser les données de combat
         init_fight_data(player1_card, round_data.player1_pillz, round_data.player1_fury)
         init_fight_data(player2_card, round_data.player2_pillz, round_data.player2_fury)
+
+        # Le bonus de clan n'est actif que si la main compte au moins 2 cartes du clan
+        if not is_clan_bonus_active(game.ally, player1_card):
+            player1_card.bonus_fight = None
+        if not is_clan_bonus_active(game.enemy, player2_card):
+            player2_card.bonus_fight = None
         
         print(f"player1_card: {player1_card}")
         print(f"player2_card: {player2_card}")
@@ -170,6 +177,14 @@ def _bet_threshold(bet: str) -> int:
     return int(bet[3:].strip())
 
 
+MIN_CLAN_CARDS_FOR_BONUS = 2
+
+
+def is_clan_bonus_active(player: Player, card: Card) -> bool:
+    """Règle Urban Rivals : le bonus de clan s'active si la main (les 4 cartes) compte au moins 2 cartes du clan."""
+    return sum(1 for c in player.cards if c.faction == card.faction) >= MIN_CLAN_CARDS_FOR_BONUS
+
+
 def init_fight_data(card: Card, nb_pillz: int, fury: bool):
     card.power_fight = card.power
     card.damage_fight = card.damage
@@ -194,5 +209,5 @@ def check_round_correct(game: Game, round_data: ProcessRoundInput):
         raise ValueError("Player 1: card already played.")
     if game.enemy.cards[round_data.player2_card_index].played:
         raise ValueError("Player 2: card already played.")
-    if game.nb_turn > NB_ROUNDS:
+    if game.nb_turn > NB_ROUNDS or game.ally.life <= 0 or game.enemy.life <= 0:
         raise ValueError("Game is already finished.")
