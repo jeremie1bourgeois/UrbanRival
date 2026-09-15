@@ -54,7 +54,7 @@ Fonction pure, déterministe, **ne lève jamais d'exception** quel que soit le t
    synonymes mot à mot (point final optionnel) : `pow`→`power`, `dam`/`dmg`→`damage`, `atk`/`att`→`attack`,
    `opp.`→`opp`, `min.`→`min`, `max.`→`max`, `modif.`/`mod`→`modif`, `prot.`/`protec.`/`protect.`→`protection`,
    `canc.`→`cancel`, `rec.`→`recover`, `conf.`→`confidence`, `vict.`→`victory`, `def.`→`defeat` ;
-   `- X` → `-X`, `+ X` → `+X` ; suppression des virgules et des points restants ; `-X pillz opp` → `-X opp pillz` ;
+   `- X` → `-X`, `+ X` → `+X` ; virgules remplacées par un espace, points restants supprimés ; `-X pillz opp` → `-X opp pillz` ;
    espaces multiples réduits, espaces avant `:` supprimés.
 2. **Découpage préfixes / cœur** sur `:` : on consomme de gauche à droite tant que le segment est un préfixe
    connu ; le reste (rejoint par `:`) est le cœur. Ainsi `courage: copy: opp bonus` → préfixes `[courage]`,
@@ -63,7 +63,7 @@ Fonction pure, déterministe, **ne lève jamais d'exception** quel que soit le t
    - conditions → `effect_conditions` : `courage`, `revenge`, `confidence`, `reprisal`, `symmetry`, `asymmetry`,
      `defeat`, `backlash`, `victory or defeat` → `victory_defeat` ;
    - multiplicateurs → `how` : `support`, `growth`, `degrowth`, `equalizer`, `brawl` ;
-   - non supportés (raison `unsupported prefix: <x>`) : `stop`, `killshot`, `day`, `team`, `versus` ;
+   - non supportés (raison `unsupported prefix: <x>`) : `stop`, `killshot`, `day`, `team`, `versus`, `xantiax` ;
    - inconnu → `unknown prefix: <x>`.
    Deux multiplicateurs (préfixe + suffixe `per …`, ou deux préfixes) → `unsupported: two multipliers`.
 4. **Cœur** — première regex qui matche, sur le texte normalisé :
@@ -78,7 +78,7 @@ Fonction pure, déterministe, **ne lève jamais d'exception** quel que soit le t
 | 6 | `(power\|damage\|power and damage) exchange` | both, types, how `exchange` |
 | 7 | `(poison\|toxin\|heal\|regen\|dope) X (min\|max) Y` | `[poison]`/`[toxine]`/`[heal]`/`[regen]`/`[dope]`, value `X`, borne `Y` ; target enemy pour poison/toxin, ally sinon |
 | 8 | `reanimate:? +X life` | ally, `[reanimate]`, value `X` |
-| 9 | `(power\|damage\|attack\|power and damage) +X( max Y)?` | ally, types, `+X`, borne `Y`/`-1` |
+| 9 | `(power\|damage\|attack\|power and damage) +X( max Y)?` | ally, types, `+X`, borne `Y`/`-1` ; `opp attack +X` → enemy |
 | 10 | `+X (life\|pillz\|attack\|power\|damage\|pillz and life)( per M)?( max Y)?` | ally ; `+X players (life\|pillz)` → both ; `+X opp (life\|pillz\|attack)` → enemy |
 | 11 | `-X opp (power\|damage\|attack\|life\|pillz\|power and damage\|pillz and life\|life and pillz)( per M)? min Y` | enemy, `-X`, borne `Y` |
 | 12 | `-X (life\|pillz) min Y` (forme backlash) | ally, `-X`, borne `Y` ; `-X players pillz min Y` → both |
@@ -90,8 +90,9 @@ Suffixe `per M` → `how` : `pillz left`→`nb_pillz_left`, `life left`→`nb_li
 `pillz lost`→`nb_pillz_lost`, `opp damage`→`nb_dam_opp` ; `damage`, `round`, `opp power` → non supporté
 (`unsupported multiplier: per <m>`).
 
-Explicitement non supportés (raison dédiée) : `cards …`, `… impose`, `cancel leader`, `consume`, `corrupt`,
-`combust`, `corrosion`, `mindwipe`, `rebirth`, `xantiax`, `recover … out of …`, `remove ability conditions`,
+Cœurs explicitement non supportés (raison dédiée `unsupported core: <mot-clé>`, testés avant les formes #2-#12) :
+`cards …`, `… impose`, `cancel leader`, `consume`, `corrupt`, `combust`, `corrosion`, `mindwipe`, `rebirth`,
+`recover … out of …`, `remove ability conditions`,
 et les mots-clés seuls (`beyond`, `bypass`, `hazard`, `illusion`, `infiltrated`, `limitless`, `tie-break`,
 `counter-attack`).
 
