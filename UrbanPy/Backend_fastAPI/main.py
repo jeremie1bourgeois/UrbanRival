@@ -7,6 +7,7 @@ from src.schemas.game_schemas import PlayerCards, ProcessRoundInput
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException, Body, Request
 from src.core.services.game_service import create_game, process_round_service, init_game_from_template, save_for_test_service
+from src.adapters.repositories.card_repository import official_card_catalogue
 from src.utils.config import BASE_DIR
 
 # logging.basicConfig(level=logging.DEBUG)
@@ -78,10 +79,12 @@ def init_game(players_cards: PlayerCards = Body(...)) -> Dict[str, Any]:
     """
     try:
         # Créer une partie avec les données validées
-        game = create_game(players_cards)
+        (game, new_id) = create_game(players_cards)
 
         # Retourner la partie initialisée
-        return {"status": "success", "game": game.to_dict()}
+        return {"status": "success", "game": game.to_dict(), "game_id": new_id}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -99,6 +102,15 @@ def init_game_template() -> Dict[str, Any]:
         return {"status": "success", "game": game.to_dict(), "game_id": new_id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/cards", response_model=List[Dict[str, Any]])
+def cards_catalogue() -> List[Dict[str, Any]]:
+    """
+    Catalogue des cartes officielles (clan, niveaux, power/damage/ability par niveau, pouvoirs gérés ou non),
+    pour composer un deck côté front.
+    """
+    return official_card_catalogue()
+
 
 @app.get("/save_for_test")
 def save_for_test(game_id: int) -> Dict[str, Any]:

@@ -2,6 +2,7 @@ from src.core.domain.player import Player
 from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card
 from src.core.domain.game import Game
+from src.core.use_cases.multipliers import MULTIPLIERS
 
 
 def apply_capacity_lvl_2(game: Game, card1: Card, card2: Card) -> None:
@@ -24,54 +25,8 @@ def apply_capacity_lvl_2(game: Game, card1: Card, card2: Card) -> None:
     if card2.bonus_fight: card2.bonus_fight = apply_target_enemy_effects(game, player2, player1, card2.bonus_fight, card2, card1)
 
 
-# Fonctions de bonus définies en dehors
-def _bonus_growth(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> int:
-    return game.nb_turn
-
-def _bonus_degrowth(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> int:
-    return 5 - game.nb_turn
-
-def _bonus_support(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> int:
-    return sum(1 for c in player1.cards if c.faction == card1.faction)
-
-def _bonus_equalizer(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> int:
-    return card2.stars
-
-def _bonus_brawl(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> int:
-    return sum(1 for c in player2.cards if c.faction == card2.faction)
-
-def _bonus_nb_damage_opp(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> int:
-    return card2.damage
-
-def _bonus_nb_life_lost(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> int:
-    return 12 - player1.life # change le hardcode 12
-
-def _bonus_nb_pillz_lost(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> int:
-    return 12 - player1.pillz # change le hardcode 12
-
-def _bonus_nb_pillz_left(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> int:
-    return player1.pillz
-
-def _bonus_nb_life_left(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> int:
-    return player1.life
-
-def _bonus_empty(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> int:
-    return 1
-
-# Mapping défini une seule fois
-_BONUS_FUNCS = {
-    "": _bonus_empty,
-    "growth": _bonus_growth,
-    "degrowth": _bonus_degrowth,
-    "support": _bonus_support,
-    "equalizer": _bonus_equalizer,
-    "brawl": _bonus_brawl,
-    "nb_dam_opp": _bonus_nb_damage_opp,
-    "nb_life_lost": _bonus_nb_life_lost,
-    "nb_pillz_lost": _bonus_nb_pillz_lost,
-    "nb_pillz_left": _bonus_nb_pillz_left,
-    "nb_life_left": _bonus_nb_life_left,
-}
+# Multiplicateurs (champ how) partagés avec le niveau 3
+_BONUS_FUNCS = MULTIPLIERS
 
 # Mapping des attributs aussi défini une seule fois
 _ATTR_MAP = {

@@ -1,10 +1,10 @@
 {
-    "nb_turn": 2,
+    "nb_turn": 4,
     "turn": true,
     "ally": {
         "name": "ally",
-        "life": 12,
-        "pillz": 12,
+        "life": 6,
+        "pillz": 5,
         "cards": [
             {
                 "name": "Agustino",
@@ -37,14 +37,15 @@
                 },
                 "bonus_description": "-2 Opp Power, Min 1",
                 "ability_description": "Growth: -1 Opp Power, Min 4",
-                "pillz_fight": 0,
-                "attack": 0,
-                "played": 0,
-                "power_fight": 0,
-                "damage_fight": 0,
+                "pillz_fight": 2,
+                "fury": true,
+                "attack": 4,
+                "played": true,
+                "power_fight": 2,
+                "damage_fight": 3,
                 "ability_fight": null,
                 "bonus_fight": null,
-                "win": false
+                "win": true
             },
             {
                 "name": "Allison",
@@ -79,11 +80,12 @@
                 },
                 "bonus_description": "-2 Opp Power, Min 1",
                 "ability_description": "Courage: Damage +3",
-                "pillz_fight": 0,
-                "attack": 0,
-                "played": 0,
-                "power_fight": 0,
-                "damage_fight": 0,
+                "pillz_fight": 2,
+                "fury": false,
+                "attack": 6,
+                "played": true,
+                "power_fight": 3,
+                "damage_fight": 6,
                 "ability_fight": null,
                 "bonus_fight": null,
                 "win": false
@@ -119,8 +121,9 @@
                 },
                 "bonus_description": "-2 Opp Power, Min 1",
                 "ability_description": "Power +4",
-                "pillz_fight": 1,
-                "attack": 5,
+                "pillz_fight": 3,
+                "fury": false,
+                "attack": 15,
                 "played": true,
                 "power_fight": 5,
                 "damage_fight": 5,
@@ -160,6 +163,7 @@
                 "bonus_description": "-2 Opp Power, Min 1",
                 "ability_description": "-3 Opp Damage, Min 2",
                 "pillz_fight": 0,
+                "fury": false,
                 "attack": 0,
                 "played": 0,
                 "power_fight": 0,
@@ -173,8 +177,8 @@
     },
     "enemy": {
         "name": "enemy",
-        "life": 7,
-        "pillz": 12,
+        "life": 4,
+        "pillz": 8,
         "cards": [
             {
                 "name": "Asporov",
@@ -207,14 +211,15 @@
                 },
                 "bonus_description": "-2 Opp Power, Min 1",
                 "ability_description": "Support: Damage +1",
-                "pillz_fight": 0,
-                "attack": 0,
-                "played": 0,
-                "power_fight": 0,
-                "damage_fight": 0,
+                "pillz_fight": 2,
+                "fury": false,
+                "attack": 10,
+                "played": true,
+                "power_fight": 5,
+                "damage_fight": 6,
                 "ability_fight": null,
                 "bonus_fight": null,
-                "win": false
+                "win": true
             },
             {
                 "name": "B Mappe Mt",
@@ -248,11 +253,12 @@
                 },
                 "bonus_description": "-2 Opp Power, Min 1",
                 "ability_description": "Equalizer: -1 Opp Pow. & Dam., Min 1",
-                "pillz_fight": 0,
-                "attack": 0,
-                "played": 0,
-                "power_fight": 0,
-                "damage_fight": 0,
+                "pillz_fight": 2,
+                "fury": false,
+                "attack": 2,
+                "played": true,
+                "power_fight": 1,
+                "damage_fight": 8,
                 "ability_fight": null,
                 "bonus_fight": null,
                 "win": false
@@ -288,8 +294,9 @@
                 },
                 "bonus_description": "-2 Opp Power, Min 1",
                 "ability_description": "Stop Opp. Bonus",
-                "pillz_fight": 1,
-                "attack": 4,
+                "pillz_fight": 3,
+                "fury": false,
+                "attack": 12,
                 "played": true,
                 "power_fight": 4,
                 "damage_fight": 2,
@@ -298,37 +305,38 @@
                 "win": false
             },
             {
-                "name": "Bixente",
-                "faction": "All Stars",
-                "starOff": 2,
+                "name": "Serafina",
+                "faction": "Rescue",
+                "starOff": 5,
                 "bonus": {
-                    "target": "enemy",
-                    "types": [
-                        "power"
-                    ],
-                    "value": -2,
-                    "how": "",
-                    "borne": 1,
-                    "effect_conditions": [],
-                    "lvl_priority": 0
-                },
-                "stars": 2,
-                "power": 6,
-                "damage": 3,
-                "ability": {
                     "target": "ally",
                     "types": [
                         "attack"
                     ],
-                    "value": 2,
-                    "how": "nb_dam_opp",
+                    "value": 3,
+                    "how": "support",
                     "borne": -1,
                     "effect_conditions": [],
                     "lvl_priority": 0
                 },
-                "bonus_description": "-2 Opp Power, Min 1",
-                "ability_description": "+2 Attack Per Opp. Damage",
+                "stars": 5,
+                "power": 8,
+                "damage": 8,
+                "ability": {
+                    "target": "ally",
+                    "types": [
+                        "reanimate"
+                    ],
+                    "value": 1,
+                    "how": "support",
+                    "borne": -1,
+                    "effect_conditions": [],
+                    "lvl_priority": 0
+                },
+                "bonus_description": "Support: Attack +3",
+                "ability_description": "Support: Reanimate: +1 Life",
                 "pillz_fight": 0,
+                "fury": false,
                 "attack": 0,
                 "played": 0,
                 "power_fight": 0,
@@ -348,6 +356,26 @@
             },
             "enemy": {
                 "card_index": 2,
+                "win": false
+            }
+        },
+        {
+            "ally": {
+                "card_index": 1,
+                "win": false
+            },
+            "enemy": {
+                "card_index": 0,
+                "win": true
+            }
+        },
+        {
+            "ally": {
+                "card_index": 0,
+                "win": true
+            },
+            "enemy": {
+                "card_index": 1,
                 "win": false
             }
         }

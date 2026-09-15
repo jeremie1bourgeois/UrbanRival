@@ -4,7 +4,7 @@ from src.core.domain.player import Player
 from src.schemas.game_schemas import GameResult, PlayerCards, ProcessRoundInput
 from src.core.domain.card import Card
 from src.adapters.repositories.game_repository import get_new_game_id, get_new_test_id, load_game_from_json, save_game_to_json
-from src.core.domain.game import Game
+from src.core.domain.game import Game, NB_ROUNDS
 from src.utils.config import BASE_DIR
 
 def process_round_service(game_id: str, round_data: ProcessRoundInput):
@@ -47,7 +47,7 @@ def check_end(board: Game) -> GameResult:
     """
     Vérifie si la partie est terminée et renvoie un GameResult.
     """
-    if board.nb_turn == 4:
+    if board.nb_turn > NB_ROUNDS:
         if board.ally.life > board.enemy.life:
             return GameResult.ALLY
         elif board.ally.life < board.enemy.life:
@@ -61,7 +61,7 @@ def check_end(board: Game) -> GameResult:
     else:
         return GameResult.NONE
 
-def create_game(players_cards: PlayerCards) -> Game:
+def create_game(players_cards: PlayerCards):
     """
     Crée une partie en initialisant les joueurs avec leurs cartes.
 
@@ -69,9 +69,9 @@ def create_game(players_cards: PlayerCards) -> Game:
         players_cards (PlayerCards): Objet contenant les cartes de `player1` et `player2`.
 
     Returns:
-        Game: Une instance de la classe `Game` initialisée avec les cartes des deux joueurs.
+        (Game, int): la partie initialisée (round 1 en cours) et son identifiant.
     """
-    game = Game(0, True, Player(name="ally", life=12, pillz=12), Player(name="enemy", life=12, pillz=12), [])
+    game = Game(1, True, Player(name="ally", life=12, pillz=12), Player(name="enemy", life=12, pillz=12), [])
 
     # Ajouter les cartes à player1
     for card_input in players_cards.player1:
@@ -92,7 +92,7 @@ def create_game(players_cards: PlayerCards) -> Game:
     # Appeler la fonction pour sauvegarder la partie en JSON dans le dossier créé
     save_game_to_json(game, new_id, game_directory)
 
-    return game
+    return (game, new_id)
 
 
 def init_game_from_template():
@@ -143,7 +143,7 @@ def save_for_test_service(game_id: int):
     if curr_nb_round < 2:
         raise ValueError("Not enough turns to save for test.")
 
-    prev_turn_file = f"game_data_{game_id}_{curr_nb_round}.json"
+    prev_turn_file = f"game_data_{game_id}_{curr_nb_round - 1}.json"
 
     curr_game_file_path = os.path.join(game_directory, curr_turn_file)
     prev_game_file_path = os.path.join(game_directory, prev_turn_file)
@@ -159,8 +159,9 @@ def save_play_on_json(curr_game_round: Game, prev_game_round: Game):
     Sauvegarde les données d'une partie, d'un play des joueurs et de la situation B qui en découle.
     L'id du test est le plus grand id des tests qui existe + 1.
     """
-    # Créer un dossier spécifique pour cette sauvegarde
-    save_directory = os.path.join(BASE_DIR, "data/test/", f"test_{get_new_test_id()}")
+    # Créer un dossier spécifique pour cette sauvegarde (l'id est calculé dans le même dossier que celui où l'on écrit)
+    test_root = os.path.join(BASE_DIR, "data", "test")
+    save_directory = os.path.join(test_root, f"test_{get_new_test_id(test_root)}")
     os.makedirs(save_directory, exist_ok=True)
     
     # Sauvegarder la partie actuelle

@@ -3,24 +3,16 @@ from typing import List
 from src.core.domain.round import Round
 from src.core.domain.player import Player
 
-class Game:
-    def __init__(self, nb_turn: int = 0, turn: bool = True, ally: Player = Player(), enemy: Player = Player(), history: List[Round] = []):
-        self.nb_turn: int = nb_turn
-        self.turn: bool = turn
-        self.ally: Player = ally
-        self.enemy: Player = enemy
-        self.history: List[Round] = history
+NB_ROUNDS = 4  # nombre de rounds d'une partie
 
-    @staticmethod
-    def from_dict(data):
-        game = Game()
-        game.nb_turn = data.get("nb_turn", 0)
-        game.turn = data.get("turn", True)
-        game.ally = Player.from_dict(data["ally"])
-        game.enemy = Player.from_dict(data["enemy"])
-        game.history = [Round(**round_data) for round_data in data.get("history", [])]
-        return game
-    
+class Game:
+    def __init__(self, nb_turn: int = 0, turn: bool = True, ally: Player = None, enemy: Player = None, history: List[Round] = None):
+        self.nb_turn: int = nb_turn  # numéro du round en cours (1 = premier round) ; vaut NB_ROUNDS + 1 quand la partie est finie
+        self.turn: bool = turn
+        self.ally: Player = ally if ally is not None else Player()
+        self.enemy: Player = enemy if enemy is not None else Player()
+        self.history: List[Round] = history if history is not None else []
+
     @staticmethod
     def from_dict_template(data):
         game = Game()
