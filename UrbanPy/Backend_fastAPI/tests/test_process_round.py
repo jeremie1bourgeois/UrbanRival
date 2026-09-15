@@ -117,3 +117,17 @@ def test_versus_condition_for_the_enemy_side_looks_at_the_ally_card(template_gam
     capacity = Capacity(target="ally", types=["power"], value=2, borne=-1, effect_conditions=["versus:Rescue"])
 
     assert check_capacity_condition(template_game, capacity, False, 3, 2) is False  # Amelia (All Stars) n'est pas Rescue
+
+
+@pytest.mark.parametrize("condition, pillz_fight, expected", [
+    ("bet>4", 6, True),    # 5 pillz misées (pillz_fight - 1) > 4
+    ("bet>4", 5, False),   # 4 misées : pas strictement plus
+    ("bet<6", 6, True),    # 5 misées < 6
+    ("bet<6", 7, False),
+    ("bet 3", 5, True),    # forme historique = « bet > 3 »
+])
+def test_bet_conditions_compare_the_pillz_actually_bet(template_game, condition, pillz_fight, expected):
+    template_game.ally.cards[0].pillz_fight = pillz_fight
+    capacity = Capacity(target="ally", types=["power"], value=2, borne=-1, effect_conditions=[condition])
+
+    assert check_capacity_condition(template_game, capacity, True, 0, 0) is expected

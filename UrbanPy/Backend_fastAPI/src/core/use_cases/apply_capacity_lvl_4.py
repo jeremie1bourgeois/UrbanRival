@@ -1,11 +1,11 @@
 """
-Niveau 4 : effets persistants (poison / toxine / heal / regen / dope).
+Niveau 4 : effets persistants (poison / toxine / heal / regen / dope / repair).
 À la fin d'un round où les deux joueurs sont en vie :
   1. les effets déjà actifs agissent (« à la fin de chaque round suivant » leur activation) ;
   2. les capacités persistantes restantes (leur condition de fin de round a été validée au niveau 3) sont
      enregistrées sur le joueur affecté : cible ally -> propriétaire, enemy -> adversaire ; le multiplicateur
      est résolu à l'activation ; un effet remplace l'effet de même sorte (poison et toxine se cumulent,
-     heal et regen aussi).
+     heal et regen aussi, dope et repair aussi).
 Un poison peut amener un joueur à 0 vie : la fin de partie est constatée par check_end.
 """
 from src.core.domain.card import Card, FIGHT_SLOTS
@@ -16,7 +16,7 @@ from src.core.use_cases.multipliers import multiplier
 
 _LIFE_LOSS = ("poison", "toxine")
 _LIFE_GAIN = ("heal", "regen")
-_PILLZ_GAIN = ("dope",)
+_PILLZ_GAIN = ("dope", "repair")
 
 
 def apply_capacity_lvl_4(game: Game, card1: Card, card2: Card) -> None:

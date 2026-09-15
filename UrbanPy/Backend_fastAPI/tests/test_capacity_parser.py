@@ -317,16 +317,16 @@ def test_gibberish_is_unknown_core():
     assert parse_capacity("Blorp the flurb").reason == "unknown core"
 
 
-# --- Couverture sur les 906 descriptions officielles -----------------------------------------
+# --- Couverture sur les descriptions officielles -----------------------------------------
 
-SUPPORTED_DESCRIPTIONS_FLOOR = 838  # mesuré le 2026-09-15 ; à relever quand la couverture progresse
+SUPPORTED_DESCRIPTIONS_FLOOR = 1116  # mesuré le 2026-09-15 sur 1310 descriptions ; à relever quand la couverture progresse
 
 
 def test_every_official_description_parses_without_raising():
     descriptions = all_capacity_descriptions()
     results = {text: parse_capacity(text) for text in descriptions}   # ne doit pas lever
 
-    assert len(descriptions) == 906
+    assert len(descriptions) == 1310   # instantané iclintz du 2026-09-15
     assert all(r.reason for r in results.values() if not r.supported)
     supported = sum(1 for r in results.values() if r.supported)
     assert supported >= SUPPORTED_DESCRIPTIONS_FLOOR, f"couverture en baisse : {supported} < {SUPPORTED_DESCRIPTIONS_FLOOR}"
@@ -335,3 +335,35 @@ def test_every_official_description_parses_without_raising():
 def test_team_prefix_is_a_leader_condition():
     assert parsed("Team: Courage: Power +3") == cap("ally", ["power"], 3, conditions=["team", "courage"])
     assert parsed("Team: +7 Attack") == cap("ally", ["attack"], 7, conditions=["team"])
+
+
+# --- Formes rencontrées dans les données 2026 -------------------------------------------------
+
+@pytest.mark.parametrize("text, expected", [
+    ("Rev: Power +2", cap("ally", ["power"], 2, conditions=["revenge"])),
+    ("Repris: Damage +2", cap("ally", ["damage"], 2, conditions=["reprisal"])),
+    ("Asym: Attack +4", cap("ally", ["attack"], 4, conditions=["asymmetry"])),
+    ("Asymm: Attack +4", cap("ally", ["attack"], 4, conditions=["asymmetry"])),
+    ("Brwl: -1 Opp Power, Min 3", cap("enemy", ["power"], -1, how="brawl", borne=3)),
+    ("+1 Attack / Life Lost", cap("ally", ["attack"], 1, how="nb_life_lost")),
+    ("+1 Dam./ Life Lost Max. 6", cap("ally", ["damage"], 1, how="nb_life_lost", borne=6)),
+    ("Repair 1, Max. 12", cap("ally", ["repair"], 1, borne=12)),
+    ("Bet > 4 pillz: -3 Opp. Life, Min 2", cap("enemy", ["life"], -3, borne=2, conditions=["bet>4"])),
+    ("Bet < 6 pillz: Power +3", cap("ally", ["power"], 3, conditions=["bet<6"])),
+])
+def test_abbreviations_repair_and_bet(text, expected):
+    assert parsed(text) == expected
+
+
+def test_night_prefix_is_inert_since_day_is_always_valid():
+    result = parse_capacity("Night: Power +2")
+
+    assert (result.supported, result.reason) == (False, "unsupported prefix: night")
+
+
+@pytest.mark.parametrize("text, keyword", [
+    ("Fatal Killshot", "fatal killshot"), ("Overdose", "overdose"), ("Perfection", "perfection"),
+    ("Sinister Symmetry", "sinister symmetry"), ("Tune Out", "tune out"), ("Defeat: Recov. 1 Pillz Out Of 1", "recover"),
+])
+def test_new_unsupported_cores_have_a_named_reason(text, keyword):
+    assert parse_capacity(text).reason == f"unsupported core: {keyword}"

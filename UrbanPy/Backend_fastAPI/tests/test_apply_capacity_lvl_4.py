@@ -184,3 +184,12 @@ def test_persistent_effects_survive_a_json_round_trip(game):
 
     assert effects(restored.enemy) == [("poison", 2, 1)]
     assert restored.to_dict() == game.to_dict()
+
+
+def test_repair_adds_pillz_and_stacks_with_dope(game):
+    play(game, 1, ally_ability="Dope 1, Max. 12", ally_pillz=6)     # allié 7 pillz
+    play(game, 2, ally_ability="Repair 2, Max. 12")                  # dope -> 8
+
+    play(game, 3)                                                    # dope 1 + repair 2 -> 11
+
+    assert (game.ally.pillz, sorted(effects(game.ally))) == (11, [("dope", 1, 12), ("repair", 2, 12)])

@@ -167,7 +167,7 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, own_
                 return False
             capacity.effect_conditions.remove(condition)
         elif condition.startswith("bet"):
-            if own_player.cards[own_card_index].pillz_fight <= _bet_threshold(condition):
+            if not _bet_condition_met(condition, own_player.cards[own_card_index].pillz_fight):
                 return False
             capacity.effect_conditions.remove(condition)
         elif condition not in DEFERRED_CONDITIONS:
@@ -200,9 +200,16 @@ def apply_killshot_condition(card: Card, opp_card: Card) -> None:
                 setattr(card, slot, None)
 
 
-def _bet_threshold(bet: str) -> int:
-    """Extrait le seuil X d'une condition "bet X"."""
-    return int(bet[3:].strip())
+def _bet_condition_met(condition: str, pillz_fight: int) -> bool:
+    """
+    « bet>N » / « bet<N » (et la forme historique « bet N » = « bet>N ») comparent les pillz réellement misées.
+    pillz_fight vaut 1 sans mise (attaque = puissance x pillz_fight), donc pillz misées = pillz_fight - 1.
+    """
+    bet = pillz_fight - 1
+    rest = condition[3:].strip()
+    if rest.startswith("<"):
+        return bet < int(rest[1:])
+    return bet > int(rest.lstrip(">").strip())
 
 
 MIN_CLAN_CARDS_FOR_BONUS = 2

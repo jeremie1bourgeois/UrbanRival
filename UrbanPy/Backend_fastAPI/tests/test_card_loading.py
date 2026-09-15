@@ -73,7 +73,8 @@ def test_card_carries_its_images_when_the_data_has_them(monkeypatch):
     assert (restored.image, restored.clan_image) == (card.image, card.clan_image)
 
 
-def test_card_images_default_to_empty_strings_with_legacy_data():
+def test_official_data_provides_card_and_clan_images():
     card = Card("Aamir", 3)
 
-    assert (card.image, card.clan_image) == ("", "")
+    assert card.image.startswith("https://") and card.image.endswith(".png")
+    assert card.clan_image == "https://s.acdn.ur-img.com/urimages/clan/ALLSTARS_42.png"

@@ -57,8 +57,8 @@ def test_save_for_test_stores_two_consecutive_states(client, tmp_path):
 REAL_DECK = {
     "player1": [{"card_name": "Aamir", "nb_stars": 3}, {"card_name": "Allison", "nb_stars": 3},
                 {"card_name": "Amelia", "nb_stars": 3}, {"card_name": "Ashley", "nb_stars": 2}],
-    "player2": [{"card_name": "Asporov", "nb_stars": 4}, {"card_name": "B Mappe Mt", "nb_stars": 5},
-                {"card_name": "Bhudd", "nb_stars": 3}, {"card_name": "Serafina", "nb_stars": 5}],
+    "player2": [{"card_name": "Asporov", "nb_stars": 4}, {"card_name": "B Mappe Cr", "nb_stars": 5},
+                {"card_name": "Bhudd", "nb_stars": 3}, {"card_name": "Serafina Cr", "nb_stars": 5}],
 }
 
 
@@ -91,7 +91,7 @@ def test_cards_catalogue_lists_every_official_card_with_its_levels(client):
 
     assert response.status_code == 200
     cards = response.json()
-    assert len(cards) == 2160
+    assert len(cards) == 2497   # instantané iclintz du 2026-09-15
     aamir = next(card for card in cards if card["name"] == "Aamir")
     assert (aamir["faction"], aamir["starOff"], aamir["bonus"], aamir["bonus_supported"]) == ("All Stars", 3, "-2 Opp Power, Min 1", True)
     assert [(level["stars"], level["power"], level["damage"], level["ability"], level["ability_supported"]) for level in aamir["levels"]] == [
