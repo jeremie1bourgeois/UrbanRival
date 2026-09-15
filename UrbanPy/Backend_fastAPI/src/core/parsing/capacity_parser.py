@@ -82,6 +82,18 @@ _R_PLUS = re.compile(rf"^\+(\d+) (?:(opp|players) )?({_STAT})(?: per (.+?))?(?: 
 _R_MINUS_OPP = re.compile(rf"^-(\d+) opp ({_STAT})(?: per (.+?))? min (\d+)$")
 _R_MINUS_SELF = re.compile(r"^-(\d+) (?:(players) )?(life|pillz) min (\d+)$")
 
+_R_STOP = re.compile(r"^stop (?:opp )?(ability|bonus)$")
+_R_COPY = re.compile(r"^copy (?:opp )?(ability|bonus|power and damage|power|damage)(?: opp)?$")
+_R_PROTECTION = re.compile(r"^protection (ability|bonus|power and damage|power|damage|attack)$")
+_R_PROTECTION_SUFFIX = re.compile(r"^(ability|bonus) protection$")
+_R_CANCEL = re.compile(r"^cancel opp (power and damage|pillz and life|power|damage|attack|life|pillz) modif$")
+_R_EXCHANGE = re.compile(r"^(power and damage|power|damage) exchange$")
+_R_PERSISTENT = re.compile(r"^(poison|toxin|heal|regen|dope) (\d+) (?:min|max) (\d+)$")
+_R_REANIMATE = re.compile(r"^reanimate \+(\d+) life$")
+
+_PERSISTENT_TYPES = {"poison": "poison", "toxin": "toxine", "heal": "heal", "regen": "regen", "dope": "dope"}
+_PERSISTENT_TARGETS = {"poison": "enemy", "toxin": "enemy", "heal": "ally", "regen": "ally", "dope": "ally"}
+
 
 def _types(stat: str) -> list:
     return list(_COMPOSITE_TYPES.get(stat, [stat]))
@@ -104,6 +116,37 @@ def _resolve_how(prefix_hows: list, per: Optional[str]):
 
 
 def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacity:
+    how, error = _resolve_how(prefix_hows, None)   # les cœurs ci-dessous n'ont pas de suffixe "per"
+
+    match = _R_STOP.match(core)
+    if match:
+        return error or _capacity("enemy", [match.group(1)], 0, "stop", -1, conditions)
+
+    match = _R_COPY.match(core)
+    if match:
+        return error or _capacity("enemy", _types(match.group(1)), 0, "copy", -1, conditions)
+
+    match = _R_PROTECTION.match(core) or _R_PROTECTION_SUFFIX.match(core)
+    if match:
+        return error or _capacity("ally", _types(match.group(1)), 0, "Protection", -1, conditions)
+
+    match = _R_CANCEL.match(core)
+    if match:
+        return error or _capacity("enemy", _types(match.group(1)), 0, "cancel", -1, conditions)
+
+    match = _R_EXCHANGE.match(core)
+    if match:
+        return error or _capacity("both", _types(match.group(1)), 0, "exchange", -1, conditions)
+
+    match = _R_PERSISTENT.match(core)
+    if match:
+        effect, value, borne = match.groups()
+        return error or _capacity(_PERSISTENT_TARGETS[effect], [_PERSISTENT_TYPES[effect]], int(value), how, int(borne), conditions)
+
+    match = _R_REANIMATE.match(core)
+    if match:
+        return error or _capacity("ally", ["reanimate"], int(match.group(1)), how, -1, conditions)
+
     match = _R_STAT_PLUS.match(core)
     if match:
         opp, stat, value, borne = match.groups()

@@ -169,3 +169,74 @@ def test_prefix_and_per_multiplier_is_rejected():
     result = parse_capacity("Growth: +1 Attack Per Pillz Left")
 
     assert (result.supported, result.reason) == (False, "unsupported: two multipliers")
+
+
+# --- Niveau 1 : stop / copy / protection / cancel / exchange ---------------------------------
+
+def test_stop_opp_bonus_golden():
+    assert parsed("Stop Opp. Bonus") == cap("enemy", ["bonus"], 0, how="stop")
+
+
+def test_stop_ability_without_opp():
+    assert parsed("Confidence: Stop Ability") == cap("enemy", ["ability"], 0, how="stop", conditions=["confidence"])
+
+
+@pytest.mark.parametrize("text, types", [
+    ("Copy: Opp. Ability", ["ability"]), ("Copy: Opp. Bonus", ["bonus"]), ("Copy: Opp. Power", ["power"]),
+    ("Copy: Opp. Damage", ["damage"]), ("Copy: Power And Damage Opp.", ["power", "damage"]),
+    ("Reprisal: Copy Opp. Bonus", ["bonus"]),
+])
+def test_copy(text, types):
+    result = parsed(text)
+
+    assert (result["target"], result["types"], result["how"]) == ("enemy", types, "copy")
+
+
+@pytest.mark.parametrize("text, types", [
+    ("Protection: Ability", ["ability"]), ("Protection : Damage", ["damage"]), ("Protection: Attack", ["attack"]),
+    ("Protection: Power And Damage", ["power", "damage"]), ("Courage: Bonus Protection", ["bonus"]),
+    ("Courage: Prot.: Power & Damage", ["power", "damage"]), ("Revenge: Protec. Power And Dmg", ["power", "damage"]),
+])
+def test_protection(text, types):
+    result = parsed(text)
+
+    assert (result["target"], result["types"], result["how"]) == ("ally", types, "Protection")
+
+
+@pytest.mark.parametrize("text, types", [
+    ("Cancel Opp. Power Modif.", ["power"]), ("Cancel Opp. Pillz & Life Modif.", ["pillz", "life"]),
+    ("Cancel Opp. Pow/dam Mod.", ["power", "damage"]), ("Reprisal: Cancel Opp Pow & Dam Mod", ["power", "damage"]),
+])
+def test_cancel(text, types):
+    result = parsed(text)
+
+    assert (result["target"], result["types"], result["how"]) == ("enemy", types, "cancel")
+
+
+@pytest.mark.parametrize("text, types", [
+    ("Power Exchange", ["power"]), ("Damage Exchange", ["damage"]), ("Power And Damage Exchange", ["power", "damage"]),
+])
+def test_exchange(text, types):
+    assert parsed(text) == cap("both", types, 0, how="exchange")
+
+
+# --- Niveau 4 : effets persistants ------------------------------------------------------------
+
+@pytest.mark.parametrize("text, target, types", [
+    ("Poison 2, Min 1", "enemy", ["poison"]), ("Toxin 1, Min 3", "enemy", ["toxine"]),
+    ("Heal 2 Max. 10", "ally", ["heal"]), ("Regen 1, Max. 12", "ally", ["regen"]), ("Dope 1, Max. 8", "ally", ["dope"]),
+])
+def test_persistent_effects(text, target, types):
+    result = parsed(text)
+
+    assert (result["target"], result["types"], result["value"], result["borne"]) == (target, types, int(text.split()[1].rstrip(",")), int(text.split()[-1]))
+
+
+def test_growth_poison_keeps_multiplier():
+    assert parsed("Growth: Poison 1, Min 2") == cap("enemy", ["poison"], 1, how="growth", borne=2)
+
+
+# --- Reanimate --------------------------------------------------------------------------------
+
+def test_reanimate_golden():
+    assert parsed("Support: Reanimate: +1 Life") == cap("ally", ["reanimate"], 1, how="support")
