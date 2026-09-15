@@ -73,7 +73,9 @@
                     "value": 3,
                     "how": "",
                     "borne": -1,
-                    "effect_conditions": [],
+                    "effect_conditions": [
+                        "courage"
+                    ],
                     "lvl_priority": 0
                 },
                 "bonus_description": "-2 Opp Power, Min 1",

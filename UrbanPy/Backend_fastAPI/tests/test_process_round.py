@@ -47,3 +47,53 @@ def test_bet_condition_is_met_when_enemy_bets_more_pillz_than_threshold(template
     template_game.enemy.cards[1].pillz_fight = 5
 
     assert check_capacity_condition(template_game, _bet_capacity(3), False, 1, 0) is True
+
+
+import pytest
+
+from src.core.use_cases.process_round import DEFERRED_CONDITIONS, process_round
+from src.schemas.game_schemas import ProcessRoundInput
+
+
+def test_none_capacity_has_no_condition_to_check(template_game):
+    assert check_capacity_condition(template_game, None, True, 0, 0) is True
+
+
+def test_deferred_condition_is_left_for_level_3(template_game):
+    capacity = Capacity(target="enemy", types=["life"], value=-2, borne=0, effect_conditions=["defeat"])
+
+    assert check_capacity_condition(template_game, capacity, True, 0, 0) is True
+    assert capacity.effect_conditions == ["defeat"]
+
+
+def test_met_condition_is_consumed_and_deferred_one_kept(template_game):
+    template_game.turn = True
+    capacity = Capacity(target="ally", types=["life"], value=2, borne=-1, effect_conditions=["courage", "defeat"])
+
+    assert check_capacity_condition(template_game, capacity, True, 0, 0) is True
+    assert capacity.effect_conditions == ["defeat"]
+
+
+def test_unknown_condition_raises(template_game):
+    capacity = Capacity(target="ally", types=["life"], value=2, borne=-1, effect_conditions=["moonlight"])
+
+    with pytest.raises(ValueError, match="Invalid effect_conditions"):
+        check_capacity_condition(template_game, capacity, True, 0, 0)
+
+
+def test_deferred_conditions_constant():
+    assert DEFERRED_CONDITIONS == {"defeat", "backlash", "victory_defeat"}
+
+
+def test_courage_life_ability_applies_and_leaves_the_original_untouched(template_game):
+    # Allison reçoit "Courage: +2 Life" (capacité de niveau 3 avec condition de début de round)
+    template_game.turn = True
+    allison = template_game.ally.cards[1]
+    allison.ability = Capacity(target="ally", types=["life"], value=2, borne=-1, effect_conditions=["courage"])
+    round_data = ProcessRoundInput(player1_card_index=1, player1_pillz=4, player2_card_index=2, player2_pillz=1)
+
+    process_round(template_game, round_data)   # Allison (5-2)x4 = 12 > Bhudd 4x1 = 4 : victoire
+
+    assert allison.win is True
+    assert template_game.ally.life == 14
+    assert allison.ability.effect_conditions == ["courage"]
