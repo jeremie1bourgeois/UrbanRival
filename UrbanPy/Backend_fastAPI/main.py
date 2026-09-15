@@ -78,10 +78,12 @@ def init_game(players_cards: PlayerCards = Body(...)) -> Dict[str, Any]:
     """
     try:
         # Créer une partie avec les données validées
-        game = create_game(players_cards)
+        (game, new_id) = create_game(players_cards)
 
         # Retourner la partie initialisée
-        return {"status": "success", "game": game.to_dict()}
+        return {"status": "success", "game": game.to_dict(), "game_id": new_id}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

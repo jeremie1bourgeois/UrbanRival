@@ -61,7 +61,7 @@ def check_end(board: Game) -> GameResult:
     else:
         return GameResult.NONE
 
-def create_game(players_cards: PlayerCards) -> Game:
+def create_game(players_cards: PlayerCards):
     """
     Crée une partie en initialisant les joueurs avec leurs cartes.
 
@@ -69,9 +69,9 @@ def create_game(players_cards: PlayerCards) -> Game:
         players_cards (PlayerCards): Objet contenant les cartes de `player1` et `player2`.
 
     Returns:
-        Game: Une instance de la classe `Game` initialisée avec les cartes des deux joueurs.
+        (Game, int): la partie initialisée (round 1 en cours) et son identifiant.
     """
-    game = Game(0, True, Player(name="ally", life=12, pillz=12), Player(name="enemy", life=12, pillz=12), [])
+    game = Game(1, True, Player(name="ally", life=12, pillz=12), Player(name="enemy", life=12, pillz=12), [])
 
     # Ajouter les cartes à player1
     for card_input in players_cards.player1:
@@ -92,7 +92,7 @@ def create_game(players_cards: PlayerCards) -> Game:
     # Appeler la fonction pour sauvegarder la partie en JSON dans le dossier créé
     save_game_to_json(game, new_id, game_directory)
 
-    return game
+    return (game, new_id)
 
 
 def init_game_from_template():

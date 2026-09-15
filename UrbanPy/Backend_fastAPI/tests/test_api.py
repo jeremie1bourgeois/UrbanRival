@@ -52,3 +52,35 @@ def test_save_for_test_stores_two_consecutive_states(client, tmp_path):
     prev, curr = json.load(open(prev_path)), json.load(open(curr_path))
     assert (prev["nb_turn"], curr["nb_turn"]) == (2, 3)
     assert len(prev["history"]) == 1 and len(curr["history"]) == 2
+
+
+REAL_DECK = {
+    "player1": [{"card_name": "Aamir", "nb_stars": 3}, {"card_name": "Allison", "nb_stars": 3},
+                {"card_name": "Amelia", "nb_stars": 3}, {"card_name": "Ashley", "nb_stars": 2}],
+    "player2": [{"card_name": "Asporov", "nb_stars": 4}, {"card_name": "B Mappe Mt", "nb_stars": 5},
+                {"card_name": "Bhudd", "nb_stars": 3}, {"card_name": "Serafina", "nb_stars": 5}],
+}
+
+
+def test_init_game_with_real_cards_then_play_a_round(client):
+    response = client.post("/init_game/", json=REAL_DECK)
+
+    assert response.status_code == 200, response.json()
+    body = response.json()
+    game_id = body["game_id"]
+    assert body["game"]["nb_turn"] == 1
+    aamir = body["game"]["ally"]["cards"][0]
+    assert (aamir["power"], aamir["damage"], aamir["ability"]["how"]) == (5, 4, "growth")
+
+    played = _play(client, game_id, 0, 2)   # Aamir vs Bhudd
+
+    assert played.status_code == 200, played.json()
+    assert played.json()["game"]["nb_turn"] == 2
+
+
+def test_init_game_with_unknown_card_is_a_client_error(client):
+    deck = {**REAL_DECK, "player1": [{"card_name": "Zorglub", "nb_stars": 1}] + REAL_DECK["player1"][1:]}
+
+    response = client.post("/init_game/", json=deck)
+
+    assert (response.status_code, response.json()["detail"]) == (400, "No card found with name: Zorglub")
