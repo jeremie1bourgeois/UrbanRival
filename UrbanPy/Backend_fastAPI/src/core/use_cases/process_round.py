@@ -69,7 +69,7 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
             fct_lvl_3.apply_reanimate(game, player1_card, player2_card)
         if game.ally.life > 0 and game.enemy.life > 0:
             fct_lvl_3.apply_capacity_lvl_3(game, player1_card, player2_card)
-            fct_lvl_4.apply_capacity_lvl_4(game, game.ally, game.enemy, player1_card, player2_card)
+            fct_lvl_4.apply_capacity_lvl_4(game, player1_card, player2_card)
 
         # Ajouter le round au history
         game.history.append(round_result)
