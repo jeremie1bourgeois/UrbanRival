@@ -76,6 +76,7 @@ class Card:
         card.ability_description = data.get("ability_description")
         
         card.pillz_fight = data.get("pillz_fight")
+        card.fury = data.get("fury", False)
         card.attack = data.get("attack")
         card.played = data.get("played")
 
@@ -117,6 +118,7 @@ class Card:
             "bonus_description": self.bonus_description,
             "ability_description": self.ability_description,
             "pillz_fight": self.pillz_fight,
+            "fury": self.fury,
             "attack": self.attack,
             "played": self.played,
             "power_fight": self.power_fight,
