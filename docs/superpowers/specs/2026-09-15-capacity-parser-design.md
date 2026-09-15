@@ -82,7 +82,7 @@ Fonction pure, déterministe, **ne lève jamais d'exception** quel que soit le t
 | 10 | `+X (life\|pillz\|attack\|power\|damage\|pillz and life)( per M)?( max Y)?` | ally ; `+X players (life\|pillz)` → both ; `+X opp (life\|pillz\|attack)` → enemy |
 | 11 | `-X opp (power\|damage\|attack\|life\|pillz\|power and damage\|pillz and life\|life and pillz)( per M)? min Y` | enemy, `-X`, borne `Y` |
 | 12 | `-X (life\|pillz) min Y` (forme backlash) | ally, `-X`, borne `Y` ; `-X players pillz min Y` → both |
-| 13 | tout le reste | non supporté, raison `unknown core: <texte normalisé>` |
+| 13 | tout le reste | non supporté, raison `unknown core` (constante, pour être groupable dans le rapport) |
 
 Types composés : `power and damage` → `["power", "damage"]`, `pillz and life` / `life and pillz` → `["pillz", "life"]`.
 
@@ -125,7 +125,9 @@ Le template encode `Stop Opp. Bonus` avec `value: 5`, sans signification pour le
 - `Card.from_dict_template` tolère `bonus` / `ability` à `null` ; `Card.to_dict` les sérialise déjà en `null`.
 - Suppression de la chaîne morte `Game.from_dict` → `Player.from_dict` → `Card.from_dict` :
   `from_dict_template` est l'unique désérialiseur.
-- `create_game` démarre à `nb_turn = 1` (convention fixée au point 2 : numéro du round en cours).
+- `create_game` démarre à `nb_turn = 1` (convention fixée au point 2 : numéro du round en cours) et renvoie
+  `(game, new_id)` comme `init_game_from_template` ; `POST /init_game/` renvoie `game_id` (sans lui, impossible
+  d'appeler `/process_round/{game_id}` ensuite).
 
 ## 5. Garde-fous dans le moteur
 
@@ -138,6 +140,11 @@ Le template encode `Stop Opp. Bonus` avec `value: 5`, sans signification pour le
 
 Sémantique conservée pour les conditions connues (mêmes règles ally/enemy qu'aujourd'hui). C'est le bug #7
 du rapport ; il devient bloquant dès qu'une vraie carte porte `Defeat:`.
+
+`process_round` appelle `check_capacity_condition` sur **`ability_fight` / `bonus_fight`** (la copie de combat)
+et non plus sur `ability` / `bonus` : aujourd'hui la copie est faite avant la vérification, donc les conditions
+consommées restent dans la copie et le niveau 3 lève `ValueError` sur `["courage"]` pour une capacité life/pillz
+(ex. `Courage: +2 Life`). L'original n'est plus muté (il est sérialisé dans la partie).
 
 ## 6. Rapport de couverture — `scripts/capacity_coverage.py`
 
@@ -165,7 +172,8 @@ Code de sortie 0 toujours (outil de lecture, pas une CI).
   conservée ; aller-retour `to_dict` / `from_dict_template` avec `ability = None`.
 - `tests/test_process_round.py` : `check_capacity_condition(None)` → `True` ; `["defeat"]` → `True` et la
   condition reste ; `["courage", "defeat"]` avec courage satisfait → `True` et il reste `["defeat"]` ;
-  condition inconnue → `ValueError`.
+  condition inconnue → `ValueError` ; un round avec une capacité `Courage: +2 Life` gagnée applique +2 vie et
+  laisse `card.ability.effect_conditions` intact.
 - `tests/test_api.py` : `POST /init_game/` avec 2 × 4 vraies cartes → 200 et `game_id` ; puis un round
   joué sur cette partie → 200.
 - Les suites existantes (42 tests) restent vertes ; le template modifié (`value` de Stop → 0) n'affecte
