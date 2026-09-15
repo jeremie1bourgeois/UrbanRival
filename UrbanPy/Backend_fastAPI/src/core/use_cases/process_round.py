@@ -143,7 +143,7 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, own_
     if capacity is None or not capacity.effect_conditions:
         return True
 
-    own_player = game.ally if is_ally else game.enemy
+    own_player, opp_player = (game.ally, game.enemy) if is_ally else (game.enemy, game.ally)
     last_round = game.history[-1] if game.history else None
     own_won_last_round = None if last_round is None else (last_round.ally.win if is_ally else last_round.enemy.win)
     plays_first = game.turn if is_ally else not game.turn
@@ -160,6 +160,10 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, own_
     for condition in list(capacity.effect_conditions):
         if condition in checks:
             if not checks[condition]():
+                return False
+            capacity.effect_conditions.remove(condition)
+        elif condition.startswith("versus:"):                # « Versus <clans> » : le clan de la carte adverse
+            if opp_player.cards[opp_card_index].faction not in condition[len("versus:"):].split("|"):
                 return False
             capacity.effect_conditions.remove(condition)
         elif condition.startswith("bet"):

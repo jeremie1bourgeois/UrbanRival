@@ -154,7 +154,22 @@ def test_stop_and_killshot_prefixes_are_deferred_conditions(text, expected):
     assert parsed(text) == expected
 
 
-@pytest.mark.parametrize("prefix", ["Team", "Versus", "Xantiax"])
+@pytest.mark.parametrize("text, expected", [
+    ("Versus Freaks, Oculus: -3 Opp. Life Min 0", cap("enemy", ["life"], -3, borne=0, conditions=["versus:Freaks|Oculus"])),
+    ("Versus All Stars: Power +2", cap("ally", ["power"], 2, conditions=["versus:All Stars"])),
+    ("Courage: Versus Fang Pi Clang: Damage +2", cap("ally", ["damage"], 2, conditions=["courage", "versus:Fang Pi Clang"])),
+])
+def test_versus_prefix_keeps_the_clan_names(text, expected):
+    assert parsed(text) == expected
+
+
+def test_versus_without_clan_is_unsupported():
+    result = parse_capacity("Versus  : Power +2")   # ancien scraping : le clan (une image) a été perdu
+
+    assert (result.supported, result.reason) == (False, "unsupported prefix: versus")
+
+
+@pytest.mark.parametrize("prefix", ["Team", "Xantiax"])
 def test_unsupported_prefixes(prefix):
     result = parse_capacity(f"{prefix}: Power +2")
 

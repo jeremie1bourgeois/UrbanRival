@@ -190,8 +190,27 @@ def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacit
     return _unsupported("unknown core")
 
 
+_R_VERSUS = re.compile(r"(^|:)\s*versus\s+([^:]+?)\s*:", re.IGNORECASE)   # « Versus Freaks, Oculus: … »
+
+
+def _extract_versus(text: str):
+    """
+    Retire un préfixe « Versus <clans>: » (en tête ou après un autre préfixe) et renvoie
+    (texte restant, condition « versus:Clan|Clan » ou None). Les clans gardent leur casse (comparés à card.faction).
+    Sans clan (ancien scraping où le clan était une image) le texte est laissé tel quel.
+    """
+    match = _R_VERSUS.search(text)
+    if not match:
+        return text, None
+    clans = [clan.strip() for clan in match.group(2).split(",") if clan.strip()]
+    if not clans:
+        return text, None
+    return text[:match.start()] + match.group(1) + text[match.end():], "versus:" + "|".join(clans)
+
+
 def parse_capacity(text: str) -> ParsedCapacity:
-    normalized = normalize(text or "")
+    text, versus = _extract_versus(text or "")
+    normalized = normalize(text)
     if normalized in ("", "no ability") or re.fullmatch(r"ability at level \d+", normalized):
         return NO_ABILITY
 
@@ -213,5 +232,7 @@ def parse_capacity(text: str) -> ParsedCapacity:
         else:
             return _unsupported(f"unknown prefix: {segment}")
         index += 1
+    if versus is not None:
+        conditions.append(versus)
     core = " ".join(segments[index:])
     return _parse_core(core, conditions, prefix_hows)
