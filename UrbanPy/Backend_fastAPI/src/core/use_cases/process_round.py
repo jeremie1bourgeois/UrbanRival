@@ -3,7 +3,7 @@ from src.core.domain.round import Round
 from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card
 from src.schemas.game_schemas import ProcessRoundInput
-from src.core.domain.game import Game
+from src.core.domain.game import Game, NB_ROUNDS
 import src.core.use_cases.apply_capacity_lvl_1 as fct_lvl_1
 import src.core.use_cases.apply_capacity_lvl_2 as fct_lvl_2
 import src.core.use_cases.apply_capacity_lvl_3 as fct_lvl_3
@@ -246,5 +246,5 @@ def check_round_correct(game: Game, round_data: ProcessRoundInput):
         raise ValueError("Player 1: card already played.")
     if game.enemy.cards[round_data.player2_card_index].played:
         raise ValueError("Player 2: card already played.")
-    if game.nb_turn == 4:
+    if game.nb_turn > NB_ROUNDS:
         raise ValueError("Game is already finished.")

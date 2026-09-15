@@ -4,7 +4,7 @@ from src.core.domain.player import Player
 from src.schemas.game_schemas import GameResult, PlayerCards, ProcessRoundInput
 from src.core.domain.card import Card
 from src.adapters.repositories.game_repository import get_new_game_id, get_new_test_id, load_game_from_json, save_game_to_json
-from src.core.domain.game import Game
+from src.core.domain.game import Game, NB_ROUNDS
 from src.utils.config import BASE_DIR
 
 def process_round_service(game_id: str, round_data: ProcessRoundInput):
@@ -47,7 +47,7 @@ def check_end(board: Game) -> GameResult:
     """
     Vérifie si la partie est terminée et renvoie un GameResult.
     """
-    if board.nb_turn == 4:
+    if board.nb_turn > NB_ROUNDS:
         if board.ally.life > board.enemy.life:
             return GameResult.ALLY
         elif board.ally.life < board.enemy.life:
