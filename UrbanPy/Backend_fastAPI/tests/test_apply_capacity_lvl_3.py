@@ -151,3 +151,37 @@ def test_end_of_round_effects_are_skipped_when_a_player_is_knocked_out(template_
     play(template_game, ally_wins=False, ally_ability="Defeat: +2 Life")         # 3 dégâts -> 0, pas de rattrapage
 
     assert template_game.ally.life == 0
+
+
+# --- Killshot : attaque >= 2 x attaque adverse ------------------------------------------------
+
+def test_killshot_fires_when_attack_is_at_least_double(template_game):
+    play(template_game, ally_ability="Killshot: +3 Life", ally_pillz=10, enemy_pillz=1)   # 10 >= 2 x 5
+
+    assert template_game.ally.life == 15
+
+
+def test_killshot_does_not_fire_on_a_narrower_victory(template_game):
+    play(template_game, ally_ability="Killshot: +3 Life", ally_pillz=9, enemy_pillz=1)    # 9 > 5 mais < 10
+
+    assert template_game.ally.life == 12
+
+
+def test_killshot_gates_persistent_effects_too(template_game):
+    play(template_game, ally_ability="Killshot: Toxin 1, Min 0", ally_pillz=9, enemy_pillz=1)
+
+    assert template_game.enemy.effect_list == []
+
+
+# --- Multiplicateur « per damage » ------------------------------------------------------------
+
+def test_life_per_damage_counts_the_damage_inflicted(template_game):
+    play(template_game, ally_wins=True, ally_ability="+1 Life Per Damage")   # Amelia inflige 5
+
+    assert template_game.ally.life == 12 + 5
+
+
+def test_life_per_damage_is_zero_on_defeat(template_game):
+    play(template_game, ally_wins=False, ally_ability="Victory Or Defeat: +1 Life Per Damage")
+
+    assert template_game.ally.life == 12 - 3

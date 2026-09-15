@@ -208,3 +208,29 @@ def test_protection_capacities_are_consumed(template_game):
     amelia, _ = play(template_game, ally_ability="Protection : Damage")
 
     assert amelia.ability_fight is None
+
+
+# --- Condition « Stop: » : l'ability n'agit que si elle a été stoppée ----------------------------
+
+def test_stop_conditioned_ability_fires_when_the_ability_is_stopped(template_game):
+    amelia, _ = play(template_game, ally_ability="Stop: Power +3", enemy_ability="Stop Opp. Ability")
+
+    assert amelia.power_fight == 3 + 3 - 2
+
+
+def test_stop_conditioned_ability_does_nothing_when_not_stopped(template_game):
+    amelia, _ = play(template_game, ally_ability="Stop: Power +3")
+
+    assert amelia.power_fight == 3 - 2
+
+
+def test_stop_conditioned_ability_does_not_fire_when_protected_from_the_stop(template_game):
+    amelia, _ = play(template_game, ally_ability="Stop: Power +3", ally_bonus="Protection: Ability", enemy_ability="Stop Opp. Ability")
+
+    assert amelia.power_fight == 3 - 2
+
+
+def test_stop_conditioned_end_of_round_effect(template_game):
+    play(template_game, ally_ability="Stop: +2 Life", enemy_ability="Stop Opp. Ability", ally_pillz=6)   # Amelia gagne
+
+    assert template_game.ally.life == 14

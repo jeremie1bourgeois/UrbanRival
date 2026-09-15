@@ -37,10 +37,10 @@ def test_ability_locked_at_lower_level_is_none():
 
 
 def test_unsupported_ability_is_none_but_description_is_kept():
-    card = Card("Raoul", 2)   # "Killshot: +5 Life" : préfixe hors moteur
+    card = Card("Mr Kitty", 4)   # "Xantiax: -2 Life, Min. 0" : préfixe hors moteur
 
     assert card.ability is None
-    assert card.ability_description == "Killshot: +5 Life"
+    assert card.ability_description == "Xantiax: -2 Life, Min. 0"
 
 
 def test_card_with_no_ability_round_trips_through_json():

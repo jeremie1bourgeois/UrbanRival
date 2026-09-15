@@ -2,7 +2,8 @@
 Niveau 1 : capacités « méta » qui agissent sur les autres capacités ou sur les valeurs imprimées, avant tout
 modificateur de stats. Quatre phases, puis les capacités méta sont consommées (None) :
   1. Copy: Opp. Ability / Bonus  — l'emplacement copieur devient une copie de l'emplacement adverse
-  2. Protection: Ability / Bonus puis Stop Opp. Ability / Bonus — résolution simultanée (voir _stopped_kinds)
+  2. Protection: Ability / Bonus puis Stop Opp. Ability / Bonus — résolution simultanée (voir _stopped_kinds) ;
+     une capacité « Stop: X » s'active si son emplacement est stoppé, et reste inerte sinon
   3. Copy / Exchange de power et damage — sur les valeurs imprimées
   4. Cancel Opp. X Modif. (retire X des modifications adverses, quelle que soit leur cible) et
      Protection: X (retire X des modifications adverses qui ciblent ma carte)
@@ -113,8 +114,17 @@ def _stopped_kinds(card: Card, opp_stops: Set[str]) -> Set[str]:
 def _apply_stops(card1: Card, card2: Card) -> None:
     stopped = {id(own): _stopped_kinds(own, _stop_kinds(opp)) for own, opp in _pairs(card1, card2)}
     for card in (card1, card2):           # simultané : calculé avant toute suppression
-        for kind in stopped[id(card)]:
-            setattr(card, SLOT_OF_KIND[kind], None)
+        for kind, slot in SLOT_OF_KIND.items():
+            capacity = getattr(card, slot)
+            if capacity is None:
+                continue
+            if kind in stopped[id(card)]:
+                if "stop" in capacity.effect_conditions:      # « Stop: X » : X s'active justement parce qu'on la stoppe
+                    capacity.effect_conditions.remove("stop")
+                else:
+                    setattr(card, slot, None)
+            elif "stop" in capacity.effect_conditions:        # pas stoppée : « Stop: X » reste inerte
+                setattr(card, slot, None)
 
 
 # --- Phase 3 : Copy / Exchange de power et damage ---------------------------------------------

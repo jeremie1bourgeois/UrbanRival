@@ -82,7 +82,7 @@ def test_unknown_condition_raises(template_game):
 
 
 def test_deferred_conditions_constant():
-    assert DEFERRED_CONDITIONS == {"defeat", "backlash", "victory_defeat"}
+    assert DEFERRED_CONDITIONS == {"stop", "killshot", "defeat", "backlash", "victory_defeat"}
 
 
 def test_courage_life_ability_applies_and_leaves_the_original_untouched(template_game):

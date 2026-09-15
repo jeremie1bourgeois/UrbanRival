@@ -56,6 +56,10 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
         player1_card.attack += (player1_card.power_fight * round_data.player1_pillz)
         player2_card.attack += (player2_card.power_fight * round_data.player2_pillz)
 
+        # Killshot : la capacité n'agit que si l'attaque vaut au moins le double de l'attaque adverse
+        apply_killshot_condition(player1_card, player2_card)
+        apply_killshot_condition(player2_card, player1_card)
+
         # Créer une nouvelle instance de Round
         round_result = Round()
         round_result.ally.card_index = round_data.player1_card_index  # Stocker l'index de la carte
@@ -125,7 +129,9 @@ def resolve_combat(game: Game, player1_card: Card, player2_card: Card, round_res
         player2_card.win = True
 
 
-DEFERRED_CONDITIONS = {"defeat", "backlash", "victory_defeat"}  # évaluées après le combat (niveau 3)
+# Conditions évaluées plus tard qu'au début du round : "stop" au niveau 1 (l'ability a-t-elle été stoppée ?),
+# "killshot" après le calcul des attaques, les autres après le combat (niveau 3).
+DEFERRED_CONDITIONS = {"stop", "killshot", "defeat", "backlash", "victory_defeat"}
 
 
 def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, own_card_index: int, opp_card_index: int) -> bool:
@@ -163,6 +169,18 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, own_
         elif condition not in DEFERRED_CONDITIONS:
             raise ValueError(f"Invalid effect_conditions (check_capacity_condition): {capacity.effect_conditions}")
     return True
+
+
+def apply_killshot_condition(card: Card, opp_card: Card) -> None:
+    """Consomme la condition « killshot » (attaque >= 2 x attaque adverse) ou désactive la capacité."""
+    is_killshot = card.attack > 0 and card.attack >= 2 * opp_card.attack
+    for slot in ("ability_fight", "bonus_fight"):
+        capacity = getattr(card, slot)
+        if capacity is not None and "killshot" in capacity.effect_conditions:
+            if is_killshot:
+                capacity.effect_conditions.remove("killshot")
+            else:
+                setattr(card, slot, None)
 
 
 def _bet_threshold(bet: str) -> int:

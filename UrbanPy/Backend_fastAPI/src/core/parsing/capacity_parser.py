@@ -43,7 +43,7 @@ def normalize(text: str) -> str:
         bare = word.rstrip(".")
         words.append(_WORD_SYNONYMS.get(bare, bare))
     t = " ".join(words)
-    t = re.sub(r"^(-\d+) pillz opp\b", r"\1 opp pillz", t)
+    t = re.sub(r"(^|: )(-\d+) pillz opp\b", r"\1\2 opp pillz", t)   # "-2 pillz opp" -> "-2 opp pillz"
     return t
 
 
@@ -63,9 +63,12 @@ _CONDITION_PREFIXES = {
     "courage": "courage", "revenge": "revenge", "confidence": "confidence", "reprisal": "reprisal",
     "symmetry": "symmetry", "asymmetry": "asymmetry", "defeat": "defeat", "backlash": "backlash",
     "victory or defeat": "victory_defeat",
+    "stop": "stop",           # l'ability n'agit que si elle a été stoppée (évalué au niveau 1)
+    "killshot": "killshot",   # attaque >= 2 x attaque adverse (évalué après le calcul des attaques)
 }
 _MULTIPLIER_PREFIXES = ("support", "growth", "degrowth", "equalizer", "brawl")
-_UNSUPPORTED_PREFIXES = ("stop", "killshot", "day", "team", "versus", "xantiax")
+_IGNORED_PREFIXES = ("day",)   # cycle jour/nuit non modélisé : considéré toujours valide
+_UNSUPPORTED_PREFIXES = ("team", "versus", "xantiax")
 _CORE_STARTERS = ("copy", "protection", "reanimate")   # mots qui ouvrent un cœur contenant ':'
 
 # Cœurs connus mais hors moteur : testés avant les regex, raison groupable dans le rapport
@@ -82,6 +85,7 @@ _COMPOSITE_TYPES = {"power and damage": ["power", "damage"], "pillz and life": [
 _PER_MULTIPLIERS = {
     "pillz left": "nb_pillz_left", "life left": "nb_life_left",
     "life lost": "nb_life_lost", "pillz lost": "nb_pillz_lost", "opp damage": "nb_dam_opp",
+    "damage": "nb_damage",   # dégâts réellement infligés par la carte ce round
 }
 
 _R_STAT_PLUS = re.compile(r"^(?:(opp) )?(power and damage|power|damage|attack) \+(\d+)(?: max (\d+))?$")
@@ -93,7 +97,7 @@ _R_STOP = re.compile(r"^stop (?:opp )?(ability|bonus)$")
 _R_COPY = re.compile(r"^copy (?:opp )?(ability|bonus|power and damage|power|damage)(?: opp)?$")
 _R_PROTECTION = re.compile(r"^protection (ability|bonus|power and damage|power|damage|attack)$")
 _R_PROTECTION_SUFFIX = re.compile(r"^(ability|bonus) protection$")
-_R_CANCEL = re.compile(r"^cancel opp (power and damage|pillz and life|power|damage|attack|life|pillz) modif$")
+_R_CANCEL = re.compile(r"^cancel (?:opp )?(power and damage|pillz and life|power|damage|attack|life|pillz) modif$")
 _R_EXCHANGE = re.compile(r"^(power and damage|power|damage) exchange$")
 _R_PERSISTENT = re.compile(r"^(poison|toxin|heal|regen|dope) (\d+) (?:min|max) (\d+)$")
 _R_REANIMATE = re.compile(r"^reanimate \+(\d+) life$")
@@ -200,6 +204,8 @@ def parse_capacity(text: str) -> ParsedCapacity:
             conditions.append(_CONDITION_PREFIXES[segment])
         elif segment in _MULTIPLIER_PREFIXES:
             prefix_hows.append(segment)
+        elif segment in _IGNORED_PREFIXES:
+            pass
         elif segment in _UNSUPPORTED_PREFIXES:
             return _unsupported(f"unsupported prefix: {segment}")
         elif segment in _CORE_STARTERS:

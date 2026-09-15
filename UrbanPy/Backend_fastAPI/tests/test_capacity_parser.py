@@ -21,6 +21,7 @@ from src.core.parsing.capacity_parser import ParsedCapacity, normalize, parse_ca
     ("Revenge: Protec. Power And Dmg", "revenge : protection power and damage"),
     ("Versus  : Power +2", "versus : power +2"),
     ("Growth : Power & Damage +1", "growth : power and damage +1"),
+    ("Stop: -1 Pillz Opp. Min 2", "stop : -1 opp pillz min 2"),
 ])
 def test_normalize(raw, expected):
     assert normalize(raw) == expected
@@ -136,7 +137,24 @@ def test_two_conditions_combine():
     assert parsed("Conf.: Vict. Or Def.: -3 Opp. Life, Min 2") == cap("enemy", ["life"], -3, borne=2, conditions=["confidence", "victory_defeat"])
 
 
-@pytest.mark.parametrize("prefix", ["Stop", "Killshot", "Day", "Team", "Versus", "Xantiax"])
+def test_day_prefix_is_ignored_for_now():
+    # Simplification assumée : le cycle jour/nuit n'est pas modélisé, « Day: » est toujours valide.
+    assert parsed("Day: Power +2") == cap("ally", ["power"], 2)
+    assert parsed("Day: Courage: Attack +3") == cap("ally", ["attack"], 3, conditions=["courage"])
+
+
+@pytest.mark.parametrize("text, expected", [
+    ("Stop: Power +3", cap("ally", ["power"], 3, conditions=["stop"])),
+    ("Stop : -2 Opp Power, Min 3", cap("enemy", ["power"], -2, borne=3, conditions=["stop"])),
+    ("Stop: Equalizer: - 2 Opp. Life Min 0", cap("enemy", ["life"], -2, how="equalizer", borne=0, conditions=["stop"])),
+    ("Killshot: +3 Life", cap("ally", ["life"], 3, conditions=["killshot"])),
+    ("Killshot: Toxin 1, Min 0", cap("enemy", ["toxine"], 1, borne=0, conditions=["killshot"])),
+])
+def test_stop_and_killshot_prefixes_are_deferred_conditions(text, expected):
+    assert parsed(text) == expected
+
+
+@pytest.mark.parametrize("prefix", ["Team", "Versus", "Xantiax"])
 def test_unsupported_prefixes(prefix):
     result = parse_capacity(f"{prefix}: Power +2")
 
@@ -167,7 +185,17 @@ def test_minus_opp_per_life_left():
     assert parsed("-4 Opp Att. Per Life Left, Min 2") == cap("enemy", ["attack"], -4, how="nb_life_left", borne=2)
 
 
-@pytest.mark.parametrize("suffix", ["Damage", "Round", "Opp. Power"])
+@pytest.mark.parametrize("text, expected", [
+    ("+1 Life Per Damage", cap("ally", ["life"], 1, how="nb_damage")),
+    ("+1 Life Per Damage Max. 13", cap("ally", ["life"], 1, how="nb_damage", borne=13)),
+    ("Confidence: +1 Life Per Dmg.", cap("ally", ["life"], 1, how="nb_damage", conditions=["confidence"])),
+    ("+1 Pillz Per Damage", cap("ally", ["pillz"], 1, how="nb_damage")),
+])
+def test_per_damage_multiplier(text, expected):
+    assert parsed(text) == expected
+
+
+@pytest.mark.parametrize("suffix", ["Round", "Opp. Power"])
 def test_unsupported_per_multipliers(suffix):
     result = parse_capacity(f"+1 Life Per {suffix}")
 
@@ -215,6 +243,7 @@ def test_protection(text, types):
 @pytest.mark.parametrize("text, types", [
     ("Cancel Opp. Power Modif.", ["power"]), ("Cancel Opp. Pillz & Life Modif.", ["pillz", "life"]),
     ("Cancel Opp. Pow/dam Mod.", ["power", "damage"]), ("Reprisal: Cancel Opp Pow & Dam Mod", ["power", "damage"]),
+    ("Day: Courage: Canc. Power & Dam. Mod", ["power", "damage"]),
 ])
 def test_cancel(text, types):
     result = parsed(text)
@@ -275,7 +304,7 @@ def test_gibberish_is_unknown_core():
 
 # --- Couverture sur les 906 descriptions officielles -----------------------------------------
 
-SUPPORTED_DESCRIPTIONS_FLOOR = 743  # mesuré le 2026-09-15 ; à relever quand la couverture progresse
+SUPPORTED_DESCRIPTIONS_FLOOR = 838  # mesuré le 2026-09-15 ; à relever quand la couverture progresse
 
 
 def test_every_official_description_parses_without_raising():
