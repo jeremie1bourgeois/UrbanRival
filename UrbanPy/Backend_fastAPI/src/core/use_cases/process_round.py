@@ -118,14 +118,18 @@ def resolve_combat(game: Game, player1_card: Card, player2_card: Card, round_res
         player1_card.win = True
         player2_card.win = False
     else:
-        game.ally.life = min(0, game.ally.life - player2_card.damage_fight)
+        game.ally.life = max(0, game.ally.life - player2_card.damage_fight)
         round_result.ally.win = False
         round_result.enemy.win = True
         player1_card.win = False
         player2_card.win = True
 
 
-def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, ally_card_index: int, enemy_card_index: int) -> bool:
+def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, own_card_index: int, opp_card_index: int) -> bool:
+    """
+    Vérifie (et consomme) les conditions de déclenchement d'une capacité.
+    own_card_index / opp_card_index : index de la carte jouée par le joueur qui possède la capacité / par son adversaire.
+    """
     if not capacity.effect_conditions:
         return True
     if is_ally:
@@ -150,18 +154,19 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, ally
                 if not capacity.effect_conditions: return True
             else: return False
         if "symmetry" in capacity.effect_conditions:
-            if ally_card_index == enemy_card_index:
+            if own_card_index == opp_card_index:
                 capacity.effect_conditions.remove("symmetry")
                 if not capacity.effect_conditions: return True
             else: return False
         elif "asymmetry" in capacity.effect_conditions:
-            if ally_card_index != enemy_card_index:
+            if own_card_index != opp_card_index:
                 capacity.effect_conditions.remove("asymmetry")
                 if not capacity.effect_conditions: return True
             else: return False
-        if "bet" in capacity.effect_conditions:
-            if game.ally.cards[ally_card_index].pillz_fight > int(capacity.effect_conditions[3:]):
-                capacity.effect_conditions.remove("bet")
+        bet = _find_bet_condition(capacity)
+        if bet is not None:
+            if game.ally.cards[own_card_index].pillz_fight > _bet_threshold(bet):
+                capacity.effect_conditions.remove(bet)
                 if not capacity.effect_conditions: return True
             else: return False
         else:
@@ -188,23 +193,33 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, ally
                 if not capacity.effect_conditions: return True
             else: return False
         if "symmetry" in capacity.effect_conditions:
-            if ally_card_index == enemy_card_index:
+            if own_card_index == opp_card_index:
                 capacity.effect_conditions.remove("symmetry")
                 if not capacity.effect_conditions: return True
             else: return False
         elif "asymmetry" in capacity.effect_conditions:
-            if ally_card_index != enemy_card_index:
+            if own_card_index != opp_card_index:
                 capacity.effect_conditions.remove("asymmetry")
                 if not capacity.effect_conditions: return True
             else: return False
-        if "bet" in capacity.effect_conditions:
-            if game.enemy.cards[enemy_card_index].pillz_fight > int(capacity.effect_conditions[3:]):
-                capacity.effect_conditions.remove("bet")
+        bet = _find_bet_condition(capacity)
+        if bet is not None:
+            if game.enemy.cards[own_card_index].pillz_fight > _bet_threshold(bet):
+                capacity.effect_conditions.remove(bet)
                 if not capacity.effect_conditions: return True
             else: return False
         else:
             raise ValueError(f"Invalid effect_conditions (check_capacity_condition): {capacity.effect_conditions}")
 
+
+def _find_bet_condition(capacity: Capacity):
+    """Retourne la condition "bet X" de la capacité (ex: "bet 3"), ou None."""
+    return next((c for c in capacity.effect_conditions if c.startswith("bet")), None)
+
+
+def _bet_threshold(bet: str) -> int:
+    """Extrait le seuil X d'une condition "bet X"."""
+    return int(bet[3:].strip())
 
 
 def init_fight_data(card: Card, nb_pillz: int, fury: bool):
