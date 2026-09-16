@@ -24,7 +24,8 @@ def test_tie_on_enemy_turn_reduces_ally_life_without_going_negative(template_gam
 
 
 from src.core.domain.capacity import Capacity
-from src.core.use_cases.process_round import check_capacity_condition
+from src.core.use_cases.process_round import check_capacity_condition, process_round
+from src.schemas.game_schemas import ProcessRoundInput
 
 
 def _bet_capacity(threshold: int) -> Capacity:
@@ -147,6 +148,29 @@ def test_disunion_is_met_when_another_clan_is_in_the_hand(template_game):
 
 def test_disunion_fails_on_a_mono_clan_hand(template_game):
     assert check_capacity_condition(template_game, _hand_capacity("disunion"), True, 0, 0) is False
+
+
+# --- After (Clan X) : une carte du clan jouée par le même joueur au round précédent (règle officielle ; jamais au round 1) ---
+
+def _play_round_one(game):
+    process_round(game, ProcessRoundInput(player1_card_index=2, player1_pillz=1, player2_card_index=3, player2_pillz=1))   # Amelia (All Stars) vs Serafina (Rescue)
+
+
+def test_after_is_never_met_on_the_first_round(template_game):
+    assert check_capacity_condition(template_game, _hand_capacity("after:All Stars"), True, 0, 0) is False
+
+
+def test_after_is_met_when_i_played_a_card_of_the_clan_last_round(template_game):
+    _play_round_one(template_game)
+
+    assert check_capacity_condition(template_game, _hand_capacity("after:All Stars|Tolvack"), True, 0, 0) is True     # Amelia
+    assert check_capacity_condition(template_game, _hand_capacity("after:Rescue"), False, 0, 0) is True             # Serafina
+
+
+def test_after_looks_at_my_own_previous_card_not_the_opponent_one(template_game):
+    _play_round_one(template_game)
+
+    assert check_capacity_condition(template_game, _hand_capacity("after:Rescue"), True, 0, 0) is False
 
 
 @pytest.mark.parametrize("condition, pillz_fight, expected", [

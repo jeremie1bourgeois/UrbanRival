@@ -82,3 +82,18 @@ def test_official_json_keeps_the_first_of_two_homonyms(aamir):
     data = to_official_json([aamir, twin])
 
     assert data["Aamir"]["id"] == 1334
+
+
+def test_after_clans_are_rendered_as_text_on_abilities_and_bonus():
+    card = parse_card_page(fixture("card_2670_frau_vanda_after.html"), card_id=2670)
+
+    assert card.name == "Frau Vanda" and card.faction == "Tolvack"
+    assert card.bonus == "After Oculus, Tolvack: Power +3"
+    assert card.levels[-1].ability == "After Pussycats, Sakrohm: -4 Opp. Life Min 0"
+
+
+def test_oculus_ability_clans_are_rendered_as_an_infiltrated_prefix():
+    card = parse_card_page(fixture("card_2074_dark_smokey_oculus.html"), card_id=2074)
+
+    assert card.faction == "Oculus" and card.bonus == "Infiltrated"
+    assert card.levels[-1].ability == "Infiltrated La Junta, Piranas, Riots, Tolvack, Ulu Watu: +1 Pillz And Life"

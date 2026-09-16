@@ -103,3 +103,24 @@ def test_a_hand_of_oculus_only_has_no_bonus(game):
     amelia, asporov = play(game, AMELIA)
 
     assert (amelia.bonus_fight, asporov.power_fight) == (None, 7)
+
+
+# --- Clans infiltrables (icônes de l'ability, rendues « Infiltrated Clan, Clan: X » par le scraper) ----------------
+
+def test_oculus_only_infiltrates_the_clans_listed_on_its_card(game):
+    make(game.ally.cards[AMELIA], "Oculus", "Infiltrated")
+    game.ally.cards[AMELIA].ability = capacity("Infiltrated Montana, Junkz: Power +2")   # 3 All Stars : All Stars n'est pas infiltrable
+
+    amelia, asporov = play(game, AMELIA)
+
+    assert (amelia.bonus_fight, amelia.power_fight, asporov.power_fight) == (None, 3 - 2, 7)
+
+
+def test_oculus_ability_fires_when_the_adopted_clan_is_listed(game):
+    make(game.ally.cards[AMELIA], "Oculus", "Infiltrated")
+    game.ally.cards[AMELIA].ability = capacity("Infiltrated All Stars, Junkz: Power +2")
+
+    amelia, asporov = play(game, AMELIA)
+
+    assert (amelia.power_fight, asporov.power_fight) == (3 + 2 - 2, 7 - 2)
+

@@ -78,7 +78,7 @@ _CONDITION_PREFIXES = {
 }
 _MULTIPLIER_PREFIXES = ("support", "growth", "degrowth", "equalizer", "brawl")
 _IGNORED_PREFIXES = ("day",)   # cycle jour/nuit non modélisé : Day toujours valide, donc Night jamais
-_UNSUPPORTED_PREFIXES = ("versus", "night")
+_UNSUPPORTED_PREFIXES = ("versus", "after", "infiltrated", "night")   # sans clan : données anciennes
 _R_BET = re.compile(r"^bet ([<>]) (\d+) pillz$")   # « Bet > 4 pillz » : pillz misées ce round
 _CORE_STARTERS = ("copy", "protection", "reanimate")   # mots qui ouvrent un cœur contenant ':'
 
@@ -242,26 +242,31 @@ def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacit
     return _unsupported("unknown core")
 
 
-_R_VERSUS = re.compile(r"(^|:)\s*versus\s+([^:]+?)\s*:", re.IGNORECASE)   # « Versus Freaks, Oculus: … »
+# Préfixes à clans (rendus en texte par le scraper depuis les icônes) : « Versus Freaks, Oculus: … », « After Tolvack: … »,
+# « Infiltrated La Junta, Piranas: … » (Oculus : l'ability n'agit que si l'Oculus a infiltré l'un de ces clans).
+_R_CLAN_PREFIX = re.compile(r"(^|:)\s*(versus|after|infiltrated)\s+([^:]+?)\s*:", re.IGNORECASE)
 
 
-def _extract_versus(text: str):
+def _extract_clan_conditions(text: str):
     """
-    Retire un préfixe « Versus <clans>: » (en tête ou après un autre préfixe) et renvoie
-    (texte restant, condition « versus:Clan|Clan » ou None). Les clans gardent leur casse (comparés à card.faction).
+    Retire les préfixes à clans (en tête ou après un autre préfixe) et renvoie (texte restant, conditions
+    « versus:Clan|Clan » / « after:… » / « infiltrated:… »). Les clans gardent leur casse (comparés à card.faction).
     Sans clan (ancien scraping où le clan était une image) le texte est laissé tel quel.
     """
-    match = _R_VERSUS.search(text)
-    if not match:
-        return text, None
-    clans = [clan.strip() for clan in match.group(2).split(",") if clan.strip()]
-    if not clans:
-        return text, None
-    return text[:match.start()] + match.group(1) + text[match.end():], "versus:" + "|".join(clans)
+    conditions = []
+    while True:
+        match = _R_CLAN_PREFIX.search(text)
+        if not match:
+            return text, conditions
+        clans = [clan.strip() for clan in match.group(3).split(",") if clan.strip()]
+        if not clans:
+            return text, conditions
+        conditions.append(f"{match.group(2).lower()}:" + "|".join(clans))
+        text = text[:match.start()] + match.group(1) + text[match.end():]
 
 
 def parse_capacity(text: str) -> ParsedCapacity:
-    text, versus = _extract_versus(text or "")
+    text, clan_conditions = _extract_clan_conditions(text or "")
     normalized = normalize(text)
     if normalized in ("", "no ability") or re.fullmatch(r"ability at level \d+", normalized):
         return NO_ABILITY
@@ -292,7 +297,6 @@ def parse_capacity(text: str) -> ParsedCapacity:
         else:
             return _unsupported(f"unknown prefix: {segment}")
         index += 1
-    if versus is not None:
-        conditions.append(versus)
+    conditions.extend(clan_conditions)
     core = " ".join(segments[index:])
     return _parse_core(core, conditions, prefix_hows)

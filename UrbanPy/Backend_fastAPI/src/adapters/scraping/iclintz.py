@@ -52,16 +52,22 @@ def card_links(clan_html: str) -> List[str]:
 
 def _capacity_text(container: Tag) -> str:
     """
-    Texte d'une ability / d'un bonus. Les clans visés par « Versus » sont des images : on les rend en texte,
-    « Versus : X » + <img alt="Freaks"> <img alt="Oculus"> -> « Versus Freaks, Oculus: X ».
+    Texte d'une ability / d'un bonus. Les clans visés sont des images : on les rend en texte.
+    « Versus : X » + <img alt="Freaks"> <img alt="Oculus"> -> « Versus Freaks, Oculus: X » ; idem pour « After : X ».
+    Oculus : « X » + images des clans infiltrables -> « Infiltrated La Junta, Piranas: X » (l'ability n'agit que si
+    l'Oculus a infiltré l'un de ces clans).
     """
     content = container.find("div", {"class": "vcenterContent"}) or container
     clans = [img.get("alt", "").strip() for img in content.find_all("img", {"class": "clan"}) if img.get("alt")]
     text = re.sub(r"\s+", " ", content.get_text(" ", strip=True)).strip()
-    if clans and text.lower().startswith("versus"):
-        rest = text.split(":", 1)[1].strip() if ":" in text else ""
-        return f"Versus {', '.join(clans)}: {rest}"
-    return text
+    if not clans:
+        return text
+    lowered = text.lower()
+    for prefix in ("versus", "after"):
+        if lowered.startswith(prefix):
+            rest = text.split(":", 1)[1].strip() if ":" in text else ""
+            return f"{prefix.capitalize()} {', '.join(clans)}: {rest}"
+    return f"Infiltrated {', '.join(clans)}: {text}"
 
 
 def _int(text: str) -> int:

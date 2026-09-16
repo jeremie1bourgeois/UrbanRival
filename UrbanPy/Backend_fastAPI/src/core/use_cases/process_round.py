@@ -178,6 +178,16 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, own_
             if not any(card.faction in clans for card in opp_player.cards):
                 return False
             capacity.effect_conditions.remove(condition)
+        elif condition.startswith("after:"):                 # « After <clans> » : ma carte du round précédent est du clan
+            clans = condition[len("after:"):].split("|")    # (jamais au round 1 ; un Oculus infiltré ne compte pas)
+            previous_index = None if last_round is None else (last_round.ally if is_ally else last_round.enemy).card_index
+            if previous_index is None or own_player.cards[previous_index].faction not in clans:
+                return False
+            capacity.effect_conditions.remove(condition)
+        elif condition.startswith("infiltrated:"):           # ability d'Oculus : active seulement si le clan adopté est listé
+            if clan_for_bonus(own_player, own_player.cards[own_card_index]) not in condition[len("infiltrated:"):].split("|"):
+                return False
+            capacity.effect_conditions.remove(condition)
         elif condition.startswith("bet"):
             if not _bet_condition_met(condition, own_player.cards[own_card_index].pillz_fight):
                 return False
@@ -260,14 +270,28 @@ def infiltrated_clan(player: Player):
     deux autres clans -> celui de la carte seule ; trois autres clans ou plus d'un Oculus -> None.
     Les Leaders ne comptent pas comme clan (hypothèse, non documentée).
     """
-    if sum(1 for c in player.cards if c.faction == OCULUS) != 1:
+    oculus = [c for c in player.cards if c.faction == OCULUS]
+    if len(oculus) != 1:
         return None
     counts = Counter(c.faction for c in player.cards if c.faction not in (OCULUS, LEADER))
     if len(counts) == 1:
-        return next(iter(counts))
-    if len(counts) == 2:
+        clan = next(iter(counts))
+    elif len(counts) == 2:
         lone = [clan for clan, n in counts.items() if n == 1]
-        return lone[0] if len(lone) == 1 else None
+        clan = lone[0] if len(lone) == 1 else None
+    else:
+        clan = None
+    allowed = infiltrable_clans(oculus[0])
+    return clan if clan is not None and (allowed is None or clan in allowed) else None
+
+
+def infiltrable_clans(card: Card):
+    """Clans listés sur la carte Oculus (icônes de l'ability, condition « infiltrated:Clan|Clan ») ; None si inconnus."""
+    if card.ability is None:
+        return None
+    for condition in card.ability.effect_conditions:
+        if condition.startswith("infiltrated:"):
+            return condition[len("infiltrated:"):].split("|")
     return None
 
 

@@ -166,6 +166,20 @@ def test_versus_prefix_keeps_the_clan_names(text, expected):
     assert parsed(text) == expected
 
 
+@pytest.mark.parametrize("text, expected", [
+    ("After Oculus, Tolvack: Power +3", cap("ally", ["power"], 3, conditions=["after:Oculus|Tolvack"])),
+    ("After Pussycats, Sakrohm: -4 Opp. Life Min 0", cap("enemy", ["life"], -4, borne=0, conditions=["after:Pussycats|Sakrohm"])),
+    ("Infiltrated La Junta, Piranas: +1 Pillz And Life", cap("ally", ["pillz", "life"], 1, conditions=["infiltrated:La Junta|Piranas"])),
+    ("Infiltrated Freaks: Courage: Damage +2", cap("ally", ["damage"], 2, conditions=["courage", "infiltrated:Freaks"])),
+])
+def test_after_and_infiltrated_prefixes_keep_the_clan_names(text, expected):
+    assert parsed(text) == expected
+
+
+def test_after_without_clan_is_unsupported():
+    assert parse_capacity("After : Power +2").reason == "unsupported prefix: after"
+
+
 def test_versus_without_clan_is_unsupported():
     result = parse_capacity("Versus  : Power +2")   # ancien scraping : le clan (une image) a été perdu
 
@@ -353,14 +367,14 @@ def test_gibberish_is_unknown_core():
 
 # --- Couverture sur les descriptions officielles -----------------------------------------
 
-SUPPORTED_DESCRIPTIONS_FLOOR = 1250  # mesuré le 2026-09-16 sur 1310 descriptions ; à relever quand la couverture progresse
+SUPPORTED_DESCRIPTIONS_FLOOR = 1373  # mesuré le 2026-09-16 sur 1396 descriptions ; à relever quand la couverture progresse
 
 
 def test_every_official_description_parses_without_raising():
     descriptions = all_capacity_descriptions()
     results = {text: parse_capacity(text) for text in descriptions}   # ne doit pas lever
 
-    assert len(descriptions) == 1310   # instantané iclintz du 2026-09-15
+    assert len(descriptions) == 1396   # instantané iclintz du 2026-09-15, clans « After » et « Infiltrated » rendus en texte le 2026-09-16
     assert all(r.reason for r in results.values() if not r.supported)
     supported = sum(1 for r in results.values() if r.supported)
     assert supported >= SUPPORTED_DESCRIPTIONS_FLOOR, f"couverture en baisse : {supported} < {SUPPORTED_DESCRIPTIONS_FLOOR}"

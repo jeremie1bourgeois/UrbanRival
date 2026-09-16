@@ -54,22 +54,29 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--output", default=os.path.join(ROOT, "data", "jsonData_officiel.json"))
+    parser.add_argument("--from-cache", action="store_true",
+                        help="ne touche pas au réseau : regénère le JSON à partir des pages déjà en cache (ex. après un changement du parseur HTML)")
     args = parser.parse_args()
     os.makedirs(CACHE_DIR, exist_ok=True)
 
     session = requests.Session()
     session.headers["User-Agent"] = USER_AGENT
 
-    ids = clan_ids(fetch(session, CLANS_INDEX_URL))
-    print(f"{len(ids)} clans", flush=True)
-    card_ids = []
-    for clan_id in ids:
-        links = card_links(fetch(session, CLAN_URL.format(clan_id=clan_id)))
-        for link in links:
-            card_id = int(re.search(r"ID=(\d+)", link).group(1))
-            if card_id not in card_ids:
-                card_ids.append(card_id)
-        print(f"  clan {clan_id}: {len(links)} cartes (total {len(card_ids)})", flush=True)
+    if args.from_cache:
+        card_ids = sorted(int(match.group(1)) for name in os.listdir(CACHE_DIR)
+                          for match in [re.fullmatch(r"card_(\d+)\.html", name)] if match)
+        print(f"{len(card_ids)} pages en cache", flush=True)
+    else:
+        ids = clan_ids(fetch(session, CLANS_INDEX_URL))
+        print(f"{len(ids)} clans", flush=True)
+        card_ids = []
+        for clan_id in ids:
+            links = card_links(fetch(session, CLAN_URL.format(clan_id=clan_id)))
+            for link in links:
+                card_id = int(re.search(r"ID=(\d+)", link).group(1))
+                if card_id not in card_ids:
+                    card_ids.append(card_id)
+            print(f"  clan {clan_id}: {len(links)} cartes (total {len(card_ids)})", flush=True)
 
     cards, failures = [], []
     started = time.time()
