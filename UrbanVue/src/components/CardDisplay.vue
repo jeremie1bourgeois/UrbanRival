@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { Card, hasUnsupportedPower } from "../models/game.interface";
 
 const props = defineProps({
@@ -14,12 +14,21 @@ const props = defineProps({
 	},
 });
 
+const imageBroken = ref(false);
+
 // Images servies par le CDN d'Urban Rivals (données scrapées) ; repli sur les anciens fichiers locaux
 const imageSrc = computed(() => {
+	if (imageBroken.value) return "";
 	if (props.card.image) return props.card.image;
 	if (!props.card.name) return "src/assets/default-card.jpg";
 	return "src/assets/imageCard/" + `${props.card.name.replace(/\s+/g, "_")}_${props.card.stars}.jpg`;
 });
+
+if (props.card.image) {
+	const probe = new Image();
+	probe.onerror = () => (imageBroken.value = true);
+	probe.src = props.card.image;
+}
 
 const clanSrc = computed(() => {
 	if (props.card.clan_image) return props.card.clan_image;
@@ -58,7 +67,7 @@ const powerClass = computed(() => {
 <template>
 	<div
 		class="bg-gray-800 text-white border border-gray-700 rounded-md shadow-md w-[166px] h-[237px] text-center cardFrame urbanFont"
-		:style="{ backgroundImage: `url(${imageSrc})`, backgroundSize: 'cover', backgroundPosition: 'center' }"
+		:style="{ backgroundImage: imageSrc ? `url(${imageSrc})` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }"
 		:class="[card.played ? 'card-played' : '']"
 	>
 		<div class="cardHeader flex items-center">

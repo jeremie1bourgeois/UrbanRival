@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import CardDisplay from "./CardDisplay.vue";
 import { Card } from "../models/game.interface";
 
@@ -18,6 +18,16 @@ const emit = defineEmits(["close", "combat"]);
 const closeModal = () => {
 	emit("close");
 };
+
+const onKey = (event: KeyboardEvent) => {
+	if (event.key === "Escape") closeModal();
+};
+onMounted(() => window.addEventListener("keydown", onKey));
+onUnmounted(() => window.removeEventListener("keydown", onKey));
+
+// Pillz misées et restantes après le coup (la fury en coûte 3)
+const pillzBet = computed(() => selectedPillz.value - 1 + (isFury.value ? 3 : 0));
+const pillzLeft = computed(() => props.maxPillz - pillzBet.value);
 
 const confirmCombat = () => {
 	emit("combat", selectedPillz.value, isFury.value);
@@ -86,7 +96,13 @@ const pillzArray = computed(() => Array.from({ length: props.maxPillz }, (_, i) 
 					</button>
 				</div>
 
-				<div class="text-2xl text-center urbanFont text-white">Attaque: {{ selectedPillz * card.power }}</div>
+				<div class="text-center">
+					<div class="text-2xl text-white urbanFont">Attaque de base : {{ selectedPillz * card.power }}</div>
+					<div class="text-xs text-gray-400">
+						{{ pillzBet }} pillz misée{{ pillzBet > 1 ? "s" : "" }}{{ isFury ? " (fury comprise)" : "" }} · il en restera
+						{{ pillzLeft }} · hors bonus et abilities
+					</div>
+				</div>
 
 				<div>
 					<button
