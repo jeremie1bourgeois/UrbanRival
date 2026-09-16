@@ -46,6 +46,9 @@ class Card:
         self.attack: int = 0
         self.played: bool = False
         self.win: bool = False
+        # Stats (« life » / « pillz ») dont les modifications de cette carte sont annulées ce round par un Annul adverse :
+        # ses effets persistants (ceux qu'elle a posés sur l'adversaire, ceux dont elle profite) ne tiquent pas ce round.
+        self.cancelled_modifs: set = set()
 
     @staticmethod
     def from_dict_template(data: dict) -> "Card":

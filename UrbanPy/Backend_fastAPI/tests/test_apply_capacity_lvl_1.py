@@ -223,21 +223,6 @@ def test_cancel_opp_life_modif_removes_end_of_round_life_effects(template_game):
     assert template_game.ally.life == 12 - 3
 
 
-@pytest.mark.parametrize("enemy_ability", ["Poison 2, Min 1", "Toxin 2, Min 1", "Heal 2, Max 14", "Regen 2, Max 14"])
-def test_cancel_opp_life_modif_also_cancels_persistent_life_effects(template_game, enemy_ability):
-    # Règle officielle : « The effects of your opponent's poison, toxin, regen and heal abilities will be deactivated
-    # for the round in which the "cancel opponent life modification" is activated. »
-    play(template_game, ally_ability="Cancel Opp. Life Modif.", enemy_ability=enemy_ability)   # Asporov gagne
-
-    assert template_game.ally.effect_list == [] and template_game.enemy.effect_list == []
-
-
-def test_cancel_opp_pillz_modif_also_cancels_dope(template_game):
-    play(template_game, ally_ability="Cancel Opp. Pillz Modif.", enemy_ability="Dope 2, Max 14")   # Asporov gagne
-
-    assert template_game.enemy.effect_list == []
-
-
 def test_cancel_capacities_are_consumed(template_game):
     amelia, _ = play(template_game, ally_ability="Cancel Opp. Life Modif.")
 

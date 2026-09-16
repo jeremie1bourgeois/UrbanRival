@@ -24,10 +24,22 @@ IMMEDIATE_KINDS = ("toxine", "regen", "dope", "consume")
 _LIFE_LOSS_AND_PILLZ_LOSS = ("combust",)
 
 
+_STAT_OF_KIND = {"poison": "life", "toxine": "life", "heal": "life", "regen": "life",
+                 "dope": "pillz", "repair": "pillz", "consume": "pillz", "combust": "life"}
+_CAUSED_BY_OPPONENT = ("poison", "toxine", "consume", "combust")   # posés sur un joueur par son adversaire
+
+
+def _suspended(effect: PersistentEffect, player_card: Card, opp_card: Card) -> bool:
+    """Un Annul Modif Vie/Pillz Adv. suspend pour le round les effets persistants de la carte annulée (glossaire 56)."""
+    author = opp_card if effect.kind in _CAUSED_BY_OPPONENT else player_card
+    return _STAT_OF_KIND[effect.kind] in author.cancelled_modifs
+
+
 def apply_capacity_lvl_4(game: Game, card1: Card, card2: Card) -> None:
-    tick_persistent_effects(game.ally)
-    tick_persistent_effects(game.enemy)
-    for card, opp_card, own, opp in ((card1, card2, game.ally, game.enemy), (card2, card1, game.enemy, game.ally)):
+    sides = ((card1, card2, game.ally, game.enemy), (card2, card1, game.enemy, game.ally))
+    for card, opp_card, own, opp in sides:
+        tick_persistent_effects(own, skip=lambda effect: _suspended(effect, card, opp_card))
+    for card, opp_card, own, opp in sides:
         for slot in FIGHT_SLOTS:
             capacity = getattr(card, slot)
             if capacity is None:
@@ -40,7 +52,7 @@ def apply_capacity_lvl_4(game: Game, card1: Card, card2: Card) -> None:
             for player in affected:
                 effect = PersistentEffect(kind, value, capacity.borne)
                 register_persistent_effect(player, effect)
-                if kind in IMMEDIATE_KINDS:
+                if kind in IMMEDIATE_KINDS and _STAT_OF_KIND[kind] not in card.cancelled_modifs:
                     _tick(player, effect)
             setattr(card, slot, None)
 
@@ -57,9 +69,10 @@ def _lose(player: Player, attr: str, value: int, floor: int) -> None:
         setattr(player, attr, max(floor, current - value))
 
 
-def tick_persistent_effects(player: Player) -> None:
+def tick_persistent_effects(player: Player, skip=None) -> None:
     for effect in player.effect_list:
-        _tick(player, effect)
+        if skip is None or not skip(effect):
+            _tick(player, effect)
 
 
 def _tick(player: Player, effect: PersistentEffect) -> None:

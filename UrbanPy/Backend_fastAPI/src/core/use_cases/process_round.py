@@ -378,6 +378,7 @@ def init_fight_data(card: Card, nb_pillz: int, fury: bool):
     card.pillz_fight = nb_pillz
     card.fury = fury
     card.attack = 0
+    card.cancelled_modifs = set()
 
 
 

@@ -267,3 +267,57 @@ def test_corrosion_is_a_poison_worth_the_round_number(game):
 
     assert effects(game.enemy) == [("poison", 2, 0)]
 
+
+# --- Annul Modif Vie / Pillz Adv. face aux effets persistants — glossaire officiel (56) : « n'annule un effet permanent
+# (Poison, Soin, Toxine, Régén) que pendant le round où il est joué. L'effet reprendra lors du round suivant. Il en va
+# de même pour Annul Modif Pillz Adv. face à un Dope ou Consume. » ----------------------------------------------------
+
+def test_cancel_life_modif_skips_the_tick_of_the_opponent_poison_for_one_round(game):
+    play(game, 1, ally_ability="Poison 2, Min 0", ally_pillz=6)                 # ennemi 7, poison posé
+    play(game, 2, enemy_ability="Cancel Opp. Life Modif.", enemy_pillz=2)       # Bhudd gagne : le poison (modif alliée) ne tique pas
+
+    assert (game.enemy.life, effects(game.enemy)) == (7, [("poison", 2, 0)])
+
+    play(game, 3, enemy_pillz=5)                                                # B Mappe gagne : le poison reprend
+
+    assert game.enemy.life == 5
+
+
+def test_cancel_life_modif_registers_a_new_toxin_but_skips_its_immediate_tick(game):
+    play(game, 1, ally_ability="Toxin 2, Min 0", enemy_ability="Cancel Opp. Life Modif.", ally_pillz=6)   # Amelia gagne : 7
+
+    assert (game.enemy.life, effects(game.enemy)) == (7, [("toxine", 2, 0)])
+
+    play(game, 2, enemy_pillz=2)                                                # la toxine reprend : 7 -> 5
+
+    assert game.enemy.life == 5
+
+
+def test_cancel_life_modif_skips_the_opponent_own_heal(game):
+    play(game, 1, enemy_ability="Heal 2 Max. 14")                               # Asporov gagne : allié 9, heal ennemi posé
+    play(game, 2, ally_ability="Cancel Opp. Life Modif.")                        # Allison gagne : ennemi 9, pas de soin
+
+    assert game.enemy.life == 9
+
+    play(game, 3)                                                               # Agustino gagne : 9 - 2 + 2 (heal)
+
+    assert game.enemy.life == 9
+
+
+def test_cancel_life_modif_does_not_touch_my_own_persistent_effects(game):
+    play(game, 1, ally_ability="Poison 2, Min 0", ally_pillz=6)                 # ennemi 7
+    play(game, 2, ally_ability="Cancel Opp. Life Modif.")                        # Allison gagne : 7 - 3, mon poison tique -> 2
+
+    assert game.enemy.life == 2
+
+
+def test_cancel_pillz_modif_skips_the_opponent_dope_for_one_round(game):
+    play(game, 1, ally_ability="Dope 2, Max. 12", ally_pillz=6)                 # allié 7 + 2 = 9
+    play(game, 2, enemy_ability="Cancel Opp. Pillz Modif.", enemy_pillz=2)      # Bhudd gagne : pas de dope ce round
+
+    assert game.ally.pillz == 9
+
+    play(game, 3)                                                               # dope reprend -> 11
+
+    assert game.ally.pillz == 11
+

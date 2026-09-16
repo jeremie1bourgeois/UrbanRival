@@ -13,7 +13,7 @@ ce document décrit **où on en est et ce qui reste**, pour reprendre le travail
 | Moteur | 4 niveaux réécrits et testés (méta, stats, fin de round, persistants) ; bonus de clan (≥ 2 du clan, Oculus infiltré sur ses clans listés, Leaders), conditions Courage / Revenge / Confidence / Reprisal / Symmetry / Asymmetry / Stop / Killshot / Perfect / Bet / Versus / After / Unison / Disunion / Defeat / Backlash / Victory or Defeat / Team ; Tune Out, Impose, Cards, Consume / Combust / Mindwipe / Corrosion, Xantiax, Corrupt, Fatal Killshot, Sinister Symmetry, Leaders Tie-break / Counter-attack / Limitless / Per Round ; `scripts/engine_crash_sweep.py` : 0 exception |
 | API | `/cards`, `/init_game/`, `/init_game/template`, `/process_round/{id}`, `/ai_pick/{id}`, `/save_for_test` |
 | Front | deck builder (recherche, filtre clan, aléatoire, statut des bonus, decks mémorisés), partie à deux ou contre l'ordinateur (aléatoire / heuristique), historique des rounds, fin de partie, effets persistants, illustrations |
-| Tests | 408 backend (pytest) + 22 front (vitest) ; CI GitHub Actions (backend + front) ; 3 fixtures de rejeu `data/test/` |
+| Tests | 416 backend (pytest) + 22 front (vitest) ; CI GitHub Actions (backend + front) ; 3 fixtures de rejeu `data/test/` |
 | Dépôt | nettoyé (IDE, binaires, doublons), fins de ligne LF (`.gitattributes`), README |
 
 ### Décisions de règles prises sans certitude (à confirmer contre les règles officielles)
@@ -27,9 +27,9 @@ Cancel Life Modif., Reanimate, Versus) ont été **corrigées** le même jour ; 
 |---|---|
 | Stops résolus **en chaîne** (un Stop stoppé ne stoppe rien) — règle officielle, art. 91 du support | `apply_capacity_lvl_1._stopped_slots`, tests `test_official_example_1/2_*` |
 | Cycles (SoA contre SoA, Protection: Ability + Protection: Bonus face à SoA + SoB) : les Stops gagnent — non documenté | idem, `test_soa_versus_soa_is_a_cycle_where_both_stops_win` |
-| « Cancel Opp. Life Modif. » **annule aussi** poison / toxin / heal / regen (Pillz Modif. : dope) — règle officielle | `apply_capacity_lvl_1.PERSISTENT_TYPES_OF_STAT` |
+| « Cancel Opp. Life Modif. » **suspend pour le round** les effets persistants adverses (poison/toxin/heal/regen ; Pillz : dope/consume), qui reprennent au round suivant — glossaire officiel 56 | `Card.cancelled_modifs`, `apply_capacity_lvl_4._suspended` |
 | Reanimate = « Defeat: +X Life » qui marche aussi depuis 0 (règle officielle) ; les effets de fin de round sont sautés sur KO | `apply_capacity_lvl_3.apply_reanimate` + boucle de niveau 3, `process_round` |
-| Recover X out of Y : ⌊pillz misées × X / Y⌋, **fury comprise** (confirmé) ; minimum 1 et pillz gratuite : non tranchés | `apply_capacity_lvl_3.recovered_pillz` |
+| Recover X out of Y : ⌊pillz misées × X / Y⌋, **minimum 1** (glossaire 53), fury comprise ; pillz gratuite exclue (non tranché) | `apply_capacity_lvl_3.recovered_pillz` |
 | Infiltrated (Oculus) — règle officielle : un seul autre clan → celui-là ; deux → celui de la **carte seule** ; trois ou deux Oculus → rien. Leaders hors décompte (hypothèse) ; la liste des clans infiltrables imprimée sur la carte n'est pas modélisée | `process_round.infiltrated_clan` |
 | Team (Leader) : s'applique à chaque carte jouée, Leader compris, seulement si Leader unique | `process_round.leader_team_capacity` |
 | Versus (clans) : s'active si la **main** adverse contient une carte du clan, pas seulement la carte en face — règle officielle | `process_round.check_capacity_condition` |
@@ -37,7 +37,9 @@ Cancel Life Modif., Reanimate, Versus) ont été **corrigées** le même jour ; 
 | Killshot : attaque > 0 et ≥ 2 × attaque adverse, évaluée après les modificateurs d'attaque | `process_round.apply_killshot_condition` |
 | per damage : dégâts réellement infligés (0 en défaite) | `multipliers._nb_damage_inflicted` |
 | Copy : copie l'emplacement adverse tel que joué (conditions déjà évaluées) ; Copy vs Copy → rien | `apply_capacity_lvl_1._apply_copies` |
-| Fury : +2 dégâts ajoutés **après** les modificateurs de dégâts (confirmé par l'utilisateur) | `process_round` |
+| Fury : +2 dégâts ajoutés **après** les modificateurs de dégâts (utilisateur ; glossaire 56 : « Annul Modif Dégâts n'annule pas la Fury ») | `process_round` |
+| Toxine / Régén / Dope / Consume agissent **dès le round joué** (glossaire 51, 52) ; Poison / Heal / Repair / Combust aux rounds suivants | `apply_capacity_lvl_4.IMMEDIATE_KINDS` |
+| « Per Pillz Left » : pillz **avant la mise**, pillz gratuite exclue (glossaire 66) | `multipliers._nb_pillz_left` |
 | `Day:` toujours valide, `Night:` jamais (décision utilisateur, cycle jour/nuit non modélisé) | `capacity_parser._IGNORED_PREFIXES` |
 
 ### Ce que le moteur ne modélise pas du tout
