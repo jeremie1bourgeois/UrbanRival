@@ -156,3 +156,51 @@ def test_tune_out_is_logged(template_game):
     play(template_game, ally_bonus="Tune Out", ally_pillz=2)
 
     assert "Tune Out : le round se résout aux pillz (Amelia 2, Asporov 1)" in texts(template_game)
+
+
+# --- Fin de round (niveau 3) et effets persistants (niveau 4) ----------------------------------
+
+def test_end_of_round_life_and_pillz_effects_are_logged(template_game):
+    play(template_game, ally_ability="+3 Life", enemy_ability="Defeat: +2 Pillz", ally_pillz=6)   # Amelia gagne
+
+    log = texts(template_game)
+    assert "Amelia : pouvoir « +3 Life » → vie de l'allié 12 → 15" in log
+    assert "Asporov : pouvoir « Defeat: +2 Pillz » → pillz de l'ennemi 12 → 14" in log
+
+
+def test_recover_and_reanimate_are_logged(template_game):
+    play(template_game, ally_ability="Defeat: Recover 2 Pillz Out Of 3", ally_pillz=4, enemy_pillz=8)   # Amelia perd, 3 misées -> 2
+
+    assert "Amelia : pouvoir « Defeat: Recover 2 Pillz Out Of 3 » → pillz de l'allié 9 → 11" in texts(template_game)
+
+    game = template_game
+    game.ally.life = 3
+    game.ally.cards[2].played = game.enemy.cards[0].played = False
+    play(game, ally_ability="Reanimate +2 Life", ally_pillz=1, enemy_pillz=2)   # Amelia perd 3 -> 0, réanimée
+
+    assert "Amelia : pouvoir « Reanimate +2 Life » réanime l'allié → vie 0 → 2" in texts(game)
+
+
+def test_instant_ko_is_logged(template_game):
+    play(template_game, ally_ability="Fatal Killshot", ally_pillz=10)
+
+    assert "Amelia : pouvoir « Fatal Killshot » met l'ennemi KO" in texts(template_game)
+
+
+def test_persistent_effects_registration_tick_and_suspension_are_logged(template_game):
+    from tests.test_apply_capacity_lvl_4 import play as play4
+    game = template_game
+    for player in (game.ally, game.enemy):
+        for card in player.cards:
+            card.ability = None
+            card.ability_description = ""
+    game.enemy.cards[2].ability_description = "Cancel Opp. Life Modif."
+
+    play4(game, 1, ally_ability="Poison 2, Min 1", ally_pillz=6)
+    assert "Amelia : pouvoir « Poison 2, Min 1 » → poison 2 (min 1) sur l'ennemi" in texts(game)
+
+    play4(game, 2, enemy_ability="Cancel Opp. Life Modif.", enemy_pillz=2)
+    assert "poison 2 sur l'ennemi suspendu ce round (Annul)" in texts(game)
+
+    play4(game, 3, enemy_pillz=5)
+    assert "poison 2 → vie de l'ennemi 7 → 5" in texts(game)

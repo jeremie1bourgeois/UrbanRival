@@ -2,6 +2,7 @@ from src.core.domain.player import Player
 from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card, FIGHT_SLOTS
 from src.core.domain.game import Game
+from src.core.domain.journal import label, note, stat_change
 from src.core.use_cases.multipliers import multiplier
 
 # Types de capacité du niveau 3 -> attribut du joueur modifié
@@ -23,17 +24,24 @@ def apply_capacity_lvl_3(game: Game, card1: Card, card2: Card) -> None:
                 continue
             if "reanimate" in capacity.types:      # Reanimate = « Defeat: +X Life » (le cas KO est traité par apply_reanimate)
                 if not card.win:
+                    before = own.life
                     own.life += capacity.value * multiplier(capacity.how, game, own, opp, card, opp_card)
+                    note(card, "fin de round", f"{card.name} : {label(capacity)} → {stat_change('life', 'de ' + _side(game, own), before, own.life)}")
                 setattr(card, slot, None)
                 continue
             capacity = check_capacity_condition_lvl_3(capacity, card.win)
             if capacity is not None and "ko" in capacity.types:       # Fatal Killshot / Sinister Symmetry : KO immédiat
                 opp.life = 0
+                note(card, "fin de round", f"{card.name} : {label(capacity)} met {_side(game, opp)} KO")
                 capacity = None
             if capacity is not None and "recover" in capacity.types:
+                before = own.pillz
                 own.pillz += recovered_pillz(card, capacity)
+                note(card, "fin de round", f"{card.name} : {label(capacity)} → {stat_change('pillz', 'de ' + _side(game, own), before, own.pillz)}")
                 if capacity.target == "both":                       # « Recover X Players Pillz » : chacun sur sa propre mise
+                    before = opp.pillz
                     opp.pillz += recovered_pillz(opp_card, capacity)
+                    note(card, "fin de round", f"{card.name} : {label(capacity)} → {stat_change('pillz', 'de ' + _side(game, opp), before, opp.pillz)}")
                 capacity = None
             for apply in (apply_target_ally_effects, apply_target_both_effects, apply_target_enemy_effects):
                 if capacity is None:
@@ -64,8 +72,14 @@ def _reanimate(game: Game, own: Player, opp: Player, card: Card, opp_card: Card)
     for slot in FIGHT_SLOTS:
         capacity = getattr(card, slot)
         if capacity is not None and "reanimate" in capacity.types:
+            before = own.life
             own.life += capacity.value * multiplier(capacity.how, game, own, opp, card, opp_card)
+            note(card, "fin de round", f"{card.name} : {label(capacity)} réanime {_side(game, own)} → vie {before} → {own.life}")
             setattr(card, slot, None)
+
+
+def _side(game: Game, player: Player) -> str:
+    return "l'allié" if player is game.ally else "l'ennemi"
 
 
 def check_capacity_condition_lvl_3(capacity: Capacity, has_won: bool) -> Capacity:
@@ -111,7 +125,10 @@ def _apply_targeted(target: str, players: list, game: Game, player1: Player, pla
         return capacity
     bonus = capacity.value * multiplier(capacity.how, game, player1, player2, card1, card2)
     for player in players:
+        before = {attr: getattr(player, attr) for attr in attrs}
         _apply_to(player, attrs, bonus, capacity.borne)
+        changes = ", ".join(stat_change(attr, 'de ' + _side(game, player), before[attr], getattr(player, attr)) for attr in attrs)
+        note(card1, "fin de round", f"{card1.name} : {label(capacity)} → {changes}")
     return None
 
 
