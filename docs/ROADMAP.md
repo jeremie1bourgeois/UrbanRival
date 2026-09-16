@@ -20,6 +20,9 @@ ce document décrit **où on en est et ce qui reste**, pour reprendre le travail
 
 Chacune est isolée dans une fonction et couverte par un test : changer d'avis = une ligne + un test.
 
+**Audit du 2026-09-16 : voir `docs/REGLES.md`** — 5 décisions contredites par les sources (Stops, Bet, Infiltrated,
+Cancel Life Modif., Reanimate), 4 confirmées, le reste non documenté ; définitions des mécaniques de § 2.A retrouvées.
+
 | Règle retenue | Où |
 |---|---|
 | Stop Opp. Ability contre Stop Opp. Bonus : **les deux s'appliquent** (résolution simultanée) | `apply_capacity_lvl_1._stopped_kinds`, test `test_stops_resolve_simultaneously_soa_versus_sob` |
@@ -45,8 +48,7 @@ Chacune est isolée dans une fonction et couverte par un test : changer d'avis =
 
 ### A. Pouvoirs non gérés — 157 cartes
 
-Règles inconnues de l'utilisateur comme de l'assistant : **à documenter d'abord** (page « Règles » d'Urban Rivals ou wiki
-des joueurs), puis chacune se code comme Killshot ou Bet (une condition dans `check_capacity_condition` /
+Définitions retrouvées et consignées dans `docs/REGLES.md` § 4 ; chacune se code ensuite chacune se code comme Killshot ou Bet (une condition dans `check_capacity_condition` /
 `DEFERRED_CONDITIONS`, ou un multiplicateur dans `multipliers.py`) avec 3-4 tests de bout en bout.
 
 | Mécanique | Cartes (niveau max) | Descriptions | Note |
@@ -66,7 +68,7 @@ des joueurs), puis chacune se code comme Killshot ou Bet (une condition dans `ch
 Utilisateur : Unison et After sont **volontairement ignorés** tant que leurs règles ne sont pas connues.
 
 ### B. Fiabilité des règles existantes
-1. Confirmer les décisions du tableau § 1 contre les règles officielles.
+1. ~~Confirmer les décisions du tableau § 1 contre les règles officielles~~ → fait (`docs/REGLES.md`) ; appliquer les corrections listées en § 3 de ce document.
 2. Alimenter `data/test/` : jouer des rounds dans l'interface, vérifier à la main, « Sauvegarder … pour les tests », commiter.
    Viser en priorité les clans à bonus méta (Nightmare, Skeelz, Piranas, Roots, GHEIST, Raptors, Oblivion, Oculus, Vortex, Montana).
 3. Le journal des effets (D2) rendra ces vérifications beaucoup plus rapides.
