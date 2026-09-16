@@ -10,8 +10,9 @@ Objectif à terme : une IA par apprentissage par renforcement.
 | Cartes jouables | **2 497** (36 clans), données scrapées d'iclintz.com le 2026-09-15, illustrations incluses |
 | Pouvoirs (abilities / bonus) | **1 132 / 1 310 descriptions gérées (86 %)**, 2 340 cartes sur 2 497 entièrement gérées — `python scripts/capacity_coverage.py` liste le reste |
 | Moteur | 4 niveaux d'effets (méta, stats, fin de round, persistants), bonus de clan, Leaders, conditions Courage/Revenge/Confidence/Reprisal/Symmetry/Asymmetry/Stop/Killshot/Bet/Versus/Defeat/Backlash/Victory or Defeat |
-| Tests | 332 backend (pytest) + 22 front (vitest) ; balayage de robustesse sur toutes les descriptions gérées |
-| Interface | composition de deck (recherche, filtre par clan, decks aléatoires, statut des bonus, decks mémorisés), partie de 4 rounds contre un second joueur ou **contre l'ordinateur** (aléatoire / heuristique), historique des rounds, fin de partie, effets persistants |
+| Tests | 464 backend (pytest) + 24 front (vitest) ; balayage de robustesse sur toutes les descriptions gérées |
+| Interface | composition de deck (recherche, filtre par clan, decks aléatoires, statut des bonus, decks mémorisés), partie de 4 rounds contre un second joueur ou **contre l'ordinateur** (aléatoire / heuristique / glouton / minimax), historique des rounds, fin de partie, effets persistants |
+| IA | API moteur pure (`step` / `legal_actions` / `result` / `reward`), adversaires qui simulent un coup d'avance, banc d'essai (taux de victoire) et mesure de débit — cible : un solveur d'équilibre, voir [docs/IA.md](docs/IA.md) |
 
 Non gérés pour l'instant (par nombre de descriptions) : Unison (62), After (37), Tune Out (bonus Cosmohnuts), Cards (15), Mindwipe (7), Disunion (7), Perfect (7), Combust (6), Impose (5) et quelques mécaniques à 1-3 cartes. `Day:` est considéré toujours valide, `Night:` jamais.
 
@@ -23,7 +24,8 @@ UrbanPy/Backend_fastAPI/       backend FastAPI
   src/core/domain/             Game, Player, Card, Capacity, PersistentEffect
   src/core/parsing/            capacity_parser.py : texte d'ability -> Capacity (vocabulaire du moteur)
   src/core/use_cases/          process_round.py + apply_capacity_lvl_1..4.py (le moteur) + multipliers.py
-  src/core/ai/                 adversaires automatiques (aléatoire, heuristique)
+  src/core/ai/                 engine.py (API moteur pure), evaluation.py, opponent.py (aléatoire,
+                               heuristique, glouton, minimax), arena.py (banc d'essai)
   src/core/services/           game_service.py : parties persistées en JSON (data/game/, ignoré par git)
   src/adapters/repositories/   accès aux données officielles, sauvegarde des parties
   src/adapters/scraping/       extracteur HTML iclintz (pur, testé)
@@ -62,8 +64,8 @@ pour les tests » enregistre le round dans `data/test/test_N/` (voir ci-dessous)
 ## Tests
 
 ```bash
-cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 332 tests
-cd UrbanVue && npm test && npm run lint && npm run build           # 22 tests, lint, type-check + build
+cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 464 tests
+cd UrbanVue && npm test && npm run lint && npm run build           # 24 tests, lint, type-check + build
 ```
 
 Les tests du moteur sont écrits **de bout en bout** : un texte d'ability (« Growth: -1 Opp Power, Min 4 ») est parsé puis
@@ -83,6 +85,8 @@ cd UrbanPy/Backend_fastAPI
 .venv/bin/python scripts/capacity_coverage.py       # descriptions non gérées par le parseur, groupées par raison
 .venv/bin/python scripts/engine_crash_sweep.py      # joue un round avec chaque description gérée, liste les exceptions
 .venv/bin/python scripts/scrape_official_cards.py   # re-scrape iclintz.com (cache dans data/.scrape_cache, reprise possible)
+.venv/bin/python scripts/ai_arena.py --games 200    # taux de victoire des adversaires automatiques, deux à deux
+.venv/bin/python scripts/bench_engine.py            # débit du moteur et coût d'une décision d'IA
 ```
 
 ## Règles du moteur
@@ -102,8 +106,9 @@ Deux règles ont été tranchées sans certitude et sont isolées dans le code a
 
 État des lieux détaillé, décisions de règles et travail restant : [docs/ROADMAP.md](docs/ROADMAP.md).
 
-1. Mécaniques restantes : Unison, After, Tune Out, Cards… (règles à documenter d'abord — elles se codent comme Killshot ou Bet)
-2. Backend : journal des effets appliqués à chaque round (explicabilité, débogage des règles), API moteur pure
-   `step(state, action)` + `legal_actions(state)`, persistance en mémoire/SQLite, mise à jour FastAPI/Pydantic
-3. IA : environnement Gymnasium sur cette API, self-play (PPO/DQN), évaluation contre les adversaires heuristiques,
-   intégration comme adversaire dans l'interface
+1. Fiabilité des règles : rejouer des combats réels (oracle, [docs/ORACLE.md](docs/ORACLE.md)) et trancher les
+   mécaniques restantes (10 descriptions sans règle publiée)
+2. Backend : persistance en mémoire/SQLite, mise à jour FastAPI/Pydantic
+3. IA — **une IA imbattable en ELO** ([docs/IA.md](docs/IA.md)) : modèle d'information exact du round, matrice de
+   round rapide, solveur d'équilibre (Nash) exact en fin de partie, recherche + valeur apprise au début, puis
+   exploitation des adversaires réels. La mesure du but est l'exploitabilité, pas le taux de victoire.

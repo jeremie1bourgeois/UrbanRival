@@ -1,5 +1,6 @@
 import os
 import random
+from src.core.ai import engine
 from src.core.ai.opponent import STRATEGIES, Pick
 from src.core.use_cases.process_round import check_round_correct, process_round
 from src.core.domain.player import Player
@@ -57,21 +58,9 @@ def process_round_service(game_id: str, round_data: ProcessRoundInput):
 
 def check_end(board: Game) -> GameResult:
     """
-    Vérifie si la partie est terminée et renvoie un GameResult.
+    Vérifie si la partie est terminée et renvoie un GameResult (règle tenue par l'API moteur pure).
     """
-    if board.nb_turn > NB_ROUNDS:
-        if board.ally.life > board.enemy.life:
-            return GameResult.ALLY
-        elif board.ally.life < board.enemy.life:
-            return GameResult.ENEMY
-        else:
-            return GameResult.DRAW
-    elif board.ally.life == 0:
-        return GameResult.ENEMY
-    elif board.enemy.life == 0:
-        return GameResult.ALLY
-    else:
-        return GameResult.NONE
+    return engine.result(board)
 
 def create_game(players_cards: PlayerCards):
     """
@@ -83,17 +72,8 @@ def create_game(players_cards: PlayerCards):
     Returns:
         (Game, int): la partie initialisée (round 1 en cours) et son identifiant.
     """
-    game = Game(1, True, Player(name="ally", life=12, pillz=12), Player(name="enemy", life=12, pillz=12), [])
-
-    # Ajouter les cartes à player1
-    for card_input in players_cards.player1:
-        card = Card(card_name=card_input.card_name, nb_stars=card_input.nb_stars)
-        game.ally.cards.append(card)
-
-    # Ajouter les cartes à player2
-    for card_input in players_cards.player2:
-        card = Card(card_name=card_input.card_name, nb_stars=card_input.nb_stars)
-        game.enemy.cards.append(card)
+    game = engine.new_game([(card.card_name, card.nb_stars) for card in players_cards.player1],
+                           [(card.card_name, card.nb_stars) for card in players_cards.player2])
 
     new_id = get_new_game_id()
 

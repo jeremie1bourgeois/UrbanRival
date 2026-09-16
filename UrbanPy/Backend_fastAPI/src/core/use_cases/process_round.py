@@ -13,7 +13,14 @@ import src.core.use_cases.apply_capacity_lvl_2 as fct_lvl_2
 import src.core.use_cases.apply_capacity_lvl_3 as fct_lvl_3
 import src.core.use_cases.apply_capacity_lvl_4 as fct_lvl_4
 
-def process_round(game: Game, round_data: ProcessRoundInput) -> None:
+def process_round(game: Game, round_data: ProcessRoundInput, log: bool = True) -> None:
+    """
+    Joue un round sur la partie (modifiée sur place). `log=False` saute le journal des effets : l'état produit est
+    le même, sans les libellés français (utile pour les milliers de parties simulées par l'IA).
+    """
+    if not log:
+        _process_round(game, round_data)
+        return
     player1_card = game.ally.cards[round_data.player1_card_index]
     player2_card = game.enemy.cards[round_data.player2_card_index]
     journal = Journal(ally_card=player1_card, enemy_card=player2_card)

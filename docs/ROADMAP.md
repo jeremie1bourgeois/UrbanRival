@@ -13,7 +13,8 @@ ce document décrit **où on en est et ce qui reste**, pour reprendre le travail
 | Moteur | 4 niveaux réécrits et testés (méta, stats, fin de round, persistants) ; bonus de clan (≥ 2 du clan, Oculus infiltré sur ses clans listés, Leaders), conditions Courage / Revenge / Confidence / Reprisal / Symmetry / Asymmetry / Stop / Killshot / Perfect / Bet / Versus / After / Unison / Disunion / Defeat / Backlash / Victory or Defeat / Team ; Tune Out, Impose, Cards, Consume / Combust / Mindwipe / Corrosion, Xantiax, Corrupt, Fatal Killshot, Sinister Symmetry, Leaders Tie-break / Counter-attack / Limitless / Per Round ; `scripts/engine_crash_sweep.py` : 0 exception |
 | API | `/cards`, `/init_game/`, `/init_game/template`, `/process_round/{id}`, `/ai_pick/{id}`, `/save_for_test` |
 | Front | deck builder (recherche, filtre clan, aléatoire, statut des bonus, decks mémorisés), partie à deux ou contre l'ordinateur (aléatoire / heuristique), historique des rounds, fin de partie, effets persistants, illustrations |
-| Tests | 437 backend (pytest) + 24 front (vitest) ; CI GitHub Actions (backend + front) ; 3 fixtures de rejeu `data/test/` + 1 combat réel `data/ur_battles/` |
+| Tests | 464 backend (pytest) + 24 front (vitest) ; CI GitHub Actions (backend + front) ; 3 fixtures de rejeu `data/test/` + 1 combat réel `data/ur_battles/` |
+| IA | API moteur pure (`src/core/ai/engine.py`), évaluation d'état, adversaires aléatoire / heuristique / glouton / minimax, banc d'essai `scripts/ai_arena.py`, débit `scripts/bench_engine.py` ; cible et étapes : [docs/IA.md](IA.md) |
 | Dépôt | nettoyé (IDE, binaires, doublons), fins de ligne LF (`.gitattributes`), README |
 
 ### Décisions de règles prises sans certitude (à confirmer contre les règles officielles)
@@ -79,18 +80,31 @@ Counter-attack refixe l'ordre à chaque round.
 ### D. Backend — préparer l'IA (recommandé en premier)
 | # | Tâche | Détail |
 |---|---|---|
-| D1 | **API moteur pure** | `Engine.step(state, action) → (state, result)` et `legal_actions(state)` (déjà écrit pour l'IA : `src/core/ai/opponent.legal_picks`). `process_round` est pur ; extraire la persistance de `game_service`. Figer une représentation d'état (`Game.to_dict`) et d'action (`Pick`). |
+| D1 | ~~**API moteur pure**~~ | **Fait le 2026-09-16** : `src/core/ai/engine.py` — `step(state, ally, enemy) → (state, StepResult)`, `legal_actions`, `clone` (5× plus rapide qu'un `deepcopy`), `result` / `reward` / `is_terminal`, `new_game` sans persistance ; `check_end` de `game_service` délègue à `engine.result`, `process_round(..., log=False)` saute le journal. Débit : `scripts/bench_engine.py`. |
 | D2 | ~~**Journal des effets**~~ | **Fait le 2026-09-16** : `src/core/domain/journal.py` (`Journal`, `note`, `recording`), `Round.log` (entrées `{side, card, source, text}`), renvoyé par `/process_round`, déplié dans l'historique du front. Les fixtures de rejeu comparent l'état sans le journal. |
 | D3 | Performance | Mesurer `process_round` (deepcopy des capacités, sérialisation) ; le RL a besoin de milliers de parties/s. |
 | D4 | Persistance | Fichiers JSON par round (`data/game/`) → stockage mémoire + SQLite optionnel ; `get_new_game_id` est relatif au dossier courant (le serveur doit être lancé depuis `UrbanPy/Backend_fastAPI`). |
 | D5 | Dette | `requirements.txt` (FastAPI 0.100 de 2023, `@validator` Pydantic v1 déprécié → `field_validator`), CORS configurable, `print` de debug dans `main.py`, `debug=True`. Le front dépend du CDN d'Urban Rivals pour les images (option : script de téléchargement local). |
 
-### E. IA
-1. Adversaires étalons : aléatoire et heuristique existent (`src/core/ai/opponent.py`) ; ajouter un glouton et un minimax à 1 coup.
-2. Environnement Gymnasium `UrbanRivalEnv` sur D1 : observation = état sérialisé, action = (carte, pillz, fury), masque des actions illégales (`legal_picks`).
-3. Self-play (PPO/DQN — Stable-Baselines3 ou CleanRL), d'abord contre l'aléatoire puis contre lui-même ; decks variés.
-4. Évaluation : taux de victoire contre chaque étalon, ELO interne.
-5. Intégration : l'agent devient une stratégie de `/ai_pick`.
+### E. IA — objectif : **imbattable en ELO** (plan détaillé : [docs/IA.md](IA.md))
+
+Décision du 2026-09-16 : Urban Rivals est un jeu à somme nulle où la mise en pillz de l'adversaire est cachée. Une
+politique déterministe y est toujours exploitable — le self-play PPO/DQN « nu » converge justement vers une politique
+déterministe. La cible est donc l'**équilibre de Nash** (stratégie mixte), calculé plutôt qu'appris : le jeu est assez
+petit pour être résolu exactement en fin de partie. La mesure du but est l'**exploitabilité** (ce qu'un adversaire
+parfait gagnerait contre nous), pas le taux de victoire contre l'heuristique.
+
+1. ~~Adversaires étalons : aléatoire, heuristique, glouton, minimax à 1 coup~~ → fait (`src/core/ai/opponent.py`,
+   `evaluation.py`, banc d'essai `scripts/ai_arena.py`).
+2. Modéliser exactement le jeu ELO : 14 vies, premier joueur tiré au sort puis alterné, carte du premier joueur
+   **visible** et pillz cachées ; pool de cartes légales en ELO.
+3. Matrice de round rapide (chemin analytique vectorisé + repli moteur pour les capacités dépendant des pillz).
+4. Solveur d'équilibre (programmation linéaire, forme séquentielle) : rounds 4 et 3 exacts, mémoïsés.
+5. Rounds 1-2 : abstraction des mises + valeur `V̂` apprise sur les valeurs exactes du solveur.
+6. Mesure : `scripts/exploitability.py` (ε → 0) et échelle ELO interne ; l'oracle de combats réels grossit en
+   parallèle, car un solveur exploite les erreurs du moteur autant que celles de l'adversaire.
+7. Puis exploitation des adversaires réels (modèle d'adversaire + meilleure réponse sûre), et en phase 2 la
+   composition de deck (valeur d'équilibre d'un affrontement de mains, moyennée sur les tirages 4 parmi 8).
 
 ### F. Divers
 - Branches distantes déjà fusionnées à supprimer : `chore/infra`, `feat/donnees-scraping`, `feat/front-c`, `feat/pouvoirs-vortex-oculus`, `fix/bugs-moteur-et-fixtures`, `gameStruct`.
@@ -102,4 +116,5 @@ Counter-attack refixe l'ordre à chaque round.
 - Une branche par chantier (`feat/…`, `fix/…`, `chore/…`), commits en français, fusion `--no-ff` dans `main` après accord de l'utilisateur, push après chaque chantier.
 - TDD : test rouge avant tout code ; tests du moteur écrits de bout en bout (texte d'ability → parseur → round joué) avec des attentes calculées à la main ; balayage + couverture relancés après chaque changement de moteur ; plancher de couverture pinné dans les tests.
 - Vérification dans le navigateur (deck → partie) avant de déclarer un chantier front terminé.
-- Ordre recommandé pour la suite : **B2 (combats réels) → D1 → E**, en traitant les pouvoirs de A au fil des règles retrouvées.
+- Ordre recommandé pour la suite : **E2 (modèle ELO exact) → E3 (matrice de round rapide) → E4 (solveur)**, avec B2
+  (combats réels) mené en parallèle — le solveur a besoin de règles justes autant que de vitesse. Voir [docs/IA.md](IA.md).
