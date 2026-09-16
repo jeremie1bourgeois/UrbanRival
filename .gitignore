@@ -1,6 +1,16 @@
+# Python
 *.pyc
 __pycache__/
-UrbanPy/Backend_fastAPI/data/game
-.claude/launch.json
+.pytest_cache/
+.venv/
+venv/
 
+# Parties jouées et cache du scraper (données locales)
+UrbanPy/Backend_fastAPI/data/game
 UrbanPy/Backend_fastAPI/data/.scrape_cache
+
+# IDE / outils locaux
+.vs/
+*.suo
+*.exe
+.claude/launch.json
