@@ -1,0 +1,69 @@
+// Capture d'un combat réel Urban Rivals depuis le client web (urban-rivals.com/game/play/, session connectée).
+// Voir docs/ur-abilitydata-modele.md et docs/ROADMAP.md § 2.B.
+//
+// 1. Avant de lancer le combat, coller ce fichier entier dans la console du navigateur (ou l'exécuter via un outil
+//    d'automatisation) : il intercepte les réponses de POST /api/private/v2/ (fetch et XHR) dans window.__urCapture.
+// 2. Jouer les 4 rounds.
+// 3. Exécuter `urRecord()` : renvoie l'enregistrement compact au format de data/ur_battles/*.json (p0 = joueur 0 du
+//    serveur, p1 = joueur 1 ; à sauvegarder tel quel), et `urAbilities()` : le modèle abilityData de chaque pouvoir vu.
+
+if (!window.__urCapture) {
+  window.__urCapture = [];
+  const push = (kind, url, res) => { try { window.__urCapture.push({ t: Date.now(), kind, url: String(url), res }); } catch (e) {} };
+  const origOpen = XMLHttpRequest.prototype.open, origSend = XMLHttpRequest.prototype.send;
+  XMLHttpRequest.prototype.open = function (m, u) { this.__url = u; return origOpen.apply(this, arguments); };
+  XMLHttpRequest.prototype.send = function (body) {
+    const xhr = this;
+    xhr.addEventListener("load", () => { if (String(xhr.__url).includes("/api/")) push("xhr", xhr.__url, xhr.responseText); });
+    return origSend.apply(this, arguments);
+  };
+  const origFetch = window.fetch;
+  window.fetch = async function (input, init) {
+    const r = await origFetch.apply(this, arguments);
+    try {
+      const url = typeof input === "string" ? input : input.url;
+      if (String(url).includes("/api/")) r.clone().text().then((txt) => push("fetch", url, txt));
+    } catch (e) {}
+    return r;
+  };
+}
+
+function urStatuses() {
+  const out = [];
+  let prev = null;
+  for (const c of window.__urCapture) {
+    if (!c.res || !c.res.startsWith('{"battles.status"')) continue;
+    const b = JSON.parse(c.res)["battles.status"].data.battle;
+    const sig = JSON.stringify([b.round, b.status, b.turnPlayerId, b.player0.life, b.player1.life, b.player0.pillz, b.player1.pillz,
+      b.player0.characters.map((x) => [x.roundPlayed, x.pillzUsed, x.roundAttack]), b.player1.characters.map((x) => [x.roundPlayed, x.pillzUsed, x.roundAttack])]);
+    if (sig !== prev) { out.push(b); prev = sig; }
+  }
+  return out;
+}
+
+function urRecord() {
+  const sts = urStatuses();
+  const first = sts[0];
+  const pl = (p) => ({ name: p.player.name, base_life: p.baseLife, base_pillz: p.basePillz, cards: p.characters.map((x) => ({ id: x.id, level: x.level })) });
+  const rounds = [];
+  for (let r = 0; r < 4; r++) {
+    const start = sts.find((b) => b.round === r);
+    const resolved = sts.filter((b) => b.round === r && [b.player0, b.player1].every((p) => p.characters.some((x) => x.roundPlayed === r && x.roundAttack >= 0))).slice(-1)[0];
+    const next = sts.find((b) => b.round === r + 1);
+    if (!start || !resolved) continue;
+    const side = (p) => { const x = p.characters.find((x) => x.roundPlayed === r); return { index: x.index, pillz: x.pillzUsed, fury: !!x.isFury, power: x.roundPower, damage: x.roundDamage, attack: x.roundAttack, won: x.roundWon }; };
+    rounds.push({ round: r + 1, first: start.turnPlayerId === first.player0.player.id ? "p0" : "p1",
+      before: { life: [start.player0.life, start.player1.life], pillz: [start.player0.pillz, start.player1.pillz] },
+      p0: side(resolved.player0), p1: side(resolved.player1),
+      post_round: [resolved.player0.postRoundAbilities, resolved.player1.postRoundAbilities],
+      after: next ? { life: [next.player0.life, next.player1.life], pillz: [next.player0.pillz, next.player1.pillz] } : { life: null, pillz: null } });
+  }
+  return JSON.stringify({ _comment: "Combat réel Urban Rivals capturé via battles.status (voir scripts/ur_capture.js).", battle_id: first.id, rule_id: first.battleRuleId,
+    p0: pl(first.player0), p1: pl(first.player1), rounds }, null, 1);
+}
+
+function urAbilities() {
+  const abilities = {};
+  for (const b of urStatuses()) for (const p of [b.player0, b.player1]) for (const x of p.characters) for (const k of ["ability", "bonus"]) if (x[k]) abilities[x[k].id] = x[k];
+  return JSON.stringify(abilities, null, 1);
+}
