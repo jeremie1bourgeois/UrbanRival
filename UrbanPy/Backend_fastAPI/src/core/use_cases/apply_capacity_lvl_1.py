@@ -17,6 +17,7 @@ from typing import Optional, Set
 
 from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card, FIGHT_SLOTS
+from src.core.domain.journal import STAT_LABELS, label, note, stat_change
 
 META_HOWS = {"stop", "copy", "Protection", "cancel", "exchange", "impose", "tune_out", "tie_break"}
 SLOT_OF_KIND = {"ability": "ability_fight", "bonus": "bonus_fight"}
@@ -50,6 +51,18 @@ def _pairs(card1: Card, card2: Card):
     return ((card1, card2), (card2, card1))
 
 
+_KIND_LABELS = {"ability": "pouvoir", "bonus": "bonus"}
+
+
+def _of(card: Card) -> str:
+    """« d'Amelia » / « de Bhudd »."""
+    return ("d'" if card.name[:1].lower() in "aeiouyéè" else "de ") + card.name
+
+
+def _description(card: Card, kind: str) -> str:
+    return card.ability_description if kind == "ability" else card.bonus_description
+
+
 # --- Phase 1 : Copy: Opp. Ability / Bonus -----------------------------------------------------
 
 def _apply_copies(card1: Card, card2: Card) -> None:
@@ -62,6 +75,11 @@ def _apply_copies(card1: Card, card2: Card) -> None:
                 continue
             source = getattr(opp, SLOT_OF_KIND[kind])
             copied = None if _is(source, "copy") and _kind_targeted(source) else copy.deepcopy(source)
+            if copied is not None:
+                copied.label = f"copie du {_KIND_LABELS[kind]} {_of(opp)} « {_description(opp, kind)} »"
+                note(own, "copie", f"{own.name} : {label(capacity)} copie le {_KIND_LABELS[kind]} {_of(opp)} « {_description(opp, kind)} »")
+            else:
+                note(own, "copie", f"{own.name} : {label(capacity)} ne copie rien ({_KIND_LABELS[kind]} {_of(opp)} absent ou lui-même une copie)")
             planned.append((own, slot, copied))
     for own, slot, copied in planned:     # simultané : les deux copies lisent l'état d'origine
         setattr(own, slot, copied)
@@ -112,17 +130,23 @@ def _stopped_slots(card1: Card, card2: Card) -> Set[tuple]:
 
 def _apply_stops(card1: Card, card2: Card) -> None:
     stopped = _stopped_slots(card1, card2)
-    for card in (card1, card2):
+    for card, opp in _pairs(card1, card2):
         for kind, slot in SLOT_OF_KIND.items():
             capacity = getattr(card, slot)
             if capacity is None:
                 continue
             if (id(card), kind) in stopped:
+                stoppers = [getattr(opp, s) for s in _slots_targeting(opp, "stop").get(kind, [])
+                            if (id(opp), KIND_OF_SLOT[s]) not in stopped]
+                by = f"stoppé par {opp.name} ({label(stoppers[0])})" if stoppers else "stoppé (cycle de Stops)"
                 if "stop" in capacity.effect_conditions:      # « Stop: X » : X s'active justement parce qu'on la stoppe
                     capacity.effect_conditions.remove("stop")
+                    note(card, "stop", f"{card.name} : {label(capacity)} s'active ({by})")
                 else:
+                    note(card, "stop", f"{card.name} : {label(capacity)} {by}")
                     setattr(card, slot, None)
             elif "stop" in capacity.effect_conditions:        # pas stoppée : « Stop: X » reste inerte
+                note(card, "stop", f"{card.name} : {label(capacity)} inactif (pas de Stop adverse)")
                 setattr(card, slot, None)
 
 
@@ -137,12 +161,17 @@ def _apply_value_copies_and_exchanges(card1: Card, card2: Card) -> None:
             for stat in ("power", "damage"):
                 if stat not in capacity.types:
                     continue
+                own_before, opp_before = getattr(own, f"{stat}_fight"), getattr(opp, f"{stat}_fight")
                 if capacity.how == "impose":                       # l'adversaire prend ma valeur imprimée
                     setattr(opp, f"{stat}_fight", getattr(own, stat))
+                    note(own, "impose", f"{own.name} : {label(capacity)} → {stat_change(stat, _of(opp), opp_before, getattr(opp, f'{stat}_fight'))}")
                     continue
                 setattr(own, f"{stat}_fight", getattr(opp, stat))
+                changes = [stat_change(stat, _of(own), own_before, getattr(own, f"{stat}_fight"))]
                 if capacity.how == "exchange":
                     setattr(opp, f"{stat}_fight", getattr(own, stat))
+                    changes.append(stat_change(stat, _of(opp), opp_before, getattr(opp, f"{stat}_fight")))
+                note(own, capacity.how, f"{own.name} : {label(capacity)} → " + ", ".join(changes))
 
 
 # --- Phase 4 : Cancel Opp. X Modif. et Protection: X ------------------------------------------
@@ -166,6 +195,8 @@ def _apply_cancels(card1: Card, card2: Card) -> None:
             capacity = getattr(own, slot)
             if _is(capacity, "cancel"):
                 types = set(capacity.types)
+                stats = " et ".join(STAT_LABELS.get(type_, type_) for type_ in capacity.types)
+                note(own, "annule", f"{own.name} : {label(capacity)} annule les modifications de {stats} {_of(opp)}")
                 _strip_types(opp, types, only_targeting_opponent=False)
                 opp.cancelled_modifs |= types & {"life", "pillz"}   # les persistants adverses ne tiquent pas ce round (glossaire 56)
                 if capacity.target == "both":                  # « Cancel Players X Mod. » (Leaders) : les deux côtés
@@ -180,6 +211,9 @@ def _apply_stat_protections(card1: Card, card2: Card) -> None:
             if _is(capacity, "Protection"):
                 protected = set(capacity.types) & set(STAT_TYPES)
                 if protected:
+                    stats = " et ".join(STAT_LABELS[type_] for type_ in capacity.types if type_ in protected)
+                    possessive = "sa" if len(protected) == 1 and "damage" not in protected else "ses"
+                    note(own, "protection", f"{own.name} : {label(capacity)} protège {possessive} {stats}")
                     _strip_types(opp, protected, only_targeting_opponent=True)
                     if capacity.target == "both":                  # « Protection: Cards X » protège aussi la carte adverse
                         _strip_types(own, protected, only_targeting_opponent=True)

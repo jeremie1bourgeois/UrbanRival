@@ -91,3 +91,68 @@ def test_attack_computation_fury_and_attack_modifiers_are_logged(template_game):
     assert "Amelia : attaque = 3 × 4 pillz = 12" in log
     assert "Asporov : attaque = 7 × 1 pillz = 7" in log
     assert "Asporov : pouvoir « Attack +5 » → attaque d'Asporov 7 → 12" in log
+
+
+# --- Niveau 1 et conditions -------------------------------------------------------------------
+
+def test_stops_name_the_stopper(template_game):
+    play(template_game, enemy_ability="Stop Opp. Bonus")
+
+    assert "Amelia : bonus « -2 Opp Power, Min 1 » stoppé par Asporov (pouvoir « Stop Opp. Bonus »)" in texts(template_game)
+
+
+def test_cycle_stops_are_logged_as_a_cycle(template_game):
+    play(template_game, ally_ability="Stop Opp. Ability", enemy_ability="Stop Opp. Ability")
+
+    assert "Amelia : pouvoir « Stop Opp. Ability » stoppé (cycle de Stops)" in texts(template_game)
+
+
+def test_copy_names_what_is_copied(template_game):
+    play(template_game, ally_ability="Copy: Opp. Bonus")
+
+    log = texts(template_game)
+    assert "Amelia : pouvoir « Copy: Opp. Bonus » copie le bonus d'Asporov « -2 Opp Power, Min 1 »" in log
+    assert "Amelia : copie du bonus d'Asporov « -2 Opp Power, Min 1 » → puissance d'Asporov 7 → 5" in log or \
+           "Amelia : copie du bonus d'Asporov « -2 Opp Power, Min 1 » → puissance d'Asporov 5 → 3" in log
+
+
+def test_cancel_and_protection_are_logged(template_game):
+    play(template_game, ally_ability="Cancel Opp. Power Modif.", enemy_ability="Protection: Damage")
+
+    log = texts(template_game)
+    assert "Amelia : pouvoir « Cancel Opp. Power Modif. » annule les modifications de puissance d'Asporov" in log
+    assert "Asporov : pouvoir « Protection: Damage » protège ses dégâts" in log
+
+
+def test_impose_is_logged_as_a_stat_change(template_game):
+    play(template_game, ally_ability="Power Impose")
+
+    assert "Amelia : pouvoir « Power Impose » → puissance d'Asporov 7 → 3" in texts(template_game)
+
+
+def test_unmet_condition_and_inactive_bonus_are_logged(template_game):
+    template_game.enemy.cards[0].faction = "Rescue"                       # Asporov seul Rescue... avec Serafina : 2 -> il faut l'isoler
+    template_game.enemy.cards[3].faction = "Junkz"
+    play(template_game, ally_ability="Courage: Power +2", turn=False)
+
+    log = texts(template_game)
+    assert "Amelia : pouvoir « Courage: Power +2 » inactif (condition Courage non remplie)" in log
+    assert "Asporov : bonus « -2 Opp Power, Min 1 » inactif (une seule carte Rescue en main)" in log
+
+
+def test_killshot_condition_is_logged_both_ways(template_game):
+    play(template_game, ally_ability="Killshot: +3 Life", ally_pillz=10)
+
+    assert "Amelia : Killshot remplie (10 ≥ 2 × 5)" in texts(template_game)
+
+    game = template_game
+    game.ally.cards[2].played = game.enemy.cards[0].played = False
+    play(game, ally_ability="Killshot: +3 Life", ally_pillz=9)
+
+    assert "Amelia : Killshot non remplie (9 < 2 × 5) : pouvoir « Killshot: +3 Life » inactif" in texts(game)
+
+
+def test_tune_out_is_logged(template_game):
+    play(template_game, ally_bonus="Tune Out", ally_pillz=2)
+
+    assert "Tune Out : le round se résout aux pillz (Amelia 2, Asporov 1)" in texts(template_game)
