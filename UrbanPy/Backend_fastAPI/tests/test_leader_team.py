@@ -129,3 +129,35 @@ def test_tie_break_leader_wins_every_attack_tie(game):
     assert (allison.attack, asporov.attack) == (5, 5)
     assert allison.win is True                                  # sans Tie-break, Asporov (4 étoiles) gagnerait
 
+
+def test_counter_attack_leader_makes_his_team_always_play_second(game):
+    # Ashigaru : « The player who has Ashigaru in their team always plays second in the fight »
+    game.ally.cards[AGUSTINO].ability = ability("Counter-attack")
+    game.ally.cards[AMELIA].ability = ability("Reprisal: Power +2")
+    game.enemy.cards[ASPOROV].ability = ability("Courage: Power +2")
+
+    amelia, asporov = play(game, turn=True)                     # même si c'était le tour de l'allié
+
+    assert (amelia.power_fight, asporov.power_fight) == (3 + 2 - 2, 7 + 2 - 2)
+    assert game.turn is True                                    # le tour suivant repart normalement (l'ordre est refixé à chaque round)
+
+
+def test_limitless_leader_removes_maximums_and_zeroes_minimums_of_abilities(game):
+    # Fractal : « the maximums on abilities are cancelled and the minimums are replaced by the minimum 0. This effect does not apply to bonuses. »
+    game.ally.cards[AGUSTINO].ability = ability("Limitless")
+    game.ally.cards[AMELIA].ability = ability("-3 Opp Damage, Min 2")
+
+    _, asporov = play(game)
+
+    assert asporov.damage_fight == 0                            # 3 - 3, plancher 0 au lieu de 2
+    assert asporov.power_fight == 7 - 2                         # le bonus -2 opp power min 1 n'est pas touché
+
+
+def test_limitless_does_not_apply_to_bonuses(game):
+    game.ally.cards[AGUSTINO].ability = ability("Limitless")
+    game.enemy.cards[ASPOROV].power = 2                         # bonus allié -2 opp power, min 1 : 2 -> 1, pas 0
+
+    _, asporov = play(game)
+
+    assert asporov.power_fight == 1
+

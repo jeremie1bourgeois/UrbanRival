@@ -37,6 +37,7 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
         # L'ability « Team: » d'un Leader unique s'applique à la carte jouée
         player1_card.leader_fight = leader_team_capacity(game.ally)
         player2_card.leader_fight = leader_team_capacity(game.enemy)
+        apply_leader_modes(game, player1_card, player2_card)
 
         for card, is_ally, own_index, opp_index in ((player1_card, True, round_data.player1_card_index, round_data.player2_card_index),
                                                     (player2_card, False, round_data.player2_card_index, round_data.player1_card_index)):
@@ -239,6 +240,26 @@ def consume_tune_out(card: Card) -> bool:
             setattr(card, slot, None)
             found = True
     return found
+
+
+def apply_leader_modes(game: Game, player1_card: Card, player2_card: Card) -> None:
+    """
+    Modes de Leader lus avant les conditions : Counter-attack (Ashigaru) — « always plays second » : fixe l'ordre du
+    round si un seul camp l'a ; Limitless (Fractal) — les maximums des abilities de l'équipe tombent, les minimums
+    passent à 0 (pas les bonus).
+    """
+    modes = {}
+    for card in (player1_card, player2_card):
+        capacity = card.leader_fight
+        if capacity is not None and capacity.how in ("counter_attack", "limitless"):
+            modes[id(card)] = capacity.how
+            card.leader_fight = None
+    ally_counter, enemy_counter = modes.get(id(player1_card)) == "counter_attack", modes.get(id(player2_card)) == "counter_attack"
+    if ally_counter != enemy_counter:
+        game.turn = enemy_counter                  # l'allié joue en premier seulement si c'est l'ennemi qui a Ashigaru
+    for card in (player1_card, player2_card):
+        if modes.get(id(card)) == "limitless" and card.ability_fight is not None and card.ability_fight.borne != -1:
+            card.ability_fight.borne = -1 if card.ability_fight.value > 0 else 0
 
 
 def apply_killshot_condition(card: Card, opp_card: Card) -> None:

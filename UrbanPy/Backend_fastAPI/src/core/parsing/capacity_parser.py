@@ -84,10 +84,10 @@ _CORE_STARTERS = ("copy", "protection", "reanimate")   # mots qui ouvrent un cœ
 
 # Cœurs connus mais hors moteur : testés avant les regex, raison groupable dans le rapport
 _UNSUPPORTED_CORE_KEYWORDS = (
-    "remove ability conditions", "counter-attack",
+    "remove ability conditions",
     "overdose", "perfection",
     "rebirth",
-    "beyond", "bypass", "hazard", "illusion", "limitless",
+    "beyond", "bypass", "hazard", "illusion",
 )
 
 # --- Cœurs ------------------------------------------------------------------------------------
@@ -197,6 +197,11 @@ def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacit
 
     if core == "sinister symmetry":   # « If your card wins the round against the card in front of it, the match is over »
         return error or _capacity("enemy", ["ko"], 0, how, -1, list(conditions) + ["symmetry"])
+
+    for leader_mode in ("counter-attack", "limitless"):   # Leaders Ashigaru / Fractal : modes lus par process_round
+        if core == leader_mode:
+            how_name = leader_mode.replace("-", "_")
+            return error or _capacity("ally", [how_name], 0, how_name, -1, list(conditions) + ["team"])
 
     if core == "tie-break":      # Leader (Solomon) : l'équipe gagne toutes les égalités d'attaque
         return error or _capacity("ally", ["tie_break"], 0, "tie_break", -1, list(conditions) + ["team"])

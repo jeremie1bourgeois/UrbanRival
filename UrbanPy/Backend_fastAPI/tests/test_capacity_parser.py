@@ -357,7 +357,6 @@ from src.adapters.repositories.card_repository import all_capacity_descriptions
 
 @pytest.mark.parametrize("text, keyword", [
     ("Rebirth 2, Max. 10", "rebirth"),     ("Remove Ability Conditions", "remove ability conditions"), ("Beyond", "beyond"),
-    ("Counter-attack", "counter-attack"), ("Limitless", "limitless"),
 ])
 def test_explicitly_unsupported_cores(text, keyword):
     result = parse_capacity(text)
@@ -371,7 +370,7 @@ def test_gibberish_is_unknown_core():
 
 # --- Couverture sur les descriptions officielles -----------------------------------------
 
-SUPPORTED_DESCRIPTIONS_FLOOR = 1384  # mesuré le 2026-09-16 sur 1396 descriptions ; à relever quand la couverture progresse
+SUPPORTED_DESCRIPTIONS_FLOOR = 1386  # mesuré le 2026-09-16 sur 1396 descriptions ; à relever quand la couverture progresse
 
 
 def test_every_official_description_parses_without_raising():
@@ -404,6 +403,11 @@ def test_leader_and_players_variants(text, expected):
 ])
 def test_instant_win_abilities(text, expected):
     assert parsed(text) == expected
+
+
+def test_counter_attack_and_limitless_are_leader_modes():
+    assert parsed("Counter-attack") == cap("ally", ["counter_attack"], 0, how="counter_attack", conditions=["team"])
+    assert parsed("Limitless") == cap("ally", ["limitless"], 0, how="limitless", conditions=["team"])
 
 
 def test_team_prefix_is_a_leader_condition():
