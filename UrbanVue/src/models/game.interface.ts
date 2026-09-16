@@ -2,9 +2,18 @@
 
 export type CapacityKind = "ability" | "bonus";
 
+/** Une entrée du journal des effets d'un round (texte en français produit par le moteur). */
+export interface LogEntry {
+	side: "ally" | "enemy" | null;
+	card: string | null;
+	source: string;
+	text: string;
+}
+
 export interface RoundRecord {
 	ally: { card_index: number | null; win: boolean };
 	enemy: { card_index: number | null; win: boolean };
+	log?: LogEntry[];
 }
 
 // Formes brutes telles que renvoyées par l'API (tout est optionnel : les constructeurs posent les défauts).

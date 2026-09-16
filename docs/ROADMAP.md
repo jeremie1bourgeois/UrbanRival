@@ -13,7 +13,7 @@ ce document décrit **où on en est et ce qui reste**, pour reprendre le travail
 | Moteur | 4 niveaux réécrits et testés (méta, stats, fin de round, persistants) ; bonus de clan (≥ 2 du clan, Oculus infiltré sur ses clans listés, Leaders), conditions Courage / Revenge / Confidence / Reprisal / Symmetry / Asymmetry / Stop / Killshot / Perfect / Bet / Versus / After / Unison / Disunion / Defeat / Backlash / Victory or Defeat / Team ; Tune Out, Impose, Cards, Consume / Combust / Mindwipe / Corrosion, Xantiax, Corrupt, Fatal Killshot, Sinister Symmetry, Leaders Tie-break / Counter-attack / Limitless / Per Round ; `scripts/engine_crash_sweep.py` : 0 exception |
 | API | `/cards`, `/init_game/`, `/init_game/template`, `/process_round/{id}`, `/ai_pick/{id}`, `/save_for_test` |
 | Front | deck builder (recherche, filtre clan, aléatoire, statut des bonus, decks mémorisés), partie à deux ou contre l'ordinateur (aléatoire / heuristique), historique des rounds, fin de partie, effets persistants, illustrations |
-| Tests | 416 backend (pytest) + 22 front (vitest) ; CI GitHub Actions (backend + front) ; 3 fixtures de rejeu `data/test/` |
+| Tests | 436 backend (pytest) + 24 front (vitest) ; CI GitHub Actions (backend + front) ; 3 fixtures de rejeu `data/test/` |
 | Dépôt | nettoyé (IDE, binaires, doublons), fins de ligne LF (`.gitattributes`), README |
 
 ### Décisions de règles prises sans certitude (à confirmer contre les règles officielles)
@@ -64,11 +64,11 @@ Counter-attack refixe l'ordre à chaque round.
 1. ~~Confirmer les décisions du tableau § 1 contre les règles officielles~~ → fait (`docs/REGLES.md`) ; appliquer les corrections listées en § 3 de ce document.
 2. Alimenter `data/test/` : jouer des rounds dans l'interface, vérifier à la main, « Sauvegarder … pour les tests », commiter.
    Viser en priorité les clans à bonus méta (Nightmare, Skeelz, Piranas, Roots, GHEIST, Raptors, Oblivion, Oculus, Vortex, Montana).
-3. Le journal des effets (D2) rendra ces vérifications beaucoup plus rapides.
+3. Le journal des effets (D2, fait) rend ces vérifications immédiates : comparer le journal au déroulé réel.
 
 ### C. Front — reste mineur
 - Tests de composants (aucun : seuls la logique pure et le modèle sont testés) ; éventuellement des tests de bout en bout (Playwright).
-- Historique : afficher les effets appliqués (dépend de D2).
+- ~~Historique : afficher les effets appliqués~~ → fait (D2).
 - Montrer au second joueur la carte jouée par le premier (règle UR : la carte est visible, pas les pillz) — aujourd'hui rien n'est révélé avant la résolution.
 - Tirer un premier joueur aléatoire / laisser choisir.
 
@@ -76,7 +76,7 @@ Counter-attack refixe l'ordre à chaque round.
 | # | Tâche | Détail |
 |---|---|---|
 | D1 | **API moteur pure** | `Engine.step(state, action) → (state, result)` et `legal_actions(state)` (déjà écrit pour l'IA : `src/core/ai/opponent.legal_picks`). `process_round` est pur ; extraire la persistance de `game_service`. Figer une représentation d'état (`Game.to_dict`) et d'action (`Pick`). |
-| D2 | **Journal des effets** | Chaque niveau consigne ce qu'il applique (« Amelia : Power +4 → 7 », « Bhudd : Stop Opp. Bonus stoppe le bonus d'Amelia »). Renvoyer le journal dans `/process_round` et le stocker dans `Round`. Sert au front (historique détaillé), au débogage des règles et aux tests. |
+| D2 | ~~**Journal des effets**~~ | **Fait le 2026-09-16** : `src/core/domain/journal.py` (`Journal`, `note`, `recording`), `Round.log` (entrées `{side, card, source, text}`), renvoyé par `/process_round`, déplié dans l'historique du front. Les fixtures de rejeu comparent l'état sans le journal. |
 | D3 | Performance | Mesurer `process_round` (deepcopy des capacités, sérialisation) ; le RL a besoin de milliers de parties/s. |
 | D4 | Persistance | Fichiers JSON par round (`data/game/`) → stockage mémoire + SQLite optionnel ; `get_new_game_id` est relatif au dossier courant (le serveur doit être lancé depuis `UrbanPy/Backend_fastAPI`). |
 | D5 | Dette | `requirements.txt` (FastAPI 0.100 de 2023, `@validator` Pydantic v1 déprécié → `field_validator`), CORS configurable, `print` de debug dans `main.py`, `debug=True`. Le front dépend du CDN d'Urban Rivals pour les images (option : script de téléchargement local). |
@@ -98,4 +98,4 @@ Counter-attack refixe l'ordre à chaque round.
 - Une branche par chantier (`feat/…`, `fix/…`, `chore/…`), commits en français, fusion `--no-ff` dans `main` après accord de l'utilisateur, push après chaque chantier.
 - TDD : test rouge avant tout code ; tests du moteur écrits de bout en bout (texte d'ability → parseur → round joué) avec des attentes calculées à la main ; balayage + couverture relancés après chaque changement de moteur ; plancher de couverture pinné dans les tests.
 - Vérification dans le navigateur (deck → partie) avant de déclarer un chantier front terminé.
-- Ordre recommandé pour la suite : **D1 + D2 → B2 → E**, en traitant les pouvoirs de A au fil des règles retrouvées.
+- Ordre recommandé pour la suite : **B2 (combats réels) → D1 → E**, en traitant les pouvoirs de A au fil des règles retrouvées.

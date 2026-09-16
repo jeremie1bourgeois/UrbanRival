@@ -6,12 +6,23 @@ from src.core.domain.card import Card, FIGHT_SLOTS
 from src.core.domain.player import Player
 from src.schemas.game_schemas import ProcessRoundInput
 from src.core.domain.game import Game, NB_ROUNDS
+from src.core.domain.journal import Journal, note, recording
+from src.core.domain.journal import label as journal_label
 import src.core.use_cases.apply_capacity_lvl_1 as fct_lvl_1
 import src.core.use_cases.apply_capacity_lvl_2 as fct_lvl_2
 import src.core.use_cases.apply_capacity_lvl_3 as fct_lvl_3
 import src.core.use_cases.apply_capacity_lvl_4 as fct_lvl_4
 
 def process_round(game: Game, round_data: ProcessRoundInput) -> None:
+    player1_card = game.ally.cards[round_data.player1_card_index]
+    player2_card = game.enemy.cards[round_data.player2_card_index]
+    journal = Journal(ally_card=player1_card, enemy_card=player2_card)
+    with recording(journal):
+        _process_round(game, round_data)
+    game.history[-1].log = journal.entries
+
+
+def _process_round(game: Game, round_data: ProcessRoundInput) -> None:
     try:
         # Mise à jour des pillz
         game.ally.pillz -= ((round_data.player1_pillz - 1) + 3 * round_data.player1_fury) # -1 car 1 pillz est toujours consommée
@@ -29,10 +40,12 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
         # le bonus n'est actif que si la main compte au moins 2 cartes du clan (l'Oculus compris)
         apply_infiltrated_bonus(game.ally, player1_card)
         apply_infiltrated_bonus(game.enemy, player2_card)
-        if not is_clan_bonus_active(game.ally, player1_card):
-            player1_card.bonus_fight = None
-        if not is_clan_bonus_active(game.enemy, player2_card):
-            player2_card.bonus_fight = None
+        for player, card in ((game.ally, player1_card), (game.enemy, player2_card)):
+            if card.bonus_fight is not None and not is_clan_bonus_active(player, card):
+                clan = clan_for_bonus(player, card)
+                why = f"une seule carte {clan} en main" if clan is not None else "aucun clan infiltrable"
+                note(card, "bonus", f"{card.name} : bonus « {card.bonus_description} » inactif ({why})")
+                card.bonus_fight = None
 
         # L'ability « Team: » d'un Leader unique s'applique à la carte jouée
         player1_card.leader_fight = leader_team_capacity(game.ally)
@@ -42,7 +55,10 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
         for card, is_ally, own_index, opp_index in ((player1_card, True, round_data.player1_card_index, round_data.player2_card_index),
                                                     (player2_card, False, round_data.player2_card_index, round_data.player1_card_index)):
             for slot in FIGHT_SLOTS:
-                if not check_capacity_condition(game, getattr(card, slot), is_ally, own_index, opp_index):
+                capacity = getattr(card, slot)
+                unmet = unmet_condition(game, capacity, is_ally, own_index, opp_index)
+                if unmet is not None:
+                    note(card, "condition", f"{card.name} : {journal_label(capacity)} inactif (condition {unmet} non remplie)")
                     setattr(card, slot, None)
 
         # Appliquer les effets de combat
@@ -50,14 +66,15 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
         fct_lvl_2.apply_capacity_lvl_2(game, player1_card, player2_card, stats=("power", "damage"))
 
         # Appliquer les fury
-        if player1_card.fury:
-            player1_card.damage_fight += 2
-        if player2_card.fury:
-            player2_card.damage_fight += 2
+        for card in (player1_card, player2_card):
+            if card.fury:
+                card.damage_fight += 2
+                note(card, "fury", f"{card.name} : fury → dégâts {card.damage_fight - 2} → {card.damage_fight}")
 
         # Calculer les attaques
-        player1_card.attack += (player1_card.power_fight * round_data.player1_pillz)
-        player2_card.attack += (player2_card.power_fight * round_data.player2_pillz)
+        for card, pillz in ((player1_card, round_data.player1_pillz), (player2_card, round_data.player2_pillz)):
+            card.attack += card.power_fight * pillz
+            note(card, "attaque", f"{card.name} : attaque = {card.power_fight} × {pillz} pillz = {card.attack}")
 
         # Modificateurs d'attaque, une fois l'attaque de base connue
         fct_lvl_2.apply_capacity_lvl_2(game, player1_card, player2_card, stats=("attack",))
@@ -65,6 +82,7 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
         # Tune Out (Cosmohnuts) : « the Attack calculation is ignored and the winner is the player who bet the most Pillz »
         if consume_tune_out(player1_card) | consume_tune_out(player2_card):
             player1_card.attack, player2_card.attack = round_data.player1_pillz, round_data.player2_pillz
+            note(None, "tune_out", f"Tune Out : le round se résout aux pillz ({player1_card.name} {player1_card.attack}, {player2_card.name} {player2_card.attack})")
 
         # Killshot : la capacité n'agit que si l'attaque vaut au moins le double de l'attaque adverse
         apply_killshot_condition(player1_card, player2_card)
@@ -103,54 +121,24 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
 
 
 def resolve_combat(game: Game, player1_card: Card, player2_card: Card, round_result: Round):
-    if player1_card.attack > player2_card.attack:
-        game.enemy.life = max(0, game.enemy.life - player1_card.damage_fight)
-        round_result.ally.win = True
-        round_result.enemy.win = False
-        player1_card.win = True
-        player2_card.win = False
-    elif player2_card.attack > player1_card.attack:
-        game.ally.life = max(0, game.ally.life - player2_card.damage_fight)
-        round_result.ally.win = False
-        round_result.enemy.win = True
-        player1_card.win = False
-        player2_card.win = True
-    elif has_tie_break(player1_card) and not has_tie_break(player2_card):     # Tie-break (Solomon) : gagne toute égalité
-        game.enemy.life = max(0, game.enemy.life - player1_card.damage_fight)
-        round_result.ally.win = True
-        round_result.enemy.win = False
-        player1_card.win = True
-        player2_card.win = False
-    elif has_tie_break(player2_card) and not has_tie_break(player1_card):
-        game.ally.life = max(0, game.ally.life - player2_card.damage_fight)
-        round_result.ally.win = False
-        round_result.enemy.win = True
-        player1_card.win = False
-        player2_card.win = True
-    elif player1_card.stars < player2_card.stars:
-        game.enemy.life = max(0, game.enemy.life - player1_card.damage_fight)
-        round_result.ally.win = True
-        round_result.enemy.win = False
-        player1_card.win = True
-        player2_card.win = False
-    elif player2_card.stars < player1_card.stars:
-        game.ally.life = max(0, game.ally.life - player2_card.damage_fight)
-        round_result.ally.win = False
-        round_result.enemy.win = True
-        player1_card.win = False
-        player2_card.win = True
-    elif game.turn:
-        game.enemy.life = max(0, game.enemy.life - player1_card.damage_fight)
-        round_result.ally.win = True
-        round_result.enemy.win = False
-        player1_card.win = True
-        player2_card.win = False
-    else:
-        game.ally.life = max(0, game.ally.life - player2_card.damage_fight)
-        round_result.ally.win = False
-        round_result.enemy.win = True
-        player1_card.win = False
-        player2_card.win = True
+    a1, a2 = player1_card.attack, player2_card.attack
+    if a1 != a2:
+        ally_wins, reason = a1 > a2, f"({max(a1, a2)} > {min(a1, a2)})"
+    elif has_tie_break(player1_card) != has_tie_break(player2_card):        # Tie-break (Solomon) : gagne toute égalité
+        ally_wins, reason = has_tie_break(player1_card), "(Tie-break)"
+    elif player1_card.stars != player2_card.stars:                          # moins d'étoiles gagne
+        ally_wins, reason = player1_card.stars < player2_card.stars, "(moins d'étoiles)"
+    else:                                                                   # sinon celui qui a joué en premier
+        ally_wins, reason = game.turn, "(a joué en premier)"
+
+    winner, loser, loser_player, loser_side = ((player1_card, player2_card, game.enemy, "l'ennemi") if ally_wins
+                                               else (player2_card, player1_card, game.ally, "l'allié"))
+    before = loser_player.life
+    loser_player.life = max(0, before - winner.damage_fight)
+    round_result.ally.win, round_result.enemy.win = ally_wins, not ally_wins
+    player1_card.win, player2_card.win = ally_wins, not ally_wins
+    tie = f"Égalité {a1} à {a2} : " if a1 == a2 else ""
+    note(None, "round", f"{tie}{winner.name} gagne {reason} : {loser_side} perd {winner.damage_fight} vies ({before} → {loser_player.life})")
 
 
 # Conditions évaluées plus tard qu'au début du round : "stop" au niveau 1 (l'ability a-t-elle été stoppée ?),
@@ -158,16 +146,27 @@ def resolve_combat(game: Game, player1_card: Card, player2_card: Card, round_res
 DEFERRED_CONDITIONS = {"stop", "killshot", "perfect", "defeat", "backlash", "victory_defeat"}
 
 
+CONDITION_LABELS = {"revenge": "Revenge", "confidence": "Confidence", "courage": "Courage", "reprisal": "Reprisal",
+                    "symmetry": "Symmetry", "asymmetry": "Asymmetry", "unison": "Unison", "disunion": "Disunion",
+                    "versus": "Versus", "after": "After", "infiltrated": "Infiltrated", "bet": "Bet", "team": "Team"}
+
+
 def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, own_card_index: int, opp_card_index: int) -> bool:
+    """Vrai si toutes les conditions de début de round sont remplies (voir unmet_condition)."""
+    return unmet_condition(game, capacity, is_ally, own_card_index, opp_card_index) is None
+
+
+def unmet_condition(game: Game, capacity: Capacity, is_ally: bool, own_card_index: int, opp_card_index: int):
     """
     Vérifie (et consomme) les conditions de début de round d'une capacité de combat.
     own_card_index / opp_card_index : index de la carte jouée par le joueur qui possède la capacité / par son adversaire.
-    Retourne False si une condition n'est pas remplie ; les conditions différées au niveau 3 sont laissées en place.
+    Retourne le nom de la première condition non remplie, None si tout est rempli ; les conditions différées au
+    niveau 3 sont laissées en place.
     """
     if capacity is None or not capacity.effect_conditions:
-        return True
+        return None
     if "team" in capacity.effect_conditions:      # ability de Leader : jamais jouée comme ability de carte (voir leader_team_capacity)
-        return False
+        return CONDITION_LABELS["team"]
 
     own_player, opp_player = (game.ally, game.enemy) if is_ally else (game.enemy, game.ally)
     last_round = game.history[-1] if game.history else None
@@ -188,30 +187,30 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, own_
     for condition in list(capacity.effect_conditions):
         if condition in checks:
             if not checks[condition]():
-                return False
+                return CONDITION_LABELS[condition]
             capacity.effect_conditions.remove(condition)
         elif condition.startswith("versus:"):                # « Versus <clans> » : au moins une carte du clan dans la main adverse
             clans = condition[len("versus:"):].split("|")   # (règle officielle : pas seulement la carte en face)
             if not any(card.faction in clans for card in opp_player.cards):
-                return False
+                return f"Versus {', '.join(clans)}"
             capacity.effect_conditions.remove(condition)
         elif condition.startswith("after:"):                 # « After <clans> » : ma carte du round précédent est du clan
             clans = condition[len("after:"):].split("|")    # (jamais au round 1 ; un Oculus infiltré ne compte pas)
             previous_index = None if last_round is None else (last_round.ally if is_ally else last_round.enemy).card_index
             if previous_index is None or own_player.cards[previous_index].faction not in clans:
-                return False
+                return f"After {', '.join(clans)}"
             capacity.effect_conditions.remove(condition)
         elif condition.startswith("infiltrated:"):           # ability d'Oculus : active seulement si le clan adopté est listé
             if clan_for_bonus(own_player, own_player.cards[own_card_index]) not in condition[len("infiltrated:"):].split("|"):
-                return False
+                return "Infiltrated"
             capacity.effect_conditions.remove(condition)
         elif condition.startswith("bet"):
             if not _bet_condition_met(condition, own_player.cards[own_card_index].pillz_fight):
-                return False
+                return "Bet " + condition[3:]
             capacity.effect_conditions.remove(condition)
         elif condition not in DEFERRED_CONDITIONS:
             raise ValueError(f"Invalid effect_conditions (check_capacity_condition): {capacity.effect_conditions}")
-    return True
+    return None
 
 
 def leader_team_capacity(player: Player) -> Capacity:
@@ -224,6 +223,7 @@ def leader_team_capacity(player: Player) -> Capacity:
         return None
     capacity = copy.deepcopy(leaders[0].ability)
     capacity.effect_conditions.remove("team")
+    capacity.label = f"Leader {leaders[0].name} « {leaders[0].ability_description} »"
     return capacity
 
 
@@ -270,7 +270,9 @@ def apply_killshot_condition(card: Card, opp_card: Card) -> None:
         if capacity is not None and "killshot" in capacity.effect_conditions:
             if is_killshot:
                 capacity.effect_conditions.remove("killshot")
+                note(card, "condition", f"{card.name} : Killshot remplie ({card.attack} ≥ 2 × {opp_card.attack})")
             else:
+                note(card, "condition", f"{card.name} : Killshot non remplie ({card.attack} < 2 × {opp_card.attack}) : {journal_label(capacity)} inactif")
                 setattr(card, slot, None)
 
 
@@ -285,7 +287,9 @@ def apply_perfect_condition(card: Card, opp_card: Card) -> None:
         if capacity is not None and "perfect" in capacity.effect_conditions:
             if is_perfect:
                 capacity.effect_conditions.remove("perfect")
+                note(card, "condition", f"{card.name} : Perfect remplie (écart {card.attack - opp_card.attack} < puissance {card.power_fight})")
             else:
+                note(card, "condition", f"{card.name} : Perfect non remplie (écart {card.attack - opp_card.attack} ≥ puissance {card.power_fight}) : {journal_label(capacity)} inactif")
                 setattr(card, slot, None)
 
 
@@ -375,6 +379,10 @@ def init_fight_data(card: Card, nb_pillz: int, fury: bool):
     card.ability_fight = copy.deepcopy(card.ability)
     card.bonus_fight = copy.deepcopy(card.bonus)
     card.leader_fight = None
+    if card.ability_fight is not None:
+        card.ability_fight.label = f"pouvoir « {card.ability_description} »"
+    if card.bonus_fight is not None:
+        card.bonus_fight.label = f"bonus « {card.bonus_description} »"
     card.pillz_fight = nb_pillz
     card.fury = fury
     card.attack = 0

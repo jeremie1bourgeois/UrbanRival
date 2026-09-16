@@ -35,8 +35,10 @@ def play(game, round_number, ally_ability=None, enemy_ability=None, ally_pillz=1
     ally_index, enemy_index = ROUNDS[round_number - 1]
     if ally_ability:
         game.ally.cards[ally_index].ability = ability(ally_ability)
+        game.ally.cards[ally_index].ability_description = ally_ability
     if enemy_ability:
         game.enemy.cards[enemy_index].ability = ability(enemy_ability)
+        game.enemy.cards[enemy_index].ability_description = enemy_ability
     round_data = ProcessRoundInput(player1_card_index=ally_index, player1_pillz=ally_pillz,
                                    player2_card_index=enemy_index, player2_pillz=enemy_pillz)
     check_round_correct(game, round_data)

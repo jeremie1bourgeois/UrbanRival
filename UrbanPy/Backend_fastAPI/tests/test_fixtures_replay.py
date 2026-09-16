@@ -49,4 +49,10 @@ def test_replaying_the_saved_play_reproduces_the_saved_state(fixture_dir):
     check_round_correct(game, round_data)
     process_round(game, round_data)
 
-    assert game.to_dict() == curr
+    assert _without_logs(game.to_dict()) == _without_logs(curr)   # le journal des effets n'est pas un état
+
+
+def _without_logs(state: dict) -> dict:
+    state = dict(state)
+    state["history"] = [{key: value for key, value in round_.items() if key != "log"} for round_ in state["history"]]
+    return state

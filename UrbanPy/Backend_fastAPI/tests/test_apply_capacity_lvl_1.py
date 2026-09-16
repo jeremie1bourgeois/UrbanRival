@@ -25,6 +25,8 @@ def play(game, ally_ability=None, enemy_ability=None, ally_bonus="-2 Opp Power, 
     amelia, asporov = game.ally.cards[AMELIA], game.enemy.cards[ASPOROV]
     amelia.ability, asporov.ability = capacity(ally_ability), capacity(enemy_ability)
     amelia.bonus, asporov.bonus = capacity(ally_bonus), capacity(enemy_bonus)
+    amelia.ability_description, asporov.ability_description = ally_ability or "", enemy_ability or ""
+    amelia.bonus_description, asporov.bonus_description = ally_bonus or "", enemy_bonus or ""
     game.turn = turn
     process_round(game, ProcessRoundInput(player1_card_index=AMELIA, player1_pillz=ally_pillz,
                                           player2_card_index=ASPOROV, player2_pillz=enemy_pillz))

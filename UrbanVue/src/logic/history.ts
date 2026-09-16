@@ -1,4 +1,4 @@
-import type { Game } from "../models/game.interface";
+import type { Game, LogEntry } from "../models/game.interface";
 
 export interface PlayedCardSummary {
 	name: string;
@@ -16,6 +16,8 @@ export interface RoundSummary {
 	ally: PlayedCardSummary;
 	enemy: PlayedCardSummary;
 	lifeAfter: { ally: number; enemy: number };
+	/** Journal des effets du round, tel que produit par le moteur ([] pour les sauvegardes antérieures). */
+	log: LogEntry[];
 }
 
 /** Résume chaque round joué à partir des états successifs de la partie (l'état d'après porte les cartes jouées). */
@@ -41,6 +43,7 @@ export function roundSummaries(states: Game[]): RoundSummary[] {
 			ally: summary(ally, record.ally.win),
 			enemy: summary(enemy, record.enemy.win),
 			lifeAfter: { ally: after.ally.life, enemy: after.enemy.life },
+			log: record.log ?? [],
 		});
 	}
 	return summaries;
