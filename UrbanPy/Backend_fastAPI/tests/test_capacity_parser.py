@@ -304,6 +304,10 @@ def test_cards_effects_target_both_cards(text, expected):
     assert parsed(text) == expected
 
 
+def test_tune_out_is_a_resolution_mode():
+    assert parsed("Tune Out") == cap("both", ["tune_out"], 0, how="tune_out")
+
+
 # --- Niveau 4 : effets persistants ------------------------------------------------------------
 
 @pytest.mark.parametrize("text, target, types", [
@@ -367,7 +371,7 @@ def test_gibberish_is_unknown_core():
 
 # --- Couverture sur les descriptions officielles -----------------------------------------
 
-SUPPORTED_DESCRIPTIONS_FLOOR = 1373  # mesuré le 2026-09-16 sur 1396 descriptions ; à relever quand la couverture progresse
+SUPPORTED_DESCRIPTIONS_FLOOR = 1374  # mesuré le 2026-09-16 sur 1396 descriptions ; à relever quand la couverture progresse
 
 
 def test_every_official_description_parses_without_raising():
@@ -411,7 +415,7 @@ def test_night_prefix_is_inert_since_day_is_always_valid():
 
 @pytest.mark.parametrize("text, keyword", [
     ("Fatal Killshot", "fatal killshot"), ("Overdose", "overdose"), ("Perfection", "perfection"),
-    ("Sinister Symmetry", "sinister symmetry"), ("Tune Out", "tune out"), ])
+    ("Sinister Symmetry", "sinister symmetry"), ])
 def test_new_unsupported_cores_have_a_named_reason(text, keyword):
     assert parse_capacity(text).reason == f"unsupported core: {keyword}"
 

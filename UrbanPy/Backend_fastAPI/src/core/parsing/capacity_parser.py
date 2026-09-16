@@ -85,7 +85,7 @@ _CORE_STARTERS = ("copy", "protection", "reanimate")   # mots qui ouvrent un cœ
 # Cœurs connus mais hors moteur : testés avant les regex, raison groupable dans le rapport
 _UNSUPPORTED_CORE_KEYWORDS = (
     "remove ability conditions", "counter-attack", "tie-break",
-    "fatal killshot", "sinister symmetry", "tune out", "overdose", "perfection",
+    "fatal killshot", "sinister symmetry", "overdose", "perfection",
     "rebirth",
     "beyond", "bypass", "hazard", "illusion", "limitless",
 )
@@ -183,6 +183,9 @@ def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacit
     match = _R_EXCHANGE.match(core)
     if match:
         return error or _capacity("both", _types(match.group(1)), 0, "exchange", -1, conditions)
+
+    if core == "tune out":       # bonus Cosmohnuts : le round se résout aux pillz misées, pas à l'attaque
+        return error or _capacity("both", ["tune_out"], 0, "tune_out", -1, conditions)
 
     match = _R_IMPOSE.match(core)
     if match:

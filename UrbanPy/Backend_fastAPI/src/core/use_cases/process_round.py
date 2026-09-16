@@ -61,6 +61,10 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
         # Modificateurs d'attaque, une fois l'attaque de base connue
         fct_lvl_2.apply_capacity_lvl_2(game, player1_card, player2_card, stats=("attack",))
 
+        # Tune Out (Cosmohnuts) : « the Attack calculation is ignored and the winner is the player who bet the most Pillz »
+        if consume_tune_out(player1_card) | consume_tune_out(player2_card):
+            player1_card.attack, player2_card.attack = round_data.player1_pillz, round_data.player2_pillz
+
         # Killshot : la capacité n'agit que si l'attaque vaut au moins le double de l'attaque adverse
         apply_killshot_condition(player1_card, player2_card)
         apply_killshot_condition(player2_card, player1_card)
@@ -208,6 +212,17 @@ def leader_team_capacity(player: Player) -> Capacity:
     capacity = copy.deepcopy(leaders[0].ability)
     capacity.effect_conditions.remove("team")
     return capacity
+
+
+def consume_tune_out(card: Card) -> bool:
+    """Retire un Tune Out (survivant à la phase des Stops) de la carte ; True s'il y en avait un."""
+    found = False
+    for slot in FIGHT_SLOTS:
+        capacity = getattr(card, slot)
+        if capacity is not None and capacity.how == "tune_out":
+            setattr(card, slot, None)
+            found = True
+    return found
 
 
 def apply_killshot_condition(card: Card, opp_card: Card) -> None:
