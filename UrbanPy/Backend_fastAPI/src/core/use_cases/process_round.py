@@ -169,8 +169,9 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, own_
             if not checks[condition]():
                 return False
             capacity.effect_conditions.remove(condition)
-        elif condition.startswith("versus:"):                # « Versus <clans> » : le clan de la carte adverse
-            if opp_player.cards[opp_card_index].faction not in condition[len("versus:"):].split("|"):
+        elif condition.startswith("versus:"):                # « Versus <clans> » : au moins une carte du clan dans la main adverse
+            clans = condition[len("versus:"):].split("|")   # (règle officielle : pas seulement la carte en face)
+            if not any(card.faction in clans for card in opp_player.cards):
                 return False
             capacity.effect_conditions.remove(condition)
         elif condition.startswith("bet"):

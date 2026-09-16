@@ -106,17 +106,24 @@ def test_versus_condition_is_met_against_a_listed_clan(template_game):
     assert capacity.effect_conditions == []
 
 
-def test_versus_condition_fails_against_another_clan(template_game):
-    template_game.enemy.cards[0].faction = "Junkz"
-    capacity = Capacity(target="ally", types=["power"], value=2, borne=-1, effect_conditions=["versus:All Stars"])
+def test_versus_condition_looks_at_the_whole_opposing_hand_not_only_the_card_faced(template_game):
+    # Règle officielle : « activates only if your opponent's hand has at least 1 card of a specific clan […]
+    # your card's ability activates nonetheless, even if your card does not fight the card from the clan ».
+    capacity = Capacity(target="ally", types=["power"], value=2, borne=-1, effect_conditions=["versus:Rescue"])
+
+    assert check_capacity_condition(template_game, capacity, True, 0, 0) is True    # face à Asporov (All Stars), Serafina (Rescue) est dans la main
+
+
+def test_versus_condition_fails_when_no_card_of_the_clan_is_in_the_opposing_hand(template_game):
+    capacity = Capacity(target="ally", types=["power"], value=2, borne=-1, effect_conditions=["versus:Junkz"])
 
     assert check_capacity_condition(template_game, capacity, True, 0, 0) is False
 
 
-def test_versus_condition_for_the_enemy_side_looks_at_the_ally_card(template_game):
+def test_versus_condition_for_the_enemy_side_looks_at_the_ally_hand(template_game):
     capacity = Capacity(target="ally", types=["power"], value=2, borne=-1, effect_conditions=["versus:Rescue"])
 
-    assert check_capacity_condition(template_game, capacity, False, 3, 2) is False  # Amelia (All Stars) n'est pas Rescue
+    assert check_capacity_condition(template_game, capacity, False, 3, 2) is False  # aucune Rescue chez l'allié
 
 
 @pytest.mark.parametrize("condition, pillz_fight, expected", [
