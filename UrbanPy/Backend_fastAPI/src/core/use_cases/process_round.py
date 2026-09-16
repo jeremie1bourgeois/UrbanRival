@@ -209,10 +209,10 @@ def apply_killshot_condition(card: Card, opp_card: Card) -> None:
 
 def _bet_condition_met(condition: str, pillz_fight: int) -> bool:
     """
-    « bet>N » / « bet<N » (et la forme historique « bet N » = « bet>N ») comparent les pillz réellement misées.
-    pillz_fight vaut 1 sans mise (attaque = puissance x pillz_fight), donc pillz misées = pillz_fight - 1.
+    « bet>N » / « bet<N » (et la forme historique « bet N » = « bet>N ») comparent les pillz de la carte.
+    Règle officielle (texte des cartes) : « including free Pillz and excluding Fury » -> pillz_fight tel quel.
     """
-    bet = pillz_fight - 1
+    bet = pillz_fight
     rest = condition[3:].strip()
     if rest.startswith("<"):
         return bet < int(rest[1:])

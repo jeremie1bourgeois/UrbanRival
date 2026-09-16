@@ -38,7 +38,7 @@ def test_bet_condition_is_met_when_ally_bets_more_pillz_than_threshold(template_
 
 
 def test_bet_condition_is_not_met_when_ally_bets_too_few_pillz(template_game):
-    template_game.ally.cards[0].pillz_fight = 2
+    template_game.ally.cards[0].pillz_fight = 3
 
     assert check_capacity_condition(template_game, _bet_capacity(3), True, 0, 0) is False
 
@@ -120,11 +120,12 @@ def test_versus_condition_for_the_enemy_side_looks_at_the_ally_card(template_gam
 
 
 @pytest.mark.parametrize("condition, pillz_fight, expected", [
-    ("bet>4", 6, True),    # 5 pillz misées (pillz_fight - 1) > 4
-    ("bet>4", 5, False),   # 4 misées : pas strictement plus
-    ("bet<6", 6, True),    # 5 misées < 6
-    ("bet<6", 7, False),
-    ("bet 3", 5, True),    # forme historique = « bet > 3 »
+    # Règle officielle (texte des cartes Bet) : « including free Pillz and excluding Fury » -> on compare pillz_fight.
+    ("bet>3", 4, True),    # 4 pillz au total (dont la gratuite) : strictement plus que 3
+    ("bet>3", 3, False),   # 3 : pas strictement plus
+    ("bet<6", 5, True),
+    ("bet<6", 6, False),
+    ("bet 3", 4, True),    # forme historique = « bet > 3 »
 ])
 def test_bet_conditions_compare_the_pillz_actually_bet(template_game, condition, pillz_fight, expected):
     template_game.ally.cards[0].pillz_fight = pillz_fight
