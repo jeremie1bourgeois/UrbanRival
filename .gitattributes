@@ -1,0 +1,10 @@
+# Fins de ligne : LF dans le dépôt pour tout fichier texte (Windows : core.autocrlf gère l'affichage local)
+* text=auto eol=lf
+
+# Binaires
+*.png binary
+*.jpg binary
+*.woff binary
+*.ipch binary
+*.db binary
+*.suo binary
