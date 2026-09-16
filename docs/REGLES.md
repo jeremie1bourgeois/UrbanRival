@@ -224,6 +224,10 @@ assumé, sans conséquence tant que le jeu n'est pas comparé à des combats ré
 
 ## 4. Mécaniques non gérées : définitions retrouvées
 
+> **Mise à jour 2026-09-16 (soir)** : toutes les mécaniques de ce tableau qui ont une définition sont **implémentées**
+> (branche `feat/pouvoirs-regles`), sauf Beyond (hors périmètre) et les cartes uniques sans définition (Hazard, Illusion,
+> Bypass, Overdose, Remove Ability Conditions, Rebirth 1 Max 1, Perfection). Couverture : 1 386 / 1 396 descriptions.
+
 Textes de cartes (entre guillemets sur le wiki), utilisables directement comme spécification. Ordre du tableau
 ROADMAP § 2.A.
 
