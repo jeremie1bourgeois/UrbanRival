@@ -169,8 +169,9 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, own_
             if not checks[condition]():
                 return False
             capacity.effect_conditions.remove(condition)
-        elif condition.startswith("versus:"):                # « Versus <clans> » : le clan de la carte adverse
-            if opp_player.cards[opp_card_index].faction not in condition[len("versus:"):].split("|"):
+        elif condition.startswith("versus:"):                # « Versus <clans> » : au moins une carte du clan dans la main adverse
+            clans = condition[len("versus:"):].split("|")   # (règle officielle : pas seulement la carte en face)
+            if not any(card.faction in clans for card in opp_player.cards):
                 return False
             capacity.effect_conditions.remove(condition)
         elif condition.startswith("bet"):
@@ -209,10 +210,10 @@ def apply_killshot_condition(card: Card, opp_card: Card) -> None:
 
 def _bet_condition_met(condition: str, pillz_fight: int) -> bool:
     """
-    « bet>N » / « bet<N » (et la forme historique « bet N » = « bet>N ») comparent les pillz réellement misées.
-    pillz_fight vaut 1 sans mise (attaque = puissance x pillz_fight), donc pillz misées = pillz_fight - 1.
+    « bet>N » / « bet<N » (et la forme historique « bet N » = « bet>N ») comparent les pillz de la carte.
+    Règle officielle (texte des cartes) : « including free Pillz and excluding Fury » -> pillz_fight tel quel.
     """
-    bet = pillz_fight - 1
+    bet = pillz_fight
     rest = condition[3:].strip()
     if rest.startswith("<"):
         return bet < int(rest[1:])
@@ -230,14 +231,19 @@ def is_infiltrated(card: Card) -> bool:
 
 def infiltrated_clan(player: Player):
     """
-    Clan adopté par les Oculus « Infiltrated » de la main : le clan majoritaire parmi les autres cartes
-    (hors Oculus et Leader). None s'il n'y en a pas ou en cas d'égalité.
+    Clan adopté par l'Oculus « Infiltrated » de la main (règle officielle du bonus) : un seul autre clan -> celui-là ;
+    deux autres clans -> celui de la carte seule ; trois autres clans ou plus d'un Oculus -> None.
+    Les Leaders ne comptent pas comme clan (hypothèse, non documentée).
     """
-    counts = Counter(c.faction for c in player.cards if c.faction not in (OCULUS, LEADER))
-    ranked = counts.most_common(2)
-    if not ranked or (len(ranked) == 2 and ranked[0][1] == ranked[1][1]):
+    if sum(1 for c in player.cards if c.faction == OCULUS) != 1:
         return None
-    return ranked[0][0]
+    counts = Counter(c.faction for c in player.cards if c.faction not in (OCULUS, LEADER))
+    if len(counts) == 1:
+        return next(iter(counts))
+    if len(counts) == 2:
+        lone = [clan for clan, n in counts.items() if n == 1]
+        return lone[0] if len(lone) == 1 else None
+    return None
 
 
 def clan_for_bonus(player: Player, card: Card):

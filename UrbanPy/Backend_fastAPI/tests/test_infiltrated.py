@@ -1,6 +1,7 @@
 """
-Bonus Oculus « Infiltrated » : l'Oculus adopte le bonus du clan majoritaire parmi les autres cartes de la main
-(hors Oculus et Leader) et compte comme membre de ce clan pour l'activation du bonus ; égalité -> aucun bonus.
+Bonus Oculus « Infiltrated » (règle officielle) : un seul autre clan dans la main -> l'Oculus en fait partie ; deux autres
+clans -> il rejoint le clan de la carte seule (celui qui a besoin de lui) ; trois autres clans ou plus d'un Oculus ->
+rien. Les Leaders ne comptent pas comme clan (hypothèse). L'Oculus compte comme membre pour l'activation du bonus.
 Scénario : main alliée du template (4 All Stars, bonus -2 opp power, abilities neutralisées) modifiée carte par
 carte ; Asporov (ennemi, P7, ability neutralisée) subit ou non le bonus adopté.
 """
@@ -46,16 +47,27 @@ def test_oculus_adopts_the_bonus_of_the_other_clan(game):
     assert asporov.power_fight == 7 - 2
 
 
-def test_oculus_adopts_the_majority_clan(game):
+def test_oculus_joins_the_lone_card_clan_when_two_other_clans_are_present(game):
+    # « If two other clans are present, the Oculus card will belong to the clan of the sole card, thus activating its bonus. »
     make(game.ally.cards[AMELIA], "Oculus", "Infiltrated")
     make(game.ally.cards[AGUSTINO], "Montana", MONTANA_BONUS)         # 1 Oculus + 1 Montana + 2 All Stars
 
-    _, asporov = play(game, AMELIA)
+    _, asporov = play(game, AMELIA, enemy_pillz=2)                    # Asporov 7 x 2 = 14
 
-    assert asporov.power_fight == 7 - 2                              # All Stars, pas Montana
+    assert (asporov.power_fight, asporov.attack) == (7, 8)           # Montana (14 - 12, min 8), pas All Stars
 
 
-def test_oculus_gets_nothing_on_a_tie(game):
+def test_two_oculus_in_hand_get_nothing(game):
+    # « […] or if you have more than one Oculus in your hand, the Infiltrated bonus has no effect. »
+    make(game.ally.cards[AMELIA], "Oculus", "Infiltrated")
+    make(game.ally.cards[ALLISON], "Oculus", "Infiltrated")           # 2 Oculus + 2 All Stars
+
+    amelia, asporov = play(game, AMELIA)
+
+    assert (amelia.bonus_fight, asporov.power_fight) == (None, 7)
+
+
+def test_oculus_gets_nothing_with_three_other_clans(game):
     make(game.ally.cards[AMELIA], "Oculus", "Infiltrated")
     make(game.ally.cards[AGUSTINO], "Montana", MONTANA_BONUS)
     make(game.ally.cards[ALLISON], "Junkz", "Attack +8")              # 1 Oculus + Montana + Junkz + All Stars

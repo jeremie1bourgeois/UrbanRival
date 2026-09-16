@@ -69,56 +69,55 @@ def _apply_copies(card1: Card, card2: Card) -> None:
 
 # --- Phase 2 : Protection: Ability / Bonus et Stop Opp. Ability / Bonus -----------------------
 
-def _stop_kinds(card: Card) -> Set[str]:
-    """Emplacements adverses (« ability » / « bonus ») que les Stops de cette carte visent."""
-    kinds = set()
-    for slot in SLOT_OF_KIND.values():
-        capacity = getattr(card, slot)
-        if _is(capacity, "stop") and _kind_targeted(capacity):
-            kinds.add(_kind_targeted(capacity))
-    return kinds
-
-
-def _protection_slots(card: Card) -> dict:
-    """kind protégé -> emplacement (« ability_fight » / « bonus_fight ») qui porte la Protection."""
+def _slots_targeting(card: Card, how: str) -> dict:
+    """(« ability » / « bonus ») visé -> emplacements de `card` qui portent une capacité méta `how` le visant."""
     slots = {}
     for slot in SLOT_OF_KIND.values():
         capacity = getattr(card, slot)
-        if _is(capacity, "Protection") and _kind_targeted(capacity):
-            slots[_kind_targeted(capacity)] = slot
+        if _is(capacity, how) and _kind_targeted(capacity):
+            slots.setdefault(_kind_targeted(capacity), []).append(slot)
     return slots
 
 
-def _stopped_kinds(card: Card, opp_stops: Set[str]) -> Set[str]:
+def _stopped_slots(card1: Card, card2: Card) -> Set[tuple]:
     """
-    Emplacements de `card` réellement stoppés : visés par un Stop adverse et non couverts par une Protection
-    qui tient encore. Une Protection tient si l'emplacement qui la porte n'est pas lui-même stoppé ;
-    la récursion s'arrête sur un cycle en faveur des Stops.
+    Emplacements (carte, « ability » / « bonus ») stoppés, résolus « en chaîne » (règle officielle, support UR art. 91 :
+    « check that nothing is blocking it and […] that nothing is blocking the Ability/Bonus block ») : un Stop stoppé ne
+    stoppe rien, une Protection stoppée ne protège rien. Point fixe sur les emplacements sûrement actifs / sûrement
+    stoppés ; ce qui reste indéterminé (cycle, ex. SoA contre SoA) est stoppé : les Stops gagnent.
     """
-    protections = _protection_slots(card)
+    cards = {id(card1): card1, id(card2): card2}
+    opp_of = {id(card1): card2, id(card2): card1}
+    stops = {id(c): _slots_targeting(c, "stop") for c in cards.values()}
+    protections = {id(c): _slots_targeting(c, "Protection") for c in cards.values()}
+    every = {(id(c), kind) for c in cards.values() for kind in ("ability", "bonus")}
+    active, stopped = set(), set()
 
-    def stopped(kind: str, visiting: Set[str]) -> bool:
-        if kind not in opp_stops:
-            return False
-        protecting_slot = protections.get(kind)
-        if protecting_slot is None:
-            return True
-        protecting_kind = KIND_OF_SLOT[protecting_slot]
-        if protecting_kind in visiting:
-            return True                      # cycle : les Stops gagnent
-        return stopped(protecting_kind, visiting | {kind})
+    def state(slot_key):                 # slot_key = (id carte, emplacement)
+        return (slot_key[0], KIND_OF_SLOT[slot_key[1]])
 
-    return {kind for kind in ("ability", "bonus") if stopped(kind, set())}
+    changed = True
+    while changed:
+        changed = False
+        for key in every - active - stopped:
+            card_id, kind = key
+            attackers = [(id(opp_of[card_id]), slot) for slot in stops[id(opp_of[card_id])].get(kind, [])]
+            shields = [(card_id, slot) for slot in protections[card_id].get(kind, [])]
+            if all(state(a) in stopped for a in attackers) or any(state(s) in active for s in shields):
+                active.add(key); changed = True
+            elif any(state(a) in active for a in attackers) and all(state(s) in stopped for s in shields):
+                stopped.add(key); changed = True
+    return every - active                # indéterminé -> stoppé
 
 
 def _apply_stops(card1: Card, card2: Card) -> None:
-    stopped = {id(own): _stopped_kinds(own, _stop_kinds(opp)) for own, opp in _pairs(card1, card2)}
-    for card in (card1, card2):           # simultané : calculé avant toute suppression
+    stopped = _stopped_slots(card1, card2)
+    for card in (card1, card2):
         for kind, slot in SLOT_OF_KIND.items():
             capacity = getattr(card, slot)
             if capacity is None:
                 continue
-            if kind in stopped[id(card)]:
+            if (id(card), kind) in stopped:
                 if "stop" in capacity.effect_conditions:      # « Stop: X » : X s'active justement parce qu'on la stoppe
                     capacity.effect_conditions.remove("stop")
                 else:
@@ -158,12 +157,20 @@ def _strip_types(card: Card, types: Set[str], only_targeting_opponent: bool) -> 
             setattr(card, slot, None)
 
 
+# Les effets persistants sont des modificateurs de vie / de pillz : un Cancel Opp. Life (Pillz) Modif. les annule aussi
+# (règle officielle : « poison, toxin, regen and heal abilities will be deactivated for the round »).
+PERSISTENT_TYPES_OF_STAT = {"life": {"poison", "toxine", "heal", "regen"}, "pillz": {"dope"}}
+
+
 def _apply_cancels(card1: Card, card2: Card) -> None:
     for own, opp in _pairs(card1, card2):
         for slot in FIGHT_SLOTS:
             capacity = getattr(own, slot)
             if _is(capacity, "cancel"):
-                _strip_types(opp, set(capacity.types), only_targeting_opponent=False)
+                types = set(capacity.types)
+                for stat in capacity.types:
+                    types |= PERSISTENT_TYPES_OF_STAT.get(stat, set())
+                _strip_types(opp, types, only_targeting_opponent=False)
 
 
 def _apply_stat_protections(card1: Card, card2: Card) -> None:

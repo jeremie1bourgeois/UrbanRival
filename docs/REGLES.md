@@ -30,6 +30,10 @@ Hiérarchie de confiance : support officiel > glossaire officiel > texte de cart
 
 ## 3. Verdict sur les décisions prises sans certitude
 
+> **Mise à jour 2026-09-16** : les corrections des points 3.1, 3.3, 3.4, 3.6, 3.8 et de Versus (§ 4) ont été appliquées
+> au moteur (branche `fix/regles-officielles`), avec les exemples officiels comme tests. Le texte ci-dessous décrit l'état
+> **avant** correction. Recover (3.5, minimum 1) est laissé en l'état : source trop fragile.
+
 Les numéros suivent le tableau de `docs/ROADMAP.md` § 1. Les trois premiers points sont **prioritaires** : ce sont
 des erreurs avérées, fréquentes en jeu (tous les clans à Stop, Zenith, Oculus).
 

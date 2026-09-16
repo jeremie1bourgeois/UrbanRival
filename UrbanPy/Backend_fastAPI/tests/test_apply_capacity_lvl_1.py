@@ -51,11 +51,36 @@ def test_stop_capacities_are_consumed(template_game):
     assert amelia.ability_fight is None
 
 
-def test_stops_resolve_simultaneously_soa_versus_sob(template_game):
-    # Règle retenue (par défaut, à confirmer) : les deux Stops s'appliquent en même temps.
+# Règle officielle (support UR, article 91) : « There are no priorities. […] check that nothing is blocking it and if this
+# is the case, that nothing is blocking the Ability/Bonus block, just like a chain. » -> un Stop stoppé ne stoppe rien.
+
+def test_official_example_1_my_sob_bonus_blocks_the_soa_bonus_so_my_ability_applies(template_game):
+    # « your character has +8 Attack as his ability and Stop Bonus as his Bonus, his opponent has Stop Ability as his
+    #   Bonus. Is your Ability activated? Yes »
+    amelia, _ = play(template_game, ally_ability="Attack +8", ally_bonus="Stop Opp. Bonus", enemy_bonus="Stop Opp. Ability")
+
+    assert amelia.attack == 3 + 8
+
+
+def test_official_example_2_my_soa_ability_blocks_the_sob_ability_so_my_bonus_applies(template_game):
+    # « your character has +2 Power as his Bonus and Stop Opp Ability as his Ability, his opponent has Stop Opp Bonus as
+    #   his Ability. Is your Ability activated? Yes »
+    amelia, _ = play(template_game, ally_ability="Stop Opp. Ability", ally_bonus="Power +2", enemy_ability="Stop Opp. Bonus", enemy_bonus=None)
+
+    assert amelia.power_fight == 3 + 2
+
+
+def test_soa_ability_versus_sob_ability_the_soa_wins_the_chain(template_game):
     amelia, asporov = play(template_game, ally_ability="Stop Opp. Ability", enemy_ability="Stop Opp. Bonus")
 
-    assert (amelia.power_fight, asporov.power_fight) == (3 - 2, 7)   # A perd son bonus, B perd son ability
+    assert (amelia.power_fight, asporov.power_fight) == (3 - 2, 7 - 2)   # rien ne bloque le SoA ; il bloque le SoB ; le bonus d'Amelia frappe
+
+
+def test_soa_versus_soa_is_a_cycle_where_both_stops_win(template_game):
+    # Non tranché par la source (chaîne infinie) : les Stops gagnent, les deux abilities tombent.
+    amelia, asporov = play(template_game, ally_ability="Stop Opp. Ability", enemy_ability="Stop Opp. Ability")
+
+    assert (amelia.ability_fight, asporov.ability_fight) == (None, None)
 
 
 def test_conditional_stop_only_acts_when_its_condition_is_met(template_game):
@@ -118,9 +143,15 @@ def test_copy_versus_copy_yields_nothing(template_game):
 
 
 def test_copied_stop_takes_part_in_the_stop_phase(template_game):
+    amelia, asporov = play(template_game, ally_ability="Copy: Opp. Ability", enemy_ability="Stop Opp. Bonus")
+
+    assert (amelia.power_fight, asporov.power_fight) == (3, 7)   # deux SoB en ability : les deux bonus tombent
+
+
+def test_copied_stop_is_itself_subject_to_the_chain(template_game):
     _, asporov = play(template_game, ally_ability="Copy: Opp. Bonus", enemy_ability="Power +2", enemy_bonus="Stop Opp. Ability")
 
-    assert asporov.power_fight == 7 - 2   # le SoA copié stoppe « Power +2 »
+    assert asporov.power_fight == 7 + 2 - 2   # le SoA copié (ability) est stoppé par le SoA d'origine (bonus) : « Power +2 » tient
 
 
 # --- Copy / Exchange de power et damage -------------------------------------------------------
@@ -176,6 +207,21 @@ def test_cancel_opp_life_modif_removes_end_of_round_life_effects(template_game):
     play(template_game, ally_ability="Cancel Opp. Pillz & Life Modif.", enemy_ability="-2 Opp. Life, Min 0")   # Asporov gagne
 
     assert template_game.ally.life == 12 - 3
+
+
+@pytest.mark.parametrize("enemy_ability", ["Poison 2, Min 1", "Toxin 2, Min 1", "Heal 2, Max 14", "Regen 2, Max 14"])
+def test_cancel_opp_life_modif_also_cancels_persistent_life_effects(template_game, enemy_ability):
+    # Règle officielle : « The effects of your opponent's poison, toxin, regen and heal abilities will be deactivated
+    # for the round in which the "cancel opponent life modification" is activated. »
+    play(template_game, ally_ability="Cancel Opp. Life Modif.", enemy_ability=enemy_ability)   # Asporov gagne
+
+    assert template_game.ally.effect_list == [] and template_game.enemy.effect_list == []
+
+
+def test_cancel_opp_pillz_modif_also_cancels_dope(template_game):
+    play(template_game, ally_ability="Cancel Opp. Pillz Modif.", enemy_ability="Dope 2, Max 14")   # Asporov gagne
+
+    assert template_game.enemy.effect_list == []
 
 
 def test_cancel_capacities_are_consumed(template_game):

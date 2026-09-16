@@ -21,9 +21,12 @@ def apply_capacity_lvl_3(game: Game, card1: Card, card2: Card) -> None:
             capacity = getattr(card, slot)
             if capacity is None:
                 continue
+            if "reanimate" in capacity.types:      # Reanimate = « Defeat: +X Life » (le cas KO est traité par apply_reanimate)
+                if not card.win:
+                    own.life += capacity.value * multiplier(capacity.how, game, own, opp, card, opp_card)
+                setattr(card, slot, None)
+                continue
             capacity = check_capacity_condition_lvl_3(capacity, card.win)
-            if capacity is not None and "reanimate" in capacity.types:
-                capacity = None   # Reanimate n'agit que sur un KO (apply_reanimate), jamais en fin de round normale
             if capacity is not None and "recover" in capacity.types:
                 own.pillz += recovered_pillz(card, capacity)
                 capacity = None

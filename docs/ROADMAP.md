@@ -13,30 +13,31 @@ ce document décrit **où on en est et ce qui reste**, pour reprendre le travail
 | Moteur | 4 niveaux réécrits et testés (méta, stats, fin de round, persistants) ; bonus de clan (≥ 2 du clan, Oculus infiltré, Leaders), conditions Courage / Revenge / Confidence / Reprisal / Symmetry / Asymmetry / Stop / Killshot / Bet / Versus / Defeat / Backlash / Victory or Defeat / Team ; `scripts/engine_crash_sweep.py` : 0 exception sur toutes les descriptions gérées |
 | API | `/cards`, `/init_game/`, `/init_game/template`, `/process_round/{id}`, `/ai_pick/{id}`, `/save_for_test` |
 | Front | deck builder (recherche, filtre clan, aléatoire, statut des bonus, decks mémorisés), partie à deux ou contre l'ordinateur (aléatoire / heuristique), historique des rounds, fin de partie, effets persistants, illustrations |
-| Tests | 332 backend (pytest) + 22 front (vitest) ; CI GitHub Actions (backend + front) ; 3 fixtures de rejeu `data/test/` |
+| Tests | 344 backend (pytest) + 22 front (vitest) ; CI GitHub Actions (backend + front) ; 3 fixtures de rejeu `data/test/` |
 | Dépôt | nettoyé (IDE, binaires, doublons), fins de ligne LF (`.gitattributes`), README |
 
 ### Décisions de règles prises sans certitude (à confirmer contre les règles officielles)
 
 Chacune est isolée dans une fonction et couverte par un test : changer d'avis = une ligne + un test.
 
-**Audit du 2026-09-16 : voir `docs/REGLES.md`** — 5 décisions contredites par les sources (Stops, Bet, Infiltrated,
-Cancel Life Modif., Reanimate), 4 confirmées, le reste non documenté ; définitions des mécaniques de § 2.A retrouvées.
+**Audit du 2026-09-16 : voir `docs/REGLES.md`** — les six règles contredites par les sources (Stops, Bet, Infiltrated,
+Cancel Life Modif., Reanimate, Versus) ont été **corrigées** le même jour ; le tableau ci-dessous reflète l'état corrigé.
 
 | Règle retenue | Où |
 |---|---|
-| Stop Opp. Ability contre Stop Opp. Bonus : **les deux s'appliquent** (résolution simultanée) | `apply_capacity_lvl_1._stopped_kinds`, test `test_stops_resolve_simultaneously_soa_versus_sob` |
-| Protection cyclique (Protection: Ability + Protection: Bonus face à SoA + SoB) : les Stops gagnent | idem |
-| « Cancel Opp. Life Modif. » **n'annule pas** le poison | `apply_capacity_lvl_1._strip_types` |
-| Reanimate : uniquement pour le joueur tombé à 0, via la carte qu'il vient de jouer ; les effets de fin de round sont sautés sur KO | `apply_capacity_lvl_3.apply_reanimate`, `process_round` |
-| Recover X out of Y : ⌊pillz misées × X / Y⌋, **fury comprise** | `apply_capacity_lvl_3.recovered_pillz` |
-| Infiltrated (Oculus) : bonus du clan **majoritaire** des autres cartes (hors Oculus/Leader), l'Oculus compte comme membre, égalité → rien | `process_round.infiltrated_clan` |
+| Stops résolus **en chaîne** (un Stop stoppé ne stoppe rien) — règle officielle, art. 91 du support | `apply_capacity_lvl_1._stopped_slots`, tests `test_official_example_1/2_*` |
+| Cycles (SoA contre SoA, Protection: Ability + Protection: Bonus face à SoA + SoB) : les Stops gagnent — non documenté | idem, `test_soa_versus_soa_is_a_cycle_where_both_stops_win` |
+| « Cancel Opp. Life Modif. » **annule aussi** poison / toxin / heal / regen (Pillz Modif. : dope) — règle officielle | `apply_capacity_lvl_1.PERSISTENT_TYPES_OF_STAT` |
+| Reanimate = « Defeat: +X Life » qui marche aussi depuis 0 (règle officielle) ; les effets de fin de round sont sautés sur KO | `apply_capacity_lvl_3.apply_reanimate` + boucle de niveau 3, `process_round` |
+| Recover X out of Y : ⌊pillz misées × X / Y⌋, **fury comprise** (confirmé) ; minimum 1 et pillz gratuite : non tranchés | `apply_capacity_lvl_3.recovered_pillz` |
+| Infiltrated (Oculus) — règle officielle : un seul autre clan → celui-là ; deux → celui de la **carte seule** ; trois ou deux Oculus → rien. Leaders hors décompte (hypothèse) ; la liste des clans infiltrables imprimée sur la carte n'est pas modélisée | `process_round.infiltrated_clan` |
 | Team (Leader) : s'applique à chaque carte jouée, Leader compris, seulement si Leader unique | `process_round.leader_team_capacity` |
-| Bet > N / < N : compare les pillz **misées** (pillz_fight − 1, sans la fury) | `process_round._bet_condition_met` |
+| Versus (clans) : s'active si la **main** adverse contient une carte du clan, pas seulement la carte en face — règle officielle | `process_round.check_capacity_condition` |
+| Bet > N / < N : compare `pillz_fight` (**pillz gratuite comprise**, fury exclue) — règle officielle | `process_round._bet_condition_met` |
 | Killshot : attaque > 0 et ≥ 2 × attaque adverse, évaluée après les modificateurs d'attaque | `process_round.apply_killshot_condition` |
 | per damage : dégâts réellement infligés (0 en défaite) | `multipliers._nb_damage_inflicted` |
 | Copy : copie l'emplacement adverse tel que joué (conditions déjà évaluées) ; Copy vs Copy → rien | `apply_capacity_lvl_1._apply_copies` |
-| Fury : +2 dégâts ajoutés **après** les modificateurs de dégâts | `process_round` |
+| Fury : +2 dégâts ajoutés **après** les modificateurs de dégâts (confirmé par l'utilisateur) | `process_round` |
 | `Day:` toujours valide, `Night:` jamais (décision utilisateur, cycle jour/nuit non modélisé) | `capacity_parser._IGNORED_PREFIXES` |
 
 ### Ce que le moteur ne modélise pas du tout
