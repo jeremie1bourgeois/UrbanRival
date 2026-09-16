@@ -135,12 +135,47 @@ def test_heal_ticks_for_the_owner_up_to_its_maximum(game):
 
 
 def test_dope_adds_pillz_up_to_its_maximum(game):
-    play(game, 1, ally_ability="Dope 2, Max. 10", ally_pillz=6)   # allié 12 - 5 = 7 pillz
+    play(game, 1, ally_ability="Dope 2, Max. 10", ally_pillz=6)   # allié 12 - 5 = 7 pillz, dope immédiat -> 9
 
     play(game, 2)
-    assert game.ally.pillz == 9
+    assert game.ally.pillz == 10                                   # plafonné
     play(game, 3)
     assert game.ally.pillz == 10
+
+
+# --- Glossaire officiel (51, 52) : Toxine, Régén, Consume et Dope « agissent immédiatement à la fin du round dans lequel
+# ils ont été joués » (Poison, Soin — et Repair, par symétrie — seulement aux rounds suivants) -------------------------
+
+def test_toxin_ticks_on_its_own_round(game):
+    play(game, 1, ally_ability="Toxin 2, Min 0", ally_pillz=6)   # ennemi 12 - 5 = 7, toxine -> 5
+
+    assert game.enemy.life == 5
+
+
+def test_regen_ticks_on_its_own_round(game):
+    game.ally.life = 4
+    play(game, 1, ally_ability="Regen 2, Max. 12", ally_pillz=6)
+
+    assert game.ally.life == 6
+
+
+def test_dope_ticks_on_its_own_round(game):
+    play(game, 1, ally_ability="Dope 2, Max. 12", ally_pillz=6)   # 12 - 5 = 7, +2
+
+    assert game.ally.pillz == 9
+
+
+def test_consume_ticks_on_its_own_round(game):
+    play(game, 1, ally_ability="Consume 2, Min 0", ally_pillz=6)
+
+    assert game.enemy.pillz == 10
+
+
+def test_poison_and_heal_still_wait_for_the_next_round(game):
+    game.ally.life = 4
+    play(game, 1, ally_ability="Poison 2, Min 0", ally_pillz=6)   # ennemi 7, pas de tic
+
+    assert game.enemy.life == 7
 
 
 # --- Remplacement et cumul --------------------------------------------------------------------
@@ -154,9 +189,9 @@ def test_a_new_poison_replaces_the_previous_one_after_it_ticked(game):
 
 
 def test_toxin_stacks_with_poison(game):
-    game.enemy.life = 14
-    play(game, 1, ally_ability="Poison 1, Min 0", ally_pillz=6)   # ennemi 9
-    play(game, 2, ally_ability="Toxin 2, Min 0")                   # Allison gagne : 9 - 3 = 6, poison -> 5
+    game.enemy.life = 16
+    play(game, 1, ally_ability="Poison 1, Min 0", ally_pillz=6)   # ennemi 11
+    play(game, 2, ally_ability="Toxin 2, Min 0")                   # Allison gagne : 11 - 3 = 8, poison -> 7, toxine immédiate -> 5
 
     play(game, 3, enemy_pillz=5)                                   # B Mappe gagne : 5 - 1 - 2 -> 2
 
@@ -187,12 +222,12 @@ def test_persistent_effects_survive_a_json_round_trip(game):
 
 
 def test_repair_adds_pillz_and_stacks_with_dope(game):
-    play(game, 1, ally_ability="Dope 1, Max. 12", ally_pillz=6)     # allié 7 pillz
-    play(game, 2, ally_ability="Repair 2, Max. 12")                  # dope -> 8
+    play(game, 1, ally_ability="Dope 1, Max. 12", ally_pillz=6)     # allié 7 pillz, dope immédiat -> 8
+    play(game, 2, ally_ability="Repair 2, Max. 12")                  # dope -> 9 (repair : rounds suivants)
 
-    play(game, 3)                                                    # dope 1 + repair 2 -> 11
+    play(game, 3)                                                    # dope 1 + repair 2 -> 12
 
-    assert (game.ally.pillz, sorted(effects(game.ally))) == (11, [("dope", 1, 12), ("repair", 2, 12)])
+    assert (game.ally.pillz, sorted(effects(game.ally))) == (12, [("dope", 1, 12), ("repair", 2, 12)])
 
 
 # --- Consume / Combust : pillz (et vie) perdues à chaque round suivant (règles officielles) ------------------------
@@ -204,9 +239,9 @@ def test_consume_is_registered_on_the_opponent_when_the_card_wins(game):
 
 
 def test_consume_removes_opponent_pillz_at_the_end_of_each_following_round_down_to_its_minimum(game):
-    play(game, 1, ally_ability="Consume 2, Min 9", ally_pillz=6)   # ennemi : 12 pillz
+    play(game, 1, ally_ability="Consume 2, Min 9", ally_pillz=6)   # ennemi : 12 pillz, consume immédiat -> 10
 
-    play(game, 2, enemy_pillz=2)                                    # ennemi mise 1 -> 11, puis consume -> 9
+    play(game, 2, enemy_pillz=2)                                    # ennemi mise 1 -> 9 : au minimum, rien
     assert game.enemy.pillz == 9
     play(game, 3, enemy_pillz=5)                                    # mise 4 -> 5 : déjà sous le minimum, rien
     assert game.enemy.pillz == 5

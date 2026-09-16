@@ -5,7 +5,9 @@ Niveau 4 : effets persistants (poison / toxine / heal / regen / dope / repair / 
   2. les capacités persistantes restantes (leur condition de fin de round a été validée au niveau 3) sont
      enregistrées sur le joueur affecté : cible ally -> propriétaire, enemy -> adversaire ; le multiplicateur
      est résolu à l'activation ; un effet remplace l'effet de même sorte (poison et toxine se cumulent,
-     heal et regen aussi, dope et repair aussi).
+     heal et regen aussi, dope et repair aussi) ;
+  3. toxine, regen, dope et consume « agissent immédiatement à la fin du round dans lequel ils ont été joués »
+     (glossaire officiel 51, 52) : les effets de ces sortes enregistrés ce round agissent aussitôt.
 Un poison peut amener un joueur à 0 vie : la fin de partie est constatée par check_end.
 """
 from src.core.domain.card import Card, FIGHT_SLOTS
@@ -18,6 +20,7 @@ _LIFE_LOSS = ("poison", "toxine")
 _LIFE_GAIN = ("heal", "regen")
 _PILLZ_GAIN = ("dope", "repair")
 _PILLZ_LOSS = ("consume",)
+IMMEDIATE_KINDS = ("toxine", "regen", "dope", "consume")
 _LIFE_LOSS_AND_PILLZ_LOSS = ("combust",)
 
 
@@ -35,7 +38,10 @@ def apply_capacity_lvl_4(game: Game, card1: Card, card2: Card) -> None:
             value = capacity.value * multiplier(capacity.how, game, own, opp, card, opp_card)
             affected = {"enemy": [opp], "ally": [own], "both": [own, opp]}[capacity.target]
             for player in affected:
-                register_persistent_effect(player, PersistentEffect(kind, value, capacity.borne))
+                effect = PersistentEffect(kind, value, capacity.borne)
+                register_persistent_effect(player, effect)
+                if kind in IMMEDIATE_KINDS:
+                    _tick(player, effect)
             setattr(card, slot, None)
 
 
@@ -53,22 +59,26 @@ def _lose(player: Player, attr: str, value: int, floor: int) -> None:
 
 def tick_persistent_effects(player: Player) -> None:
     for effect in player.effect_list:
-        unbounded = effect.borne is None or effect.borne == -1
-        floor = 0 if unbounded else effect.borne
-        if effect.kind in _LIFE_LOSS:
-            _lose(player, "life", effect.value, floor)
-        elif effect.kind in _PILLZ_LOSS:
-            _lose(player, "pillz", effect.value, floor)
-        elif effect.kind in _LIFE_LOSS_AND_PILLZ_LOSS:
-            _lose(player, "life", effect.value, floor)
-            _lose(player, "pillz", effect.value, floor)
-        elif effect.kind in _LIFE_GAIN:
-            if unbounded:
-                player.life += effect.value
-            elif player.life < effect.borne:
-                player.life = min(effect.borne, player.life + effect.value)
-        elif effect.kind in _PILLZ_GAIN:
-            if unbounded:
-                player.pillz += effect.value
-            elif player.pillz < effect.borne:
-                player.pillz = min(effect.borne, player.pillz + effect.value)
+        _tick(player, effect)
+
+
+def _tick(player: Player, effect: PersistentEffect) -> None:
+    unbounded = effect.borne is None or effect.borne == -1
+    floor = 0 if unbounded else effect.borne
+    if effect.kind in _LIFE_LOSS:
+        _lose(player, "life", effect.value, floor)
+    elif effect.kind in _PILLZ_LOSS:
+        _lose(player, "pillz", effect.value, floor)
+    elif effect.kind in _LIFE_LOSS_AND_PILLZ_LOSS:
+        _lose(player, "life", effect.value, floor)
+        _lose(player, "pillz", effect.value, floor)
+    elif effect.kind in _LIFE_GAIN:
+        if unbounded:
+            player.life += effect.value
+        elif player.life < effect.borne:
+            player.life = min(effect.borne, player.life + effect.value)
+    elif effect.kind in _PILLZ_GAIN:
+        if unbounded:
+            player.pillz += effect.value
+        elif player.pillz < effect.borne:
+            player.pillz = min(effect.borne, player.pillz + effect.value)
