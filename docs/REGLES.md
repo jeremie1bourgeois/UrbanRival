@@ -282,6 +282,37 @@ Par ordre d'impact :
 Chaque combat rejoué se transcrit dans `data/test/` (voir ROADMAP § 2.B.2) ; le journal des effets (D2) rendra la
 localisation des écarts immédiate.
 
+## 6. Glossaire officiel lu en session connectée (2026-09-16, après-midi)
+
+Les 35 entrées de `urban-rivals.com/game/rules/` ont été lues connecté (texte intégral : `docs/REGLES-glossaire-officiel.md`).
+Verdicts sur les points encore ouverts ou déjà codés :
+
+| Entrée | Règle officielle | Moteur (après les corrections du matin) | Verdict |
+|---|---|---|---|
+| 53 Récup | « arrondie à l'unité inférieure, **avec un minimum de 1** » | pas de minimum | ❌ à corriger |
+| 51 Toxine / Régén, 52 Consume / Dope | « agissent **immédiatement à la fin du round** dans lequel ils ont été joués » (Drak au round 1 : vies aux rounds 1, 2, 3 et 4) | n'agissent qu'aux rounds suivants | ❌ à corriger |
+| 66 Par Pillz / Vie restante | pillz/vies « **avant de mettre des pillz** sur ton perso (sans compter la Pillz gratuite) » — Lady Ametia Cr : 13 de puissance au round 1 | `nb_pillz_left` lit les pillz **après** la mise | ❌ à corriger (pillz) ; vie : la vie ne change pas pendant la mise, OK |
+| 56 Annule (Vie / Pillz) | « n'annule un effet permanent (Poison, Soin, Toxine, Régén) que **pendant le round où il est joué. L'effet reprendra lors du round suivant** » ; idem Pillz face à Dope / Consume | la correction du matin **retire** le poison/heal/… de la carte adverse | ⚠️ trop fort : le tic du round est sauté, l'effet subsiste (et un effet joué ce round est posé) |
+| 56 Annule (Dégâts) | « n'annule pas la Fury » | fury ajoutée après les modificateurs, jamais annulée | ✅ |
+| 58 Stop | « la condition Stop ne s'active pas contre des cartes Annul » | « stop » consommé à la phase des Stops uniquement | ✅ |
+| 55 Protection | Protection: Bonus/Pouvoir protège des Stops « mais pas d'une carte Annul » ; « peut également annuler les effets négatifs d'un Leader » | Protection: X retire les modifs adverses ciblant ma carte, y compris `leader_fight` adverse | ✅ |
+| 59 Copie, 172 Impose | valeurs **de base** ; Copie Bonus « s'il est actif » | ✅ | ✅ |
+| 60 Echange | échange des valeurs de base « même si la carte en face a une Protection appropriée » ; annulé par un Annul approprié ; Echange face à Copie/Echange du même type → seul l'Echange agit | Exchange est méta (non touché par Protection) ; Cancel : à vérifier ; Exchange vs Copy : non géré | ➖ à vérifier |
+| 63 Support / Brawl, 64 Croissance, 65 Equalizer, 67 Par Puissance/Dégâts adv. (valeurs de base) | ✅ conformes | | ✅ |
+| 68 Killshot, 173 Versus (main adverse), 174 Symétrie, 175 Infiltration (carte seule, clans spécifiques) | ✅ conformes aux corrections du matin | | ✅ |
+| 50 Poison / Soin | le second remplace le premier ; Poison et Soin coexistent | ✅ | ✅ |
+| 61 Courage / Riposte, 62 Confiance / Revanche | ✅ | | ✅ |
+| 70 Jour / Nuit | cycle de 4 h dans le jeu | non modélisé (Day toujours vrai) | choix utilisateur |
+
+Non tranché par le glossaire : cycles de Stops/Protections (3.2), Leader bénéficiant de son Team (3.7 ; « la Protection
+peut annuler les effets négatifs d'un Leader » suggère que le Team touche bien les deux camps), Tune Out et fury,
+Mindwipe vs Combust, Limitless.
+
+**Historique de combats** : `player/history.php` ne donne que le score final de chaque combat (ex. « 12-3 »), sans détail
+de rounds ni rapport. Le jeu lui-même est un client Unity WebGL (`/game/play/`) ; les données de round transitent
+entre ce client et le serveur — piste pour B2 : jouer un combat dans le panneau navigateur et capturer les échanges
+réseau du client.
+
 ## Annexe A — identifiants du glossaire officiel (`/game/rules/?question=N`, connexion requise)
 
 41 Fury · 42 Bonus · 43 Ability · 44 Attack · 47 Life · 48 Pillz · 49 Pillz/Life per Damage · 50 Poison/Care ·
