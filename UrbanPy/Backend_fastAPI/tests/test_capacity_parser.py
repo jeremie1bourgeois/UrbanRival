@@ -119,6 +119,7 @@ def test_minus_players_pillz_targets_both():
     ("Courage", "courage"), ("Revenge", "revenge"), ("Confidence", "confidence"), ("Reprisal", "reprisal"),
     ("Symmetry", "symmetry"), ("Asymmetry", "asymmetry"), ("Defeat", "defeat"), ("Backlash", "backlash"),
     ("Victory Or Defeat", "victory_defeat"), ("Conf.", "confidence"),
+    ("Unison", "unison"), ("Disunion", "disunion"),
 ])
 def test_condition_prefixes(prefix, condition):
     assert parsed(f"{prefix}: Attack +5") == cap("ally", ["attack"], 5, conditions=[condition])
@@ -149,6 +150,8 @@ def test_day_prefix_is_ignored_for_now():
     ("Stop: Equalizer: - 2 Opp. Life Min 0", cap("enemy", ["life"], -2, how="equalizer", borne=0, conditions=["stop"])),
     ("Killshot: +3 Life", cap("ally", ["life"], 3, conditions=["killshot"])),
     ("Killshot: Toxin 1, Min 0", cap("enemy", ["toxine"], 1, borne=0, conditions=["killshot"])),
+    ("Perfect: +2 Pillz", cap("ally", ["pillz"], 2, conditions=["perfect"])),
+    ("Team: Perfect: -2 Opp. Life Min 0", cap("enemy", ["life"], -2, borne=0, conditions=["team", "perfect"])),
 ])
 def test_stop_and_killshot_prefixes_are_deferred_conditions(text, expected):
     assert parsed(text) == expected
@@ -163,17 +166,24 @@ def test_versus_prefix_keeps_the_clan_names(text, expected):
     assert parsed(text) == expected
 
 
+@pytest.mark.parametrize("text, expected", [
+    ("After Oculus, Tolvack: Power +3", cap("ally", ["power"], 3, conditions=["after:Oculus|Tolvack"])),
+    ("After Pussycats, Sakrohm: -4 Opp. Life Min 0", cap("enemy", ["life"], -4, borne=0, conditions=["after:Pussycats|Sakrohm"])),
+    ("Infiltrated La Junta, Piranas: +1 Pillz And Life", cap("ally", ["pillz", "life"], 1, conditions=["infiltrated:La Junta|Piranas"])),
+    ("Infiltrated Freaks: Courage: Damage +2", cap("ally", ["damage"], 2, conditions=["courage", "infiltrated:Freaks"])),
+])
+def test_after_and_infiltrated_prefixes_keep_the_clan_names(text, expected):
+    assert parsed(text) == expected
+
+
+def test_after_without_clan_is_unsupported():
+    assert parse_capacity("After : Power +2").reason == "unsupported prefix: after"
+
+
 def test_versus_without_clan_is_unsupported():
     result = parse_capacity("Versus  : Power +2")   # ancien scraping : le clan (une image) a été perdu
 
     assert (result.supported, result.reason) == (False, "unsupported prefix: versus")
-
-
-@pytest.mark.parametrize("prefix", ["Xantiax"])
-def test_unsupported_prefixes(prefix):
-    result = parse_capacity(f"{prefix}: Power +2")
-
-    assert (result.capacity, result.supported, result.reason) == (None, False, f"unsupported prefix: {prefix.lower()}")
 
 
 def test_unknown_prefix():
@@ -210,7 +220,7 @@ def test_per_damage_multiplier(text, expected):
     assert parsed(text) == expected
 
 
-@pytest.mark.parametrize("suffix", ["Round"])
+@pytest.mark.parametrize("suffix", ["Moon"])
 def test_unsupported_per_multipliers(suffix):
     result = parse_capacity(f"+1 Life Per {suffix}")
 
@@ -273,6 +283,31 @@ def test_exchange(text, types):
     assert parsed(text) == cap("both", types, 0, how="exchange")
 
 
+@pytest.mark.parametrize("text, expected", [
+    ("Power Impose", cap("enemy", ["power"], 0, how="impose")),
+    ("Reprisal: Damage Impose", cap("enemy", ["damage"], 0, how="impose", conditions=["reprisal"])),
+])
+def test_impose(text, expected):
+    assert parsed(text) == expected
+
+
+@pytest.mark.parametrize("text, expected", [
+    # « Cards » : les deux cartes du round (règle officielle : « The Damage points of both characters are reduced… »)
+    ("-2 Cards Damage, Min 1", cap("both", ["damage"], -2, borne=1)),
+    ("-7 Cards Attack, Min 0", cap("both", ["attack"], -7, borne=0)),
+    ("Cards Damage +2", cap("both", ["damage"], 2)),
+    ("Support: -1 Cards Damage, Min 0", cap("both", ["damage"], -1, how="support", borne=0)),
+    ("Confidence: -4 Cards Damage, Min 0", cap("both", ["damage"], -4, borne=0, conditions=["confidence"])),
+    ("Protection: Cards Power And Damage", cap("both", ["power", "damage"], 0, how="Protection")),
+])
+def test_cards_effects_target_both_cards(text, expected):
+    assert parsed(text) == expected
+
+
+def test_tune_out_is_a_resolution_mode():
+    assert parsed("Tune Out") == cap("both", ["tune_out"], 0, how="tune_out")
+
+
 # --- Niveau 4 : effets persistants ------------------------------------------------------------
 
 @pytest.mark.parametrize("text, target, types", [
@@ -283,6 +318,28 @@ def test_persistent_effects(text, target, types):
     result = parsed(text)
 
     assert (result["target"], result["types"], result["value"], result["borne"]) == (target, types, int(text.split()[1].rstrip(",")), int(text.split()[-1]))
+
+
+@pytest.mark.parametrize("text, expected", [
+    ("Consume 1, Min 3", cap("enemy", ["consume"], 1, borne=3)),
+    ("Repris.: Consume 1, Min 4", cap("enemy", ["consume"], 1, borne=4, conditions=["reprisal"])),
+    ("Combust 1, Min 2", cap("enemy", ["combust"], 1, borne=2)),
+    ("Players Combust 1, Min 0", cap("both", ["combust"], 1, borne=0)),
+    ("Victory Or Defeat: Combust 1, Min 3", cap("enemy", ["combust"], 1, borne=3, conditions=["victory_defeat"])),
+    ("Mindwipe 1, Min 3", cap("enemy", ["combust"], 1, borne=3)),            # même effet que Combust d'après les textes officiels
+    ("Confidence: Mindwipe 2, Min 0", cap("enemy", ["combust"], 2, borne=0, conditions=["confidence"])),
+    ("Victory Or Defeat: Corrosion 1, Min 0", cap("enemy", ["poison"], 1, how="growth", borne=0, conditions=["victory_defeat"])),   # poison x numéro du round
+])
+def test_new_persistent_effects(text, expected):
+    assert parsed(text) == expected
+
+
+def test_xantiax_hits_both_players_win_or_lose():
+    assert parsed("Xantiax: -3 Life, Min. 5") == cap("both", ["life"], -3, borne=5, conditions=["victory_defeat"])
+
+
+def test_corrupt_costs_the_owner_life_win_or_lose():
+    assert parsed("Corrupt 2 Min. 5") == cap("ally", ["life"], -2, borne=5, conditions=["victory_defeat"])
 
 
 def test_growth_poison_keeps_multiplier():
@@ -299,12 +356,7 @@ from src.adapters.repositories.card_repository import all_capacity_descriptions
 
 
 @pytest.mark.parametrize("text, keyword", [
-    ("-2 Cards Damage, Min 1", "cards"), ("Protection: Cards Power And Damage", "cards"),
-    ("Damage Impose", "impose"), ("Consume 2, Min 1", "consume"),
-    ("Corrupt 2 Min. 1", "corrupt"), ("Victory Or Defeat: Combust 2, Min 1", "combust"),
-    ("Victory Or Defeat: Corrosion 1, Min 2", "corrosion"), ("Revenge: Mindwipe 2, Min 1", "mindwipe"),
-    ("Rebirth 2, Max. 10", "rebirth"),     ("Remove Ability Conditions", "remove ability conditions"), ("Beyond", "beyond"), ("Tie-break", "tie-break"),
-    ("Counter-attack", "counter-attack"), ("Limitless", "limitless"),
+    ("Rebirth 2, Max. 10", "rebirth"),     ("Remove Ability Conditions", "remove ability conditions"), ("Beyond", "beyond"),
 ])
 def test_explicitly_unsupported_cores(text, keyword):
     result = parse_capacity(text)
@@ -318,17 +370,44 @@ def test_gibberish_is_unknown_core():
 
 # --- Couverture sur les descriptions officielles -----------------------------------------
 
-SUPPORTED_DESCRIPTIONS_FLOOR = 1132  # mesuré le 2026-09-16 sur 1310 descriptions ; à relever quand la couverture progresse
+SUPPORTED_DESCRIPTIONS_FLOOR = 1386  # mesuré le 2026-09-16 sur 1396 descriptions ; à relever quand la couverture progresse
 
 
 def test_every_official_description_parses_without_raising():
     descriptions = all_capacity_descriptions()
     results = {text: parse_capacity(text) for text in descriptions}   # ne doit pas lever
 
-    assert len(descriptions) == 1310   # instantané iclintz du 2026-09-15
+    assert len(descriptions) == 1396   # instantané iclintz du 2026-09-15, clans « After » et « Infiltrated » rendus en texte le 2026-09-16
     assert all(r.reason for r in results.values() if not r.supported)
     supported = sum(1 for r in results.values() if r.supported)
     assert supported >= SUPPORTED_DESCRIPTIONS_FLOOR, f"couverture en baisse : {supported} < {SUPPORTED_DESCRIPTIONS_FLOOR}"
+
+
+@pytest.mark.parametrize("text, expected", [
+    # Leaders : « Per Round » = à chaque round, victoire ou défaite, pour la carte jouée (comme un Team:)
+    ("+1 Pillz Per Round", cap("ally", ["pillz"], 1, conditions=["team", "victory_defeat"])),
+    ("-1 Opp. Pillz, Per Round, Min 4", cap("enemy", ["pillz"], -1, borne=4, conditions=["team", "victory_defeat"])),
+    ("Team: Cancel Players Dam. Mod.", cap("both", ["damage"], 0, how="cancel", conditions=["team"])),
+    ("Team: Cancel Players Life Mod.", cap("both", ["life"], 0, how="cancel", conditions=["team"])),
+    ("Tie-break", cap("ally", ["tie_break"], 0, how="tie_break", conditions=["team"])),
+    ("Recover 1 Players Pillz Out Of 2", cap("both", ["recover"], 1, borne=2)),
+])
+def test_leader_and_players_variants(text, expected):
+    assert parsed(text) == expected
+
+
+@pytest.mark.parametrize("text, expected", [
+    ("Fatal Killshot", cap("enemy", ["ko"], 0, conditions=["killshot"])),
+    ("Infiltrated GHEIST, Zenith: Fatal Killshot", cap("enemy", ["ko"], 0, conditions=["infiltrated:GHEIST|Zenith", "killshot"])),
+    ("Sinister Symmetry", cap("enemy", ["ko"], 0, conditions=["symmetry"])),
+])
+def test_instant_win_abilities(text, expected):
+    assert parsed(text) == expected
+
+
+def test_counter_attack_and_limitless_are_leader_modes():
+    assert parsed("Counter-attack") == cap("ally", ["counter_attack"], 0, how="counter_attack", conditions=["team"])
+    assert parsed("Limitless") == cap("ally", ["limitless"], 0, how="limitless", conditions=["team"])
 
 
 def test_team_prefix_is_a_leader_condition():
@@ -361,8 +440,7 @@ def test_night_prefix_is_inert_since_day_is_always_valid():
 
 
 @pytest.mark.parametrize("text, keyword", [
-    ("Fatal Killshot", "fatal killshot"), ("Overdose", "overdose"), ("Perfection", "perfection"),
-    ("Sinister Symmetry", "sinister symmetry"), ("Tune Out", "tune out"), ])
+    ("Overdose", "overdose"), ("Perfection", "perfection"), ])
 def test_new_unsupported_cores_have_a_named_reason(text, keyword):
     assert parse_capacity(text).reason == f"unsupported core: {keyword}"
 

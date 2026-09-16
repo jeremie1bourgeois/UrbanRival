@@ -2,15 +2,15 @@
 Niveau 1 : capacités « méta » qui agissent sur les autres capacités ou sur les valeurs imprimées, avant tout
 modificateur de stats. Quatre phases, puis les capacités méta sont consommées (None) :
   1. Copy: Opp. Ability / Bonus  — l'emplacement copieur devient une copie de l'emplacement adverse
-  2. Protection: Ability / Bonus puis Stop Opp. Ability / Bonus — résolution simultanée (voir _stopped_kinds) ;
+  2. Protection: Ability / Bonus puis Stop Opp. Ability / Bonus — résolution « en chaîne » (voir _stopped_slots) ;
      une capacité « Stop: X » s'active si son emplacement est stoppé, et reste inerte sinon
-  3. Copy / Exchange de power et damage — sur les valeurs imprimées
-  4. Cancel Opp. X Modif. (retire X des modifications adverses, quelle que soit leur cible) et
-     Protection: X (retire X des modifications adverses qui ciblent ma carte)
-Règles retenues là où Urban Rivals est ambigu : les Stops s'appliquent tous en même temps (SoA vs SoA :
-les deux abilities tombent ; SoA vs SoB : l'un perd son ability, l'autre son bonus) ; une protection tombe
-si l'adversaire stoppe l'emplacement où elle se trouve, sauf si une autre protection non tombée la couvre ;
-en cas de cycle (les deux protections face aux deux stops), les stops gagnent.
+  3. Copy / Exchange / Impose de power et damage — sur les valeurs imprimées
+  4. Cancel Opp. X Modif. (retire X des modifications adverses, quelle que soit leur cible ; Life / Pillz retirent
+     aussi les effets persistants) et Protection: X (retire X des modifications adverses qui ciblent ma carte ;
+     « Cards » protège les deux cartes)
+Règle officielle des Stops (support UR, art. 91) : un Stop stoppé ne stoppe rien, une Protection stoppée ne protège
+rien ; les cycles (SoA contre SoA, deux Protections face à deux Stops) ne sont pas tranchés par la source : les Stops
+gagnent. Tune Out survit à la consommation : process_round le lit pour résoudre le round aux pillz.
 """
 import copy
 from typing import Optional, Set
@@ -18,7 +18,7 @@ from typing import Optional, Set
 from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card, FIGHT_SLOTS
 
-META_HOWS = {"stop", "copy", "Protection", "cancel", "exchange"}
+META_HOWS = {"stop", "copy", "Protection", "cancel", "exchange", "impose", "tune_out", "tie_break"}
 SLOT_OF_KIND = {"ability": "ability_fight", "bonus": "bonus_fight"}
 KIND_OF_SLOT = {"ability_fight": "ability", "bonus_fight": "bonus"}
 STAT_TYPES = ("power", "damage", "attack")
@@ -126,16 +126,19 @@ def _apply_stops(card1: Card, card2: Card) -> None:
                 setattr(card, slot, None)
 
 
-# --- Phase 3 : Copy / Exchange de power et damage ---------------------------------------------
+# --- Phase 3 : Copy / Exchange / Impose de power et damage ---------------------------------------------
 
 def _apply_value_copies_and_exchanges(card1: Card, card2: Card) -> None:
     for own, opp in _pairs(card1, card2):
         for slot in FIGHT_SLOTS:
             capacity = getattr(own, slot)
-            if capacity is None or capacity.how not in ("copy", "exchange"):
+            if capacity is None or capacity.how not in ("copy", "exchange", "impose"):
                 continue
             for stat in ("power", "damage"):
                 if stat not in capacity.types:
+                    continue
+                if capacity.how == "impose":                       # l'adversaire prend ma valeur imprimée
+                    setattr(opp, f"{stat}_fight", getattr(own, stat))
                     continue
                 setattr(own, f"{stat}_fight", getattr(opp, stat))
                 if capacity.how == "exchange":
@@ -171,6 +174,8 @@ def _apply_cancels(card1: Card, card2: Card) -> None:
                 for stat in capacity.types:
                     types |= PERSISTENT_TYPES_OF_STAT.get(stat, set())
                 _strip_types(opp, types, only_targeting_opponent=False)
+                if capacity.target == "both":                  # « Cancel Players X Mod. » (Leaders) : les deux côtés
+                    _strip_types(own, types, only_targeting_opponent=False)
 
 
 def _apply_stat_protections(card1: Card, card2: Card) -> None:
@@ -181,6 +186,8 @@ def _apply_stat_protections(card1: Card, card2: Card) -> None:
                 protected = set(capacity.types) & set(STAT_TYPES)
                 if protected:
                     _strip_types(opp, protected, only_targeting_opponent=True)
+                    if capacity.target == "both":                  # « Protection: Cards X » protège aussi la carte adverse
+                        _strip_types(own, protected, only_targeting_opponent=True)
 
 
 # --- Consommation -----------------------------------------------------------------------------
@@ -189,5 +196,5 @@ def _consume_meta_capacities(card1: Card, card2: Card) -> None:
     for card in (card1, card2):
         for slot in FIGHT_SLOTS:
             capacity = getattr(card, slot)
-            if capacity is not None and capacity.how in META_HOWS:
+            if capacity is not None and capacity.how in META_HOWS and capacity.how not in ("tune_out", "tie_break"):   # lus par process_round
                 setattr(card, slot, None)

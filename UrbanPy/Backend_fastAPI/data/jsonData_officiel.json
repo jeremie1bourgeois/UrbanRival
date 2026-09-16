@@ -6385,7 +6385,7 @@
         "3": {
             "power": 7,
             "damage": 6,
-            "ability": "After : Attack +6",
+            "ability": "After Junkz, Sakrohm: Attack +6",
             "image": "https://s.acdn.ur-img.com/characters/922435c65bf66eba3719a3263b0ebf68.png"
         },
         "4": {
@@ -7234,7 +7234,7 @@
         "2": {
             "power": 6,
             "damage": 3,
-            "ability": "After : -3 Opp Damage, Min 2",
+            "ability": "After Montana, Oculus, Sentinel: -3 Opp Damage, Min 2",
             "image": "https://s.acdn.ur-img.com/characters/fefe73363a9acb6954533c490b1ddee7.png"
         },
         "3": {
@@ -12888,13 +12888,13 @@
         "2": {
             "power": 7,
             "damage": 3,
-            "ability": "After : Damage +3",
+            "ability": "After Fang Pi Clang: Damage +3",
             "image": "https://s.acdn.ur-img.com/characters/5e841bdea8aa04617a48ce69c0390864.png"
         },
         "3": {
             "power": 7,
             "damage": 4,
-            "ability": "After : Damage +3",
+            "ability": "After Fang Pi Clang: Damage +3",
             "image": "https://s.acdn.ur-img.com/characters/8e45c694053caa41375c047556b19bac.png"
         },
         "4": {
@@ -16013,7 +16013,7 @@
         "3": {
             "power": 7,
             "damage": 4,
-            "ability": "After : +1 Life Per Damage",
+            "ability": "After Sakrohm: +1 Life Per Damage",
             "image": "https://s.acdn.ur-img.com/characters/75c0ad6ecd81b365f86045af27a532d3.png"
         },
         "4": {
@@ -16904,7 +16904,7 @@
         "3": {
             "power": 7,
             "damage": 4,
-            "ability": "After : Stop Opp. Bonus",
+            "ability": "After La Junta, Roots: Stop Opp. Bonus",
             "image": "https://s.acdn.ur-img.com/characters/b2db3b35fb85a6011a10e314f4603500.png"
         },
         "4": {
@@ -17141,7 +17141,7 @@
         "4": {
             "power": 5,
             "damage": 7,
-            "ability": "After : -3 Opp Power, Min 4",
+            "ability": "After Uppers: -3 Opp Power, Min 4",
             "image": "https://s.acdn.ur-img.com/characters/2f97d5bd7d722d49bc011cc8b63d0717.png"
         },
         "5": {
@@ -22754,19 +22754,19 @@
         "2": {
             "power": 6,
             "damage": 1,
-            "ability": "After : Power And Damage +3",
+            "ability": "After Ulu Watu: Power And Damage +3",
             "image": "https://s.acdn.ur-img.com/characters/6492c623bdaed0724b40757be3d6b07f.png"
         },
         "3": {
             "power": 6,
             "damage": 2,
-            "ability": "After : Power And Damage +3",
+            "ability": "After Ulu Watu: Power And Damage +3",
             "image": "https://s.acdn.ur-img.com/characters/2f23ad0657b523c6ad732223e15cec4c.png"
         },
         "4": {
             "power": 6,
             "damage": 3,
-            "ability": "After : Power And Damage +3",
+            "ability": "After Ulu Watu: Power And Damage +3",
             "image": "https://s.acdn.ur-img.com/characters/2b806261528252706c35e5988d691f18.png"
         },
         "5": {
@@ -26458,7 +26458,7 @@
         "3": {
             "power": 7,
             "damage": 5,
-            "ability": "After : Power And Damage +1",
+            "ability": "After Junkz, Roots: Power And Damage +1",
             "image": "https://s.acdn.ur-img.com/characters/b3dc511c7003567fdf089627660db076.png"
         },
         "4": {
@@ -28690,19 +28690,19 @@
         "2": {
             "power": 7,
             "damage": 4,
-            "ability": "After : Protection: Attack",
+            "ability": "After Fang Pi Clang: Protection: Attack",
             "image": "https://s.acdn.ur-img.com/characters/d90069adc1d0fa32422a197d86713fea.png"
         },
         "3": {
             "power": 8,
             "damage": 5,
-            "ability": "After : Protection : Damage",
+            "ability": "After Fang Pi Clang: Protection : Damage",
             "image": "https://s.acdn.ur-img.com/characters/b4ddecc2f7163ef20b153fcfa982127c.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "After : Protection: Power",
+            "ability": "After Fang Pi Clang: Protection: Power",
             "image": "https://s.acdn.ur-img.com/characters/bb891c73fbc019f9f2bd0a86511780a5.png"
         },
         "5": {
@@ -28802,13 +28802,13 @@
         "3": {
             "power": 9,
             "damage": 4,
-            "ability": "After : -1 Opp. Life Min 1",
+            "ability": "After Huracan, Oculus: -1 Opp. Life Min 1",
             "image": "https://s.acdn.ur-img.com/characters/f2baa3f1fc34aa7b4a65d2d51a7bf178.png"
         },
         "4": {
             "power": 9,
             "damage": 5,
-            "ability": "After : -1 Opp. Life Min 1",
+            "ability": "After Huracan, Oculus: -1 Opp. Life Min 1",
             "image": "https://s.acdn.ur-img.com/characters/6bd59c7010b6e7b4116cc50aef223184.png"
         },
         "5": {
@@ -29993,7 +29993,7 @@
         "2": {
             "power": 7,
             "damage": 3,
-            "ability": "After : +1 Life Per Damage",
+            "ability": "After Huracan, Piranas, Uppers: +1 Life Per Damage",
             "image": "https://s.acdn.ur-img.com/characters/dc3b4c81d9c56fe7b85cc567f2caaa8c.png"
         },
         "3": {
@@ -33515,13 +33515,13 @@
         "3": {
             "power": 8,
             "damage": 4,
-            "ability": "After : +3 Life",
+            "ability": "After Nightmare: +3 Life",
             "image": "https://s.acdn.ur-img.com/characters/679e9dd5aac8ad8997e9880308f98ec4.png"
         },
         "4": {
             "power": 9,
             "damage": 4,
-            "ability": "After : +3 Life",
+            "ability": "After Nightmare: +3 Life",
             "image": "https://s.acdn.ur-img.com/characters/2f759378f39eb96dab9a6a4793237f44.png"
         },
         "5": {
@@ -34631,13 +34631,13 @@
         "3": {
             "power": 7,
             "damage": 4,
-            "ability": "After : -3 Opp Damage, Min 1",
+            "ability": "After All Stars: -3 Opp Damage, Min 1",
             "image": "https://s.acdn.ur-img.com/characters/6b8975ff9b03ca9c38948bdf1aa38dd6.png"
         },
         "4": {
             "power": 7,
             "damage": 5,
-            "ability": "After : -4 Opp Damage, Min 1",
+            "ability": "After All Stars: -4 Opp Damage, Min 1",
             "image": "https://s.acdn.ur-img.com/characters/bc1e3cf1e1f9921ff808a2647dd39683.png"
         },
         "5": {
@@ -35161,7 +35161,7 @@
         "3": {
             "power": 8,
             "damage": 2,
-            "ability": "After : -4 Opp. Life, Min 1",
+            "ability": "After Oculus, Tolvack: -4 Opp. Life, Min 1",
             "image": "https://s.acdn.ur-img.com/characters/d60e5f5a0c053a39402dad286e2d5512.png"
         },
         "4": {
@@ -37133,13 +37133,13 @@
         "2": {
             "power": 7,
             "damage": 2,
-            "ability": "After : -5 Opp Damage, Min 2",
+            "ability": "After GHEIST: -5 Opp Damage, Min 2",
             "image": "https://s.acdn.ur-img.com/characters/528b5084d1ab0d1558ad279d90ff72cb.png"
         },
         "3": {
             "power": 7,
             "damage": 4,
-            "ability": "After : -5 Opp Damage, Min 2",
+            "ability": "After GHEIST: -5 Opp Damage, Min 2",
             "image": "https://s.acdn.ur-img.com/characters/2c0dcdb299fbcdea53e2fbe2d1418e46.png"
         },
         "4": {
@@ -37401,19 +37401,19 @@
         "2": {
             "power": 7,
             "damage": 2,
-            "ability": "After : Damage +5",
+            "ability": "After Tolvack: Damage +5",
             "image": "https://s.acdn.ur-img.com/characters/da1a9d2796722c64306249a8f95ab3b9.png"
         },
         "3": {
             "power": 7,
             "damage": 3,
-            "ability": "After : Damage +5",
+            "ability": "After Tolvack: Damage +5",
             "image": "https://s.acdn.ur-img.com/characters/b5e2a7dea4a62756f347382a82c61d0a.png"
         },
         "4": {
             "power": 7,
             "damage": 4,
-            "ability": "After : Damage +5",
+            "ability": "After Tolvack: Damage +5",
             "image": "https://s.acdn.ur-img.com/characters/e601523abdc3b17a5a66a4d46f1299e6.png"
         },
         "5": {
@@ -39373,7 +39373,7 @@
         "3": {
             "power": 6,
             "damage": 5,
-            "ability": "After : -3 Opp Damage, Min 1",
+            "ability": "After Junkz: -3 Opp Damage, Min 1",
             "image": "https://s.acdn.ur-img.com/characters/88e3aed48b33758d93b1776f20b4efd9.png"
         },
         "4": {
@@ -40504,7 +40504,7 @@
         "4": {
             "power": 8,
             "damage": 6,
-            "ability": "After : Backlash: - 4 Life Min 2",
+            "ability": "After Dominion: Backlash: - 4 Life Min 2",
             "image": "https://s.acdn.ur-img.com/characters/3d0b65a79526f7074261ab90cee9dcf1.png"
         },
         "5": {
@@ -40610,13 +40610,13 @@
         "2": {
             "power": 6,
             "damage": 2,
-            "ability": "After : Damage Exchange",
+            "ability": "After Dominion: Damage Exchange",
             "image": "https://s.acdn.ur-img.com/characters/b081d7ae333a9294e0779579b9a34580.png"
         },
         "3": {
             "power": 7,
             "damage": 1,
-            "ability": "After : Damage Exchange",
+            "ability": "After Dominion: Damage Exchange",
             "image": "https://s.acdn.ur-img.com/characters/83cb70d972f94576e07b4b7527f286d6.png"
         },
         "4": {
@@ -42090,7 +42090,7 @@
         "2": {
             "power": 7,
             "damage": 3,
-            "ability": "After : +1 Life Per Damage",
+            "ability": "After Pussycats, Sentinel, Uppers: +1 Life Per Damage",
             "image": "https://s.acdn.ur-img.com/characters/20c58cea372165d84e37df898f44aa35.png"
         },
         "3": {
@@ -42570,7 +42570,7 @@
         "2": {
             "power": 8,
             "damage": 2,
-            "ability": "After : Damage Exchange",
+            "ability": "After Berzerk: Damage Exchange",
             "image": "https://s.acdn.ur-img.com/characters/53c4587750ae4ec9879e214cff32b3ad.png"
         },
         "3": {
@@ -44049,7 +44049,7 @@
         "2": {
             "power": 8,
             "damage": 1,
-            "ability": "After : +3 Life",
+            "ability": "After Piranas: +3 Life",
             "image": "https://s.acdn.ur-img.com/characters/c1becc1ba5bad2161d5b8e46aecffed8.png"
         },
         "3": {
@@ -44809,7 +44809,7 @@
         "2": {
             "power": 6,
             "damage": 2,
-            "ability": "After : Damage Exchange",
+            "ability": "After Huracan, Komboka: Damage Exchange",
             "image": "https://s.acdn.ur-img.com/characters/af574222b7096ecbd295c6c0c85f90bf.png"
         },
         "3": {
@@ -45958,7 +45958,7 @@
         "2": {
             "power": 8,
             "damage": 2,
-            "ability": "After : +3 Life",
+            "ability": "After Komboka, Skeelz: +3 Life",
             "image": "https://s.acdn.ur-img.com/characters/f5c22a4045cdb7837043ff772272eccc.png"
         },
         "3": {
@@ -47295,13 +47295,13 @@
         "2": {
             "power": 8,
             "damage": 2,
-            "ability": "After : -3 Opp Power, Min 5",
+            "ability": "After Oculus, Zenith: -3 Opp Power, Min 5",
             "image": "https://s.acdn.ur-img.com/characters/c8f74342c5f41e0ba737935fb041f444.png"
         },
         "3": {
             "power": 8,
             "damage": 3,
-            "ability": "After : -3 Opp Power, Min 5",
+            "ability": "After Oculus, Zenith: -3 Opp Power, Min 5",
             "image": "https://s.acdn.ur-img.com/characters/0e30296ac5d144e47e17e4a55bcde479.png"
         },
         "4": {
@@ -48626,25 +48626,25 @@
         "1": {
             "power": 7,
             "damage": 1,
-            "ability": "+1 Pillz And Life",
+            "ability": "Infiltrated La Junta, Piranas, Riots, Tolvack, Ulu Watu: +1 Pillz And Life",
             "image": "https://s.acdn.ur-img.com/characters/adf1a1558169efefa5bb0ef54d79b589.png"
         },
         "2": {
             "power": 7,
             "damage": 2,
-            "ability": "+1 Pillz And Life",
+            "ability": "Infiltrated La Junta, Piranas, Riots, Tolvack, Ulu Watu: +1 Pillz And Life",
             "image": "https://s.acdn.ur-img.com/characters/b0aa78b6dd3a5e9d081267fdc7771ea1.png"
         },
         "3": {
             "power": 7,
             "damage": 4,
-            "ability": "+1 Pillz And Life",
+            "ability": "Infiltrated La Junta, Piranas, Riots, Tolvack, Ulu Watu: +1 Pillz And Life",
             "image": "https://s.acdn.ur-img.com/characters/9b2ce6f9b609972c91930f5d123383c6.png"
         },
         "4": {
             "power": 8,
             "damage": 4,
-            "ability": "+1 Pillz And Life",
+            "ability": "Infiltrated La Junta, Piranas, Riots, Tolvack, Ulu Watu: +1 Pillz And Life",
             "image": "https://s.acdn.ur-img.com/characters/98c3974062d83c1fd01e27041b313b54.png"
         }
     },
@@ -48657,25 +48657,25 @@
         "1": {
             "power": 6,
             "damage": 2,
-            "ability": "Equalizer: Attack +2",
+            "ability": "Infiltrated Montana, Sakrohm, Sentinel, Uppers: Equalizer: Attack +2",
             "image": "https://s.acdn.ur-img.com/characters/37c56f0f713a7ea8fd6001d70d36ae06.png"
         },
         "2": {
             "power": 6,
             "damage": 3,
-            "ability": "Equalizer: Attack +3",
+            "ability": "Infiltrated Montana, Sakrohm, Sentinel, Uppers: Equalizer: Attack +3",
             "image": "https://s.acdn.ur-img.com/characters/4672d7f24af393148a375857d48df160.png"
         },
         "3": {
             "power": 7,
             "damage": 4,
-            "ability": "Equalizer: Attack +3",
+            "ability": "Infiltrated Montana, Sakrohm, Sentinel, Uppers: Equalizer: Attack +3",
             "image": "https://s.acdn.ur-img.com/characters/2d824ed0867b69ab77beee7d5bdcfe86.png"
         },
         "4": {
             "power": 7,
             "damage": 6,
-            "ability": "Equalizer: Attack +3",
+            "ability": "Infiltrated Montana, Sakrohm, Sentinel, Uppers: Equalizer: Attack +3",
             "image": "https://s.acdn.ur-img.com/characters/f7986a723c021bf7879e7bafb4cd8ab1.png"
         }
     },
@@ -48906,19 +48906,19 @@
         "1": {
             "power": 4,
             "damage": 4,
-            "ability": "-4 Opp Attack, Min 1",
+            "ability": "Infiltrated All Stars, Berzerk, GHEIST, Junkz, Oblivion: -4 Opp Attack, Min 1",
             "image": "https://s.acdn.ur-img.com/characters/35919a389adcfb5e624775754dcb8163.png"
         },
         "2": {
             "power": 5,
             "damage": 4,
-            "ability": "-7 Opp Attack, Min 1",
+            "ability": "Infiltrated All Stars, Berzerk, GHEIST, Junkz, Oblivion: -7 Opp Attack, Min 1",
             "image": "https://s.acdn.ur-img.com/characters/b59fe81214a806c665c1f442ef7ab740.png"
         },
         "3": {
             "power": 7,
             "damage": 4,
-            "ability": "-8 Opp Attack, Min 1",
+            "ability": "Infiltrated All Stars, Berzerk, GHEIST, Junkz, Oblivion: -8 Opp Attack, Min 1",
             "image": "https://s.acdn.ur-img.com/characters/a95e44f7839385bf5bcdaebb07b97585.png"
         }
     },
@@ -48931,19 +48931,19 @@
         "3": {
             "power": 7,
             "damage": 4,
-            "ability": "Victory Or Defeat : +2 Life",
+            "ability": "Infiltrated Freaks, Huracan, Jungo, Raptors: Victory Or Defeat : +2 Life",
             "image": "https://s.acdn.ur-img.com/characters/cc943e81256b57a3b2d7de541bfed608.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "Victory Or Defeat : +2 Life",
+            "ability": "Infiltrated Freaks, Huracan, Jungo, Raptors: Victory Or Defeat : +2 Life",
             "image": "https://s.acdn.ur-img.com/characters/11193a460df303f494d825941cd626c6.png"
         },
         "5": {
             "power": 9,
             "damage": 6,
-            "ability": "Victory Or Defeat : +3 Life",
+            "ability": "Infiltrated Freaks, Huracan, Jungo, Raptors: Victory Or Defeat : +3 Life",
             "image": "https://s.acdn.ur-img.com/characters/3fe441889805130cf7a0b2980852450c.png"
         }
     },
@@ -49174,7 +49174,7 @@
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "- 2 Opp. Life Min 2",
+            "ability": "Infiltrated Cosmohnuts, Freaks, Raptors, Riots, Skeelz: - 2 Opp. Life Min 2",
             "image": "https://s.acdn.ur-img.com/characters/02472972da28dcb627682dba7926bfae.png"
         }
     },
@@ -49224,13 +49224,13 @@
         "1": {
             "power": 7,
             "damage": 2,
-            "ability": "-1 Opp Pow. & Dam., Min 3",
+            "ability": "Infiltrated Bangers, Fang Pi Clang, Junkz, Roots: -1 Opp Pow. & Dam., Min 3",
             "image": "https://s.acdn.ur-img.com/characters/1bfe0b93a64a3a92f4f6386a76fad112.png"
         },
         "2": {
             "power": 8,
             "damage": 2,
-            "ability": "-1 Opp Pow. & Dam., Min 0",
+            "ability": "Infiltrated Bangers, Fang Pi Clang, Junkz, Roots: -1 Opp Pow. & Dam., Min 0",
             "image": "https://s.acdn.ur-img.com/characters/d95015f6824be6a6b8cef7a9dc928761.png"
         }
     },
@@ -49243,25 +49243,25 @@
         "2": {
             "power": 7,
             "damage": 2,
-            "ability": "-2 Opp Pillz. Min 2",
+            "ability": "Infiltrated GhosTown, Komboka, La Junta, Oblivion, Pussycats: -2 Opp Pillz. Min 2",
             "image": "https://s.acdn.ur-img.com/characters/3be857784dfbb02c0694f2503946b435.png"
         },
         "3": {
             "power": 8,
             "damage": 3,
-            "ability": "-2 Opp Pillz. Min 2",
+            "ability": "Infiltrated GhosTown, Komboka, La Junta, Oblivion, Pussycats: -2 Opp Pillz. Min 2",
             "image": "https://s.acdn.ur-img.com/characters/f2554cd76c13e393a96f5ec31f839550.png"
         },
         "4": {
             "power": 8,
             "damage": 4,
-            "ability": "-2 Opp Pillz. Min 2",
+            "ability": "Infiltrated GhosTown, Komboka, La Junta, Oblivion, Pussycats: -2 Opp Pillz. Min 2",
             "image": "https://s.acdn.ur-img.com/characters/7bc7a064456ef427b83fd64457c4d024.png"
         },
         "5": {
             "power": 8,
             "damage": 6,
-            "ability": "-2 Opp Pillz. Min 2",
+            "ability": "Infiltrated GhosTown, Komboka, La Junta, Oblivion, Pussycats: -2 Opp Pillz. Min 2",
             "image": "https://s.acdn.ur-img.com/characters/0e6a656bdb678ac7fec33b83212d9a12.png"
         }
     },
@@ -49599,13 +49599,13 @@
         "1": {
             "power": 6,
             "damage": 1,
-            "ability": "Courage: Power +4",
+            "ability": "Infiltrated All Stars, Fang Pi Clang, Frozn, Komboka, Zenith: Courage: Power +4",
             "image": "https://s.acdn.ur-img.com/characters/1cd84fceb308b65b0336cfc0ed0daaab.png"
         },
         "2": {
             "power": 6,
             "damage": 3,
-            "ability": "Courage: Power +4",
+            "ability": "Infiltrated All Stars, Fang Pi Clang, Frozn, Komboka, Zenith: Courage: Power +4",
             "image": "https://s.acdn.ur-img.com/characters/3433fb6d2799560ddce3c8768a958dcb.png"
         }
     },
@@ -49618,25 +49618,25 @@
         "2": {
             "power": 8,
             "damage": 2,
-            "ability": "Brawl: +1 Life",
+            "ability": "Infiltrated Frozn, Hive, Rescue, Ulu Watu, Zenith: Brawl: +1 Life",
             "image": "https://s.acdn.ur-img.com/characters/ded113db65403cfda04d19d057db2b8d.png"
         },
         "3": {
             "power": 8,
             "damage": 5,
-            "ability": "Brawl: +1 Life",
+            "ability": "Infiltrated Frozn, Hive, Rescue, Ulu Watu, Zenith: Brawl: +1 Life",
             "image": "https://s.acdn.ur-img.com/characters/925b2022b1fafb5e368a99d897ca647f.png"
         },
         "4": {
             "power": 8,
             "damage": 7,
-            "ability": "Brawl: +1 Life",
+            "ability": "Infiltrated Frozn, Hive, Rescue, Ulu Watu, Zenith: Brawl: +1 Life",
             "image": "https://s.acdn.ur-img.com/characters/546daeebf09105d9ae9bcc7a6e80fc5a.png"
         },
         "5": {
             "power": 8,
             "damage": 9,
-            "ability": "Brawl: +1 Life",
+            "ability": "Infiltrated Frozn, Hive, Rescue, Ulu Watu, Zenith: Brawl: +1 Life",
             "image": "https://s.acdn.ur-img.com/characters/d931a86741989fe7effe37ee16d235dc.png"
         }
     },
@@ -49749,19 +49749,19 @@
         "1": {
             "power": 6,
             "damage": 2,
-            "ability": "Power +2",
+            "ability": "Infiltrated Berzerk, Junkz, Piranas, Pussycats, Sentinel: Power +2",
             "image": "https://s.acdn.ur-img.com/characters/762cfc1cb7f712e790ca9ac4af09785e.png"
         },
         "2": {
             "power": 6,
             "damage": 3,
-            "ability": "Power +2",
+            "ability": "Infiltrated Berzerk, Junkz, Piranas, Pussycats, Sentinel: Power +2",
             "image": "https://s.acdn.ur-img.com/characters/dd432be3d3832424f1e27439c60535ee.png"
         },
         "3": {
             "power": 6,
             "damage": 5,
-            "ability": "Power +2",
+            "ability": "Infiltrated Berzerk, Junkz, Piranas, Pussycats, Sentinel: Power +2",
             "image": "https://s.acdn.ur-img.com/characters/4fbf2e470d1734ae2ca043c93d298713.png"
         }
     },
@@ -49774,19 +49774,19 @@
         "1": {
             "power": 6,
             "damage": 2,
-            "ability": "-2 Opp Power, Min 6",
+            "ability": "Infiltrated Frozn, GHEIST, Rescue, Ulu Watu, Uppers: -2 Opp Power, Min 6",
             "image": "https://s.acdn.ur-img.com/characters/728cd617873e3fe9533ee5123250c848.png"
         },
         "2": {
             "power": 6,
             "damage": 3,
-            "ability": "-2 Opp Power, Min 5",
+            "ability": "Infiltrated Frozn, GHEIST, Rescue, Ulu Watu, Uppers: -2 Opp Power, Min 5",
             "image": "https://s.acdn.ur-img.com/characters/40e8a15cbd1b9f6356cabfabfa43fd0c.png"
         },
         "3": {
             "power": 6,
             "damage": 5,
-            "ability": "-2 Opp Power, Min 5",
+            "ability": "Infiltrated Frozn, GHEIST, Rescue, Ulu Watu, Uppers: -2 Opp Power, Min 5",
             "image": "https://s.acdn.ur-img.com/characters/e348d2609d2c8013fbe2d77686f479f0.png"
         }
     },
@@ -49799,25 +49799,25 @@
         "1": {
             "power": 4,
             "damage": 2,
-            "ability": "-1 Opp Damage, Min 3",
+            "ability": "Infiltrated All Stars, Bangers, La Junta, Montana, Paradox: -1 Opp Damage, Min 3",
             "image": "https://s.acdn.ur-img.com/characters/61cdf353fd77362ef51fbd45af724a4b.png"
         },
         "2": {
             "power": 6,
             "damage": 3,
-            "ability": "-2 Opp Damage, Min 2",
+            "ability": "Infiltrated All Stars, Bangers, La Junta, Montana, Paradox: -2 Opp Damage, Min 2",
             "image": "https://s.acdn.ur-img.com/characters/fbdcc13d2552331b3136313873b06f09.png"
         },
         "3": {
             "power": 7,
             "damage": 4,
-            "ability": "-2 Opp Damage, Min 2",
+            "ability": "Infiltrated All Stars, Bangers, La Junta, Montana, Paradox: -2 Opp Damage, Min 2",
             "image": "https://s.acdn.ur-img.com/characters/9b7432a5a0d58153dba3f9df4779239f.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "-2 Opp Damage, Min 2",
+            "ability": "Infiltrated All Stars, Bangers, La Junta, Montana, Paradox: -2 Opp Damage, Min 2",
             "image": "https://s.acdn.ur-img.com/characters/c639f3b1e7dbc49b60eafa94f9a1dd1d.png"
         }
     },
@@ -49830,13 +49830,13 @@
         "1": {
             "power": 6,
             "damage": 2,
-            "ability": "-10 Opp Attack, Min 5",
+            "ability": "Infiltrated Hive, Huracan, Komboka, Sakrohm, Vortex: -10 Opp Attack, Min 5",
             "image": "https://s.acdn.ur-img.com/characters/d4b707365b9aeb2933a3612212c3be36.png"
         },
         "2": {
             "power": 6,
             "damage": 3,
-            "ability": "-12 Opp Attack, Min 3",
+            "ability": "Infiltrated Hive, Huracan, Komboka, Sakrohm, Vortex: -12 Opp Attack, Min 3",
             "image": "https://s.acdn.ur-img.com/characters/0c4d98c76aa99afaa4f0bb80b150a891.png"
         }
     },
@@ -49849,13 +49849,13 @@
         "1": {
             "power": 8,
             "damage": 1,
-            "ability": "+1 Life",
+            "ability": "Infiltrated Fang Pi Clang, GhosTown, Jungo, Nightmare, Roots: +1 Life",
             "image": "https://s.acdn.ur-img.com/characters/4270650bce5bcd64fdcec324f6cf55dc.png"
         },
         "2": {
             "power": 8,
             "damage": 1,
-            "ability": "+2 Life",
+            "ability": "Infiltrated Fang Pi Clang, GhosTown, Jungo, Nightmare, Roots: +2 Life",
             "image": "https://s.acdn.ur-img.com/characters/33583c7e13d4bd8a68de2e1924b1852e.png"
         }
     },
@@ -49980,25 +49980,25 @@
         "2": {
             "power": 6,
             "damage": 3,
-            "ability": "Copy Opp. Bonus",
+            "ability": "Infiltrated Dominion, Nightmare, Paradox, Sakrohm, Zenith: Copy Opp. Bonus",
             "image": "https://s.acdn.ur-img.com/characters/211317556a7e59343e0a2f35b91220fa.png"
         },
         "3": {
             "power": 6,
             "damage": 5,
-            "ability": "Copy Opp. Bonus",
+            "ability": "Infiltrated Dominion, Nightmare, Paradox, Sakrohm, Zenith: Copy Opp. Bonus",
             "image": "https://s.acdn.ur-img.com/characters/0804350b08986157d542432581ae677e.png"
         },
         "4": {
             "power": 7,
             "damage": 5,
-            "ability": "Copy Opp. Bonus",
+            "ability": "Infiltrated Dominion, Nightmare, Paradox, Sakrohm, Zenith: Copy Opp. Bonus",
             "image": "https://s.acdn.ur-img.com/characters/722ea990491a326c5f38b369ed1158ff.png"
         },
         "5": {
             "power": 8,
             "damage": 5,
-            "ability": "Copy Opp. Bonus",
+            "ability": "Infiltrated Dominion, Nightmare, Paradox, Sakrohm, Zenith: Copy Opp. Bonus",
             "image": "https://s.acdn.ur-img.com/characters/3ab5cc3b16faeba4321004df1fa2de93.png"
         }
     },
@@ -50011,19 +50011,19 @@
         "3": {
             "power": 8,
             "damage": 1,
-            "ability": "-4 Opp. Life Min 0",
+            "ability": "Infiltrated Berzerk, Sakrohm, Skeelz, Vortex: -4 Opp. Life Min 0",
             "image": "https://s.acdn.ur-img.com/characters/2fea76e05480fcece61bb2013e5b3ccb.png"
         },
         "4": {
             "power": 8,
             "damage": 1,
-            "ability": "-6 Opp. Life Min 0",
+            "ability": "Infiltrated Berzerk, Sakrohm, Skeelz, Vortex: -6 Opp. Life Min 0",
             "image": "https://s.acdn.ur-img.com/characters/fe224e0a1d77278144bcc807c8a7483b.png"
         },
         "5": {
             "power": 9,
             "damage": 1,
-            "ability": "-8 Opp. Life Min 0",
+            "ability": "Infiltrated Berzerk, Sakrohm, Skeelz, Vortex: -8 Opp. Life Min 0",
             "image": "https://s.acdn.ur-img.com/characters/ca213ea33cc619818112e390e658a4c5.png"
         }
     },
@@ -50130,19 +50130,19 @@
         "1": {
             "power": 7,
             "damage": 1,
-            "ability": "-1 Opp Pow. And Dam., Min 5",
+            "ability": "Infiltrated Dominion, Paradox, Piranas, Pussycats: -1 Opp Pow. And Dam., Min 5",
             "image": "https://s.acdn.ur-img.com/characters/79b5d38ba44be0c01f8be6dff7647424.png"
         },
         "2": {
             "power": 7,
             "damage": 2,
-            "ability": "-2 Opp Pow. And Dam., Min 5",
+            "ability": "Infiltrated Dominion, Paradox, Piranas, Pussycats: -2 Opp Pow. And Dam., Min 5",
             "image": "https://s.acdn.ur-img.com/characters/3aa832726f7082d0c0c14f31496f78d5.png"
         },
         "3": {
             "power": 8,
             "damage": 4,
-            "ability": "-2 Opp Pow. And Dam., Min 3",
+            "ability": "Infiltrated Dominion, Paradox, Piranas, Pussycats: -2 Opp Pow. And Dam., Min 3",
             "image": "https://s.acdn.ur-img.com/characters/bfb1028e3ec4bf94576d1f11800aa4f8.png"
         }
     },
@@ -50367,19 +50367,19 @@
         "3": {
             "power": 6,
             "damage": 4,
-            "ability": "+2 Pillz",
+            "ability": "Infiltrated Bangers, Cosmohnuts, GhosTown, Junkz, Piranas: +2 Pillz",
             "image": "https://s.acdn.ur-img.com/characters/c6e0fdfc9119d0944d19c74bbbffaebe.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "+3 Pillz",
+            "ability": "Infiltrated Bangers, Cosmohnuts, GhosTown, Junkz, Piranas: +3 Pillz",
             "image": "https://s.acdn.ur-img.com/characters/131f6346ec7ac05d4ccd4368f7dd514b.png"
         },
         "5": {
             "power": 8,
             "damage": 7,
-            "ability": "+3 Pillz",
+            "ability": "Infiltrated Bangers, Cosmohnuts, GhosTown, Junkz, Piranas: +3 Pillz",
             "image": "https://s.acdn.ur-img.com/characters/e448dd1baff671f6a4458dd656900a2b.png"
         }
     },
@@ -50517,19 +50517,19 @@
         "3": {
             "power": 6,
             "damage": 6,
-            "ability": "Growth: Attack +1",
+            "ability": "Infiltrated GHEIST, Huracan, Rescue, Riots: Growth: Attack +1",
             "image": "https://s.acdn.ur-img.com/characters/2f469235a6aa076c556e55eb881fab6f.png"
         },
         "4": {
             "power": 7,
             "damage": 6,
-            "ability": "Growth: Attack +1",
+            "ability": "Infiltrated GHEIST, Huracan, Rescue, Riots: Growth: Attack +1",
             "image": "https://s.acdn.ur-img.com/characters/d686b4622945020b5bcada8b33b35f2e.png"
         },
         "5": {
             "power": 8,
             "damage": 6,
-            "ability": "Growth: Attack +2",
+            "ability": "Infiltrated GHEIST, Huracan, Rescue, Riots: Growth: Attack +2",
             "image": "https://s.acdn.ur-img.com/characters/de25245b89ed31ca0729bf5a8df049c0.png"
         }
     },
@@ -50648,19 +50648,19 @@
         "3": {
             "power": 8,
             "damage": 4,
-            "ability": "-1 Opp Power, Min 6",
+            "ability": "Infiltrated La Junta, Nightmare, Raptors, Sentinel: -1 Opp Power, Min 6",
             "image": "https://s.acdn.ur-img.com/characters/d14c114be5e14c964aa8249c9c1b9cd9.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "-1 Opp Power, Min 5",
+            "ability": "Infiltrated La Junta, Nightmare, Raptors, Sentinel: -1 Opp Power, Min 5",
             "image": "https://s.acdn.ur-img.com/characters/3342eeaf639b318316428060053ea0f4.png"
         },
         "5": {
             "power": 8,
             "damage": 6,
-            "ability": "-1 Opp Power, Min 5",
+            "ability": "Infiltrated La Junta, Nightmare, Raptors, Sentinel: -1 Opp Power, Min 5",
             "image": "https://s.acdn.ur-img.com/characters/0440c0f8eb420e02617b706189f941e3.png"
         }
     },
@@ -50798,25 +50798,25 @@
         "1": {
             "power": 5,
             "damage": 2,
-            "ability": "Brawl: Power +1",
+            "ability": "Infiltrated Jungo, Oblivion, Raptors, Sentinel, Skeelz: Brawl: Power +1",
             "image": "https://s.acdn.ur-img.com/characters/a1522c622cd816bfa9f694c5f67ebf3f.png"
         },
         "2": {
             "power": 5,
             "damage": 4,
-            "ability": "Brawl: Power +1",
+            "ability": "Infiltrated Jungo, Oblivion, Raptors, Sentinel, Skeelz: Brawl: Power +1",
             "image": "https://s.acdn.ur-img.com/characters/eceff3381e3c5ec9aa75fdd92057dfd6.png"
         },
         "3": {
             "power": 5,
             "damage": 5,
-            "ability": "Brawl: Power +1",
+            "ability": "Infiltrated Jungo, Oblivion, Raptors, Sentinel, Skeelz: Brawl: Power +1",
             "image": "https://s.acdn.ur-img.com/characters/62bcaf6c805e73f55dd7013a9d361765.png"
         },
         "4": {
             "power": 5,
             "damage": 7,
-            "ability": "Brawl: Power +1",
+            "ability": "Infiltrated Jungo, Oblivion, Raptors, Sentinel, Skeelz: Brawl: Power +1",
             "image": "https://s.acdn.ur-img.com/characters/0f3e5dc31d65be7e98c324bea4c06674.png"
         }
     },
@@ -50935,19 +50935,19 @@
         "1": {
             "power": 7,
             "damage": 1,
-            "ability": "+1 Atk Per Pillz Left",
+            "ability": "Infiltrated Fang Pi Clang, Montana, Nightmare, Oblivion, Roots: +1 Atk Per Pillz Left",
             "image": "https://s.acdn.ur-img.com/characters/67ff7b1a2d159e58d1ee0e348625c3dc.png"
         },
         "2": {
             "power": 8,
             "damage": 2,
-            "ability": "+1 Atk Per Pillz Left",
+            "ability": "Infiltrated Fang Pi Clang, Montana, Nightmare, Oblivion, Roots: +1 Atk Per Pillz Left",
             "image": "https://s.acdn.ur-img.com/characters/740985ab17e9e3b12e27a12c08ad3307.png"
         },
         "3": {
             "power": 9,
             "damage": 4,
-            "ability": "+1 Atk Per Pillz Left",
+            "ability": "Infiltrated Fang Pi Clang, Montana, Nightmare, Oblivion, Roots: +1 Atk Per Pillz Left",
             "image": "https://s.acdn.ur-img.com/characters/e112a5acf2527ab53f7209c20400b867.png"
         }
     },
@@ -51066,7 +51066,7 @@
         "2": {
             "power": 5,
             "damage": 4,
-            "ability": "Stop Opp. Bonus",
+            "ability": "Infiltrated Cosmohnuts, Dominion, GHEIST, Hive, Sakrohm: Stop Opp. Bonus",
             "image": "https://s.acdn.ur-img.com/characters/d04dcc36afc0e85267b2bc00696ee4db.png"
         }
     },
@@ -51198,19 +51198,19 @@
         "3": {
             "power": 7,
             "damage": 5,
-            "ability": "Reprisal: Stop Opp. Ability",
+            "ability": "Infiltrated Freaks, Frozn, Uppers, Vortex: Reprisal: Stop Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/691fa5bd98d8c4c25d4557a83caa48fa.png"
         },
         "4": {
             "power": 7,
             "damage": 7,
-            "ability": "Reprisal: Stop Opp. Ability",
+            "ability": "Infiltrated Freaks, Frozn, Uppers, Vortex: Reprisal: Stop Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/3fb554dfc933588539d99897df67222e.png"
         },
         "5": {
             "power": 9,
             "damage": 7,
-            "ability": "Reprisal: Stop Opp. Ability",
+            "ability": "Infiltrated Freaks, Frozn, Uppers, Vortex: Reprisal: Stop Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/3e4df47a9cf9062a016ec1143e66747b.png"
         }
     },
@@ -51479,7 +51479,7 @@
         "3": {
             "power": 8,
             "damage": 4,
-            "ability": "Attack +8",
+            "ability": "Infiltrated Komboka, Riots, Skeelz, Vortex: Attack +8",
             "image": "https://s.acdn.ur-img.com/characters/33b4d7dd831273aca99662aa13894382.png"
         }
     },
@@ -51586,19 +51586,19 @@
         "3": {
             "power": 2,
             "damage": 8,
-            "ability": "Growth: Power +1",
+            "ability": "Infiltrated Berzerk, Rescue, Sentinel, Vortex: Growth: Power +1",
             "image": "https://s.acdn.ur-img.com/characters/9520d8a4b45aa57818ee5cd9c1681221.png"
         },
         "4": {
             "power": 4,
             "damage": 8,
-            "ability": "Growth: Power +1",
+            "ability": "Infiltrated Berzerk, Rescue, Sentinel, Vortex: Growth: Power +1",
             "image": "https://s.acdn.ur-img.com/characters/8af5c9390707eba16e4db7faa005dacb.png"
         },
         "5": {
             "power": 7,
             "damage": 8,
-            "ability": "Growth: Power +1",
+            "ability": "Infiltrated Berzerk, Rescue, Sentinel, Vortex: Growth: Power +1",
             "image": "https://s.acdn.ur-img.com/characters/2890d3e3d41d98bd18c603add1e8755f.png"
         }
     },
@@ -52004,7 +52004,7 @@
         "4": {
             "power": 8,
             "damage": 7,
-            "ability": "After : Damage +2",
+            "ability": "After Rescue: Damage +2",
             "image": "https://s.acdn.ur-img.com/characters/48ab42dad54be9b3851b274ace5c9c86.png"
         },
         "5": {
@@ -52160,19 +52160,19 @@
         "3": {
             "power": 6,
             "damage": 6,
-            "ability": "Stop Opp. Bonus",
+            "ability": "Infiltrated All Stars, Frozn, Montana, Oblivion, Uppers: Stop Opp. Bonus",
             "image": "https://s.acdn.ur-img.com/characters/ba75b4abe22a20b09ff0ddce9be4bcda.png"
         },
         "4": {
             "power": 7,
             "damage": 6,
-            "ability": "Stop Opp. Bonus",
+            "ability": "Infiltrated All Stars, Frozn, Montana, Oblivion, Uppers: Stop Opp. Bonus",
             "image": "https://s.acdn.ur-img.com/characters/fd13c1b4ce6bf278aa2d306e5f392e49.png"
         },
         "5": {
             "power": 8,
             "damage": 8,
-            "ability": "Stop Opp. Bonus",
+            "ability": "Infiltrated All Stars, Frozn, Montana, Oblivion, Uppers: Stop Opp. Bonus",
             "image": "https://s.acdn.ur-img.com/characters/0550c7e38b2802c4ef92be5ba2650efd.png"
         }
     },
@@ -52185,19 +52185,19 @@
         "1": {
             "power": 7,
             "damage": 1,
-            "ability": "-2 Opp. Life Min 1",
+            "ability": "Infiltrated Cosmohnuts, GhosTown, Jungo, Komboka, Roots: -2 Opp. Life Min 1",
             "image": "https://s.acdn.ur-img.com/characters/cacb4c62f8bae575fe28e4673464c6c0.png"
         },
         "2": {
             "power": 7,
             "damage": 2,
-            "ability": "-2 Opp. Life Min 1",
+            "ability": "Infiltrated Cosmohnuts, GhosTown, Jungo, Komboka, Roots: -2 Opp. Life Min 1",
             "image": "https://s.acdn.ur-img.com/characters/447bde0960863bc6019beb314d3a1477.png"
         },
         "3": {
             "power": 7,
             "damage": 4,
-            "ability": "-2 Opp. Life Min 1",
+            "ability": "Infiltrated Cosmohnuts, GhosTown, Jungo, Komboka, Roots: -2 Opp. Life Min 1",
             "image": "https://s.acdn.ur-img.com/characters/0f6be0368605897fb3e98ca312dfe510.png"
         }
     },
@@ -52454,13 +52454,13 @@
         "4": {
             "power": 8,
             "damage": 6,
-            "ability": "Growth: -1 Opp. Life Min 0",
+            "ability": "Infiltrated Huracan, Nightmare, Piranas, Sakrohm: Growth: -1 Opp. Life Min 0",
             "image": "https://s.acdn.ur-img.com/characters/1e637ba4920f12c16c9bce32bc0c4410.png"
         },
         "5": {
             "power": 8,
             "damage": 8,
-            "ability": "Growth: -1 Opp. Life Min 0",
+            "ability": "Infiltrated Huracan, Nightmare, Piranas, Sakrohm: Growth: -1 Opp. Life Min 0",
             "image": "https://s.acdn.ur-img.com/characters/c56d8a55499344ab34712e981e226574.png"
         }
     },
@@ -52473,19 +52473,19 @@
         "1": {
             "power": 7,
             "damage": 1,
-            "ability": "Toxin 1, Min 1",
+            "ability": "Infiltrated Paradox, Raptors, Riots, Skeelz, Tolvack: Toxin 1, Min 1",
             "image": "https://s.acdn.ur-img.com/characters/530c84a22812f85f5f998b9694395450.png"
         },
         "2": {
             "power": 8,
             "damage": 1,
-            "ability": "Toxin 1, Min 1",
+            "ability": "Infiltrated Paradox, Raptors, Riots, Skeelz, Tolvack: Toxin 1, Min 1",
             "image": "https://s.acdn.ur-img.com/characters/5944a6ebb8ab5eff1fa2db6ba6589207.png"
         },
         "3": {
             "power": 9,
             "damage": 1,
-            "ability": "Toxin 2, Min 0",
+            "ability": "Infiltrated Paradox, Raptors, Riots, Skeelz, Tolvack: Toxin 2, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/425286879bd6eeb6b26e782b69e0485f.png"
         }
     },
@@ -52979,7 +52979,7 @@
         "2": {
             "power": 8,
             "damage": 2,
-            "ability": "After : Stop Opp. Ability",
+            "ability": "After Fang Pi Clang, Paradox: Stop Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/1045d76df0a155ef823ba98f972482cc.png"
         },
         "3": {
@@ -53266,19 +53266,19 @@
         "1": {
             "power": 5,
             "damage": 3,
-            "ability": "Degrowth: Attack +3",
+            "ability": "Infiltrated Bangers, Dominion, Pussycats, Tolvack, Ulu Watu: Degrowth: Attack +3",
             "image": "https://s.acdn.ur-img.com/characters/f921c9dcfd60ed6001bfb363fa556439.png"
         },
         "2": {
             "power": 5,
             "damage": 4,
-            "ability": "Degrowth: Attack +3",
+            "ability": "Infiltrated Bangers, Dominion, Pussycats, Tolvack, Ulu Watu: Degrowth: Attack +3",
             "image": "https://s.acdn.ur-img.com/characters/6a4c2edd3e76009bc8309bcf2d98da80.png"
         },
         "3": {
             "power": 6,
             "damage": 5,
-            "ability": "Degrowth: Attack +3",
+            "ability": "Infiltrated Bangers, Dominion, Pussycats, Tolvack, Ulu Watu: Degrowth: Attack +3",
             "image": "https://s.acdn.ur-img.com/characters/465dc85612cfa1c9a3d2b576ccff020d.png"
         }
     },
@@ -53678,19 +53678,19 @@
         "1": {
             "power": 7,
             "damage": 1,
-            "ability": "-2 Opp. Life Min 5",
+            "ability": "Infiltrated GHEIST, Hive, Pussycats, Vortex: -2 Opp. Life Min 5",
             "image": "https://s.acdn.ur-img.com/characters/68de1db0613460db3a98ad73963774c6.png"
         },
         "2": {
             "power": 8,
             "damage": 1,
-            "ability": "-3 Opp. Life Min 5",
+            "ability": "Infiltrated GHEIST, Hive, Pussycats, Vortex: -3 Opp. Life Min 5",
             "image": "https://s.acdn.ur-img.com/characters/f5eb8fa1bf413eed1bc0bf4d6f1b25af.png"
         },
         "3": {
             "power": 8,
             "damage": 2,
-            "ability": "-3 Opp. Life Min 4",
+            "ability": "Infiltrated GHEIST, Hive, Pussycats, Vortex: -3 Opp. Life Min 4",
             "image": "https://s.acdn.ur-img.com/characters/66358409acf5c0426aa388214bce1bfd.png"
         }
     },
@@ -54365,19 +54365,19 @@
         "3": {
             "power": 6,
             "damage": 6,
-            "ability": "-1 Opp Pow. & Dam., Min 6",
+            "ability": "Infiltrated Bangers, Fang Pi Clang, GhosTown, La Junta: -1 Opp Pow. & Dam., Min 6",
             "image": "https://s.acdn.ur-img.com/characters/1a5946eed276c609a9915a74ac53574b.png"
         },
         "4": {
             "power": 7,
             "damage": 6,
-            "ability": "-1 Opp Pow. & Dam., Min 3",
+            "ability": "Infiltrated Bangers, Fang Pi Clang, GhosTown, La Junta: -1 Opp Pow. & Dam., Min 3",
             "image": "https://s.acdn.ur-img.com/characters/1b832b220e7485f4bb728c47307f2cff.png"
         },
         "5": {
             "power": 7,
             "damage": 7,
-            "ability": "-1 Opp Pow. & Dam., Min 0",
+            "ability": "Infiltrated Bangers, Fang Pi Clang, GhosTown, La Junta: -1 Opp Pow. & Dam., Min 0",
             "image": "https://s.acdn.ur-img.com/characters/310936b5238eeeb0702276356391fea3.png"
         }
     },
@@ -54390,19 +54390,19 @@
         "3": {
             "power": 8,
             "damage": 3,
-            "ability": "Equalizer: Att. +3",
+            "ability": "Infiltrated Berzerk, Freaks, Paradox, Tolvack, Ulu Watu: Equalizer: Att. +3",
             "image": "https://s.acdn.ur-img.com/characters/a0b44ab2b9b8a7db5ffa50f7939e1edd.png"
         },
         "4": {
             "power": 8,
             "damage": 4,
-            "ability": "Equalizer: Att. +4",
+            "ability": "Infiltrated Berzerk, Freaks, Paradox, Tolvack, Ulu Watu: Equalizer: Att. +4",
             "image": "https://s.acdn.ur-img.com/characters/617a02d5afa1a58fb178aac2ad916f82.png"
         },
         "5": {
             "power": 8,
             "damage": 7,
-            "ability": "Equalizer: Att. +5",
+            "ability": "Infiltrated Berzerk, Freaks, Paradox, Tolvack, Ulu Watu: Equalizer: Att. +5",
             "image": "https://s.acdn.ur-img.com/characters/0c7a17a4610f2978d2665fcdbcf8a170.png"
         }
     },
@@ -54765,19 +54765,19 @@
         "3": {
             "power": 8,
             "damage": 4,
-            "ability": "Copy: Opp. Ability",
+            "ability": "Infiltrated All Stars, Dominion, Huracan, Komboka: Copy: Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/6301b0074dc44d36ddcaf7315bba5f0f.png"
         },
         "4": {
             "power": 8,
             "damage": 6,
-            "ability": "Copy: Opp. Ability",
+            "ability": "Infiltrated All Stars, Dominion, Huracan, Komboka: Copy: Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/3400d3fd9e718bd14ac9208a13f94a62.png"
         },
         "5": {
             "power": 8,
             "damage": 8,
-            "ability": "Copy: Opp. Ability",
+            "ability": "Infiltrated All Stars, Dominion, Huracan, Komboka: Copy: Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/998dd2bc932795083ccb3802c9c3f2a5.png"
         }
     },
@@ -54890,19 +54890,19 @@
         "3": {
             "power": 8,
             "damage": 3,
-            "ability": "-3 Opp Damage, Min 0",
+            "ability": "Infiltrated Bangers, Cosmohnuts, Jungo, Montana, Uppers: -3 Opp Damage, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/0b22156986f666203696aa34d51aa031.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "-4 Opp Damage, Min 0",
+            "ability": "Infiltrated Bangers, Cosmohnuts, Jungo, Montana, Uppers: -4 Opp Damage, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/275b80124259bc148a69e2e143d77b3b.png"
         },
         "5": {
             "power": 8,
             "damage": 7,
-            "ability": "-4 Opp Damage, Min 0",
+            "ability": "Infiltrated Bangers, Cosmohnuts, Jungo, Montana, Uppers: -4 Opp Damage, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/7264c082475b4de8f156af5c36a84dff.png"
         }
     },
@@ -54915,19 +54915,19 @@
         "1": {
             "power": 7,
             "damage": 1,
-            "ability": "Copy: Opp. Ability",
+            "ability": "Infiltrated Freaks, Hive, Junkz, Roots: Copy: Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/140f4ef7acb6dcfa615803d14a3e35c4.png"
         },
         "2": {
             "power": 7,
             "damage": 2,
-            "ability": "Copy: Opp. Ability",
+            "ability": "Infiltrated Freaks, Hive, Junkz, Roots: Copy: Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/73dce25fce1bde1ddcdfdc763c069b9b.png"
         },
         "3": {
             "power": 7,
             "damage": 4,
-            "ability": "Copy: Opp. Ability",
+            "ability": "Infiltrated Freaks, Hive, Junkz, Roots: Copy: Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/7cf331348b0ddfca2ee6e68ff00d8f94.png"
         }
     },
@@ -55595,19 +55595,19 @@
         "3": {
             "power": 8,
             "damage": 4,
-            "ability": "Cancel Opp. Pow/dam Mod.",
+            "ability": "Infiltrated Berzerk, Riots, Sentinel, Skeelz: Cancel Opp. Pow/dam Mod.",
             "image": "https://s.acdn.ur-img.com/characters/1b2dd22098dbfc9f9a00901867476009.png"
         },
         "4": {
             "power": 8,
             "damage": 6,
-            "ability": "Cancel Opp. Pow/dam Mod.",
+            "ability": "Infiltrated Berzerk, Riots, Sentinel, Skeelz: Cancel Opp. Pow/dam Mod.",
             "image": "https://s.acdn.ur-img.com/characters/831fc524380c9a16007ce306e8d9ea5a.png"
         },
         "5": {
             "power": 8,
             "damage": 8,
-            "ability": "Cancel Opp. Pow/dam Mod.",
+            "ability": "Infiltrated Berzerk, Riots, Sentinel, Skeelz: Cancel Opp. Pow/dam Mod.",
             "image": "https://s.acdn.ur-img.com/characters/157f6764ff7f8009d8f3c9157d576ed0.png"
         }
     },
@@ -55726,19 +55726,19 @@
         "1": {
             "power": 7,
             "damage": 2,
-            "ability": "Attack +6",
+            "ability": "Infiltrated Fang Pi Clang, Jungo, Paradox, Sentinel, Zenith: Attack +6",
             "image": "https://s.acdn.ur-img.com/characters/3b2f94e98e8841aad0080362d88215fe.png"
         },
         "2": {
             "power": 7,
             "damage": 2,
-            "ability": "Attack +8",
+            "ability": "Infiltrated Fang Pi Clang, Jungo, Paradox, Sentinel, Zenith: Attack +8",
             "image": "https://s.acdn.ur-img.com/characters/d1edc9670b3a8f2472f2714ffc5624dd.png"
         },
         "3": {
             "power": 7,
             "damage": 4,
-            "ability": "Attack +9",
+            "ability": "Infiltrated Fang Pi Clang, Jungo, Paradox, Sentinel, Zenith: Attack +9",
             "image": "https://s.acdn.ur-img.com/characters/5cab3ec2bb63c66cf2cd6017930a3b28.png"
         }
     },
@@ -55951,19 +55951,19 @@
         "3": {
             "power": 7,
             "damage": 4,
-            "ability": "-4 Opp Damage, Min 0",
+            "ability": "Infiltrated Fang Pi Clang, GHEIST, Piranas, Rescue, Zenith: -4 Opp Damage, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/88877231475ac95f0962ca6346dd557c.png"
         },
         "4": {
             "power": 7,
             "damage": 6,
-            "ability": "-4 Opp Damage, Min 0",
+            "ability": "Infiltrated Fang Pi Clang, GHEIST, Piranas, Rescue, Zenith: -4 Opp Damage, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/a15e3ca360522c09409a2f0e0f78970a.png"
         },
         "5": {
             "power": 7,
             "damage": 8,
-            "ability": "-4 Opp Damage, Min 0",
+            "ability": "Infiltrated Fang Pi Clang, GHEIST, Piranas, Rescue, Zenith: -4 Opp Damage, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/bf266ae7f8ae7579109c6a63caa94043.png"
         }
     },
@@ -55976,13 +55976,13 @@
         "1": {
             "power": 7,
             "damage": 2,
-            "ability": "Asymm.: Stop Opp. Ability",
+            "ability": "Infiltrated Bangers, Berzerk, Komboka, Riots: Asymm.: Stop Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/2df3de4941e8ad0e48e81c82c9712085.png"
         },
         "2": {
             "power": 8,
             "damage": 2,
-            "ability": "Asymm.: Stop Opp. Ability",
+            "ability": "Infiltrated Bangers, Berzerk, Komboka, Riots: Asymm.: Stop Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/ffae9a741076ac75e50a9597ee0bb2a8.png"
         }
     },
@@ -56101,19 +56101,19 @@
         "3": {
             "power": 9,
             "damage": 2,
-            "ability": "Regen 2, Max. 16",
+            "ability": "Infiltrated Dominion, Roots, Sakrohm, Ulu Watu: Regen 2, Max. 16",
             "image": "https://s.acdn.ur-img.com/characters/fab28c7f7154c3d0434cb1617d547424.png"
         },
         "4": {
             "power": 9,
             "damage": 3,
-            "ability": "Regen 2, Max. 16",
+            "ability": "Infiltrated Dominion, Roots, Sakrohm, Ulu Watu: Regen 2, Max. 16",
             "image": "https://s.acdn.ur-img.com/characters/911ee39b6a65a1ead72ec8b6007aa181.png"
         },
         "5": {
             "power": 9,
             "damage": 4,
-            "ability": "Regen 2, Max. 16",
+            "ability": "Infiltrated Dominion, Roots, Sakrohm, Ulu Watu: Regen 2, Max. 16",
             "image": "https://s.acdn.ur-img.com/characters/5b40801925954ab5c57a10ee675b29bf.png"
         }
     },
@@ -56126,19 +56126,19 @@
         "3": {
             "power": 9,
             "damage": 4,
-            "ability": "Defeat: -3 Opp. Life, Min 0",
+            "ability": "Infiltrated Freaks, Komboka, Nightmare, Raptors: Defeat: -3 Opp. Life, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/2096c08825d5fd7843df3d9c96da73ae.png"
         },
         "4": {
             "power": 9,
             "damage": 5,
-            "ability": "Defeat: -3 Opp. Life, Min 0",
+            "ability": "Infiltrated Freaks, Komboka, Nightmare, Raptors: Defeat: -3 Opp. Life, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/ae48d7eaad417e5df2c27b784f4309a0.png"
         },
         "5": {
             "power": 9,
             "damage": 7,
-            "ability": "Defeat: -3 Opp. Life, Min 0",
+            "ability": "Infiltrated Freaks, Komboka, Nightmare, Raptors: Defeat: -3 Opp. Life, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/4371c93e564c2971ca47f39e91e41c42.png"
         }
     },
@@ -56151,19 +56151,19 @@
         "3": {
             "power": 6,
             "damage": 1,
-            "ability": "+2 Life Per Opp. Damage",
+            "ability": "Infiltrated Frozn, GhosTown, Jungo, Skeelz: +2 Life Per Opp. Damage",
             "image": "https://s.acdn.ur-img.com/characters/cfea5548a2268b76c957590995e15632.png"
         },
         "4": {
             "power": 7,
             "damage": 1,
-            "ability": "+2 Life Per Opp. Damage",
+            "ability": "Infiltrated Frozn, GhosTown, Jungo, Skeelz: +2 Life Per Opp. Damage",
             "image": "https://s.acdn.ur-img.com/characters/ce4f1c6e7873655b7ad03455f418c6e2.png"
         },
         "5": {
             "power": 9,
             "damage": 1,
-            "ability": "+2 Life Per Opp. Damage",
+            "ability": "Infiltrated Frozn, GhosTown, Jungo, Skeelz: +2 Life Per Opp. Damage",
             "image": "https://s.acdn.ur-img.com/characters/c8759ac3c4bfa1d248af9b773550f275.png"
         }
     },
@@ -56657,19 +56657,19 @@
         "1": {
             "power": 5,
             "damage": 3,
-            "ability": "Equalizer: -4 Opp Attack, Min 4",
+            "ability": "Infiltrated Berzerk, Oblivion, Raptors, Vortex: Equalizer: -4 Opp Attack, Min 4",
             "image": "https://s.acdn.ur-img.com/characters/5717b54106ae5f3c32fc1b7301a3064a.png"
         },
         "2": {
             "power": 5,
             "damage": 4,
-            "ability": "Equalizer: -4 Opp Attack, Min 4",
+            "ability": "Infiltrated Berzerk, Oblivion, Raptors, Vortex: Equalizer: -4 Opp Attack, Min 4",
             "image": "https://s.acdn.ur-img.com/characters/49c80fac06e1e79040dc31f5efa99ecc.png"
         },
         "3": {
             "power": 6,
             "damage": 5,
-            "ability": "Equalizer: -4 Opp Attack, Min 4",
+            "ability": "Infiltrated Berzerk, Oblivion, Raptors, Vortex: Equalizer: -4 Opp Attack, Min 4",
             "image": "https://s.acdn.ur-img.com/characters/24d0d35352ede578aed366e0e40f7e29.png"
         }
     },
@@ -57026,19 +57026,19 @@
         "3": {
             "power": 7,
             "damage": 5,
-            "ability": "+2 Pillz And Life",
+            "ability": "Infiltrated La Junta, Pussycats, Riots, Vortex: +2 Pillz And Life",
             "image": "https://s.acdn.ur-img.com/characters/c7ce1bb5130ebb49f8c1b9dec98aefc3.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "+2 Pillz And Life",
+            "ability": "Infiltrated La Junta, Pussycats, Riots, Vortex: +2 Pillz And Life",
             "image": "https://s.acdn.ur-img.com/characters/fbf8a3297c9f685235a62d4f80b98cd6.png"
         },
         "5": {
             "power": 9,
             "damage": 5,
-            "ability": "+3 Pillz And Life",
+            "ability": "Infiltrated La Junta, Pussycats, Riots, Vortex: +3 Pillz And Life",
             "image": "https://s.acdn.ur-img.com/characters/e74d19e1850d89b43a509c4421b90a6f.png"
         }
     },
@@ -57264,25 +57264,25 @@
         "1": {
             "power": 5,
             "damage": 3,
-            "ability": "Stop Opp. Ability",
+            "ability": "Infiltrated Bangers, GhosTown, Piranas, Uppers: Stop Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/3c283a9901c1aa35215c2d014f9fa32b.png"
         },
         "2": {
             "power": 5,
             "damage": 4,
-            "ability": "Stop Opp. Ability",
+            "ability": "Infiltrated Bangers, GhosTown, Piranas, Uppers: Stop Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/db495dfa353a175389bfb28cce94bf0f.png"
         },
         "3": {
             "power": 6,
             "damage": 4,
-            "ability": "Stop Opp. Ability",
+            "ability": "Infiltrated Bangers, GhosTown, Piranas, Uppers: Stop Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/d7eb8aef3be7d50fb19c15ec16b8b242.png"
         },
         "4": {
             "power": 6,
             "damage": 6,
-            "ability": "Stop Opp. Ability",
+            "ability": "Infiltrated Bangers, GhosTown, Piranas, Uppers: Stop Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/3b9e27a50dce9a92bf478125fd0b62e2.png"
         }
     },
@@ -57395,19 +57395,19 @@
         "3": {
             "power": 8,
             "damage": 4,
-            "ability": "+3 Attack Per Opp. Damage",
+            "ability": "Infiltrated All Stars, GHEIST, Hive, La Junta: +3 Attack Per Opp. Damage",
             "image": "https://s.acdn.ur-img.com/characters/2f343703855675069da582e925f13752.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "+3 Attack Per Opp. Damage",
+            "ability": "Infiltrated All Stars, GHEIST, Hive, La Junta: +3 Attack Per Opp. Damage",
             "image": "https://s.acdn.ur-img.com/characters/3009a2051626be9da2f3d82e49336d66.png"
         },
         "5": {
             "power": 8,
             "damage": 6,
-            "ability": "+3 Attack Per Opp. Damage",
+            "ability": "Infiltrated All Stars, GHEIST, Hive, La Junta: +3 Attack Per Opp. Damage",
             "image": "https://s.acdn.ur-img.com/characters/b6875c9cc5d28b746c5c151c76052bce.png"
         }
     },
@@ -57520,13 +57520,13 @@
         "2": {
             "power": 8,
             "damage": 1,
-            "ability": "Equalizer: +1 Life",
+            "ability": "Infiltrated Pussycats, Sakrohm, Skeelz, Tolvack, Vortex: Equalizer: +1 Life",
             "image": "https://s.acdn.ur-img.com/characters/fa5170e64328c2c899ee80ebe63d2350.png"
         },
         "3": {
             "power": 9,
             "damage": 1,
-            "ability": "Equalizer: +1 Life",
+            "ability": "Infiltrated Pussycats, Sakrohm, Skeelz, Tolvack, Vortex: Equalizer: +1 Life",
             "image": "https://s.acdn.ur-img.com/characters/976e75cf0aefcc25abfc2c1fde0fe243.png"
         }
     },
@@ -57539,25 +57539,25 @@
         "2": {
             "power": 8,
             "damage": 2,
-            "ability": "Cancel Opp. Attack Modif.",
+            "ability": "Infiltrated All Stars, Fang Pi Clang, Montana, Ulu Watu: Cancel Opp. Attack Modif.",
             "image": "https://s.acdn.ur-img.com/characters/0117f9eaef1a21ba59c349d6d8d8a506.png"
         },
         "3": {
             "power": 8,
             "damage": 3,
-            "ability": "Cancel Opp. Attack Modif.",
+            "ability": "Infiltrated All Stars, Fang Pi Clang, Montana, Ulu Watu: Cancel Opp. Attack Modif.",
             "image": "https://s.acdn.ur-img.com/characters/926270f1e85ea8f3f58635032e7bac0c.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "Cancel Opp. Attack Modif.",
+            "ability": "Infiltrated All Stars, Fang Pi Clang, Montana, Ulu Watu: Cancel Opp. Attack Modif.",
             "image": "https://s.acdn.ur-img.com/characters/edb1c118b3cc9f336d1154ab5d5fd71f.png"
         },
         "5": {
             "power": 8,
             "damage": 6,
-            "ability": "Cancel Opp. Attack Modif.",
+            "ability": "Infiltrated All Stars, Fang Pi Clang, Montana, Ulu Watu: Cancel Opp. Attack Modif.",
             "image": "https://s.acdn.ur-img.com/characters/d73de9da968e616b778fc7ba891e781e.png"
         }
     },
@@ -57858,13 +57858,13 @@
         "1": {
             "power": 8,
             "damage": 1,
-            "ability": "Killshot: Regen 1, Max. 15",
+            "ability": "Infiltrated Frozn, GhosTown, Hive, Oblivion, Tolvack: Killshot: Regen 1, Max. 15",
             "image": "https://s.acdn.ur-img.com/characters/dc5ac8a1df7ade6827ec3cde87eca552.png"
         },
         "2": {
             "power": 8,
             "damage": 2,
-            "ability": "Killshot: Regen 1, Max. 15",
+            "ability": "Infiltrated Frozn, GhosTown, Hive, Oblivion, Tolvack: Killshot: Regen 1, Max. 15",
             "image": "https://s.acdn.ur-img.com/characters/8f3524de5c12ad8f0e18676502c9a986.png"
         }
     },
@@ -57983,19 +57983,19 @@
         "3": {
             "power": 8,
             "damage": 4,
-            "ability": "Defeat: Recov. 1 Pillz Out Of 1",
+            "ability": "Infiltrated Frozn, La Junta, Paradox, Pussycats, Riots: Defeat: Recov. 1 Pillz Out Of 1",
             "image": "https://s.acdn.ur-img.com/characters/50371000c036bce9db81a05cfe3d1135.png"
         },
         "4": {
             "power": 9,
             "damage": 5,
-            "ability": "Defeat: Recov. 1 Pillz Out Of 1",
+            "ability": "Infiltrated Frozn, La Junta, Paradox, Pussycats, Riots: Defeat: Recov. 1 Pillz Out Of 1",
             "image": "https://s.acdn.ur-img.com/characters/db907d068dc23c8c5ce83c5959c0ba1a.png"
         },
         "5": {
             "power": 9,
             "damage": 7,
-            "ability": "Defeat: Recov. 1 Pillz Out Of 1",
+            "ability": "Infiltrated Frozn, La Junta, Paradox, Pussycats, Riots: Defeat: Recov. 1 Pillz Out Of 1",
             "image": "https://s.acdn.ur-img.com/characters/16c2326b4a418deb8a4571c0a357c557.png"
         }
     },
@@ -58008,19 +58008,19 @@
         "3": {
             "power": 8,
             "damage": 4,
-            "ability": "Copy: Opp. Bonus",
+            "ability": "Infiltrated GHEIST, GhosTown, Roots, Sentinel, Uppers: Copy: Opp. Bonus",
             "image": "https://s.acdn.ur-img.com/characters/44bb877b5c1864b725d55103234ecb3f.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "Copy: Opp. Bonus",
+            "ability": "Infiltrated GHEIST, GhosTown, Roots, Sentinel, Uppers: Copy: Opp. Bonus",
             "image": "https://s.acdn.ur-img.com/characters/28a74ae6b476c617d3365f25872ee635.png"
         },
         "5": {
             "power": 9,
             "damage": 7,
-            "ability": "Copy: Opp. Bonus",
+            "ability": "Infiltrated GHEIST, GhosTown, Roots, Sentinel, Uppers: Copy: Opp. Bonus",
             "image": "https://s.acdn.ur-img.com/characters/9d226f8d99db7953db29c579fcb4e194.png"
         }
     },
@@ -58033,19 +58033,19 @@
         "3": {
             "power": 8,
             "damage": 3,
-            "ability": "Mindwipe 1, Min 0",
+            "ability": "Infiltrated Bangers, Hive, Komboka, Raptors, Vortex: Mindwipe 1, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/309b8b293b53671f34bacbf1547c6ae2.png"
         },
         "4": {
             "power": 8,
             "damage": 4,
-            "ability": "Mindwipe 1, Min 0",
+            "ability": "Infiltrated Bangers, Hive, Komboka, Raptors, Vortex: Mindwipe 1, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/1c2590b139dd3f6c83c5184e7e488955.png"
         },
         "5": {
             "power": 8,
             "damage": 6,
-            "ability": "Mindwipe 1, Min 0",
+            "ability": "Infiltrated Bangers, Hive, Komboka, Raptors, Vortex: Mindwipe 1, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/fc34b718597cbca3fc7028b5fecedd72.png"
         }
     },
@@ -58058,19 +58058,19 @@
         "3": {
             "power": 8,
             "damage": 4,
-            "ability": "Stop Opp. Ability",
+            "ability": "Infiltrated Berzerk, Fang Pi Clang, Freaks, Junkz, Sakrohm: Stop Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/ad9efef57e0c4b72a86acf29a47358ab.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "Stop Opp. Ability",
+            "ability": "Infiltrated Berzerk, Fang Pi Clang, Freaks, Junkz, Sakrohm: Stop Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/09b62c5f29c071f7952388bfb02dd505.png"
         },
         "5": {
             "power": 9,
             "damage": 6,
-            "ability": "Stop Opp. Ability",
+            "ability": "Infiltrated Berzerk, Fang Pi Clang, Freaks, Junkz, Sakrohm: Stop Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/7e8fb783e1393287a5f039d97763cd85.png"
         }
     },
@@ -58083,19 +58083,19 @@
         "3": {
             "power": 8,
             "damage": 4,
-            "ability": "Cancel Opp. Pow/dam Mod.",
+            "ability": "Infiltrated All Stars, Huracan, Jungo, Montana, Ulu Watu: Cancel Opp. Pow/dam Mod.",
             "image": "https://s.acdn.ur-img.com/characters/54868880afaaf80f86aa39b5cab4131a.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "Cancel Opp. Pow/dam Mod.",
+            "ability": "Infiltrated All Stars, Huracan, Jungo, Montana, Ulu Watu: Cancel Opp. Pow/dam Mod.",
             "image": "https://s.acdn.ur-img.com/characters/8ce5c0a2b9edb5baf914c7ab8e8a1be5.png"
         },
         "5": {
             "power": 8,
             "damage": 7,
-            "ability": "Cancel Opp. Pow/dam Mod.",
+            "ability": "Infiltrated All Stars, Huracan, Jungo, Montana, Ulu Watu: Cancel Opp. Pow/dam Mod.",
             "image": "https://s.acdn.ur-img.com/characters/d942cb38f66d8b84c7b8b6a5f5582c4c.png"
         }
     },
@@ -60017,25 +60017,25 @@
         "2": {
             "power": 8,
             "damage": 2,
-            "ability": "Copy: Opp. Ability",
+            "ability": "Infiltrated Fang Pi Clang, Pussycats, Raptors, Sentinel: Copy: Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/a11820baef6bfc7ba8349089d3224bf0.png"
         },
         "3": {
             "power": 9,
             "damage": 3,
-            "ability": "Copy: Opp. Ability",
+            "ability": "Infiltrated Fang Pi Clang, Pussycats, Raptors, Sentinel: Copy: Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/b9002bfdb75dc862825b211eab6144a6.png"
         },
         "4": {
             "power": 9,
             "damage": 4,
-            "ability": "Copy: Opp. Ability",
+            "ability": "Infiltrated Fang Pi Clang, Pussycats, Raptors, Sentinel: Copy: Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/ad97b8f56b6ff6ccd9070279a6a43414.png"
         },
         "5": {
             "power": 9,
             "damage": 7,
-            "ability": "Copy: Opp. Ability",
+            "ability": "Infiltrated Fang Pi Clang, Pussycats, Raptors, Sentinel: Copy: Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/40093854219194ff7f51bc4d2441c0c1.png"
         }
     },
@@ -60334,13 +60334,13 @@
         "2": {
             "power": 6,
             "damage": 3,
-            "ability": "-2 Opp Damage, Min 0",
+            "ability": "Infiltrated All Stars, Raptors, Rescue, Sakrohm: -2 Opp Damage, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/bfdeb7752ea74a73f04b02698d2be40c.png"
         },
         "3": {
             "power": 6,
             "damage": 5,
-            "ability": "-2 Opp Damage, Min 0",
+            "ability": "Infiltrated All Stars, Raptors, Rescue, Sakrohm: -2 Opp Damage, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/795b20718917c4fdd9f67fb3bb0c92f7.png"
         }
     },
@@ -60553,19 +60553,19 @@
         "3": {
             "power": 6,
             "damage": 5,
-            "ability": "-2 Opp Power, Min 4",
+            "ability": "Infiltrated GHEIST, Junkz, Oblivion, Pussycats: -2 Opp Power, Min 4",
             "image": "https://s.acdn.ur-img.com/characters/2ba8813b0b5c3cfe3cd1f23af076a862.png"
         },
         "4": {
             "power": 6,
             "damage": 6,
-            "ability": "-2 Opp Power, Min 4",
+            "ability": "Infiltrated GHEIST, Junkz, Oblivion, Pussycats: -2 Opp Power, Min 4",
             "image": "https://s.acdn.ur-img.com/characters/ced2c3f7ce027ec2a652ea301c58bd82.png"
         },
         "5": {
             "power": 6,
             "damage": 8,
-            "ability": "-3 Opp Pow. And Dam., Min 1",
+            "ability": "Infiltrated GHEIST, Junkz, Oblivion, Pussycats: -3 Opp Pow. And Dam., Min 1",
             "image": "https://s.acdn.ur-img.com/characters/2f1f2da5c16fdf57556d7d9406c58604.png"
         }
     },
@@ -60715,19 +60715,19 @@
         "3": {
             "power": 6,
             "damage": 5,
-            "ability": "Growth: -3 Opp Attack, Min 4",
+            "ability": "Infiltrated All Stars, Komboka, Piranas, Uppers, Zenith: Growth: -3 Opp Attack, Min 4",
             "image": "https://s.acdn.ur-img.com/characters/ce7c8e063fd174f59340a10c2a0c1dfb.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "Defeat: -1 Opp. Pillz, Min 4",
+            "ability": "Infiltrated All Stars, Komboka, Piranas, Uppers, Zenith: Defeat: -1 Opp. Pillz, Min 4",
             "image": "https://s.acdn.ur-img.com/characters/5bf75edd3bcc63aef3fada6b59e4dc00.png"
         },
         "5": {
             "power": 8,
             "damage": 8,
-            "ability": "+2 Attack Per Pillz Lost",
+            "ability": "Infiltrated All Stars, Komboka, Piranas, Uppers, Zenith: +2 Attack Per Pillz Lost",
             "image": "https://s.acdn.ur-img.com/characters/dcbf8d7fba1010c3dbff392ca6972d98.png"
         }
     },
@@ -60928,19 +60928,19 @@
         "3": {
             "power": 8,
             "damage": 4,
-            "ability": "Defeat: +1 Pillz",
+            "ability": "Infiltrated Cosmohnuts, Dominion, La Junta, Oblivion, Roots: Defeat: +1 Pillz",
             "image": "https://s.acdn.ur-img.com/characters/0efa9db28dc6fa8b1d16c070984e28fe.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "Defeat: +1 Pillz",
+            "ability": "Infiltrated Cosmohnuts, Dominion, La Junta, Oblivion, Roots: Defeat: +1 Pillz",
             "image": "https://s.acdn.ur-img.com/characters/07068369d1c09f2eb22307b94454de41.png"
         },
         "5": {
             "power": 8,
             "damage": 9,
-            "ability": "Defeat: +2 Pillz",
+            "ability": "Infiltrated Cosmohnuts, Dominion, La Junta, Oblivion, Roots: Defeat: +2 Pillz",
             "image": "https://s.acdn.ur-img.com/characters/fc07bad57ad6ce97bd58ac6315de486a.png"
         }
     },
@@ -61596,19 +61596,19 @@
         "3": {
             "power": 8,
             "damage": 4,
-            "ability": "+1 Attack Per Life Lost",
+            "ability": "Infiltrated GHEIST, GhosTown, Raptors, Zenith: +1 Attack Per Life Lost",
             "image": "https://s.acdn.ur-img.com/characters/ab5116c59ab161ca769267ce8071a492.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "Defeat: Poison 1, Min 4",
+            "ability": "Infiltrated GHEIST, GhosTown, Raptors, Zenith: Defeat: Poison 1, Min 4",
             "image": "https://s.acdn.ur-img.com/characters/62118a32643085d759d3b9032592c3ff.png"
         },
         "5": {
             "power": 9,
             "damage": 6,
-            "ability": "Fatal Killshot",
+            "ability": "Infiltrated GHEIST, GhosTown, Raptors, Zenith: Fatal Killshot",
             "image": "https://s.acdn.ur-img.com/characters/f5e528edda6790831b012acc154fbdf6.png"
         }
     },
@@ -61940,19 +61940,19 @@
         "3": {
             "power": 5,
             "damage": 5,
-            "ability": "Rev.: Power Exchange",
+            "ability": "Infiltrated Fang Pi Clang, Huracan, Pussycats, Tolvack, Vortex: Rev.: Power Exchange",
             "image": "https://s.acdn.ur-img.com/characters/b717a0bc7fc971a4f52c1443f50e4442.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "Rev.: -10 Opp. Attack, Min 5",
+            "ability": "Infiltrated Fang Pi Clang, Huracan, Pussycats, Tolvack, Vortex: Rev.: -10 Opp. Attack, Min 5",
             "image": "https://s.acdn.ur-img.com/characters/88409fe82e419418f5679a19e19fb7b8.png"
         },
         "5": {
             "power": 8,
             "damage": 6,
-            "ability": "Rev.: -5 Opp. Pow., Min 1",
+            "ability": "Infiltrated Fang Pi Clang, Huracan, Pussycats, Tolvack, Vortex: Rev.: -5 Opp. Pow., Min 1",
             "image": "https://s.acdn.ur-img.com/characters/9c2783db984de3ef8f75f7004588e9aa.png"
         }
     },
@@ -62158,19 +62158,19 @@
         "3": {
             "power": 8,
             "damage": 2,
-            "ability": "Growth: Damage +1",
+            "ability": "Infiltrated Bangers, Junkz, Montana, Pussycats, Tolvack, Uppers: Growth: Damage +1",
             "image": "https://s.acdn.ur-img.com/characters/8c7d713602e52bebfca6a3cb28b34b46.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "Growth: Attack +2",
+            "ability": "Infiltrated Bangers, Junkz, Montana, Pussycats, Tolvack, Uppers: Growth: Attack +2",
             "image": "https://s.acdn.ur-img.com/characters/599569000c581b9552be19943ae33be1.png"
         },
         "5": {
             "power": 9,
             "damage": 7,
-            "ability": "Growth: Dope 1, Max. 20",
+            "ability": "Infiltrated Bangers, Junkz, Montana, Pussycats, Tolvack, Uppers: Growth: Dope 1, Max. 20",
             "image": "https://s.acdn.ur-img.com/characters/533de96c23d45a931285d5fd52928986.png"
         }
     },
@@ -62214,19 +62214,19 @@
         "2": {
             "power": 8,
             "damage": 1,
-            "ability": "Poison 1, Min 3",
+            "ability": "Infiltrated Dominion, Jungo, Junkz, Vortex: Poison 1, Min 3",
             "image": "https://s.acdn.ur-img.com/characters/ca4f4f363a392acdcd3374478bf0b2b5.png"
         },
         "3": {
             "power": 8,
             "damage": 1,
-            "ability": "Poison 2, Min 3",
+            "ability": "Infiltrated Dominion, Jungo, Junkz, Vortex: Poison 2, Min 3",
             "image": "https://s.acdn.ur-img.com/characters/88d32a2b87597ecee64e673c6084e8d7.png"
         },
         "4": {
             "power": 9,
             "damage": 3,
-            "ability": "Toxin 2, Min 0",
+            "ability": "Infiltrated Dominion, Jungo, Junkz, Vortex: Toxin 2, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/d04791b95d9acc5352bccc20e99fa051.png"
         }
     },
@@ -62283,19 +62283,19 @@
         "3": {
             "power": 6,
             "damage": 4,
-            "ability": "Brawl: Power +1",
+            "ability": "Infiltrated All Stars, Fang Pi Clang, Huracan, La Junta, Rescue, Sentinel: Brawl: Power +1",
             "image": "https://s.acdn.ur-img.com/characters/be0fb3a3c8e365081f9b646c4623f392.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "Brawl: Attack +2",
+            "ability": "Infiltrated All Stars, Fang Pi Clang, Huracan, La Junta, Rescue, Sentinel: Brawl: Attack +2",
             "image": "https://s.acdn.ur-img.com/characters/a6ffccb985f25823e70187df47c0e722.png"
         },
         "5": {
             "power": 8,
             "damage": 8,
-            "ability": "Brwl. : -2 Opp Dam., Min 1",
+            "ability": "Infiltrated All Stars, Fang Pi Clang, Huracan, La Junta, Rescue, Sentinel: Brwl. : -2 Opp Dam., Min 1",
             "image": "https://s.acdn.ur-img.com/characters/335b02857a7a77ef9a7d786cbeebe87b.png"
         }
     },
@@ -62395,19 +62395,19 @@
         "2": {
             "power": 8,
             "damage": 2,
-            "ability": "Cancel Opp. Pillz & Life Mod.",
+            "ability": "Infiltrated Berzerk, Dominion, Frozn, Nightmare: Cancel Opp. Pillz & Life Mod.",
             "image": "https://s.acdn.ur-img.com/characters/2e2e227751db682d6a07e0f140629e90.png"
         },
         "3": {
             "power": 9,
             "damage": 2,
-            "ability": "Defeat: Poison 1, Min 2",
+            "ability": "Infiltrated Berzerk, Dominion, Frozn, Nightmare: Defeat: Poison 1, Min 2",
             "image": "https://s.acdn.ur-img.com/characters/e6d7a4ff3a4d5568bfb5b7b5b374b5a8.png"
         },
         "4": {
             "power": 9,
             "damage": 5,
-            "ability": "Asym.: -3 Opp Power, Min 2",
+            "ability": "Infiltrated Berzerk, Dominion, Frozn, Nightmare: Asym.: -3 Opp Power, Min 2",
             "image": "https://s.acdn.ur-img.com/characters/73d25b1cb97d3582fa113f3f151eff00.png"
         }
     },
@@ -62464,19 +62464,19 @@
         "3": {
             "power": 6,
             "damage": 4,
-            "ability": "Asy. : -3 Opp Dam., Min 1",
+            "ability": "Infiltrated Berzerk, Cosmohnuts, Freaks, Paradox, Piranas, Raptors: Asy. : -3 Opp Dam., Min 1",
             "image": "https://s.acdn.ur-img.com/characters/229b258b5dec36cab6781c57a4db35b1.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "Asy. : Copy: Opp. Ability",
+            "ability": "Infiltrated Berzerk, Cosmohnuts, Freaks, Paradox, Piranas, Raptors: Asy. : Copy: Opp. Ability",
             "image": "https://s.acdn.ur-img.com/characters/e359c91f331a584877e5225300eef457.png"
         },
         "5": {
             "power": 9,
             "damage": 6,
-            "ability": "Asymmetry: +5 Life",
+            "ability": "Infiltrated Berzerk, Cosmohnuts, Freaks, Paradox, Piranas, Raptors: Asymmetry: +5 Life",
             "image": "https://s.acdn.ur-img.com/characters/fd11ab205bb9ba24ff7ab49eafc0bb7f.png"
         }
     },
@@ -62577,19 +62577,19 @@
         "3": {
             "power": 8,
             "damage": 1,
-            "ability": "+1 Dam./ Life Lost Max. 6",
+            "ability": "Infiltrated Frozn, Jungo, Komboka, Roots, Ulu Watu, Zenith: +1 Dam./ Life Lost Max. 6",
             "image": "https://s.acdn.ur-img.com/characters/6fcb8c7fe97186706c926039a260c269.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "+1 Attack / Life Lost",
+            "ability": "Infiltrated Frozn, Jungo, Komboka, Roots, Ulu Watu, Zenith: +1 Attack / Life Lost",
             "image": "https://s.acdn.ur-img.com/characters/8d3ad6d02d6c1e1a18013c6513aa6d10.png"
         },
         "5": {
             "power": 8,
             "damage": 6,
-            "ability": "+1 Pow./ Life Lost Max. 15",
+            "ability": "Infiltrated Frozn, Jungo, Komboka, Roots, Ulu Watu, Zenith: +1 Pow./ Life Lost Max. 15",
             "image": "https://s.acdn.ur-img.com/characters/ee99d4003233c48f4e3f8d47dbc68ccb.png"
         }
     },
@@ -62751,19 +62751,19 @@
         "3": {
             "power": 5,
             "damage": 5,
-            "ability": "Equalizer: Power +1",
+            "ability": "Infiltrated GHEIST, Hive, Riots, Sakrohm, Vortex: Equalizer: Power +1",
             "image": "https://s.acdn.ur-img.com/characters/ca99178d1553b4aca45d851f47218450.png"
         },
         "4": {
             "power": 7,
             "damage": 5,
-            "ability": "Equalizer: +1 Pillz",
+            "ability": "Infiltrated GHEIST, Hive, Riots, Sakrohm, Vortex: Equalizer: +1 Pillz",
             "image": "https://s.acdn.ur-img.com/characters/65f4e420eb3f9afe3079e14d13d5869e.png"
         },
         "5": {
             "power": 7,
             "damage": 8,
-            "ability": "Equalizer: Attack +4",
+            "ability": "Infiltrated GHEIST, Hive, Riots, Sakrohm, Vortex: Equalizer: Attack +4",
             "image": "https://s.acdn.ur-img.com/characters/3778b35247388d29887378e0fdfaa81d.png"
         }
     },
@@ -62813,7 +62813,7 @@
         "2": {
             "power": 6,
             "damage": 3,
-            "ability": "Defeat: Heal 1, Max 14",
+            "ability": "Infiltrated Junkz, Nightmare, Paradox, Ulu Watu: Defeat: Heal 1, Max 14",
             "image": "https://s.acdn.ur-img.com/characters/deaff6ac7138ca1a0bd966dc8e99d428.png"
         }
     },
@@ -63069,19 +63069,19 @@
         "3": {
             "power": 8,
             "damage": 3,
-            "ability": "Repris.: Toxin 1, Min 1",
+            "ability": "Infiltrated Dominion, GhosTown, Nightmare, Oblivion, Skeelz: Repris.: Toxin 1, Min 1",
             "image": "https://s.acdn.ur-img.com/characters/1e957176e6e9c4c9a8f245128447265b.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "Repris.: Consume 1, Min 4",
+            "ability": "Infiltrated Dominion, GhosTown, Nightmare, Oblivion, Skeelz: Repris.: Consume 1, Min 4",
             "image": "https://s.acdn.ur-img.com/characters/183748e29f6450ab4e506abedef12617.png"
         },
         "5": {
             "power": 9,
             "damage": 7,
-            "ability": "Repris. : Mindwipe 1, Min 0",
+            "ability": "Infiltrated Dominion, GhosTown, Nightmare, Oblivion, Skeelz: Repris. : Mindwipe 1, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/d643a5d47ccc8c1fc6bb0fdb82cbf45f.png"
         }
     },
@@ -63707,7 +63707,7 @@
         "id": 2666,
         "faction": "Tolvack",
         "starOff": 4,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "2": {
             "power": 6,
@@ -63770,7 +63770,7 @@
         "id": 2669,
         "faction": "Tolvack",
         "starOff": 3,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "1": {
             "power": 8,
@@ -63795,18 +63795,18 @@
         "id": 2670,
         "faction": "Tolvack",
         "starOff": 2,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "1": {
             "power": 8,
             "damage": 1,
-            "ability": "After : -3 Opp. Life Min 0",
+            "ability": "After Pussycats, Sakrohm: -3 Opp. Life Min 0",
             "image": "https://s.acdn.ur-img.com/characters/12774612f69da2d6c87d889966f4010e.png"
         },
         "2": {
             "power": 8,
             "damage": 2,
-            "ability": "After : -4 Opp. Life Min 0",
+            "ability": "After Pussycats, Sakrohm: -4 Opp. Life Min 0",
             "image": "https://s.acdn.ur-img.com/characters/3195b4107ab473b3e191cd895175f966.png"
         }
     },
@@ -63814,7 +63814,7 @@
         "id": 2671,
         "faction": "Tolvack",
         "starOff": 4,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "2": {
             "power": 6,
@@ -63839,7 +63839,7 @@
         "id": 2672,
         "faction": "Tolvack",
         "starOff": 5,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "3": {
             "power": 7,
@@ -63864,7 +63864,7 @@
         "id": 2673,
         "faction": "Tolvack",
         "starOff": 4,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "1": {
             "power": 8,
@@ -63895,7 +63895,7 @@
         "id": 2674,
         "faction": "Tolvack",
         "starOff": 2,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "1": {
             "power": 5,
@@ -63914,18 +63914,18 @@
         "id": 2675,
         "faction": "Tolvack",
         "starOff": 3,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "1": {
             "power": 8,
             "damage": 2,
-            "ability": "After : +1 Pillz",
+            "ability": "After Hive, Leader, Riots, Vortex: +1 Pillz",
             "image": "https://s.acdn.ur-img.com/characters/a4073b21ca3e46cbb8f3323f76b24f04.png"
         },
         "2": {
             "power": 8,
             "damage": 3,
-            "ability": "After : +3 Pillz",
+            "ability": "After Hive, Leader, Riots, Vortex: +3 Pillz",
             "image": "https://s.acdn.ur-img.com/characters/36cd5adde10455da9417e09110deb855.png"
         },
         "3": {
@@ -63939,7 +63939,7 @@
         "id": 2676,
         "faction": "Tolvack",
         "starOff": 5,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "2": {
             "power": 6,
@@ -63970,7 +63970,7 @@
         "id": 2677,
         "faction": "Tolvack",
         "starOff": 5,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "3": {
             "power": 8,
@@ -63995,7 +63995,7 @@
         "id": 2678,
         "faction": "Tolvack",
         "starOff": 2,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "1": {
             "power": 8,
@@ -64014,24 +64014,24 @@
         "id": 2679,
         "faction": "Tolvack",
         "starOff": 3,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "1": {
             "power": 8,
             "damage": 2,
-            "ability": "After : +2 Life",
+            "ability": "After Frozn: +2 Life",
             "image": "https://s.acdn.ur-img.com/characters/74e7ec7acc7f4fd17cba5d79a4bdf12f.png"
         },
         "2": {
             "power": 9,
             "damage": 2,
-            "ability": "After : +2 Life",
+            "ability": "After Frozn: +2 Life",
             "image": "https://s.acdn.ur-img.com/characters/3c1396d03d80590992f8e124c1de9f66.png"
         },
         "3": {
             "power": 9,
             "damage": 4,
-            "ability": "After : +2 Life",
+            "ability": "After Frozn: +2 Life",
             "image": "https://s.acdn.ur-img.com/characters/f474e782d461b02504ba920a38fefa05.png"
         }
     },
@@ -64039,7 +64039,7 @@
         "id": 2680,
         "faction": "Tolvack",
         "starOff": 4,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "1": {
             "power": 6,
@@ -64081,7 +64081,7 @@
         "2": {
             "power": 6,
             "damage": 3,
-            "ability": "After : -2 Opp. Pow. & Dam., Min 2",
+            "ability": "After La Junta, Roots: -2 Opp. Pow. & Dam., Min 2",
             "image": "https://s.acdn.ur-img.com/characters/eacda6880592c8ae0cc0b1ccf1b7c2a1.png"
         }
     },
@@ -64089,7 +64089,7 @@
         "id": 2682,
         "faction": "Tolvack",
         "starOff": 5,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "3": {
             "power": 8,
@@ -64150,19 +64150,19 @@
         "3": {
             "power": 8,
             "damage": 4,
-            "ability": "After : +2 Pillz",
+            "ability": "After Komboka, Oblivion: +2 Pillz",
             "image": "https://s.acdn.ur-img.com/characters/196ffe72e54dcf2220d13afae69eff46.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "After : +2 Life",
+            "ability": "After Komboka, Oblivion: +2 Life",
             "image": "https://s.acdn.ur-img.com/characters/2d3c3eb803a8957d320000ab5d453fc5.png"
         },
         "5": {
             "power": 9,
             "damage": 6,
-            "ability": "After : +3 Pillz And Life",
+            "ability": "After Komboka, Oblivion: +3 Pillz And Life",
             "image": "https://s.acdn.ur-img.com/characters/278c03216ea6c1148fc8db5feec4ddcc.png"
         }
     },
@@ -64170,7 +64170,7 @@
         "id": 2685,
         "faction": "Tolvack",
         "starOff": 5,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "2": {
             "power": 8,
@@ -64201,18 +64201,18 @@
         "id": 2686,
         "faction": "Tolvack",
         "starOff": 2,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "1": {
             "power": 5,
             "damage": 3,
-            "ability": "After : -3 Opp Power, Min 0",
+            "ability": "After Oculus, Tolvack: -3 Opp Power, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/34a5c4c37e8266acc813a6c8989bb9ea.png"
         },
         "2": {
             "power": 5,
             "damage": 4,
-            "ability": "After : -3 Opp Power, Min 0",
+            "ability": "After Oculus, Tolvack: -3 Opp Power, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/f4b4ac8248be6a0a0646da445f4de8df.png"
         }
     },
@@ -64225,13 +64225,13 @@
         "2": {
             "power": 7,
             "damage": 3,
-            "ability": "After : Protection: Power",
+            "ability": "After Fang Pi Clang: Protection: Power",
             "image": "https://s.acdn.ur-img.com/characters/0192ca58760bf6fb4c364df8bbebc2f1.png"
         },
         "3": {
             "power": 8,
             "damage": 4,
-            "ability": "After : Protection : Damage",
+            "ability": "After Fang Pi Clang: Protection : Damage",
             "image": "https://s.acdn.ur-img.com/characters/ee836805359f66cba0ca2458cfe571c6.png"
         },
         "4": {
@@ -64295,7 +64295,7 @@
         "id": 2690,
         "faction": "Tolvack",
         "starOff": 3,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "1": {
             "power": 8,
@@ -64356,13 +64356,13 @@
         "1": {
             "power": 5,
             "damage": 2,
-            "ability": "After : -5 Opp Power, Min 2",
+            "ability": "After Piranas, Pussycats, Ulu Watu: -5 Opp Power, Min 2",
             "image": "https://s.acdn.ur-img.com/characters/ba7a20e1755719cb2964310fe8bb17d1.png"
         },
         "2": {
             "power": 5,
             "damage": 3,
-            "ability": "After : -5 Opp Power, Min 2",
+            "ability": "After Piranas, Pussycats, Ulu Watu: -5 Opp Power, Min 2",
             "image": "https://s.acdn.ur-img.com/characters/5b3c99ecd79af6c8a6aa395d66a5f9c8.png"
         }
     },
@@ -64370,7 +64370,7 @@
         "id": 2693,
         "faction": "Tolvack",
         "starOff": 5,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "2": {
             "power": 6,
@@ -64406,19 +64406,19 @@
         "1": {
             "power": 7,
             "damage": 1,
-            "ability": "-2 Opp Power, Min 5",
+            "ability": "Infiltrated All Stars, Freaks, Nightmare, Tolvack: -2 Opp Power, Min 5",
             "image": "https://s.acdn.ur-img.com/characters/49a650bd6515810260bafe2300439508.png"
         },
         "2": {
             "power": 7,
             "damage": 2,
-            "ability": "-2 Opp Power, Min 5",
+            "ability": "Infiltrated All Stars, Freaks, Nightmare, Tolvack: -2 Opp Power, Min 5",
             "image": "https://s.acdn.ur-img.com/characters/91110808896fc2a303fdb7f4a4d7e983.png"
         },
         "3": {
             "power": 7,
             "damage": 4,
-            "ability": "-2 Opp Power, Min 5",
+            "ability": "Infiltrated All Stars, Freaks, Nightmare, Tolvack: -2 Opp Power, Min 5",
             "image": "https://s.acdn.ur-img.com/characters/62bb69ff4407a2fd95e32426e2ab4ed3.png"
         }
     },
@@ -64468,13 +64468,13 @@
         "2": {
             "power": 8,
             "damage": 2,
-            "ability": "After : -3 Opp Damage, Min 1",
+            "ability": "After Piranas, Zenith: -3 Opp Damage, Min 1",
             "image": "https://s.acdn.ur-img.com/characters/a673504a5a8ee352bea17e6ea7c69501.png"
         },
         "3": {
             "power": 8,
             "damage": 4,
-            "ability": "After : -6 Opp Damage, Min 0",
+            "ability": "After Piranas, Zenith: -6 Opp Damage, Min 0",
             "image": "https://s.acdn.ur-img.com/characters/5e43c56c2f4943a6acc8e3170178a569.png"
         }
     },
@@ -64513,7 +64513,7 @@
         "id": 2698,
         "faction": "Tolvack",
         "starOff": 2,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "1": {
             "power": 6,
@@ -64537,7 +64537,7 @@
         "3": {
             "power": 5,
             "damage": 6,
-            "ability": "After : -4 Opp Power, Min 3",
+            "ability": "After All Stars: -4 Opp Power, Min 3",
             "image": "https://s.acdn.ur-img.com/characters/06ae5cf86f850f1298b9f2b971417e7a.png"
         },
         "4": {
@@ -64582,24 +64582,24 @@
         "id": 2701,
         "faction": "Tolvack",
         "starOff": 4,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "2": {
             "power": 8,
             "damage": 3,
-            "ability": "After : Power +2",
+            "ability": "After Bangers, Junkz, Montana, Pussycats, Uppers: Power +2",
             "image": "https://s.acdn.ur-img.com/characters/61d8fd5b58178fe83528d20259d53dea.png"
         },
         "3": {
             "power": 8,
             "damage": 5,
-            "ability": "After : Power +2",
+            "ability": "After Bangers, Junkz, Montana, Pussycats, Uppers: Power +2",
             "image": "https://s.acdn.ur-img.com/characters/22cc297bec23d4860e5c82389c790d8f.png"
         },
         "4": {
             "power": 9,
             "damage": 5,
-            "ability": "After : Power +3",
+            "ability": "After Bangers, Junkz, Montana, Pussycats, Uppers: Power +3",
             "image": "https://s.acdn.ur-img.com/characters/1bffeb52d0295777862baa232cc77d28.png"
         }
     },
@@ -64612,19 +64612,19 @@
         "3": {
             "power": 7,
             "damage": 4,
-            "ability": "-1 Opp Pow. & Dam., Min 1",
+            "ability": "Infiltrated Bangers, Freaks, GhosTown, Sentinel: -1 Opp Pow. & Dam., Min 1",
             "image": "https://s.acdn.ur-img.com/characters/702d5b00555c9608a8bb5862b72f8c71.png"
         },
         "4": {
             "power": 8,
             "damage": 5,
-            "ability": "Cancel Opp. Attack Modif.",
+            "ability": "Infiltrated Bangers, Freaks, GhosTown, Sentinel: Cancel Opp. Attack Modif.",
             "image": "https://s.acdn.ur-img.com/characters/c204113d54c86c47f46f6a3604597797.png"
         },
         "5": {
             "power": 9,
             "damage": 7,
-            "ability": "Power +3",
+            "ability": "Infiltrated Bangers, Freaks, GhosTown, Sentinel: Power +3",
             "image": "https://s.acdn.ur-img.com/characters/ee2d4f65b28ddd18d33b7492db90d000.png"
         }
     },
@@ -64657,7 +64657,7 @@
         "id": 2704,
         "faction": "Tolvack",
         "starOff": 3,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "1": {
             "power": 7,
@@ -64820,7 +64820,7 @@
         "id": 2711,
         "faction": "Tolvack",
         "starOff": 5,
-        "bonus": "After : Power +3",
+        "bonus": "After Oculus, Tolvack: Power +3",
         "clan_image": "https://s.acdn.ur-img.com/urimages/clan/TOLVACK_42.png",
         "3": {
             "power": 7,

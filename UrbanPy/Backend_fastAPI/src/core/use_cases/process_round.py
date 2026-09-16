@@ -37,6 +37,7 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
         # L'ability « Team: » d'un Leader unique s'applique à la carte jouée
         player1_card.leader_fight = leader_team_capacity(game.ally)
         player2_card.leader_fight = leader_team_capacity(game.enemy)
+        apply_leader_modes(game, player1_card, player2_card)
 
         for card, is_ally, own_index, opp_index in ((player1_card, True, round_data.player1_card_index, round_data.player2_card_index),
                                                     (player2_card, False, round_data.player2_card_index, round_data.player1_card_index)):
@@ -61,9 +62,15 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
         # Modificateurs d'attaque, une fois l'attaque de base connue
         fct_lvl_2.apply_capacity_lvl_2(game, player1_card, player2_card, stats=("attack",))
 
+        # Tune Out (Cosmohnuts) : « the Attack calculation is ignored and the winner is the player who bet the most Pillz »
+        if consume_tune_out(player1_card) | consume_tune_out(player2_card):
+            player1_card.attack, player2_card.attack = round_data.player1_pillz, round_data.player2_pillz
+
         # Killshot : la capacité n'agit que si l'attaque vaut au moins le double de l'attaque adverse
         apply_killshot_condition(player1_card, player2_card)
         apply_killshot_condition(player2_card, player1_card)
+        apply_perfect_condition(player1_card, player2_card)
+        apply_perfect_condition(player2_card, player1_card)
 
         # Créer une nouvelle instance de Round
         round_result = Round()
@@ -108,6 +115,18 @@ def resolve_combat(game: Game, player1_card: Card, player2_card: Card, round_res
         round_result.enemy.win = True
         player1_card.win = False
         player2_card.win = True
+    elif has_tie_break(player1_card) and not has_tie_break(player2_card):     # Tie-break (Solomon) : gagne toute égalité
+        game.enemy.life = max(0, game.enemy.life - player1_card.damage_fight)
+        round_result.ally.win = True
+        round_result.enemy.win = False
+        player1_card.win = True
+        player2_card.win = False
+    elif has_tie_break(player2_card) and not has_tie_break(player1_card):
+        game.ally.life = max(0, game.ally.life - player2_card.damage_fight)
+        round_result.ally.win = False
+        round_result.enemy.win = True
+        player1_card.win = False
+        player2_card.win = True
     elif player1_card.stars < player2_card.stars:
         game.enemy.life = max(0, game.enemy.life - player1_card.damage_fight)
         round_result.ally.win = True
@@ -135,8 +154,8 @@ def resolve_combat(game: Game, player1_card: Card, player2_card: Card, round_res
 
 
 # Conditions évaluées plus tard qu'au début du round : "stop" au niveau 1 (l'ability a-t-elle été stoppée ?),
-# "killshot" après le calcul des attaques, les autres après le combat (niveau 3).
-DEFERRED_CONDITIONS = {"stop", "killshot", "defeat", "backlash", "victory_defeat"}
+# "killshot" et "perfect" après le calcul des attaques, les autres après le combat (niveau 3).
+DEFERRED_CONDITIONS = {"stop", "killshot", "perfect", "defeat", "backlash", "victory_defeat"}
 
 
 def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, own_card_index: int, opp_card_index: int) -> bool:
@@ -162,6 +181,8 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, own_
         "reprisal": lambda: not plays_first,
         "symmetry": lambda: own_card_index == opp_card_index,
         "asymmetry": lambda: own_card_index != opp_card_index,
+        "unison": lambda: hand_is_mono_clan(own_player, own_card_index),
+        "disunion": lambda: not hand_is_mono_clan(own_player, own_card_index),
     }
 
     for condition in list(capacity.effect_conditions):
@@ -172,6 +193,16 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, own_
         elif condition.startswith("versus:"):                # « Versus <clans> » : au moins une carte du clan dans la main adverse
             clans = condition[len("versus:"):].split("|")   # (règle officielle : pas seulement la carte en face)
             if not any(card.faction in clans for card in opp_player.cards):
+                return False
+            capacity.effect_conditions.remove(condition)
+        elif condition.startswith("after:"):                 # « After <clans> » : ma carte du round précédent est du clan
+            clans = condition[len("after:"):].split("|")    # (jamais au round 1 ; un Oculus infiltré ne compte pas)
+            previous_index = None if last_round is None else (last_round.ally if is_ally else last_round.enemy).card_index
+            if previous_index is None or own_player.cards[previous_index].faction not in clans:
+                return False
+            capacity.effect_conditions.remove(condition)
+        elif condition.startswith("infiltrated:"):           # ability d'Oculus : active seulement si le clan adopté est listé
+            if clan_for_bonus(own_player, own_player.cards[own_card_index]) not in condition[len("infiltrated:"):].split("|"):
                 return False
             capacity.effect_conditions.remove(condition)
         elif condition.startswith("bet"):
@@ -196,6 +227,41 @@ def leader_team_capacity(player: Player) -> Capacity:
     return capacity
 
 
+def has_tie_break(card: Card) -> bool:
+    return any(getattr(card, slot) is not None and getattr(card, slot).how == "tie_break" for slot in FIGHT_SLOTS)
+
+
+def consume_tune_out(card: Card) -> bool:
+    """Retire un Tune Out (survivant à la phase des Stops) de la carte ; True s'il y en avait un."""
+    found = False
+    for slot in FIGHT_SLOTS:
+        capacity = getattr(card, slot)
+        if capacity is not None and capacity.how == "tune_out":
+            setattr(card, slot, None)
+            found = True
+    return found
+
+
+def apply_leader_modes(game: Game, player1_card: Card, player2_card: Card) -> None:
+    """
+    Modes de Leader lus avant les conditions : Counter-attack (Ashigaru) — « always plays second » : fixe l'ordre du
+    round si un seul camp l'a ; Limitless (Fractal) — les maximums des abilities de l'équipe tombent, les minimums
+    passent à 0 (pas les bonus).
+    """
+    modes = {}
+    for card in (player1_card, player2_card):
+        capacity = card.leader_fight
+        if capacity is not None and capacity.how in ("counter_attack", "limitless"):
+            modes[id(card)] = capacity.how
+            card.leader_fight = None
+    ally_counter, enemy_counter = modes.get(id(player1_card)) == "counter_attack", modes.get(id(player2_card)) == "counter_attack"
+    if ally_counter != enemy_counter:
+        game.turn = enemy_counter                  # l'allié joue en premier seulement si c'est l'ennemi qui a Ashigaru
+    for card in (player1_card, player2_card):
+        if modes.get(id(card)) == "limitless" and card.ability_fight is not None and card.ability_fight.borne != -1:
+            card.ability_fight.borne = -1 if card.ability_fight.value > 0 else 0
+
+
 def apply_killshot_condition(card: Card, opp_card: Card) -> None:
     """Consomme la condition « killshot » (attaque >= 2 x attaque adverse) ou désactive la capacité."""
     is_killshot = card.attack > 0 and card.attack >= 2 * opp_card.attack
@@ -204,6 +270,21 @@ def apply_killshot_condition(card: Card, opp_card: Card) -> None:
         if capacity is not None and "killshot" in capacity.effect_conditions:
             if is_killshot:
                 capacity.effect_conditions.remove("killshot")
+            else:
+                setattr(card, slot, None)
+
+
+def apply_perfect_condition(card: Card, opp_card: Card) -> None:
+    """
+    Consomme la condition « perfect » ou désactive la capacité. Règle officielle : l'écart d'attaque est strictement
+    inférieur à la puissance de la carte (une pillz de moins n'aurait pas gagné). La victoire est exigée au niveau 3.
+    """
+    is_perfect = card.attack - opp_card.attack < card.power_fight
+    for slot in FIGHT_SLOTS:
+        capacity = getattr(card, slot)
+        if capacity is not None and "perfect" in capacity.effect_conditions:
+            if is_perfect:
+                capacity.effect_conditions.remove("perfect")
             else:
                 setattr(card, slot, None)
 
@@ -218,6 +299,12 @@ def _bet_condition_met(condition: str, pillz_fight: int) -> bool:
     if rest.startswith("<"):
         return bet < int(rest[1:])
     return bet > int(rest.lstrip(">").strip())
+
+
+def hand_is_mono_clan(player: Player, card_index: int) -> bool:
+    """Unison (règle officielle) : la main contient exclusivement des cartes du clan de la carte jouée."""
+    clan = player.cards[card_index].faction
+    return all(card.faction == clan for card in player.cards)
 
 
 MIN_CLAN_CARDS_FOR_BONUS = 2
@@ -235,14 +322,28 @@ def infiltrated_clan(player: Player):
     deux autres clans -> celui de la carte seule ; trois autres clans ou plus d'un Oculus -> None.
     Les Leaders ne comptent pas comme clan (hypothèse, non documentée).
     """
-    if sum(1 for c in player.cards if c.faction == OCULUS) != 1:
+    oculus = [c for c in player.cards if c.faction == OCULUS]
+    if len(oculus) != 1:
         return None
     counts = Counter(c.faction for c in player.cards if c.faction not in (OCULUS, LEADER))
     if len(counts) == 1:
-        return next(iter(counts))
-    if len(counts) == 2:
+        clan = next(iter(counts))
+    elif len(counts) == 2:
         lone = [clan for clan, n in counts.items() if n == 1]
-        return lone[0] if len(lone) == 1 else None
+        clan = lone[0] if len(lone) == 1 else None
+    else:
+        clan = None
+    allowed = infiltrable_clans(oculus[0])
+    return clan if clan is not None and (allowed is None or clan in allowed) else None
+
+
+def infiltrable_clans(card: Card):
+    """Clans listés sur la carte Oculus (icônes de l'ability, condition « infiltrated:Clan|Clan ») ; None si inconnus."""
+    if card.ability is None:
+        return None
+    for condition in card.ability.effect_conditions:
+        if condition.startswith("infiltrated:"):
+            return condition[len("infiltrated:"):].split("|")
     return None
 
 

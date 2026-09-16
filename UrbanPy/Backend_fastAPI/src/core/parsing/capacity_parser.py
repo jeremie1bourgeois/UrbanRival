@@ -71,20 +71,23 @@ _CONDITION_PREFIXES = {
     "victory or defeat": "victory_defeat",
     "stop": "stop",           # l'ability n'agit que si elle a été stoppée (évalué au niveau 1)
     "killshot": "killshot",   # attaque >= 2 x attaque adverse (évalué après le calcul des attaques)
+    "perfect": "perfect",     # écart d'attaque < puissance : une pillz de moins n'aurait pas gagné (idem)
     "team": "team",           # ability de Leader : s'applique à chaque carte jouée de l'équipe (voir process_round)
+    "unison": "unison",       # la main est exclusivement du clan de la carte
+    "disunion": "disunion",   # au moins une carte d'un autre clan dans la main
 }
 _MULTIPLIER_PREFIXES = ("support", "growth", "degrowth", "equalizer", "brawl")
 _IGNORED_PREFIXES = ("day",)   # cycle jour/nuit non modélisé : Day toujours valide, donc Night jamais
-_UNSUPPORTED_PREFIXES = ("versus", "xantiax", "night")
+_UNSUPPORTED_PREFIXES = ("versus", "after", "infiltrated", "night")   # sans clan : données anciennes
 _R_BET = re.compile(r"^bet ([<>]) (\d+) pillz$")   # « Bet > 4 pillz » : pillz misées ce round
 _CORE_STARTERS = ("copy", "protection", "reanimate")   # mots qui ouvrent un cœur contenant ':'
 
 # Cœurs connus mais hors moteur : testés avant les regex, raison groupable dans le rapport
 _UNSUPPORTED_CORE_KEYWORDS = (
-    "remove ability conditions", "counter-attack", "tie-break",
-    "fatal killshot", "sinister symmetry", "tune out", "overdose", "perfection",
-    "cards", "impose", "consume", "corrupt", "combust", "corrosion", "mindwipe", "rebirth",
-    "beyond", "bypass", "hazard", "illusion", "limitless",
+    "remove ability conditions",
+    "overdose", "perfection",
+    "rebirth",
+    "beyond", "bypass", "hazard", "illusion",
 )
 
 # --- Cœurs ------------------------------------------------------------------------------------
@@ -107,15 +110,21 @@ _R_STOP = re.compile(r"^stop (?:opp )?(ability|bonus)$")
 _R_COPY = re.compile(r"^copy (?:opp )?(ability|bonus|power and damage|power|damage)(?: opp)?$")
 _R_PROTECTION = re.compile(r"^protection (ability|bonus|power and damage|power|damage|attack)$")
 _R_PROTECTION_SUFFIX = re.compile(r"^(ability|bonus) protection$")
-_R_CANCEL = re.compile(r"^cancel (?:opp )?(power and damage|pillz and life|power|damage|attack|life|pillz) modif$")
+_R_CANCEL = re.compile(r"^cancel (?:(opp|players) )?(power and damage|pillz and life|power|damage|attack|life|pillz) modif$")
 _R_EXCHANGE = re.compile(r"^(power and damage|power|damage) exchange$")
-_R_PERSISTENT = re.compile(r"^(poison|toxin|heal|regen|dope|repair) (\d+) (?:min|max) (\d+)$")
+_R_IMPOSE = re.compile(r"^(power|damage) impose$")   # la stat adverse prend la valeur imprimée de ma carte
+_R_PERSISTENT = re.compile(r"^(?:(players) )?(poison|toxin|heal|regen|dope|repair|consume|combust|mindwipe) (\d+) (?:min|max) (\d+)$")
+_R_CORRUPT = re.compile(r"^corrupt (\d+) min (\d+)$")           # le propriétaire perd X vies, victoire ou défaite
+_R_CORROSION = re.compile(r"^corrosion (\d+) min (\d+)$")   # poison dont la valeur est multipliée par le numéro du round
 _R_REANIMATE = re.compile(r"^reanimate \+(\d+) life$")
-_R_RECOVER = re.compile(r"^recover (\d+) pillz out of (\d+)$")   # X pillz récupérées sur Y misées (fin de round)
+_R_RECOVER = re.compile(r"^recover (\d+) (?:(players) )?pillz out of (\d+)$")   # X pillz récupérées sur Y misées (fin de round)
 _R_INFILTRATED = re.compile(r"^infiltrated$")                        # bonus Oculus : adopte le bonus du clan majoritaire de la main
 
-_PERSISTENT_TYPES = {"poison": "poison", "toxin": "toxine", "heal": "heal", "regen": "regen", "dope": "dope", "repair": "repair"}
-_PERSISTENT_TARGETS = {"poison": "enemy", "toxin": "enemy", "heal": "ally", "regen": "ally", "dope": "ally", "repair": "ally"}
+# Mindwipe : « lose X Life Points and Pillz, minimum Y, at the end of each of the following rounds » = Combust (textes officiels)
+_PERSISTENT_TYPES = {"poison": "poison", "toxin": "toxine", "heal": "heal", "regen": "regen", "dope": "dope", "repair": "repair",
+                     "consume": "consume", "combust": "combust", "mindwipe": "combust"}
+_PERSISTENT_TARGETS = {"poison": "enemy", "toxin": "enemy", "heal": "ally", "regen": "ally", "dope": "ally", "repair": "ally",
+                       "consume": "enemy", "combust": "enemy", "mindwipe": "enemy"}
 
 
 def _types(stat: str) -> list:
@@ -126,10 +135,13 @@ def _borne(group) -> int:
     return int(group) if group is not None else -1
 
 
+_PER_ROUND = "round"   # « +1 Pillz Per Round » (Leaders) : à chaque round, victoire ou défaite = Team: Victory Or Defeat: X
+
+
 def _resolve_how(prefix_hows: list, per: Optional[str]):
     """Retourne (how, erreur) : un seul multiplicateur autorisé."""
     hows = list(prefix_hows)
-    if per is not None:
+    if per is not None and per != _PER_ROUND:
         if per not in _PER_MULTIPLIERS:
             return None, _unsupported(f"unsupported multiplier: per {per}")
         hows.append(_PER_MULTIPLIERS[per])
@@ -138,7 +150,21 @@ def _resolve_how(prefix_hows: list, per: Optional[str]):
     return (hows[0] if hows else ""), None
 
 
+_R_CARDS = re.compile(r"\bcards\b")
+
+
+def _per_round(conditions: list, per: Optional[str]) -> list:
+    return list(conditions) + ["team", "victory_defeat"] if per == _PER_ROUND else conditions
+
+
 def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacity:
+    """« Cards » (ex. « -2 Cards Damage, Min 1 », « Protection: Cards Power ») : l'effet porte sur les deux cartes du round."""
+    if _R_CARDS.search(core):
+        stripped = _R_CARDS.sub("opp" if core.startswith("-") else "", core)
+        parsed = _parse_core(re.sub(r"\s+", " ", stripped).strip(), conditions, prefix_hows)
+        if parsed.supported and parsed.capacity is not None:
+            parsed.capacity.target = "both"
+        return parsed
     for keyword in _UNSUPPORTED_CORE_KEYWORDS:
         if re.search(rf"(?<![\w-]){re.escape(keyword)}(?![\w-])", core):
             return _unsupported(f"unsupported core: {keyword}")
@@ -159,16 +185,48 @@ def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacit
 
     match = _R_CANCEL.match(core)
     if match:
-        return error or _capacity("enemy", _types(match.group(1)), 0, "cancel", -1, conditions)
+        target = "both" if match.group(1) == "players" else "enemy"
+        return error or _capacity(target, _types(match.group(2)), 0, "cancel", -1, conditions)
 
     match = _R_EXCHANGE.match(core)
     if match:
         return error or _capacity("both", _types(match.group(1)), 0, "exchange", -1, conditions)
 
+    if core == "fatal killshot":   # « the match is over and you win by KO » dès que l'attaque vaut le double
+        return error or _capacity("enemy", ["ko"], 0, how, -1, list(conditions) + ["killshot"])
+
+    if core == "sinister symmetry":   # « If your card wins the round against the card in front of it, the match is over »
+        return error or _capacity("enemy", ["ko"], 0, how, -1, list(conditions) + ["symmetry"])
+
+    for leader_mode in ("counter-attack", "limitless"):   # Leaders Ashigaru / Fractal : modes lus par process_round
+        if core == leader_mode:
+            how_name = leader_mode.replace("-", "_")
+            return error or _capacity("ally", [how_name], 0, how_name, -1, list(conditions) + ["team"])
+
+    if core == "tie-break":      # Leader (Solomon) : l'équipe gagne toutes les égalités d'attaque
+        return error or _capacity("ally", ["tie_break"], 0, "tie_break", -1, list(conditions) + ["team"])
+
+    if core == "tune out":       # bonus Cosmohnuts : le round se résout aux pillz misées, pas à l'attaque
+        return error or _capacity("both", ["tune_out"], 0, "tune_out", -1, conditions)
+
+    match = _R_IMPOSE.match(core)
+    if match:
+        return error or _capacity("enemy", [match.group(1)], 0, "impose", -1, conditions)
+
     match = _R_PERSISTENT.match(core)
     if match:
-        effect, value, borne = match.groups()
-        return error or _capacity(_PERSISTENT_TARGETS[effect], [_PERSISTENT_TYPES[effect]], int(value), how, int(borne), conditions)
+        players, effect, value, borne = match.groups()
+        target = "both" if players else _PERSISTENT_TARGETS[effect]
+        return error or _capacity(target, [_PERSISTENT_TYPES[effect]], int(value), how, int(borne), conditions)
+
+    match = _R_CORRUPT.match(core)
+    if match:
+        return error or _capacity("ally", ["life"], -int(match.group(1)), how, int(match.group(2)), conditions + ["victory_defeat"])
+
+    match = _R_CORROSION.match(core)
+    if match:
+        how, error = _resolve_how(prefix_hows + ["growth"], None)
+        return error or _capacity("enemy", ["poison"], int(match.group(1)), how, int(match.group(2)), conditions)
 
     match = _R_REANIMATE.match(core)
     if match:
@@ -176,7 +234,8 @@ def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacit
 
     match = _R_RECOVER.match(core)
     if match:
-        return error or _capacity("ally", ["recover"], int(match.group(1)), how, int(match.group(2)), conditions)
+        target = "both" if match.group(2) else "ally"
+        return error or _capacity(target, ["recover"], int(match.group(1)), how, int(match.group(3)), conditions)
 
     if _R_INFILTRATED.match(core):
         return error or _capacity("ally", ["infiltrated"], 0, how, -1, conditions)
@@ -192,13 +251,13 @@ def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacit
         value, who, stat, per, borne = match.groups()
         how, error = _resolve_how(prefix_hows, per)
         target = {"opp": "enemy", "players": "both"}.get(who, "ally")
-        return error or _capacity(target, _types(stat), int(value), how, _borne(borne), conditions)
+        return error or _capacity(target, _types(stat), int(value), how, _borne(borne), _per_round(conditions, per))
 
     match = _R_MINUS_OPP.match(core)
     if match:
         value, stat, per, borne = match.groups()
         how, error = _resolve_how(prefix_hows, per)
-        return error or _capacity("enemy", _types(stat), -int(value), how, int(borne), conditions)
+        return error or _capacity("enemy", _types(stat), -int(value), how, int(borne), _per_round(conditions, per))
 
     match = _R_MINUS_SELF.match(core)
     if match:
@@ -209,26 +268,31 @@ def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacit
     return _unsupported("unknown core")
 
 
-_R_VERSUS = re.compile(r"(^|:)\s*versus\s+([^:]+?)\s*:", re.IGNORECASE)   # « Versus Freaks, Oculus: … »
+# Préfixes à clans (rendus en texte par le scraper depuis les icônes) : « Versus Freaks, Oculus: … », « After Tolvack: … »,
+# « Infiltrated La Junta, Piranas: … » (Oculus : l'ability n'agit que si l'Oculus a infiltré l'un de ces clans).
+_R_CLAN_PREFIX = re.compile(r"(^|:)\s*(versus|after|infiltrated)\s+([^:]+?)\s*:", re.IGNORECASE)
 
 
-def _extract_versus(text: str):
+def _extract_clan_conditions(text: str):
     """
-    Retire un préfixe « Versus <clans>: » (en tête ou après un autre préfixe) et renvoie
-    (texte restant, condition « versus:Clan|Clan » ou None). Les clans gardent leur casse (comparés à card.faction).
+    Retire les préfixes à clans (en tête ou après un autre préfixe) et renvoie (texte restant, conditions
+    « versus:Clan|Clan » / « after:… » / « infiltrated:… »). Les clans gardent leur casse (comparés à card.faction).
     Sans clan (ancien scraping où le clan était une image) le texte est laissé tel quel.
     """
-    match = _R_VERSUS.search(text)
-    if not match:
-        return text, None
-    clans = [clan.strip() for clan in match.group(2).split(",") if clan.strip()]
-    if not clans:
-        return text, None
-    return text[:match.start()] + match.group(1) + text[match.end():], "versus:" + "|".join(clans)
+    conditions = []
+    while True:
+        match = _R_CLAN_PREFIX.search(text)
+        if not match:
+            return text, conditions
+        clans = [clan.strip() for clan in match.group(3).split(",") if clan.strip()]
+        if not clans:
+            return text, conditions
+        conditions.append(f"{match.group(2).lower()}:" + "|".join(clans))
+        text = text[:match.start()] + match.group(1) + text[match.end():]
 
 
 def parse_capacity(text: str) -> ParsedCapacity:
-    text, versus = _extract_versus(text or "")
+    text, clan_conditions = _extract_clan_conditions(text or "")
     normalized = normalize(text)
     if normalized in ("", "no ability") or re.fullmatch(r"ability at level \d+", normalized):
         return NO_ABILITY
@@ -247,6 +311,9 @@ def parse_capacity(text: str) -> ParsedCapacity:
             conditions.append(f"bet{bet.group(1)}{bet.group(2)}")
         elif segment in _MULTIPLIER_PREFIXES:
             prefix_hows.append(segment)
+        elif segment == "xantiax":            # « Xantiax: -X Life, Min Y » : les deux joueurs, victoire ou défaite
+            conditions.append("victory_defeat")
+            segments[-1] = re.sub(r"^(-\d+) life", r"\1 players life", segments[-1])
         elif segment in _IGNORED_PREFIXES:
             pass
         elif segment in _UNSUPPORTED_PREFIXES:
@@ -256,7 +323,6 @@ def parse_capacity(text: str) -> ParsedCapacity:
         else:
             return _unsupported(f"unknown prefix: {segment}")
         index += 1
-    if versus is not None:
-        conditions.append(versus)
+    conditions.extend(clan_conditions)
     core = " ".join(segments[index:])
     return _parse_core(core, conditions, prefix_hows)

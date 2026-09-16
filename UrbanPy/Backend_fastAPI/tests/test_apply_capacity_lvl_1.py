@@ -156,6 +156,20 @@ def test_copied_stop_is_itself_subject_to_the_chain(template_game):
 
 # --- Copy / Exchange de power et damage -------------------------------------------------------
 
+def test_power_impose_gives_the_opponent_my_printed_power(template_game):
+    # Règle officielle : « The opposing character has equal Power to your card. This number only takes into account the
+    # figure shown on your card and does not include changes related to an Ability, Bonus or Fury. »
+    _, asporov = play(template_game, ally_ability="Power Impose")
+
+    assert asporov.power_fight == 3 - 2   # puissance imprimée d'Amelia (3), puis le bonus d'Amelia (-2)
+
+
+def test_damage_impose_gives_the_opponent_my_printed_damage(template_game):
+    _, asporov = play(template_game, ally_ability="Damage Impose")
+
+    assert asporov.damage_fight == 5
+
+
 def test_copy_opp_power_uses_the_printed_value(template_game):
     amelia, _ = play(template_game, ally_ability="Copy: Opp. Power")
 
@@ -230,6 +244,26 @@ def test_cancel_capacities_are_consumed(template_game):
     assert amelia.ability_fight is None
 
 
+# --- Cards : les deux cartes du round ---------------------------------------------------------
+
+def test_minus_cards_damage_reduces_both_cards(template_game):
+    amelia, asporov = play(template_game, ally_ability="-2 Cards Damage, Min 2")
+
+    assert (amelia.damage_fight, asporov.damage_fight) == (5 - 2, max(2, 3 - 2))
+
+
+def test_cards_damage_plus_raises_both_cards(template_game):
+    amelia, asporov = play(template_game, ally_ability="Cards Damage +2")
+
+    assert (amelia.damage_fight, asporov.damage_fight) == (7, 5)
+
+
+def test_protection_cards_power_shields_both_cards_from_power_reductions(template_game):
+    amelia, asporov = play(template_game, ally_ability="Protection: Cards Power And Damage", enemy_ability="-3 Opp Damage, Min 1")
+
+    assert (amelia.power_fight, amelia.damage_fight, asporov.power_fight) == (3, 5, 7)   # les deux bonus -2 opp power et le -3 damage sont neutralisés
+
+
 # --- Protection: Power / Damage / Attack ------------------------------------------------------
 
 def test_protection_power_shields_only_my_stat(template_game):
@@ -280,3 +314,26 @@ def test_stop_conditioned_end_of_round_effect(template_game):
     play(template_game, ally_ability="Stop: +2 Life", enemy_ability="Stop Opp. Ability", ally_pillz=6)   # Amelia gagne
 
     assert template_game.ally.life == 14
+
+
+# --- Tune Out (bonus Cosmohnuts) : « the Attack calculation is ignored and the winner of the round is the player who
+# bet the most Pillz. In case of a tie in Pillz, the two cards are decided in the same way as for a tie in Attack. » ---
+
+def test_tune_out_makes_the_most_pillz_win_whatever_the_attack(template_game):
+    amelia, asporov = play(template_game, ally_bonus="Tune Out", ally_pillz=2, enemy_pillz=1)   # sans Tune Out : 3 x 2 = 6 > 5 x 1... mais Asporov P7 : 7
+
+    assert (amelia.attack, asporov.attack) == (2, 1)
+    assert amelia.win is True
+
+
+def test_tune_out_ties_on_pillz_fall_back_to_the_attack_tie_rule(template_game):
+    amelia, asporov = play(template_game, ally_bonus="Tune Out", ally_pillz=1, enemy_pillz=1)   # Amelia 3 étoiles < Asporov 4
+
+    assert amelia.win is True
+
+
+def test_tune_out_applies_when_only_the_opponent_has_it(template_game):
+    amelia, asporov = play(template_game, enemy_bonus="Tune Out", ally_pillz=3, enemy_pillz=2)   # Asporov aurait 7 x 2 = 14 > 3 x 3 = 9
+
+    assert amelia.win is True
+

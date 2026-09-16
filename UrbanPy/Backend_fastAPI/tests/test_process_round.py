@@ -24,7 +24,8 @@ def test_tie_on_enemy_turn_reduces_ally_life_without_going_negative(template_gam
 
 
 from src.core.domain.capacity import Capacity
-from src.core.use_cases.process_round import check_capacity_condition
+from src.core.use_cases.process_round import check_capacity_condition, process_round
+from src.schemas.game_schemas import ProcessRoundInput
 
 
 def _bet_capacity(threshold: int) -> Capacity:
@@ -82,7 +83,7 @@ def test_unknown_condition_raises(template_game):
 
 
 def test_deferred_conditions_constant():
-    assert DEFERRED_CONDITIONS == {"stop", "killshot", "defeat", "backlash", "victory_defeat"}
+    assert DEFERRED_CONDITIONS == {"stop", "killshot", "perfect", "defeat", "backlash", "victory_defeat"}
 
 
 def test_courage_life_ability_applies_and_leaves_the_original_untouched(template_game):
@@ -124,6 +125,52 @@ def test_versus_condition_for_the_enemy_side_looks_at_the_ally_hand(template_gam
     capacity = Capacity(target="ally", types=["power"], value=2, borne=-1, effect_conditions=["versus:Rescue"])
 
     assert check_capacity_condition(template_game, capacity, False, 3, 2) is False  # aucune Rescue chez l'allié
+
+
+# --- Unison / Disunion : composition de la main (règle officielle : Unison = main EXCLUSIVEMENT du clan de la carte,
+# Disunion = au moins une carte d'un autre clan) ---------------------------------------------------------------
+
+def _hand_capacity(condition):
+    return Capacity(target="ally", types=["power"], value=2, borne=-1, effect_conditions=[condition])
+
+
+def test_unison_is_met_when_the_whole_hand_shares_the_card_clan(template_game):
+    assert check_capacity_condition(template_game, _hand_capacity("unison"), True, 0, 0) is True    # 4 All Stars
+
+
+def test_unison_fails_when_another_clan_is_in_the_hand(template_game):
+    assert check_capacity_condition(template_game, _hand_capacity("unison"), False, 0, 2) is False  # Asporov : 3 All Stars + Serafina (Rescue)
+
+
+def test_disunion_is_met_when_another_clan_is_in_the_hand(template_game):
+    assert check_capacity_condition(template_game, _hand_capacity("disunion"), False, 0, 2) is True
+
+
+def test_disunion_fails_on_a_mono_clan_hand(template_game):
+    assert check_capacity_condition(template_game, _hand_capacity("disunion"), True, 0, 0) is False
+
+
+# --- After (Clan X) : une carte du clan jouée par le même joueur au round précédent (règle officielle ; jamais au round 1) ---
+
+def _play_round_one(game):
+    process_round(game, ProcessRoundInput(player1_card_index=2, player1_pillz=1, player2_card_index=3, player2_pillz=1))   # Amelia (All Stars) vs Serafina (Rescue)
+
+
+def test_after_is_never_met_on_the_first_round(template_game):
+    assert check_capacity_condition(template_game, _hand_capacity("after:All Stars"), True, 0, 0) is False
+
+
+def test_after_is_met_when_i_played_a_card_of_the_clan_last_round(template_game):
+    _play_round_one(template_game)
+
+    assert check_capacity_condition(template_game, _hand_capacity("after:All Stars|Tolvack"), True, 0, 0) is True     # Amelia
+    assert check_capacity_condition(template_game, _hand_capacity("after:Rescue"), False, 0, 0) is True             # Serafina
+
+
+def test_after_looks_at_my_own_previous_card_not_the_opponent_one(template_game):
+    _play_round_one(template_game)
+
+    assert check_capacity_condition(template_game, _hand_capacity("after:Rescue"), True, 0, 0) is False
 
 
 @pytest.mark.parametrize("condition, pillz_fight, expected", [

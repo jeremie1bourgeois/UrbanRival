@@ -181,6 +181,42 @@ def test_killshot_gates_persistent_effects_too(template_game):
     assert template_game.enemy.effect_list == []
 
 
+# --- Perfect : victoire avec le nombre exact de pillz (règle officielle : « If the difference between your attack and
+# attack of the opponent is less than the power of your card you have a perfect pill ») ------------------------
+
+def test_perfect_fires_when_one_pillz_less_would_not_have_won(template_game):
+    play(template_game, ally_ability="Perfect: +2 Life", ally_pillz=5, enemy_pillz=1)   # 5 = 5 : égalité gagnée aux étoiles, écart 0 < puissance 1
+
+    assert template_game.ally.cards[AMELIA].win is True
+    assert template_game.ally.life == 14
+
+
+def test_perfect_does_not_fire_on_a_wasted_pillz(template_game):
+    play(template_game, ally_ability="Perfect: +2 Life", ally_pillz=6, enemy_pillz=1)   # 6 > 5, écart 1 >= puissance 1
+
+    assert template_game.ally.life == 12
+
+
+def test_perfect_does_not_fire_on_defeat(template_game):
+    play(template_game, ally_ability="Perfect: +2 Life", ally_pillz=4, enemy_pillz=1)   # 4 < 5
+
+    assert template_game.ally.life == 12 - 3
+
+
+# --- Xantiax / Corrupt : vie perdue en fin de round, victoire ou défaite --------------------------------------
+
+def test_xantiax_makes_both_players_lose_life_even_on_defeat(template_game):
+    play(template_game, ally_ability="Xantiax: -2 Life, Min. 0", ally_wins=False)   # Amelia perd (-3)
+
+    assert (template_game.ally.life, template_game.enemy.life) == (12 - 3 - 2, 12 - 2)
+
+
+def test_corrupt_costs_the_winner_his_own_life(template_game):
+    play(template_game, ally_ability="Corrupt 2 Min. 5", ally_wins=True)
+
+    assert template_game.ally.life == 10
+
+
 # --- Multiplicateur « per damage » ------------------------------------------------------------
 
 def test_life_per_damage_counts_the_damage_inflicted(template_game):
@@ -224,3 +260,40 @@ def test_unconditional_recover_applies_on_victory(template_game):
     play(template_game, ally_ability="Recover 1 Pillz Out Of 2", ally_wins=True)           # 5 misées -> 2
 
     assert template_game.ally.pillz == 12 - 5 + 2
+
+
+def test_recover_players_pillz_gives_both_players_part_of_their_own_bet(template_game):
+    # Amelia (P1) mise 6 (7 pillz) contre Asporov (P5) qui mise 2 (3 pillz) : 7 < 15, Amelia perd -> victoire requise, rien.
+    play(template_game, ally_ability="Victory Or Defeat: Recover 1 Players Pillz Out Of 2", ally_pillz=7, enemy_pillz=3)
+
+    assert template_game.ally.cards[AMELIA].win is False
+    assert (template_game.ally.pillz, template_game.enemy.pillz) == (12 - 6 + 3, 12 - 2 + 1)   # chacun récupère la moitié de sa propre mise
+
+
+# --- Fatal Killshot / Sinister Symmetry : la partie est gagnée sur-le-champ (règles officielles) -----------------
+
+def test_fatal_killshot_knocks_the_opponent_out(template_game):
+    play(template_game, ally_ability="Fatal Killshot", ally_pillz=10, enemy_pillz=1)   # 10 >= 2 x 5
+
+    assert template_game.enemy.life == 0
+    assert check_end(template_game) is GameResult.ALLY
+
+
+def test_fatal_killshot_is_an_ordinary_win_below_double(template_game):
+    play(template_game, ally_ability="Fatal Killshot", ally_pillz=9, enemy_pillz=1)
+
+    assert template_game.enemy.life == 12 - 5
+
+
+def test_sinister_symmetry_wins_the_match_against_the_card_in_front(template_game):
+    template_game.enemy.cards[2].ability = None                                         # Bhudd (idx 2, P4)
+    play(template_game, ally_ability="Sinister Symmetry", enemy_index=2, ally_pillz=6, enemy_pillz=1)   # 6 > 4 - 2
+
+    assert template_game.enemy.life == 0
+
+
+def test_sinister_symmetry_does_nothing_off_symmetry(template_game):
+    play(template_game, ally_ability="Sinister Symmetry", ally_pillz=6, enemy_pillz=1)   # idx 2 contre idx 0
+
+    assert template_game.enemy.life == 12 - 5
+

@@ -7,13 +7,13 @@ ce document décrit **où on en est et ce qui reste**, pour reprendre le travail
 
 | Domaine | État |
 |---|---|
-| Données | 2 497 cartes, 36 clans, illustrations (URLs CDN), scrapées d'iclintz.com le 2026-09-15 par `scripts/scrape_official_cards.py` (cache disque, reprise possible) |
-| Parseur de capacités | 1 132 / 1 310 descriptions gérées (86 %) ; `scripts/capacity_coverage.py` liste le reste par raison |
-| Cartes entièrement gérées | 2 340 / 2 497 (94 %) — les 157 restantes ont au moins un pouvoir non géré à leur niveau max |
-| Moteur | 4 niveaux réécrits et testés (méta, stats, fin de round, persistants) ; bonus de clan (≥ 2 du clan, Oculus infiltré, Leaders), conditions Courage / Revenge / Confidence / Reprisal / Symmetry / Asymmetry / Stop / Killshot / Bet / Versus / Defeat / Backlash / Victory or Defeat / Team ; `scripts/engine_crash_sweep.py` : 0 exception sur toutes les descriptions gérées |
+| Données | 2 497 cartes, 36 clans, illustrations (URLs CDN), scrapées d'iclintz.com le 2026-09-15 par `scripts/scrape_official_cards.py` (cache disque, reprise possible, `--from-cache` pour regénérer sans réseau) ; les icônes de clan de « Versus », « After » et des abilities d'Oculus sont rendues en texte |
+| Parseur de capacités | 1 386 / 1 396 descriptions gérées (99,3 %) ; `scripts/capacity_coverage.py` liste les 10 restantes (capacités uniques sans règle publiée) |
+| Cartes entièrement gérées | toutes sauf les porteuses des 10 descriptions restantes (Genesis, Robert Cobb, Bugamon, Memento, Kate, Glibon Cr, Hekate, Administrator, Nemo Cr, une carte Night) |
+| Moteur | 4 niveaux réécrits et testés (méta, stats, fin de round, persistants) ; bonus de clan (≥ 2 du clan, Oculus infiltré sur ses clans listés, Leaders), conditions Courage / Revenge / Confidence / Reprisal / Symmetry / Asymmetry / Stop / Killshot / Perfect / Bet / Versus / After / Unison / Disunion / Defeat / Backlash / Victory or Defeat / Team ; Tune Out, Impose, Cards, Consume / Combust / Mindwipe / Corrosion, Xantiax, Corrupt, Fatal Killshot, Sinister Symmetry, Leaders Tie-break / Counter-attack / Limitless / Per Round ; `scripts/engine_crash_sweep.py` : 0 exception |
 | API | `/cards`, `/init_game/`, `/init_game/template`, `/process_round/{id}`, `/ai_pick/{id}`, `/save_for_test` |
 | Front | deck builder (recherche, filtre clan, aléatoire, statut des bonus, decks mémorisés), partie à deux ou contre l'ordinateur (aléatoire / heuristique), historique des rounds, fin de partie, effets persistants, illustrations |
-| Tests | 344 backend (pytest) + 22 front (vitest) ; CI GitHub Actions (backend + front) ; 3 fixtures de rejeu `data/test/` |
+| Tests | 408 backend (pytest) + 22 front (vitest) ; CI GitHub Actions (backend + front) ; 3 fixtures de rejeu `data/test/` |
 | Dépôt | nettoyé (IDE, binaires, doublons), fins de ligne LF (`.gitattributes`), README |
 
 ### Décisions de règles prises sans certitude (à confirmer contre les règles officielles)
@@ -47,26 +47,16 @@ Cancel Life Modif., Reanimate, Versus) ont été **corrigées** le même jour ; 
 
 ## 2. Travail restant
 
-### A. Pouvoirs non gérés — 157 cartes
+### A. Pouvoirs non gérés — 10 descriptions, capacités uniques
 
-Définitions retrouvées et consignées dans `docs/REGLES.md` § 4 ; chacune se code ensuite chacune se code comme Killshot ou Bet (une condition dans `check_capacity_condition` /
-`DEFERRED_CONDITIONS`, ou un multiplicateur dans `multipliers.py`) avec 3-4 tests de bout en bout.
+Tout ce qui a une règle publiée est codé (voir `docs/REGLES.md` § 4). Reste, sans règle trouvée ni sur le site ni sur le
+wiki : **Beyond** (Genesis, 5e round — hors périmètre), **Bypass** (Robert Cobb), **Hazard** (Administrator), **Illusion**
+(Kate), **Overdose** (Hekate), **Perfection** (Glibon Cr), **Rebirth 1, Max. 1** (Nemo Cr), **Remove Ability Conditions**
+(Memento), `Growth: -1 Power And Damage, Min 4` (Bugamon, coquille probable) et `Night:` (ignoré volontairement).
 
-| Mécanique | Cartes (niveau max) | Descriptions | Note |
-|---|---|---|---|
-| Tune Out (bonus **Cosmohnuts**) | 35 | 1 | tout le clan ; texte « Tune Out » seul |
-| Unison: X | 30 | 62 | préfixe de condition, dispersé sur tous les clans |
-| After: X (bonus **Tolvack** + abilities) | 30 | 37 | tout le clan Tolvack |
-| Cards … (`-2 Cards Damage`, `Cards Damage +2`, `Protection: Cards …`) | 15 | 15 | effet sur toutes les cartes de la main → nouveau type d'effet |
-| Impose (`Damage Impose`, `Power Impose`) | 10 | 5 | échange forcé de stat ? |
-| Perfect: X | 8 | 7 | condition |
-| Consume X, Min Y | 7 | 4 | effet persistant ? |
-| Combust X, Min Y / Mindwipe X, Min Y / Xantiax | 13 | 16 | effets persistants ou de fin de round à définir |
-| Disunion: X | ~6 | 7 | condition (opposé d'Unison ?) |
-| per round, Rebirth, Corrosion, Corrupt, mots-clés seuls (Beyond, Bypass, Hazard, Illusion, Limitless, Tie-break, Counter-attack, Fatal Killshot, Sinister Symmetry, Overdose, Perfection, Remove Ability Conditions) | ~12 | ~15 | rendement faible |
-| `unknown core` | — | 6 | `Growth: -1 Power And Damage, Min 4` (coquille du site ?), `Team: Cancel Players X Mod.` (×4), `+1 Attack / Life Lost`-like déjà traités — vérifier avec `capacity_coverage.py` |
-
-Utilisateur : Unison et After sont **volontairement ignorés** tant que leurs règles ne sont pas connues.
+Choix de modélisation à confirmer en combat réel : Mindwipe = Combust (textes identiques) ; Tune Out compare
+`pillz_fight` sans la fury ; Perfect = écart d'attaque < puissance ; Limitless ne touche que l'ability de la carte jouée ;
+Counter-attack refixe l'ordre à chaque round.
 
 ### B. Fiabilité des règles existantes
 1. ~~Confirmer les décisions du tableau § 1 contre les règles officielles~~ → fait (`docs/REGLES.md`) ; appliquer les corrections listées en § 3 de ce document.
@@ -100,7 +90,7 @@ Utilisateur : Unison et After sont **volontairement ignorés** tant que leurs r�
 - Branches distantes déjà fusionnées à supprimer : `chore/infra`, `feat/donnees-scraping`, `feat/front-c`, `feat/pouvoirs-vortex-oculus`, `fix/bugs-moteur-et-fixtures`, `gameStruct`.
 - `.claude/launch.json` (ignoré par git) lance backend et front depuis le dossier du projet avec `.venv` ; à recréer si besoin.
 - `UrbanPy/script/` (pipeline historique `all_capacities_v*.json`) n'est plus utilisé par le code ; à archiver ou supprimer.
-- Le scraper peut être relancé quand le site publie de nouvelles cartes ; les compteurs pinnés dans `tests/test_api.py` (2 497) et `tests/test_capacity_parser.py` (1 310, plancher 1 132) sont alors à mettre à jour.
+- Le scraper peut être relancé quand le site publie de nouvelles cartes ; les compteurs pinnés dans `tests/test_api.py` (2 497) et `tests/test_capacity_parser.py` (1 396, plancher 1 386) sont alors à mettre à jour.
 
 ## 3. Conventions de travail utilisées jusqu'ici
 - Une branche par chantier (`feat/…`, `fix/…`, `chore/…`), commits en français, fusion `--no-ff` dans `main` après accord de l'utilisateur, push après chaque chantier.
