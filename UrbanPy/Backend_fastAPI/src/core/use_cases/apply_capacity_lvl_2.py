@@ -8,6 +8,7 @@ from src.core.domain.player import Player
 from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card, FIGHT_SLOTS
 from src.core.domain.game import Game
+from src.core.domain.journal import label, note, stat_change
 from src.core.use_cases.multipliers import multiplier
 
 # Type de capacité -> attribut de la carte modifié
@@ -52,7 +53,11 @@ def _apply_targeted(target: str, cards: list, game: Game, player1: Player, playe
     bonus = capacity.value * multiplier(capacity.how, game, player1, player2, card1, card2)
     attrs = [_ATTR_MAP[type_] for type_ in applied]
     for card in cards:
+        before = {attr: getattr(card, attr) for attr in attrs}
         _apply_to(card, attrs, bonus, capacity.borne, increase=capacity.value > 0)
+        owner = "d'" + card.name if card.name[:1].lower() in "aeiouy" else "de " + card.name
+        changes = ", ".join(stat_change(type_, owner, before[_ATTR_MAP[type_]], getattr(card, _ATTR_MAP[type_])) for type_ in applied)
+        note(card1, "modificateur", f"{card1.name} : {label(capacity)} → {changes}")
     capacity.types = [type_ for type_ in capacity.types if type_ not in applied]
     return capacity if capacity.types else None
 

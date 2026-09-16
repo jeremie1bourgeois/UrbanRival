@@ -60,14 +60,15 @@ def _process_round(game: Game, round_data: ProcessRoundInput) -> None:
         fct_lvl_2.apply_capacity_lvl_2(game, player1_card, player2_card, stats=("power", "damage"))
 
         # Appliquer les fury
-        if player1_card.fury:
-            player1_card.damage_fight += 2
-        if player2_card.fury:
-            player2_card.damage_fight += 2
+        for card in (player1_card, player2_card):
+            if card.fury:
+                card.damage_fight += 2
+                note(card, "fury", f"{card.name} : fury → dégâts {card.damage_fight - 2} → {card.damage_fight}")
 
         # Calculer les attaques
-        player1_card.attack += (player1_card.power_fight * round_data.player1_pillz)
-        player2_card.attack += (player2_card.power_fight * round_data.player2_pillz)
+        for card, pillz in ((player1_card, round_data.player1_pillz), (player2_card, round_data.player2_pillz)):
+            card.attack += card.power_fight * pillz
+            note(card, "attaque", f"{card.name} : attaque = {card.power_fight} × {pillz} pillz = {card.attack}")
 
         # Modificateurs d'attaque, une fois l'attaque de base connue
         fct_lvl_2.apply_capacity_lvl_2(game, player1_card, player2_card, stats=("attack",))
@@ -204,6 +205,7 @@ def leader_team_capacity(player: Player) -> Capacity:
         return None
     capacity = copy.deepcopy(leaders[0].ability)
     capacity.effect_conditions.remove("team")
+    capacity.label = f"Leader {leaders[0].name} « {leaders[0].ability_description} »"
     return capacity
 
 
@@ -355,6 +357,10 @@ def init_fight_data(card: Card, nb_pillz: int, fury: bool):
     card.ability_fight = copy.deepcopy(card.ability)
     card.bonus_fight = copy.deepcopy(card.bonus)
     card.leader_fight = None
+    if card.ability_fight is not None:
+        card.ability_fight.label = f"pouvoir « {card.ability_description} »"
+    if card.bonus_fight is not None:
+        card.bonus_fight.label = f"bonus « {card.bonus_description} »"
     card.pillz_fight = nb_pillz
     card.fury = fury
     card.attack = 0

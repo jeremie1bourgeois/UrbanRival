@@ -6,7 +6,19 @@ niveaux appellent `note(...)` sans connaître le journal ; hors enregistrement, 
 from contextlib import contextmanager
 from typing import List, Optional
 
+from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card
+
+STAT_LABELS = {"power": "puissance", "damage": "dégâts", "attack": "attaque", "life": "vie", "pillz": "pillz"}
+
+
+def label(capacity: Capacity) -> str:
+    """Libellé d'une capacité de combat, posé par process_round (« pouvoir « Power +2 » ») ; repli sur son how."""
+    return getattr(capacity, "label", None) or capacity.how or "effet"
+
+
+def stat_change(stat: str, owner: str, before: int, after: int) -> str:
+    return f"{STAT_LABELS.get(stat, stat)} {owner} {before} → {after}"
 
 
 class Journal:
