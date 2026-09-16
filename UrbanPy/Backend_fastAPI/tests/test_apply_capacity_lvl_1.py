@@ -244,6 +244,26 @@ def test_cancel_capacities_are_consumed(template_game):
     assert amelia.ability_fight is None
 
 
+# --- Cards : les deux cartes du round ---------------------------------------------------------
+
+def test_minus_cards_damage_reduces_both_cards(template_game):
+    amelia, asporov = play(template_game, ally_ability="-2 Cards Damage, Min 2")
+
+    assert (amelia.damage_fight, asporov.damage_fight) == (5 - 2, max(2, 3 - 2))
+
+
+def test_cards_damage_plus_raises_both_cards(template_game):
+    amelia, asporov = play(template_game, ally_ability="Cards Damage +2")
+
+    assert (amelia.damage_fight, asporov.damage_fight) == (7, 5)
+
+
+def test_protection_cards_power_shields_both_cards_from_power_reductions(template_game):
+    amelia, asporov = play(template_game, ally_ability="Protection: Cards Power And Damage", enemy_ability="-3 Opp Damage, Min 1")
+
+    assert (amelia.power_fight, amelia.damage_fight, asporov.power_fight) == (3, 5, 7)   # les deux bonus -2 opp power et le -3 damage sont neutralisés
+
+
 # --- Protection: Power / Damage / Attack ------------------------------------------------------
 
 def test_protection_power_shields_only_my_stat(template_game):

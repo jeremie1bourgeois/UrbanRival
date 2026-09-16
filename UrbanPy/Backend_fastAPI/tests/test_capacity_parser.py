@@ -277,6 +277,19 @@ def test_impose(text, expected):
     assert parsed(text) == expected
 
 
+@pytest.mark.parametrize("text, expected", [
+    # « Cards » : les deux cartes du round (règle officielle : « The Damage points of both characters are reduced… »)
+    ("-2 Cards Damage, Min 1", cap("both", ["damage"], -2, borne=1)),
+    ("-7 Cards Attack, Min 0", cap("both", ["attack"], -7, borne=0)),
+    ("Cards Damage +2", cap("both", ["damage"], 2)),
+    ("Support: -1 Cards Damage, Min 0", cap("both", ["damage"], -1, how="support", borne=0)),
+    ("Confidence: -4 Cards Damage, Min 0", cap("both", ["damage"], -4, borne=0, conditions=["confidence"])),
+    ("Protection: Cards Power And Damage", cap("both", ["power", "damage"], 0, how="Protection")),
+])
+def test_cards_effects_target_both_cards(text, expected):
+    assert parsed(text) == expected
+
+
 # --- Niveau 4 : effets persistants ------------------------------------------------------------
 
 @pytest.mark.parametrize("text, target, types", [
@@ -325,7 +338,6 @@ from src.adapters.repositories.card_repository import all_capacity_descriptions
 
 
 @pytest.mark.parametrize("text, keyword", [
-    ("-2 Cards Damage, Min 1", "cards"), ("Protection: Cards Power And Damage", "cards"),
     ("Rebirth 2, Max. 10", "rebirth"),     ("Remove Ability Conditions", "remove ability conditions"), ("Beyond", "beyond"), ("Tie-break", "tie-break"),
     ("Counter-attack", "counter-attack"), ("Limitless", "limitless"),
 ])
@@ -341,7 +353,7 @@ def test_gibberish_is_unknown_core():
 
 # --- Couverture sur les descriptions officielles -----------------------------------------
 
-SUPPORTED_DESCRIPTIONS_FLOOR = 1235  # mesuré le 2026-09-16 sur 1310 descriptions ; à relever quand la couverture progresse
+SUPPORTED_DESCRIPTIONS_FLOOR = 1250  # mesuré le 2026-09-16 sur 1310 descriptions ; à relever quand la couverture progresse
 
 
 def test_every_official_description_parses_without_raising():

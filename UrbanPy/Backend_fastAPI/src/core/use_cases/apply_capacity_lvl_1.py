@@ -184,6 +184,8 @@ def _apply_stat_protections(card1: Card, card2: Card) -> None:
                 protected = set(capacity.types) & set(STAT_TYPES)
                 if protected:
                     _strip_types(opp, protected, only_targeting_opponent=True)
+                    if capacity.target == "both":                  # « Protection: Cards X » protège aussi la carte adverse
+                        _strip_types(own, protected, only_targeting_opponent=True)
 
 
 # --- Consommation -----------------------------------------------------------------------------

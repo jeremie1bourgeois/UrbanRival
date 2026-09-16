@@ -86,7 +86,7 @@ _CORE_STARTERS = ("copy", "protection", "reanimate")   # mots qui ouvrent un cœ
 _UNSUPPORTED_CORE_KEYWORDS = (
     "remove ability conditions", "counter-attack", "tie-break",
     "fatal killshot", "sinister symmetry", "tune out", "overdose", "perfection",
-    "cards", "rebirth",
+    "rebirth",
     "beyond", "bypass", "hazard", "illusion", "limitless",
 )
 
@@ -147,7 +147,17 @@ def _resolve_how(prefix_hows: list, per: Optional[str]):
     return (hows[0] if hows else ""), None
 
 
+_R_CARDS = re.compile(r"\bcards\b")
+
+
 def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacity:
+    """« Cards » (ex. « -2 Cards Damage, Min 1 », « Protection: Cards Power ») : l'effet porte sur les deux cartes du round."""
+    if _R_CARDS.search(core):
+        stripped = _R_CARDS.sub("opp" if core.startswith("-") else "", core)
+        parsed = _parse_core(re.sub(r"\s+", " ", stripped).strip(), conditions, prefix_hows)
+        if parsed.supported and parsed.capacity is not None:
+            parsed.capacity.target = "both"
+        return parsed
     for keyword in _UNSUPPORTED_CORE_KEYWORDS:
         if re.search(rf"(?<![\w-]){re.escape(keyword)}(?![\w-])", core):
             return _unsupported(f"unsupported core: {keyword}")
