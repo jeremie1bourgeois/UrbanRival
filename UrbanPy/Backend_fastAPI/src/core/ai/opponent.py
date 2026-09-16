@@ -58,7 +58,15 @@ def heuristic_pick(game: Game, side: str, rng: random.Random) -> Pick:
     return Pick(card_index, bet + 1, False)
 
 
+def _trained_pick(game: Game, side: str, rng: random.Random) -> Pick:
+    # Import différé : `trained` importe `policy`, qui importe `opponent` — l'importer en tête boucle.
+    from src.core.ai.trained import trained_pick
+    return trained_pick(game, side, rng)
+
+
 STRATEGIES = {
     "random": random_pick,
     "heuristic": heuristic_pick,
+    # IA entraînée par apprentissage (voir docs/IA.md). Disponible seulement si data/ai/policy.json existe.
+    "trained": _trained_pick,
 }

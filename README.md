@@ -19,11 +19,15 @@ Non gérés pour l'instant (par nombre de descriptions) : Unison (62), After (37
 
 ```
 UrbanPy/Backend_fastAPI/       backend FastAPI
-  main.py                      endpoints : /cards, /init_game/, /init_game/template, /process_round/{id}, /ai_pick/{id}, /save_for_test
+  main.py                      endpoints : /cards, /init_game/, /init_game/template, /process_round/{id}, /ai_pick/{id}, /ai_strategies, /save_for_test
   src/core/domain/             Game, Player, Card, Capacity, PersistentEffect
   src/core/parsing/            capacity_parser.py : texte d'ability -> Capacity (vocabulaire du moteur)
   src/core/use_cases/          process_round.py + apply_capacity_lvl_1..4.py (le moteur) + multipliers.py
-  src/core/ai/                 adversaires automatiques (aléatoire, heuristique)
+  src/core/ai/                 adversaires automatiques + l'IA par apprentissage (voir docs/IA.md)
+    engine_api.py              moteur pur pour l'IA : new_game / legal_actions / step, sans fichiers
+    features.py                les 24 critères d'évaluation d'un coup
+    policy.py, train.py        l'IA (note pondérée + tirage au sort) et son entraînement
+    arena.py                   évaluation honnête : camps inversés, marge d'erreur
   src/core/services/           game_service.py : parties persistées en JSON (data/game/, ignoré par git)
   src/adapters/repositories/   accès aux données officielles, sauvegarde des parties
   src/adapters/scraping/       extracteur HTML iclintz (pur, testé)
@@ -63,8 +67,8 @@ de même pour **n'importe quel round déjà joué**, y compris après coup (voir
 ## Tests
 
 ```bash
-cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 332 tests
-cd UrbanVue && npm test && npm run lint && npm run build           # 22 tests, lint, type-check + build
+cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 486 tests
+cd UrbanVue && npm test && npm run lint && npm run build           # 24 tests, lint, type-check + build
 ```
 
 Les tests du moteur sont écrits **de bout en bout** : un texte d'ability (« Growth: -1 Opp Power, Min 4 ») est parsé puis
@@ -114,5 +118,8 @@ Deux règles ont été tranchées sans certitude et sont isolées dans le code a
 1. Mécaniques restantes : Unison, After, Tune Out, Cards… (règles à documenter d'abord — elles se codent comme Killshot ou Bet)
 2. Backend : journal des effets appliqués à chaque round (explicabilité, débogage des règles), API moteur pure
    `step(state, action)` + `legal_actions(state)`, persistance en mémoire/SQLite, mise à jour FastAPI/Pydantic
-3. IA : environnement Gymnasium sur cette API, self-play (PPO/DQN), évaluation contre les adversaires heuristiques,
-   intégration comme adversaire dans l'interface
+3. IA : **première ébauche en place** — voir [docs/IA.md](docs/IA.md). Moteur pur (`step` / `legal_actions`),
+   IA à note pondérée sur 24 critères, entraînement par méthode des élites, arène d'évaluation, branchement
+   comme adversaire du jeu. Elle **bat l'heuristique : 56,2 % ± 3,4 %** (le jeu aléatoire fait 20,7 %) — mais
+   en la contrant plutôt qu'en jouant bien : contre l'aléatoire elle ne fait que 63,9 %, contre 81,3 % à
+   l'heuristique. Ce paradoxe et les pistes sont au § 8 du document

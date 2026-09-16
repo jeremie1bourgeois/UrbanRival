@@ -118,6 +118,23 @@ def ai_pick(game_id: str, body: AiPickInput = Body(...)) -> Dict[str, Any]:
         raise HTTPException(status_code=404, detail=f"Game ID '{game_id}' not found.")
 
 
+@app.get("/ai_strategies", response_model=List[Dict[str, Any]])
+def ai_strategies() -> List[Dict[str, Any]]:
+    """
+    Les adversaires automatiques disponibles. « trained » n'apparaît comme disponible que si une IA a été
+    entraînée (data/ai/policy.json) : le front s'en sert pour ne pas proposer un adversaire qui n'existe pas.
+    """
+    from src.core.ai.trained import is_available
+    labels = {
+        "random": "Ordinateur — aléatoire",
+        "heuristic": "Ordinateur — heuristique",
+        "trained": "Ordinateur — IA entraînée",
+    }
+    return [{"name": name, "label": labels.get(name, name),
+             "available": is_available() if name == "trained" else True}
+            for name in ("random", "heuristic", "trained")]
+
+
 @app.get("/cards", response_model=List[Dict[str, Any]])
 def cards_catalogue() -> List[Dict[str, Any]]:
     """

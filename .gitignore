@@ -9,6 +9,9 @@ venv/
 UrbanPy/Backend_fastAPI/data/game
 UrbanPy/Backend_fastAPI/data/.scrape_cache
 
+# IA entraînées : se régénèrent avec scripts/train_ai.py (voir docs/IA.md)
+UrbanPy/Backend_fastAPI/data/ai
+
 # IDE / outils locaux
 .vs/
 *.suo

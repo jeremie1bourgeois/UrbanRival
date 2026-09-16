@@ -6,13 +6,25 @@ const apiClient = axios.create({
 	headers: { "Content-Type": "application/json" },
 });
 
-export type Opponent = "human" | "random" | "heuristic";
+export type Opponent = "human" | "random" | "heuristic" | "trained";
 
 export const OPPONENT_LABELS: Record<Opponent, string> = {
 	human: "Deux joueurs (même écran)",
 	random: "Ordinateur — aléatoire",
 	heuristic: "Ordinateur — heuristique",
+	trained: "Ordinateur — IA entraînée",
 };
+
+/** Adversaires automatiques réellement utilisables : « trained » n'existe qu'une fois une IA entraînée
+ *  (voir docs/IA.md). En cas de backend injoignable, on retombe sur les deux adversaires toujours présents. */
+export async function getAvailableOpponents(): Promise<Opponent[]> {
+	try {
+		const response = await apiClient.get<{ name: string; available: boolean }[]>("/ai_strategies");
+		return response.data.filter((entry) => entry.available).map((entry) => entry.name as Opponent);
+	} catch {
+		return ["random", "heuristic"];
+	}
+}
 
 export interface StartedGame {
 	game: Game;

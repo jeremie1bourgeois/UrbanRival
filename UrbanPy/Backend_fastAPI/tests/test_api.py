@@ -159,3 +159,45 @@ def test_ai_pick_rejects_an_unknown_strategy(client):
     response = client.post(f"/ai_pick/{game_id}", json={"strategy": "psychic", "side": "enemy"})
 
     assert response.status_code == 400
+
+
+@pytest.fixture
+def trained_policy_installed():
+    """Installe / retire l'IA entraînée en mémoire, pour ne pas dépendre de la présence de data/ai/policy.json
+    sur la machine qui lance les tests."""
+    from src.core.ai import trained
+    from src.core.ai.policy import LinearPolicy
+
+    def install(available: bool):
+        trained.forget_cached_policy()
+        trained._cache[trained.DEFAULT_POLICY_PATH] = LinearPolicy() if available else None
+
+    yield install
+    from src.core.ai import trained as module
+    module.forget_cached_policy()
+
+
+def test_ai_strategies_lists_the_three_opponents(client):
+    response = client.get("/ai_strategies")
+
+    assert response.status_code == 200
+    strategies = {entry["name"]: entry for entry in response.json()}
+    assert set(strategies) == {"random", "heuristic", "trained"}
+    assert strategies["heuristic"]["available"] is True
+
+
+def test_the_trained_opponent_is_announced_unavailable_until_one_is_trained(client, trained_policy_installed):
+    """Mieux vaut ne pas le proposer que le proposer et échouer au premier coup."""
+    trained_policy_installed(False)
+
+    strategies = {entry["name"]: entry for entry in client.get("/ai_strategies").json()}
+
+    assert strategies["trained"]["available"] is False
+
+
+def test_the_trained_opponent_becomes_available_once_a_policy_exists(client, trained_policy_installed):
+    trained_policy_installed(True)
+
+    strategies = {entry["name"]: entry for entry in client.get("/ai_strategies").json()}
+
+    assert strategies["trained"]["available"] is True

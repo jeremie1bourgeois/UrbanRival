@@ -79,18 +79,36 @@ Counter-attack refixe l'ordre à chaque round.
 ### D. Backend — préparer l'IA (recommandé en premier)
 | # | Tâche | Détail |
 |---|---|---|
-| D1 | **API moteur pure** | `Engine.step(state, action) → (state, result)` et `legal_actions(state)` (déjà écrit pour l'IA : `src/core/ai/opponent.legal_picks`). `process_round` est pur ; extraire la persistance de `game_service`. Figer une représentation d'état (`Game.to_dict`) et d'action (`Pick`). |
+| D1 | ~~**API moteur pure**~~ | `Engine.step(state, action) → (state, result)` et `legal_actions(state)` (déjà écrit pour l'IA : `src/core/ai/opponent.legal_picks`). `process_round` est pur ; extraire la persistance de `game_service`. Figer une représentation d'état (`Game.to_dict`) et d'action (`Pick`). **Fait le 2026-09-16** : `src/core/ai/engine_api.py` (`new_game`, `legal_actions`, `step`, `is_terminal`, `winner`, `DeckPool`). `step` ne modifie pas l'état reçu ; aucun fichier n'est écrit. Mesuré : ~1 300 parties/s, ~3 600 copies d'état/s (répond aussi à D3). |
 | D2 | ~~**Journal des effets**~~ | **Fait le 2026-09-16** : `src/core/domain/journal.py` (`Journal`, `note`, `recording`), `Round.log` (entrées `{side, card, source, text}`), renvoyé par `/process_round`, déplié dans l'historique du front. Les fixtures de rejeu comparent l'état sans le journal. |
 | D3 | Performance | Mesurer `process_round` (deepcopy des capacités, sérialisation) ; le RL a besoin de milliers de parties/s. |
 | D4 | Persistance | Fichiers JSON par round (`data/game/`) → stockage mémoire + SQLite optionnel ; `get_new_game_id` est relatif au dossier courant (le serveur doit être lancé depuis `UrbanPy/Backend_fastAPI`). |
 | D5 | Dette | `requirements.txt` (FastAPI 0.100 de 2023, `@validator` Pydantic v1 déprécié → `field_validator`), CORS configurable, `print` de debug dans `main.py`, `debug=True`. Le front dépend du CDN d'Urban Rivals pour les images (option : script de téléchargement local). |
 
-### E. IA
-1. Adversaires étalons : aléatoire et heuristique existent (`src/core/ai/opponent.py`) ; ajouter un glouton et un minimax à 1 coup.
-2. Environnement Gymnasium `UrbanRivalEnv` sur D1 : observation = état sérialisé, action = (carte, pillz, fury), masque des actions illégales (`legal_picks`).
-3. Self-play (PPO/DQN — Stable-Baselines3 ou CleanRL), d'abord contre l'aléatoire puis contre lui-même ; decks variés.
-4. Évaluation : taux de victoire contre chaque étalon, ELO interne.
-5. Intégration : l'agent devient une stratégie de `/ai_pick`.
+### E. IA — première ébauche livrée le 2026-09-16 (voir [IA.md](IA.md))
+Choix de conception : **Python pur, aucune dépendance ajoutée**. Le moteur tourne à ~1 300 parties/s, ce qui
+suffit à une méthode sans gradient ; et une IA lisible est une IA que l'utilisateur peut guider, ce qui est
+l'objectif de cette étape. PyTorch reste la marche d'après, pas la première.
+
+1. ~~Adversaires étalons~~ : aléatoire et heuristique (`opponent.py`). Repère mesuré : **l'heuristique gagne 76 % contre l'aléatoire**. Reste à faire : un glouton et un minimax à 1 coup.
+2. Environnement : `engine_api.py` fournit le `step` / `legal_actions` qu'attend un environnement Gymnasium, mais **sans dépendre de Gymnasium**. L'emballage reste à écrire le jour où on passera à Stable-Baselines3.
+3. ~~Apprentissage~~ : méthode des élites (cross-entropy) sur une note pondérée de 24 critères, avec tirage au sort proportionnel à `exp(note)` — `policy.py`, `train.py`, `features.py`. Self-play disponible (`--opponent self`). PPO/DQN non faits.
+4. ~~Évaluation~~ : `arena.py` + `scripts/evaluate_ai.py`, avec camps inversés et marge d'erreur. ELO interne non fait.
+5. ~~Intégration~~ : stratégie `trained` de `/ai_pick`, plus `GET /ai_strategies` qui dit si une IA a été entraînée.
+
+**Résultat mesuré** (800 parties fraîches, camps inversés) : l'IA **bat l'heuristique à 56,2 % ± 3,4 %**, là
+où le jeu aléatoire fait 20,7 %. Mais elle ne fait que 63,9 % contre l'aléatoire quand l'heuristique en fait
+81,3 % : elle a appris à **contrer cet adversaire précis** (112 000 parties contre lui), pas à bien jouer.
+« Être meilleur que » n'est pas transitif. Prochain pas le plus rentable : varier l'adversaire d'entraînement.
+
+**Deux enseignements de la mise au point**, qui valent pour la suite :
+- Une politique **déterministe** aux poids au hasard gagne 1,2 % ; la même en **tirage au sort** gagne 18,7 %.
+  Sans stochasticité, le paysage d'optimisation est plat et l'entraînement ne démarre pas. (Et le jeu étant à
+  coups simultanés, une IA prévisible est de toute façon exploitable.)
+- Ne pas donner à l'IA les **cartes adverses** la plafonnait à ~20 %.
+- Une note linéaire préfère mécaniquement toujours *plus* de pillz. Le critère `juste_suffisant` (« je passe
+  devant lui de peu »), qui encode l'optimum que la linéarité ne peut pas exprimer, a fait passer l'IA de 35 %
+  à 56 % : c'est aujourd'hui son poids le plus fort (+2,95).
 
 ### F. Divers
 - Branches distantes déjà fusionnées à supprimer : `chore/infra`, `feat/donnees-scraping`, `feat/front-c`, `feat/pouvoirs-vortex-oculus`, `fix/bugs-moteur-et-fixtures`, `gameStruct`.

@@ -27,8 +27,23 @@ def test_legal_picks_enumerate_unplayed_cards_pillz_and_affordable_fury(template
     assert all(is_legal(template_game, p, "enemy") for p in picks)
 
 
+@pytest.fixture
+def installed_trained_policy():
+    """
+    La stratégie « trained » lit une IA sur disque, absente d'un dépôt frais. On en installe une en mémoire
+    (poids nuls = jeu aléatoire) pour que le balayage de légalité la couvre comme les autres, puis on nettoie :
+    sans cela, le cache fuiterait sur les tests suivants, qui la supposent indisponible.
+    """
+    from src.core.ai import trained
+    from src.core.ai.policy import LinearPolicy
+    trained.forget_cached_policy()
+    trained._cache[trained.DEFAULT_POLICY_PATH] = LinearPolicy()
+    yield
+    trained.forget_cached_policy()
+
+
 @pytest.mark.parametrize("strategy", sorted(STRATEGIES))
-def test_strategies_only_return_legal_picks_over_a_whole_game(template_game, strategy):
+def test_strategies_only_return_legal_picks_over_a_whole_game(template_game, strategy, installed_trained_policy):
     rng = random.Random(42)
     for _ in range(4):
         enemy_pick = STRATEGIES[strategy](template_game, "enemy", rng)

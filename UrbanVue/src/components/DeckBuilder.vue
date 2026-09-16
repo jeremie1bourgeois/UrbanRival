@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
-import { OPPONENT_LABELS, errorMessage, getCatalogue, getInitGameTemplate, initGame, type Opponent, type StartedGame } from "../api/game";
+import {
+	OPPONENT_LABELS,
+	errorMessage,
+	getAvailableOpponents,
+	getCatalogue,
+	getInitGameTemplate,
+	initGame,
+	type Opponent,
+	type StartedGame,
+} from "../api/game";
 import { DECK_SIZE, clanBonusStatus, emptySlots, filterCatalogue, isDeckComplete, randomDeck, toDeck, type DeckSlots } from "../logic/deck";
 import { loadSavedDecks, saveDecks } from "../logic/storage";
 import type { CatalogueCard, CatalogueLevel } from "../models/game.interface";
@@ -15,6 +24,8 @@ const query = ref("");
 const clanFilter = ref("");
 const side = ref<Side>("ally");
 const opponent = ref<Opponent>("heuristic");
+// « trained » n'apparaît que si une IA a été entraînée côté backend (docs/IA.md).
+const availableOpponents = ref<Opponent[]>(["human", "random", "heuristic"]);
 const slots = ref<Record<Side, DeckSlots>>(loadSavedDecks() ?? { ally: emptySlots(), enemy: emptySlots() });
 
 const byName = computed(() => new Map(catalogue.value.map((card) => [card.name, card])));
@@ -40,7 +51,12 @@ async function loadCatalogue() {
 	}
 }
 
+async function loadOpponents() {
+	availableOpponents.value = ["human", ...(await getAvailableOpponents())];
+}
+
 onMounted(loadCatalogue);
+onMounted(loadOpponents);
 
 function add(card: CatalogueCard, level: CatalogueLevel) {
 	const target = slots.value[side.value];
@@ -90,7 +106,7 @@ async function startTemplate() {
 				<label class="flex items-center gap-2">
 					Adversaire
 					<select v-model="opponent" class="rounded bg-gray-800 px-2 py-1">
-						<option v-for="(label, key) in OPPONENT_LABELS" :key="key" :value="key">{{ label }}</option>
+						<option v-for="key in availableOpponents" :key="key" :value="key">{{ OPPONENT_LABELS[key] }}</option>
 					</select>
 				</label>
 				<button class="rounded bg-gray-700 px-3 py-2 hover:bg-gray-600" @click="startTemplate">Partie d'exemple</button>
