@@ -24,11 +24,24 @@ def apply_capacity_lvl_3(game: Game, card1: Card, card2: Card) -> None:
             capacity = check_capacity_condition_lvl_3(capacity, card.win)
             if capacity is not None and "reanimate" in capacity.types:
                 capacity = None   # Reanimate n'agit que sur un KO (apply_reanimate), jamais en fin de round normale
+            if capacity is not None and "recover" in capacity.types:
+                own.pillz += recovered_pillz(card, capacity)
+                capacity = None
             for apply in (apply_target_ally_effects, apply_target_both_effects, apply_target_enemy_effects):
                 if capacity is None:
                     break
                 capacity = apply(game, own, opp, capacity, card, opp_card)
             setattr(card, slot, capacity)
+
+
+def pillz_bet(card: Card) -> int:
+    """Pillz misées sur la carte ce round : pillz_fight vaut 1 sans mise ; la fury coûte 3 pillz."""
+    return card.pillz_fight - 1 + (3 if card.fury else 0)
+
+
+def recovered_pillz(card: Card, capacity: Capacity) -> int:
+    """« Recover X Pillz Out Of Y » : floor(pillz misées x X / Y). Hypothèse : les pillz de fury comptent."""
+    return pillz_bet(card) * capacity.value // capacity.borne if capacity.borne > 0 else 0
 
 
 def apply_reanimate(game: Game, card1: Card, card2: Card) -> None:

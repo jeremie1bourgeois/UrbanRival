@@ -210,7 +210,7 @@ def test_per_damage_multiplier(text, expected):
     assert parsed(text) == expected
 
 
-@pytest.mark.parametrize("suffix", ["Round", "Opp. Power"])
+@pytest.mark.parametrize("suffix", ["Round"])
 def test_unsupported_per_multipliers(suffix):
     result = parse_capacity(f"+1 Life Per {suffix}")
 
@@ -300,11 +300,10 @@ from src.adapters.repositories.card_repository import all_capacity_descriptions
 
 @pytest.mark.parametrize("text, keyword", [
     ("-2 Cards Damage, Min 1", "cards"), ("Protection: Cards Power And Damage", "cards"),
-    ("Damage Impose", "impose"), ("Cancel Leader", "cancel leader"), ("Consume 2, Min 1", "consume"),
+    ("Damage Impose", "impose"), ("Consume 2, Min 1", "consume"),
     ("Corrupt 2 Min. 1", "corrupt"), ("Victory Or Defeat: Combust 2, Min 1", "combust"),
     ("Victory Or Defeat: Corrosion 1, Min 2", "corrosion"), ("Revenge: Mindwipe 2, Min 1", "mindwipe"),
-    ("Rebirth 2, Max. 10", "rebirth"), ("Recover 2 Pillz Out Of 3", "recover"),
-    ("Remove Ability Conditions", "remove ability conditions"), ("Beyond", "beyond"), ("Tie-break", "tie-break"),
+    ("Rebirth 2, Max. 10", "rebirth"),     ("Remove Ability Conditions", "remove ability conditions"), ("Beyond", "beyond"), ("Tie-break", "tie-break"),
     ("Counter-attack", "counter-attack"), ("Limitless", "limitless"),
 ])
 def test_explicitly_unsupported_cores(text, keyword):
@@ -319,7 +318,7 @@ def test_gibberish_is_unknown_core():
 
 # --- Couverture sur les descriptions officielles -----------------------------------------
 
-SUPPORTED_DESCRIPTIONS_FLOOR = 1116  # mesuré le 2026-09-15 sur 1310 descriptions ; à relever quand la couverture progresse
+SUPPORTED_DESCRIPTIONS_FLOOR = 1132  # mesuré le 2026-09-16 sur 1310 descriptions ; à relever quand la couverture progresse
 
 
 def test_every_official_description_parses_without_raising():
@@ -363,7 +362,27 @@ def test_night_prefix_is_inert_since_day_is_always_valid():
 
 @pytest.mark.parametrize("text, keyword", [
     ("Fatal Killshot", "fatal killshot"), ("Overdose", "overdose"), ("Perfection", "perfection"),
-    ("Sinister Symmetry", "sinister symmetry"), ("Tune Out", "tune out"), ("Defeat: Recov. 1 Pillz Out Of 1", "recover"),
-])
+    ("Sinister Symmetry", "sinister symmetry"), ("Tune Out", "tune out"), ])
 def test_new_unsupported_cores_have_a_named_reason(text, keyword):
     assert parse_capacity(text).reason == f"unsupported core: {keyword}"
+
+
+# --- Recover, Cancel Leader, per opp power, Infiltrated -------------------------------------
+
+@pytest.mark.parametrize("text, expected", [
+    ("Defeat: Recover 2 Pillz Out Of 3", cap("ally", ["recover"], 2, borne=3, conditions=["defeat"])),
+    ("Recover 1 Pillz Out Of 2", cap("ally", ["recover"], 1, borne=2)),
+    ("Team: Defeat: Rec. 1 Pillz Out Of 2", cap("ally", ["recover"], 1, borne=2, conditions=["team", "defeat"])),
+    ("+1 Attack Per Opp. Power", cap("ally", ["attack"], 1, how="nb_pow_opp")),
+    ("Revenge: + 2 Attack Per Opp. Power", cap("ally", ["attack"], 2, how="nb_pow_opp", conditions=["revenge"])),
+    ("Infiltrated", cap("ally", ["infiltrated"], 0)),
+])
+def test_recover_per_opp_power_and_infiltrated(text, expected):
+    assert parsed(text) == expected
+
+
+def test_cancel_leader_is_handled_by_the_single_leader_rule():
+    result = parse_capacity("Cancel Leader")
+
+    assert (result.capacity, result.supported) == (None, True)
+    assert "leader" in result.reason

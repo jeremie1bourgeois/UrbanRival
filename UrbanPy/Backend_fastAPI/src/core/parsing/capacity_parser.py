@@ -18,6 +18,9 @@ class ParsedCapacity:
 
 
 NO_ABILITY = ParsedCapacity(capacity=None, supported=True, reason="no ability")
+# Bonus des Leaders : deux Leaders en main s'annulent ; le moteur l'applique via la règle « Leader unique »
+# (process_round.leader_team_capacity), le bonus lui-même n'a pas d'effet propre.
+CANCEL_LEADER = ParsedCapacity(capacity=None, supported=True, reason="cancel leader: géré par la règle du Leader unique")
 
 # Synonymes mot à mot (le point final est retiré avant la recherche)
 _WORD_SYNONYMS = {
@@ -78,10 +81,10 @@ _CORE_STARTERS = ("copy", "protection", "reanimate")   # mots qui ouvrent un cœ
 
 # Cœurs connus mais hors moteur : testés avant les regex, raison groupable dans le rapport
 _UNSUPPORTED_CORE_KEYWORDS = (
-    "remove ability conditions", "cancel leader", "counter-attack", "tie-break",
+    "remove ability conditions", "counter-attack", "tie-break",
     "fatal killshot", "sinister symmetry", "tune out", "overdose", "perfection",
-    "cards", "impose", "consume", "corrupt", "combust", "corrosion", "mindwipe", "rebirth", "recover",
-    "beyond", "bypass", "hazard", "illusion", "infiltrated", "limitless",
+    "cards", "impose", "consume", "corrupt", "combust", "corrosion", "mindwipe", "rebirth",
+    "beyond", "bypass", "hazard", "illusion", "limitless",
 )
 
 # --- Cœurs ------------------------------------------------------------------------------------
@@ -92,6 +95,7 @@ _PER_MULTIPLIERS = {
     "pillz left": "nb_pillz_left", "life left": "nb_life_left",
     "life lost": "nb_life_lost", "pillz lost": "nb_pillz_lost", "opp damage": "nb_dam_opp",
     "damage": "nb_damage",   # dégâts réellement infligés par la carte ce round
+    "opp power": "nb_pow_opp",
 }
 
 _R_STAT_PLUS = re.compile(r"^(?:(opp) )?(power and damage|power|damage|attack) \+(\d+)(?: max (\d+))?$")
@@ -107,6 +111,8 @@ _R_CANCEL = re.compile(r"^cancel (?:opp )?(power and damage|pillz and life|power
 _R_EXCHANGE = re.compile(r"^(power and damage|power|damage) exchange$")
 _R_PERSISTENT = re.compile(r"^(poison|toxin|heal|regen|dope|repair) (\d+) (?:min|max) (\d+)$")
 _R_REANIMATE = re.compile(r"^reanimate \+(\d+) life$")
+_R_RECOVER = re.compile(r"^recover (\d+) pillz out of (\d+)$")   # X pillz récupérées sur Y misées (fin de round)
+_R_INFILTRATED = re.compile(r"^infiltrated$")                        # bonus Oculus : adopte le bonus du clan majoritaire de la main
 
 _PERSISTENT_TYPES = {"poison": "poison", "toxin": "toxine", "heal": "heal", "regen": "regen", "dope": "dope", "repair": "repair"}
 _PERSISTENT_TARGETS = {"poison": "enemy", "toxin": "enemy", "heal": "ally", "regen": "ally", "dope": "ally", "repair": "ally"}
@@ -168,6 +174,13 @@ def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacit
     if match:
         return error or _capacity("ally", ["reanimate"], int(match.group(1)), how, -1, conditions)
 
+    match = _R_RECOVER.match(core)
+    if match:
+        return error or _capacity("ally", ["recover"], int(match.group(1)), how, int(match.group(2)), conditions)
+
+    if _R_INFILTRATED.match(core):
+        return error or _capacity("ally", ["infiltrated"], 0, how, -1, conditions)
+
     match = _R_STAT_PLUS.match(core)
     if match:
         opp, stat, value, borne = match.groups()
@@ -219,6 +232,8 @@ def parse_capacity(text: str) -> ParsedCapacity:
     normalized = normalize(text)
     if normalized in ("", "no ability") or re.fullmatch(r"ability at level \d+", normalized):
         return NO_ABILITY
+    if normalized == "cancel leader":
+        return CANCEL_LEADER
 
     segments = [segment.strip() for segment in normalized.split(" : ")]
     conditions, prefix_hows = [], []
