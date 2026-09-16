@@ -119,6 +119,7 @@ def test_minus_players_pillz_targets_both():
     ("Courage", "courage"), ("Revenge", "revenge"), ("Confidence", "confidence"), ("Reprisal", "reprisal"),
     ("Symmetry", "symmetry"), ("Asymmetry", "asymmetry"), ("Defeat", "defeat"), ("Backlash", "backlash"),
     ("Victory Or Defeat", "victory_defeat"), ("Conf.", "confidence"),
+    ("Unison", "unison"), ("Disunion", "disunion"),
 ])
 def test_condition_prefixes(prefix, condition):
     assert parsed(f"{prefix}: Attack +5") == cap("ally", ["attack"], 5, conditions=[condition])
@@ -318,7 +319,7 @@ def test_gibberish_is_unknown_core():
 
 # --- Couverture sur les descriptions officielles -----------------------------------------
 
-SUPPORTED_DESCRIPTIONS_FLOOR = 1132  # mesuré le 2026-09-16 sur 1310 descriptions ; à relever quand la couverture progresse
+SUPPORTED_DESCRIPTIONS_FLOOR = 1197  # mesuré le 2026-09-16 sur 1310 descriptions ; à relever quand la couverture progresse
 
 
 def test_every_official_description_parses_without_raising():

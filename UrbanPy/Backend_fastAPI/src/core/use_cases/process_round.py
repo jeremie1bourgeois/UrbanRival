@@ -162,6 +162,8 @@ def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, own_
         "reprisal": lambda: not plays_first,
         "symmetry": lambda: own_card_index == opp_card_index,
         "asymmetry": lambda: own_card_index != opp_card_index,
+        "unison": lambda: hand_is_mono_clan(own_player, own_card_index),
+        "disunion": lambda: not hand_is_mono_clan(own_player, own_card_index),
     }
 
     for condition in list(capacity.effect_conditions):
@@ -218,6 +220,12 @@ def _bet_condition_met(condition: str, pillz_fight: int) -> bool:
     if rest.startswith("<"):
         return bet < int(rest[1:])
     return bet > int(rest.lstrip(">").strip())
+
+
+def hand_is_mono_clan(player: Player, card_index: int) -> bool:
+    """Unison (règle officielle) : la main contient exclusivement des cartes du clan de la carte jouée."""
+    clan = player.cards[card_index].faction
+    return all(card.faction == clan for card in player.cards)
 
 
 MIN_CLAN_CARDS_FOR_BONUS = 2

@@ -126,6 +126,29 @@ def test_versus_condition_for_the_enemy_side_looks_at_the_ally_hand(template_gam
     assert check_capacity_condition(template_game, capacity, False, 3, 2) is False  # aucune Rescue chez l'allié
 
 
+# --- Unison / Disunion : composition de la main (règle officielle : Unison = main EXCLUSIVEMENT du clan de la carte,
+# Disunion = au moins une carte d'un autre clan) ---------------------------------------------------------------
+
+def _hand_capacity(condition):
+    return Capacity(target="ally", types=["power"], value=2, borne=-1, effect_conditions=[condition])
+
+
+def test_unison_is_met_when_the_whole_hand_shares_the_card_clan(template_game):
+    assert check_capacity_condition(template_game, _hand_capacity("unison"), True, 0, 0) is True    # 4 All Stars
+
+
+def test_unison_fails_when_another_clan_is_in_the_hand(template_game):
+    assert check_capacity_condition(template_game, _hand_capacity("unison"), False, 0, 2) is False  # Asporov : 3 All Stars + Serafina (Rescue)
+
+
+def test_disunion_is_met_when_another_clan_is_in_the_hand(template_game):
+    assert check_capacity_condition(template_game, _hand_capacity("disunion"), False, 0, 2) is True
+
+
+def test_disunion_fails_on_a_mono_clan_hand(template_game):
+    assert check_capacity_condition(template_game, _hand_capacity("disunion"), True, 0, 0) is False
+
+
 @pytest.mark.parametrize("condition, pillz_fight, expected", [
     # Règle officielle (texte des cartes Bet) : « including free Pillz and excluding Fury » -> on compare pillz_fight.
     ("bet>3", 4, True),    # 4 pillz au total (dont la gratuite) : strictement plus que 3

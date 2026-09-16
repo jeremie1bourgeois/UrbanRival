@@ -72,6 +72,8 @@ _CONDITION_PREFIXES = {
     "stop": "stop",           # l'ability n'agit que si elle a été stoppée (évalué au niveau 1)
     "killshot": "killshot",   # attaque >= 2 x attaque adverse (évalué après le calcul des attaques)
     "team": "team",           # ability de Leader : s'applique à chaque carte jouée de l'équipe (voir process_round)
+    "unison": "unison",       # la main est exclusivement du clan de la carte
+    "disunion": "disunion",   # au moins une carte d'un autre clan dans la main
 }
 _MULTIPLIER_PREFIXES = ("support", "growth", "degrowth", "equalizer", "brawl")
 _IGNORED_PREFIXES = ("day",)   # cycle jour/nuit non modélisé : Day toujours valide, donc Night jamais
