@@ -44,6 +44,25 @@ choisit les deux decks et les deux mains, donc le scénario exact à tester. Poi
 | Repair (immédiat ou différé ?) | une carte Repair gagnante, pillz au round même |
 | Combust / Mindwipe : immédiats ? | idem, vie et pillz au round même |
 
+### Decks prêts à jouer (2026-09-16)
+
+Un duel = deck A (vous) contre deck B (l'ami / le second compte), 8 cartes chacun composées autour du scénario pour que
+tout tirage de 4 convienne. Les cartes sont choisies petites (2-3★) et fréquentes ; remplacer par une équivalente
+(même pouvoir) si elle manque. Les stats sont celles du niveau max.
+
+| # | Question | Deck A | Deck B | Consigne par round |
+|---|---|---|---|---|
+| D1 | **SoA contre SoA** (cycle pur) et SoA contre SoB en ability | 4 × SoA en ability : Angelo (Montana), Cardigan, Cesare (All Stars), Jean (Jungo) + 4 × SoB en ability : Bol, Flo Cr (All Stars), Flanagan (Junkz), Borss (Jungo) | idem, autres clans : Doggonuts (Cosmohnuts), Graff Cr (Bangers), Guiliug (Dominion), Liam (Skeelz) + Angora (Vortex), Graziella (Freaks), Hella (Paradox), Globumm Cr (Sakrohm) | jouer SoA contre SoA, puis SoA contre SoB, puis SoB contre SoB ; 1-2 pillz, noter puissance finale des deux cartes |
+| D2 | **All-Stop contre Protection: Ability** (Skeelz) et chaîne GHEIST/Roots contre Nightmare/Piranas | 8 Skeelz avec pouvoirs de stats visibles (bonus Protection: Ability), ex. Liam + n'importe quels Skeelz « Power +X » / « Damage +X » | Glorg, Dieter (Nightmare), Spycee, Yaccanemba (Piranas) + Morlha, XU-Dr0ne, Leviatonn Cr (GHEIST), Nahi Cr (Roots) | chaque Skeelz contre un All-Stop : le pouvoir Skeelz doit tomber (SoB retire la Protection, puis SoA passe) ; puis GHEIST contre Piranas entre eux |
+| D3 | **Le Leader profite-t-il de son Team ?** + Solomon (Tie-break) + Ashigaru (Counter-attack) | Ambre, Eyrik, Vholt, Timber, Hugo + 3 cartes quelconques d'un même clan | Solomon, Ashigaru + 6 cartes quelconques | jouer **le Leader lui-même** (Ambre avec Courage, Eyrik…) et lire sa puissance/dégâts ; provoquer une égalité d'attaque contre Solomon ; observer qui joue en premier avec Ashigaru en main |
+| D4 | **Tune Out et fury**, Consume/Combust/Mindwipe immédiats ? | 8 Cosmohnuts : Bobby Cornteeth (Players Combust), Colton, Cosmo Curcan, Curcan Noel, Doggonuts, Jacob, Maraval, Paw Paw | Prince Candle (Combust, Skeelz), Virtmund (Mindwipe, GHEIST), Hoffman, Wave Ld (Consume), H4rp3r (Toxin), Artax (Poison), Wilo Ld (Repair), Fletcher (Cancel Life Modif.) | round 1 : Cosmohnuts avec fury contre une carte à **une pillz de plus** (fury compte-t-elle ?) ; puis faire gagner Combust / Mindwipe / Consume / Repair et lire vies et pillz **au round même** puis au suivant ; Fletcher contre un poison posé au round précédent |
+| D5 | **Limitless** (Fractal) et bornes | Fractal + 7 réducteurs à minimum : Arno, Artus, Ashley, B Ball, Ella, Kit-E, Klaus | 8 cartes à gros dégâts quelconques | faire gagner un réducteur avec Fractal en main : le minimum doit tomber à 0 ; vérifier que le bonus (ex. Pussycats -2 min 1) n'est pas touché |
+| D6 | **Exchange contre Copy / Annul** | Blast, Blackfin, Cerra, Fink Cr, Homy, Taki (Damage Exchange), Bruno, Calamity (Power Exchange) | Angelina, Bettisia, Darril, Dash (Copy: Opp. Damage) + Shaker, Lenora (Cancel Opp. Damage Modif.) + Zwoosh, Zombiyaki (Power Impose) | Exchange contre Copy (qui l'emporte ?), Exchange contre Annul (annulé ?), Exchange contre Impose |
+| D7 | **Conditions numériques** : Perfect, Bet, Per Pillz Left, Cards | Cyloxxt, Hula, Akirale, Dr Horatio (Perfect) + Scooty, Kent, Hundun (Per Pillz Left) + Rajesh (-2 Cards Damage, Min 4) | Imbris Cr, Flotillo, Slatka, Ziwi (Zenith, Bet > N) + Giovanni, Merrick Cr (Cards) + 2 quelconques | Perfect : gagner avec exactement la pillz nécessaire, puis une de trop ; Bet : miser exactement N pillz (gratuite comprise) puis N+1 ; Per Pillz Left : lire l'attaque au round 1 |
+| D8 | **Clans à condition de main** : Oculus, Tolvack (After), Unison, Xantiax/Corrupt/Corrosion | 1 Oculus (Dark Nunavik, Dark Kupanda…) + 3 cartes d'un clan qu'il infiltre + Frau Vanda, Rauta (Tolvack) + Jamtiax, Cameron | Almastine, Aquiline, Caballine, Carcharine (Unison, mono-clan impossible → tester la **non-activation**) + 4 quelconques | Oculus : main 1 Oculus + 3 clan X (bonus adopté), puis 2 + 1 (carte seule) ; After : jouer Tolvack après une carte du clan indiqué ; Xantiax/Corrosion : vies des deux joueurs en fin de round |
+
+Ordre de rentabilité : D4 (4 questions ouvertes en un duel), D1, D3, D6, puis D5, D7, D8, D2.
+
 ## 3. Exporter
 
 Dans la console, à la fin de la session :
