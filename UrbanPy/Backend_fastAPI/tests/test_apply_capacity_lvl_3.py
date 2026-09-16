@@ -250,6 +250,13 @@ def test_defeat_recover_counts_fury_pillz(template_game):
     assert template_game.ally.pillz == 12 - 5 + 3
 
 
+def test_defeat_recover_gives_at_least_one_pillz(template_game):
+    # Glossaire officiel (53) : « arrondie à l'unité inférieure, avec un minimum de 1 »
+    play(template_game, ally_ability="Defeat: Recover 1 Pillz Out Of 3", ally_pillz=2, enemy_pillz=8)   # 1 misée : floor(1/3) = 0 -> 1
+
+    assert template_game.ally.pillz == 12 - 1 + 1
+
+
 def test_defeat_recover_does_nothing_on_victory(template_game):
     play(template_game, ally_ability="Defeat: Recover 2 Pillz Out Of 3", ally_wins=True)   # 5 misées, victoire
 

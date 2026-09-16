@@ -5,8 +5,8 @@ modificateur de stats. Quatre phases, puis les capacités méta sont consommées
   2. Protection: Ability / Bonus puis Stop Opp. Ability / Bonus — résolution « en chaîne » (voir _stopped_slots) ;
      une capacité « Stop: X » s'active si son emplacement est stoppé, et reste inerte sinon
   3. Copy / Exchange / Impose de power et damage — sur les valeurs imprimées
-  4. Cancel Opp. X Modif. (retire X des modifications adverses, quelle que soit leur cible ; Life / Pillz retirent
-     aussi les effets persistants) et Protection: X (retire X des modifications adverses qui ciblent ma carte ;
+  4. Cancel Opp. X Modif. (retire X des modifications adverses, quelle que soit leur cible ; Life / Pillz suspendent
+     aussi les effets persistants adverses pour le round — glossaire officiel 56) et Protection: X (retire X des modifications adverses qui ciblent ma carte ;
      « Cards » protège les deux cartes)
 Règle officielle des Stops (support UR, art. 91) : un Stop stoppé ne stoppe rien, une Protection stoppée ne protège
 rien ; les cycles (SoA contre SoA, deux Protections face à deux Stops) ne sont pas tranchés par la source : les Stops
@@ -160,22 +160,17 @@ def _strip_types(card: Card, types: Set[str], only_targeting_opponent: bool) -> 
             setattr(card, slot, None)
 
 
-# Les effets persistants sont des modificateurs de vie / de pillz : un Cancel Opp. Life (Pillz) Modif. les annule aussi
-# (règle officielle : « poison, toxin, regen and heal abilities will be deactivated for the round »).
-PERSISTENT_TYPES_OF_STAT = {"life": {"poison", "toxine", "heal", "regen"}, "pillz": {"dope"}}
-
-
 def _apply_cancels(card1: Card, card2: Card) -> None:
     for own, opp in _pairs(card1, card2):
         for slot in FIGHT_SLOTS:
             capacity = getattr(own, slot)
             if _is(capacity, "cancel"):
                 types = set(capacity.types)
-                for stat in capacity.types:
-                    types |= PERSISTENT_TYPES_OF_STAT.get(stat, set())
                 _strip_types(opp, types, only_targeting_opponent=False)
+                opp.cancelled_modifs |= types & {"life", "pillz"}   # les persistants adverses ne tiquent pas ce round (glossaire 56)
                 if capacity.target == "both":                  # « Cancel Players X Mod. » (Leaders) : les deux côtés
                     _strip_types(own, types, only_targeting_opponent=False)
+                    own.cancelled_modifs |= types & {"life", "pillz"}
 
 
 def _apply_stat_protections(card1: Card, card2: Card) -> None:

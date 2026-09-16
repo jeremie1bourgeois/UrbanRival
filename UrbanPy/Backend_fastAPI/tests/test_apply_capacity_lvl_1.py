@@ -223,21 +223,6 @@ def test_cancel_opp_life_modif_removes_end_of_round_life_effects(template_game):
     assert template_game.ally.life == 12 - 3
 
 
-@pytest.mark.parametrize("enemy_ability", ["Poison 2, Min 1", "Toxin 2, Min 1", "Heal 2, Max 14", "Regen 2, Max 14"])
-def test_cancel_opp_life_modif_also_cancels_persistent_life_effects(template_game, enemy_ability):
-    # Règle officielle : « The effects of your opponent's poison, toxin, regen and heal abilities will be deactivated
-    # for the round in which the "cancel opponent life modification" is activated. »
-    play(template_game, ally_ability="Cancel Opp. Life Modif.", enemy_ability=enemy_ability)   # Asporov gagne
-
-    assert template_game.ally.effect_list == [] and template_game.enemy.effect_list == []
-
-
-def test_cancel_opp_pillz_modif_also_cancels_dope(template_game):
-    play(template_game, ally_ability="Cancel Opp. Pillz Modif.", enemy_ability="Dope 2, Max 14")   # Asporov gagne
-
-    assert template_game.enemy.effect_list == []
-
-
 def test_cancel_capacities_are_consumed(template_game):
     amelia, _ = play(template_game, ally_ability="Cancel Opp. Life Modif.")
 
@@ -337,3 +322,23 @@ def test_tune_out_applies_when_only_the_opponent_has_it(template_game):
 
     assert amelia.win is True
 
+
+
+# --- Par Pillz restante : glossaire officiel (66) : « le nombre de Pillz qu'il te reste avant de mettre des pillz sur ton
+# perso (sans compter la Pillz gratuite) » — Lady Ametia Cr : 13 de puissance au round 1 ---------------------------
+
+def test_per_pillz_left_counts_the_pillz_before_the_bet(template_game):
+    amelia, _ = play(template_game, ally_ability="+1 Attack Per Pillz Left", ally_pillz=6)   # 12 pillz avant la mise de 5
+
+    assert amelia.attack == 1 * 6 + 12
+
+
+def test_per_pillz_left_ignores_the_fury_cost_too(template_game):
+    amelia = template_game.ally.cards[AMELIA]
+    amelia.ability = capacity("+1 Attack Per Pillz Left")
+    amelia.bonus = capacity("-2 Opp Power, Min 1")
+    template_game.enemy.cards[ASPOROV].ability = None
+    process_round(template_game, ProcessRoundInput(player1_card_index=AMELIA, player1_pillz=2, player1_fury=True,
+                                                   player2_card_index=ASPOROV, player2_pillz=1))
+
+    assert amelia.attack == 1 * 2 + 12

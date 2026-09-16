@@ -48,8 +48,8 @@ def pillz_bet(card: Card) -> int:
 
 
 def recovered_pillz(card: Card, capacity: Capacity) -> int:
-    """« Recover X Pillz Out Of Y » : floor(pillz misées x X / Y). Hypothèse : les pillz de fury comptent."""
-    return pillz_bet(card) * capacity.value // capacity.borne if capacity.borne > 0 else 0
+    """« Recover X Pillz Out Of Y » : floor(pillz misées x X / Y), minimum 1 (glossaire officiel 53) ; la fury compte."""
+    return max(1, pillz_bet(card) * capacity.value // capacity.borne) if capacity.borne > 0 else 0
 
 
 def apply_reanimate(game: Game, card1: Card, card2: Card) -> None:
