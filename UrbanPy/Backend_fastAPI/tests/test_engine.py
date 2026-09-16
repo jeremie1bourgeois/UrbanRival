@@ -233,3 +233,24 @@ def test_full_game_life_trajectory_and_final_result(template_game):
     assert [(ally, enemy) for ally, enemy in trajectory[:3]] == [(12, 7), (6, 7), (6, 6)]
     assert trajectory[3][0] == 0
     assert check_end(template_game) is GameResult.ENEMY
+
+
+# --- Modificateurs d'attaque : après le calcul puissance x pillz ------------------------------
+
+def test_minus_opp_attack_applies_to_the_computed_attack(template_game):
+    from src.core.parsing.capacity_parser import parse_capacity
+    template_game.enemy.cards[ASPOROV].ability = parse_capacity("-4 Opp Attack, Min 2").capacity
+
+    amelia, _ = play(template_game, AMELIA, ASPOROV)   # Amelia (3 + 4 - 2) x 1 = 5, puis -4 min 2
+
+    assert amelia.attack == 2
+
+
+def test_attack_bonus_then_opp_attack_malus(template_game):
+    from src.core.parsing.capacity_parser import parse_capacity
+    template_game.ally.cards[AMELIA].ability = parse_capacity("Attack +6").capacity
+    template_game.enemy.cards[ASPOROV].ability = parse_capacity("-4 Opp Attack, Min 0").capacity
+
+    amelia, _ = play(template_game, AMELIA, ASPOROV, ally_pillz=2)   # (3 - 2) x 2 = 2, +6 = 8, -4 = 4
+
+    assert amelia.attack == 4

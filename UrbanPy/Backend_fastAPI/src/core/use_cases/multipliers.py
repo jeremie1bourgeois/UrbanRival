@@ -35,6 +35,10 @@ def _nb_damage_opp(game, player1, player2, card1, card2) -> int:
     return card2.damage
 
 
+def _nb_power_opp(game, player1, player2, card1, card2) -> int:
+    return card2.power
+
+
 def _nb_damage_inflicted(game, player1, player2, card1, card2) -> int:
     """Dégâts réellement infligés par la carte ce round (0 si elle a perdu) ; valable après resolve_combat."""
     return card1.damage_fight if card1.win else 0
@@ -65,6 +69,7 @@ MULTIPLIERS = {
     "brawl": _brawl,
     "nb_dam_opp": _nb_damage_opp,
     "nb_damage": _nb_damage_inflicted,
+    "nb_pow_opp": _nb_power_opp,
     "nb_life_lost": _nb_life_lost,
     "nb_pillz_lost": _nb_pillz_lost,
     "nb_pillz_left": _nb_pillz_left,

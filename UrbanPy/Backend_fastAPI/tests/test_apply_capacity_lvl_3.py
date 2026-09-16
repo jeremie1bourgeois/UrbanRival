@@ -185,3 +185,34 @@ def test_life_per_damage_is_zero_on_defeat(template_game):
     play(template_game, ally_wins=False, ally_ability="Victory Or Defeat: +1 Life Per Damage")
 
     assert template_game.ally.life == 12 - 3
+
+
+# --- Recover X Pillz Out Of Y ----------------------------------------------------------------
+
+def test_defeat_recover_returns_part_of_the_pillz_bet(template_game):
+    # Amelia mise 5 pillz (pillz_fight 6) et perd contre Asporov à 8 pillz : récupère floor(5 x 2 / 3) = 3
+    play(template_game, ally_ability="Defeat: Recover 2 Pillz Out Of 3", ally_pillz=6, enemy_pillz=8)
+
+    assert template_game.ally.cards[AMELIA].win is False
+    assert template_game.ally.pillz == 12 - 5 + 3
+
+
+def test_defeat_recover_counts_fury_pillz(template_game):
+    amelia = template_game.ally.cards[AMELIA]
+    amelia.ability = ability("Defeat: Recover 2 Pillz Out Of 3")
+    process_round(template_game, ProcessRoundInput(player1_card_index=AMELIA, player1_pillz=3, player1_fury=True,
+                                                   player2_card_index=ASPOROV, player2_pillz=8))   # 2 + 3 fury = 5 misées
+
+    assert template_game.ally.pillz == 12 - 5 + 3
+
+
+def test_defeat_recover_does_nothing_on_victory(template_game):
+    play(template_game, ally_ability="Defeat: Recover 2 Pillz Out Of 3", ally_wins=True)   # 5 misées, victoire
+
+    assert template_game.ally.pillz == 12 - 5
+
+
+def test_unconditional_recover_applies_on_victory(template_game):
+    play(template_game, ally_ability="Recover 1 Pillz Out Of 2", ally_wins=True)           # 5 misées -> 2
+
+    assert template_game.ally.pillz == 12 - 5 + 2

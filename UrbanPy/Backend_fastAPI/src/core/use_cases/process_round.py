@@ -1,4 +1,5 @@
 import copy
+from collections import Counter
 from src.core.domain.round import Round
 from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card, FIGHT_SLOTS
@@ -24,7 +25,10 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
         init_fight_data(player1_card, round_data.player1_pillz, round_data.player1_fury)
         init_fight_data(player2_card, round_data.player2_pillz, round_data.player2_fury)
 
-        # Le bonus de clan n'est actif que si la main compte au moins 2 cartes du clan
+        # Bonus de clan : un Oculus « Infiltrated » adopte le bonus du clan majoritaire de la main ;
+        # le bonus n'est actif que si la main compte au moins 2 cartes du clan (l'Oculus compris)
+        apply_infiltrated_bonus(game.ally, player1_card)
+        apply_infiltrated_bonus(game.enemy, player2_card)
         if not is_clan_bonus_active(game.ally, player1_card):
             player1_card.bonus_fight = None
         if not is_clan_bonus_active(game.enemy, player2_card):
@@ -42,7 +46,7 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
 
         # Appliquer les effets de combat
         fct_lvl_1.apply_capacity_lvl_1(player1_card, player2_card)
-        fct_lvl_2.apply_capacity_lvl_2(game, player1_card, player2_card)
+        fct_lvl_2.apply_capacity_lvl_2(game, player1_card, player2_card, stats=("power", "damage"))
 
         # Appliquer les fury
         if player1_card.fury:
@@ -53,6 +57,9 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
         # Calculer les attaques
         player1_card.attack += (player1_card.power_fight * round_data.player1_pillz)
         player2_card.attack += (player2_card.power_fight * round_data.player2_pillz)
+
+        # Modificateurs d'attaque, une fois l'attaque de base connue
+        fct_lvl_2.apply_capacity_lvl_2(game, player1_card, player2_card, stats=("attack",))
 
         # Killshot : la capacité n'agit que si l'attaque vaut au moins le double de l'attaque adverse
         apply_killshot_condition(player1_card, player2_card)
@@ -213,11 +220,46 @@ def _bet_condition_met(condition: str, pillz_fight: int) -> bool:
 
 
 MIN_CLAN_CARDS_FOR_BONUS = 2
+OCULUS = "Oculus"
+LEADER = "Leader"
+
+
+def is_infiltrated(card: Card) -> bool:
+    return card.faction == OCULUS and card.bonus is not None and "infiltrated" in card.bonus.types
+
+
+def infiltrated_clan(player: Player):
+    """
+    Clan adopté par les Oculus « Infiltrated » de la main : le clan majoritaire parmi les autres cartes
+    (hors Oculus et Leader). None s'il n'y en a pas ou en cas d'égalité.
+    """
+    counts = Counter(c.faction for c in player.cards if c.faction not in (OCULUS, LEADER))
+    ranked = counts.most_common(2)
+    if not ranked or (len(ranked) == 2 and ranked[0][1] == ranked[1][1]):
+        return None
+    return ranked[0][0]
+
+
+def clan_for_bonus(player: Player, card: Card):
+    """Clan dont la carte porte le bonus : son propre clan, ou le clan adopté pour un Oculus infiltré."""
+    return infiltrated_clan(player) if is_infiltrated(card) else card.faction
+
+
+def apply_infiltrated_bonus(player: Player, card: Card) -> None:
+    """Remplace le bonus de combat d'un Oculus infiltré par celui du clan adopté (None s'il n'y en a pas)."""
+    if not is_infiltrated(card):
+        return
+    clan = infiltrated_clan(player)
+    source = next((c for c in player.cards if c.faction == clan and c.bonus is not None), None)
+    card.bonus_fight = copy.deepcopy(source.bonus) if source else None
 
 
 def is_clan_bonus_active(player: Player, card: Card) -> bool:
     """Règle Urban Rivals : le bonus de clan s'active si la main (les 4 cartes) compte au moins 2 cartes du clan."""
-    return sum(1 for c in player.cards if c.faction == card.faction) >= MIN_CLAN_CARDS_FOR_BONUS
+    clan = clan_for_bonus(player, card)
+    if clan is None:
+        return False
+    return sum(1 for c in player.cards if clan_for_bonus(player, c) == clan) >= MIN_CLAN_CARDS_FOR_BONUS
 
 
 def init_fight_data(card: Card, nb_pillz: int, fury: bool):
