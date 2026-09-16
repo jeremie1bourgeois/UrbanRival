@@ -156,6 +156,20 @@ def test_copied_stop_is_itself_subject_to_the_chain(template_game):
 
 # --- Copy / Exchange de power et damage -------------------------------------------------------
 
+def test_power_impose_gives_the_opponent_my_printed_power(template_game):
+    # Règle officielle : « The opposing character has equal Power to your card. This number only takes into account the
+    # figure shown on your card and does not include changes related to an Ability, Bonus or Fury. »
+    _, asporov = play(template_game, ally_ability="Power Impose")
+
+    assert asporov.power_fight == 3 - 2   # puissance imprimée d'Amelia (3), puis le bonus d'Amelia (-2)
+
+
+def test_damage_impose_gives_the_opponent_my_printed_damage(template_game):
+    _, asporov = play(template_game, ally_ability="Damage Impose")
+
+    assert asporov.damage_fight == 5
+
+
 def test_copy_opp_power_uses_the_printed_value(template_game):
     amelia, _ = play(template_game, ally_ability="Copy: Opp. Power")
 

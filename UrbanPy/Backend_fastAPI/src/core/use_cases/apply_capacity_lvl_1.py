@@ -18,7 +18,7 @@ from typing import Optional, Set
 from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card, FIGHT_SLOTS
 
-META_HOWS = {"stop", "copy", "Protection", "cancel", "exchange"}
+META_HOWS = {"stop", "copy", "Protection", "cancel", "exchange", "impose"}
 SLOT_OF_KIND = {"ability": "ability_fight", "bonus": "bonus_fight"}
 KIND_OF_SLOT = {"ability_fight": "ability", "bonus_fight": "bonus"}
 STAT_TYPES = ("power", "damage", "attack")
@@ -126,16 +126,19 @@ def _apply_stops(card1: Card, card2: Card) -> None:
                 setattr(card, slot, None)
 
 
-# --- Phase 3 : Copy / Exchange de power et damage ---------------------------------------------
+# --- Phase 3 : Copy / Exchange / Impose de power et damage ---------------------------------------------
 
 def _apply_value_copies_and_exchanges(card1: Card, card2: Card) -> None:
     for own, opp in _pairs(card1, card2):
         for slot in FIGHT_SLOTS:
             capacity = getattr(own, slot)
-            if capacity is None or capacity.how not in ("copy", "exchange"):
+            if capacity is None or capacity.how not in ("copy", "exchange", "impose"):
                 continue
             for stat in ("power", "damage"):
                 if stat not in capacity.types:
+                    continue
+                if capacity.how == "impose":                       # l'adversaire prend ma valeur imprimée
+                    setattr(opp, f"{stat}_fight", getattr(own, stat))
                     continue
                 setattr(own, f"{stat}_fight", getattr(opp, stat))
                 if capacity.how == "exchange":

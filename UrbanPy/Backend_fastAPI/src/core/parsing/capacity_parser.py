@@ -86,7 +86,7 @@ _CORE_STARTERS = ("copy", "protection", "reanimate")   # mots qui ouvrent un cœ
 _UNSUPPORTED_CORE_KEYWORDS = (
     "remove ability conditions", "counter-attack", "tie-break",
     "fatal killshot", "sinister symmetry", "tune out", "overdose", "perfection",
-    "cards", "impose", "rebirth",
+    "cards", "rebirth",
     "beyond", "bypass", "hazard", "illusion", "limitless",
 )
 
@@ -112,6 +112,7 @@ _R_PROTECTION = re.compile(r"^protection (ability|bonus|power and damage|power|d
 _R_PROTECTION_SUFFIX = re.compile(r"^(ability|bonus) protection$")
 _R_CANCEL = re.compile(r"^cancel (?:opp )?(power and damage|pillz and life|power|damage|attack|life|pillz) modif$")
 _R_EXCHANGE = re.compile(r"^(power and damage|power|damage) exchange$")
+_R_IMPOSE = re.compile(r"^(power|damage) impose$")   # la stat adverse prend la valeur imprimée de ma carte
 _R_PERSISTENT = re.compile(r"^(?:(players) )?(poison|toxin|heal|regen|dope|repair|consume|combust|mindwipe) (\d+) (?:min|max) (\d+)$")
 _R_CORRUPT = re.compile(r"^corrupt (\d+) min (\d+)$")           # le propriétaire perd X vies, victoire ou défaite
 _R_CORROSION = re.compile(r"^corrosion (\d+) min (\d+)$")   # poison dont la valeur est multipliée par le numéro du round
@@ -172,6 +173,10 @@ def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacit
     match = _R_EXCHANGE.match(core)
     if match:
         return error or _capacity("both", _types(match.group(1)), 0, "exchange", -1, conditions)
+
+    match = _R_IMPOSE.match(core)
+    if match:
+        return error or _capacity("enemy", [match.group(1)], 0, "impose", -1, conditions)
 
     match = _R_PERSISTENT.match(core)
     if match:

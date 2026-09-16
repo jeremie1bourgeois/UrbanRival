@@ -269,6 +269,14 @@ def test_exchange(text, types):
     assert parsed(text) == cap("both", types, 0, how="exchange")
 
 
+@pytest.mark.parametrize("text, expected", [
+    ("Power Impose", cap("enemy", ["power"], 0, how="impose")),
+    ("Reprisal: Damage Impose", cap("enemy", ["damage"], 0, how="impose", conditions=["reprisal"])),
+])
+def test_impose(text, expected):
+    assert parsed(text) == expected
+
+
 # --- Niveau 4 : effets persistants ------------------------------------------------------------
 
 @pytest.mark.parametrize("text, target, types", [
@@ -318,7 +326,6 @@ from src.adapters.repositories.card_repository import all_capacity_descriptions
 
 @pytest.mark.parametrize("text, keyword", [
     ("-2 Cards Damage, Min 1", "cards"), ("Protection: Cards Power And Damage", "cards"),
-    ("Damage Impose", "impose"),
     ("Rebirth 2, Max. 10", "rebirth"),     ("Remove Ability Conditions", "remove ability conditions"), ("Beyond", "beyond"), ("Tie-break", "tie-break"),
     ("Counter-attack", "counter-attack"), ("Limitless", "limitless"),
 ])
@@ -334,7 +341,7 @@ def test_gibberish_is_unknown_core():
 
 # --- Couverture sur les descriptions officielles -----------------------------------------
 
-SUPPORTED_DESCRIPTIONS_FLOOR = 1229  # mesuré le 2026-09-16 sur 1310 descriptions ; à relever quand la couverture progresse
+SUPPORTED_DESCRIPTIONS_FLOOR = 1235  # mesuré le 2026-09-16 sur 1310 descriptions ; à relever quand la couverture progresse
 
 
 def test_every_official_description_parses_without_raising():
