@@ -1,5 +1,5 @@
 """
-Niveau 4 : effets persistants (poison / toxine / heal / regen / dope / repair).
+Niveau 4 : effets persistants (poison / toxine / heal / regen / dope / repair / consume / combust).
 À la fin d'un round où les deux joueurs sont en vie :
   1. les effets déjà actifs agissent (« à la fin de chaque round suivant » leur activation) ;
   2. les capacités persistantes restantes (leur condition de fin de round a été validée au niveau 3) sont
@@ -17,6 +17,8 @@ from src.core.use_cases.multipliers import multiplier
 _LIFE_LOSS = ("poison", "toxine")
 _LIFE_GAIN = ("heal", "regen")
 _PILLZ_GAIN = ("dope", "repair")
+_PILLZ_LOSS = ("consume",)
+_LIFE_LOSS_AND_PILLZ_LOSS = ("combust",)
 
 
 def apply_capacity_lvl_4(game: Game, card1: Card, card2: Card) -> None:
@@ -31,8 +33,9 @@ def apply_capacity_lvl_4(game: Game, card1: Card, card2: Card) -> None:
             if kind is None:
                 continue
             value = capacity.value * multiplier(capacity.how, game, own, opp, card, opp_card)
-            affected = opp if capacity.target == "enemy" else own
-            register_persistent_effect(affected, PersistentEffect(kind, value, capacity.borne))
+            affected = {"enemy": [opp], "ally": [own], "both": [own, opp]}[capacity.target]
+            for player in affected:
+                register_persistent_effect(player, PersistentEffect(kind, value, capacity.borne))
             setattr(card, slot, None)
 
 
@@ -42,13 +45,23 @@ def register_persistent_effect(player: Player, effect: PersistentEffect) -> None
     player.effect_list.append(effect)
 
 
+def _lose(player: Player, attr: str, value: int, floor: int) -> None:
+    current = getattr(player, attr)
+    if current > floor:
+        setattr(player, attr, max(floor, current - value))
+
+
 def tick_persistent_effects(player: Player) -> None:
     for effect in player.effect_list:
         unbounded = effect.borne is None or effect.borne == -1
+        floor = 0 if unbounded else effect.borne
         if effect.kind in _LIFE_LOSS:
-            floor = 0 if unbounded else effect.borne
-            if player.life > floor:
-                player.life = max(floor, player.life - effect.value)
+            _lose(player, "life", effect.value, floor)
+        elif effect.kind in _PILLZ_LOSS:
+            _lose(player, "pillz", effect.value, floor)
+        elif effect.kind in _LIFE_LOSS_AND_PILLZ_LOSS:
+            _lose(player, "life", effect.value, floor)
+            _lose(player, "pillz", effect.value, floor)
         elif effect.kind in _LIFE_GAIN:
             if unbounded:
                 player.life += effect.value

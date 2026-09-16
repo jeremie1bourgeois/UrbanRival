@@ -288,6 +288,20 @@ def test_persistent_effects(text, target, types):
     assert (result["target"], result["types"], result["value"], result["borne"]) == (target, types, int(text.split()[1].rstrip(",")), int(text.split()[-1]))
 
 
+@pytest.mark.parametrize("text, expected", [
+    ("Consume 1, Min 3", cap("enemy", ["consume"], 1, borne=3)),
+    ("Repris.: Consume 1, Min 4", cap("enemy", ["consume"], 1, borne=4, conditions=["reprisal"])),
+    ("Combust 1, Min 2", cap("enemy", ["combust"], 1, borne=2)),
+    ("Players Combust 1, Min 0", cap("both", ["combust"], 1, borne=0)),
+    ("Victory Or Defeat: Combust 1, Min 3", cap("enemy", ["combust"], 1, borne=3, conditions=["victory_defeat"])),
+    ("Mindwipe 1, Min 3", cap("enemy", ["combust"], 1, borne=3)),            # même effet que Combust d'après les textes officiels
+    ("Confidence: Mindwipe 2, Min 0", cap("enemy", ["combust"], 2, borne=0, conditions=["confidence"])),
+    ("Victory Or Defeat: Corrosion 1, Min 0", cap("enemy", ["poison"], 1, how="growth", borne=0, conditions=["victory_defeat"])),   # poison x numéro du round
+])
+def test_new_persistent_effects(text, expected):
+    assert parsed(text) == expected
+
+
 def test_growth_poison_keeps_multiplier():
     assert parsed("Growth: Poison 1, Min 2") == cap("enemy", ["poison"], 1, how="growth", borne=2)
 
@@ -303,9 +317,7 @@ from src.adapters.repositories.card_repository import all_capacity_descriptions
 
 @pytest.mark.parametrize("text, keyword", [
     ("-2 Cards Damage, Min 1", "cards"), ("Protection: Cards Power And Damage", "cards"),
-    ("Damage Impose", "impose"), ("Consume 2, Min 1", "consume"),
-    ("Corrupt 2 Min. 1", "corrupt"), ("Victory Or Defeat: Combust 2, Min 1", "combust"),
-    ("Victory Or Defeat: Corrosion 1, Min 2", "corrosion"), ("Revenge: Mindwipe 2, Min 1", "mindwipe"),
+    ("Damage Impose", "impose"), ("Corrupt 2 Min. 1", "corrupt"),
     ("Rebirth 2, Max. 10", "rebirth"),     ("Remove Ability Conditions", "remove ability conditions"), ("Beyond", "beyond"), ("Tie-break", "tie-break"),
     ("Counter-attack", "counter-attack"), ("Limitless", "limitless"),
 ])
@@ -321,7 +333,7 @@ def test_gibberish_is_unknown_core():
 
 # --- Couverture sur les descriptions officielles -----------------------------------------
 
-SUPPORTED_DESCRIPTIONS_FLOOR = 1203  # mesuré le 2026-09-16 sur 1310 descriptions ; à relever quand la couverture progresse
+SUPPORTED_DESCRIPTIONS_FLOOR = 1225  # mesuré le 2026-09-16 sur 1310 descriptions ; à relever quand la couverture progresse
 
 
 def test_every_official_description_parses_without_raising():

@@ -86,7 +86,7 @@ _CORE_STARTERS = ("copy", "protection", "reanimate")   # mots qui ouvrent un cœ
 _UNSUPPORTED_CORE_KEYWORDS = (
     "remove ability conditions", "counter-attack", "tie-break",
     "fatal killshot", "sinister symmetry", "tune out", "overdose", "perfection",
-    "cards", "impose", "consume", "corrupt", "combust", "corrosion", "mindwipe", "rebirth",
+    "cards", "impose", "corrupt", "rebirth",
     "beyond", "bypass", "hazard", "illusion", "limitless",
 )
 
@@ -112,13 +112,17 @@ _R_PROTECTION = re.compile(r"^protection (ability|bonus|power and damage|power|d
 _R_PROTECTION_SUFFIX = re.compile(r"^(ability|bonus) protection$")
 _R_CANCEL = re.compile(r"^cancel (?:opp )?(power and damage|pillz and life|power|damage|attack|life|pillz) modif$")
 _R_EXCHANGE = re.compile(r"^(power and damage|power|damage) exchange$")
-_R_PERSISTENT = re.compile(r"^(poison|toxin|heal|regen|dope|repair) (\d+) (?:min|max) (\d+)$")
+_R_PERSISTENT = re.compile(r"^(?:(players) )?(poison|toxin|heal|regen|dope|repair|consume|combust|mindwipe) (\d+) (?:min|max) (\d+)$")
+_R_CORROSION = re.compile(r"^corrosion (\d+) min (\d+)$")   # poison dont la valeur est multipliée par le numéro du round
 _R_REANIMATE = re.compile(r"^reanimate \+(\d+) life$")
 _R_RECOVER = re.compile(r"^recover (\d+) pillz out of (\d+)$")   # X pillz récupérées sur Y misées (fin de round)
 _R_INFILTRATED = re.compile(r"^infiltrated$")                        # bonus Oculus : adopte le bonus du clan majoritaire de la main
 
-_PERSISTENT_TYPES = {"poison": "poison", "toxin": "toxine", "heal": "heal", "regen": "regen", "dope": "dope", "repair": "repair"}
-_PERSISTENT_TARGETS = {"poison": "enemy", "toxin": "enemy", "heal": "ally", "regen": "ally", "dope": "ally", "repair": "ally"}
+# Mindwipe : « lose X Life Points and Pillz, minimum Y, at the end of each of the following rounds » = Combust (textes officiels)
+_PERSISTENT_TYPES = {"poison": "poison", "toxin": "toxine", "heal": "heal", "regen": "regen", "dope": "dope", "repair": "repair",
+                     "consume": "consume", "combust": "combust", "mindwipe": "combust"}
+_PERSISTENT_TARGETS = {"poison": "enemy", "toxin": "enemy", "heal": "ally", "regen": "ally", "dope": "ally", "repair": "ally",
+                       "consume": "enemy", "combust": "enemy", "mindwipe": "enemy"}
 
 
 def _types(stat: str) -> list:
@@ -170,8 +174,14 @@ def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacit
 
     match = _R_PERSISTENT.match(core)
     if match:
-        effect, value, borne = match.groups()
-        return error or _capacity(_PERSISTENT_TARGETS[effect], [_PERSISTENT_TYPES[effect]], int(value), how, int(borne), conditions)
+        players, effect, value, borne = match.groups()
+        target = "both" if players else _PERSISTENT_TARGETS[effect]
+        return error or _capacity(target, [_PERSISTENT_TYPES[effect]], int(value), how, int(borne), conditions)
+
+    match = _R_CORROSION.match(core)
+    if match:
+        how, error = _resolve_how(prefix_hows + ["growth"], None)
+        return error or _capacity("enemy", ["poison"], int(match.group(1)), how, int(match.group(2)), conditions)
 
     match = _R_REANIMATE.match(core)
     if match:
