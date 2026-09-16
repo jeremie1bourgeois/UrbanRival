@@ -4,8 +4,10 @@
 // 1. Avant de lancer le combat, coller ce fichier entier dans la console du navigateur (ou l'exécuter via un outil
 //    d'automatisation) : il intercepte les réponses de POST /api/private/v2/ (fetch et XHR) dans window.__urCapture.
 // 2. Jouer les 4 rounds.
-// 3. Exécuter `urRecord()` : renvoie l'enregistrement compact au format de data/ur_battles/*.json (p0 = joueur 0 du
-//    serveur, p1 = joueur 1 ; à sauvegarder tel quel), et `urAbilities()` : le modèle abilityData de chaque pouvoir vu.
+// 3. Enchaîner autant de combats que voulu sans recharger la page (sinon : recoller le script puis urRestore()).
+// 4. Exécuter `urRecords()` : un tableau d'enregistrements au format de data/ur_battles/*.json (p0 = joueur 0 du
+//    serveur, p1 = joueur 1) ; `scripts/import_ur_battles.py` les éclate en fichiers. `urAbilities()` : le modèle
+//    abilityData de chaque pouvoir vu.
 
 if (!window.__urCapture) {
   window.__urCapture = [];
@@ -28,21 +30,26 @@ if (!window.__urCapture) {
   };
 }
 
+// Sauvegarde continue dans localStorage (clé ur_capture) : survit à un rechargement de page ; urRestore() recharge.
+if (!window.__urSaver) {
+  window.__urSaver = setInterval(() => { try { localStorage.setItem("ur_capture", JSON.stringify(window.__urCapture.filter((c) => c.res && c.res.startsWith('{"battles.status"')))); } catch (e) {} }, 5000);
+}
+function urRestore() { const saved = JSON.parse(localStorage.getItem("ur_capture") || "[]"); window.__urCapture = saved.concat(window.__urCapture); return window.__urCapture.length; }
+
 function urStatuses() {
   const out = [];
   let prev = null;
   for (const c of window.__urCapture) {
     if (!c.res || !c.res.startsWith('{"battles.status"')) continue;
     const b = JSON.parse(c.res)["battles.status"].data.battle;
-    const sig = JSON.stringify([b.round, b.status, b.turnPlayerId, b.player0.life, b.player1.life, b.player0.pillz, b.player1.pillz,
+    const sig = JSON.stringify([b.id, b.round, b.status, b.turnPlayerId, b.player0.life, b.player1.life, b.player0.pillz, b.player1.pillz,
       b.player0.characters.map((x) => [x.roundPlayed, x.pillzUsed, x.roundAttack]), b.player1.characters.map((x) => [x.roundPlayed, x.pillzUsed, x.roundAttack])]);
     if (sig !== prev) { out.push(b); prev = sig; }
   }
   return out;
 }
 
-function urRecord() {
-  const sts = urStatuses();
+function urRecordOf(sts) {
   const first = sts[0];
   const pl = (p) => ({ name: p.player.name, base_life: p.baseLife, base_pillz: p.basePillz, cards: p.characters.map((x) => ({ id: x.id, level: x.level })) });
   const rounds = [];
@@ -58,9 +65,17 @@ function urRecord() {
       post_round: [resolved.player0.postRoundAbilities, resolved.player1.postRoundAbilities],
       after: next ? { life: [next.player0.life, next.player1.life], pillz: [next.player0.pillz, next.player1.pillz] } : { life: null, pillz: null } });
   }
-  return JSON.stringify({ _comment: "Combat réel Urban Rivals capturé via battles.status (voir scripts/ur_capture.js).", battle_id: first.id, rule_id: first.battleRuleId,
-    p0: pl(first.player0), p1: pl(first.player1), rounds }, null, 1);
+  return { _comment: "Combat réel Urban Rivals capturé via battles.status (voir scripts/ur_capture.js).", battle_id: first.id, rule_id: first.battleRuleId,
+    p0: pl(first.player0), p1: pl(first.player1), rounds };
 }
+
+// Tous les combats capturés depuis le chargement du script (ou urRestore()), un enregistrement par combat.
+function urRecords() {
+  const byBattle = {};
+  for (const b of urStatuses()) (byBattle[b.id] = byBattle[b.id] || []).push(b);
+  return JSON.stringify(Object.values(byBattle).map(urRecordOf).filter((r) => r.rounds.length), null, 1);
+}
+function urRecord() { return urRecords(); }
 
 function urAbilities() {
   const abilities = {};
