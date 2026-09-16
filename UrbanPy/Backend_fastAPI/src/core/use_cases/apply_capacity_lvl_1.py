@@ -158,12 +158,20 @@ def _strip_types(card: Card, types: Set[str], only_targeting_opponent: bool) -> 
             setattr(card, slot, None)
 
 
+# Les effets persistants sont des modificateurs de vie / de pillz : un Cancel Opp. Life (Pillz) Modif. les annule aussi
+# (règle officielle : « poison, toxin, regen and heal abilities will be deactivated for the round »).
+PERSISTENT_TYPES_OF_STAT = {"life": {"poison", "toxine", "heal", "regen"}, "pillz": {"dope"}}
+
+
 def _apply_cancels(card1: Card, card2: Card) -> None:
     for own, opp in _pairs(card1, card2):
         for slot in FIGHT_SLOTS:
             capacity = getattr(own, slot)
             if _is(capacity, "cancel"):
-                _strip_types(opp, set(capacity.types), only_targeting_opponent=False)
+                types = set(capacity.types)
+                for stat in capacity.types:
+                    types |= PERSISTENT_TYPES_OF_STAT.get(stat, set())
+                _strip_types(opp, types, only_targeting_opponent=False)
 
 
 def _apply_stat_protections(card1: Card, card2: Card) -> None:
