@@ -130,6 +130,14 @@ def test_reanimate_revives_the_owner_who_falls_to_zero(template_game):
     assert check_end(template_game) is GameResult.NONE
 
 
+def test_reanimate_heals_on_a_defeat_that_is_not_a_ko(template_game):
+    # Règle officielle : « If your card loses the fight, you will win +X Life Points at the end of the round.
+    # This ability is able to prevent you from going KO » -> un Defeat: +X Life qui marche aussi depuis 0.
+    play(template_game, ally_ability="Reanimate +2 Life", ally_wins=False)   # Amelia perd, 3 dégâts
+
+    assert template_game.ally.life == 12 - 3 + 2
+
+
 def test_reanimate_does_not_heal_on_victory(template_game):
     play(template_game, ally_index=ASHLEY, enemy_index=SERAFINA, ally_pillz=1, enemy_pillz=2)   # Serafina gagne
 
