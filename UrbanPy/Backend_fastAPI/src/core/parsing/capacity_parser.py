@@ -78,7 +78,7 @@ _CONDITION_PREFIXES = {
 }
 _MULTIPLIER_PREFIXES = ("support", "growth", "degrowth", "equalizer", "brawl")
 _IGNORED_PREFIXES = ("day",)   # cycle jour/nuit non modélisé : Day toujours valide, donc Night jamais
-_UNSUPPORTED_PREFIXES = ("versus", "xantiax", "night")
+_UNSUPPORTED_PREFIXES = ("versus", "night")
 _R_BET = re.compile(r"^bet ([<>]) (\d+) pillz$")   # « Bet > 4 pillz » : pillz misées ce round
 _CORE_STARTERS = ("copy", "protection", "reanimate")   # mots qui ouvrent un cœur contenant ':'
 
@@ -86,7 +86,7 @@ _CORE_STARTERS = ("copy", "protection", "reanimate")   # mots qui ouvrent un cœ
 _UNSUPPORTED_CORE_KEYWORDS = (
     "remove ability conditions", "counter-attack", "tie-break",
     "fatal killshot", "sinister symmetry", "tune out", "overdose", "perfection",
-    "cards", "impose", "corrupt", "rebirth",
+    "cards", "impose", "rebirth",
     "beyond", "bypass", "hazard", "illusion", "limitless",
 )
 
@@ -113,6 +113,7 @@ _R_PROTECTION_SUFFIX = re.compile(r"^(ability|bonus) protection$")
 _R_CANCEL = re.compile(r"^cancel (?:opp )?(power and damage|pillz and life|power|damage|attack|life|pillz) modif$")
 _R_EXCHANGE = re.compile(r"^(power and damage|power|damage) exchange$")
 _R_PERSISTENT = re.compile(r"^(?:(players) )?(poison|toxin|heal|regen|dope|repair|consume|combust|mindwipe) (\d+) (?:min|max) (\d+)$")
+_R_CORRUPT = re.compile(r"^corrupt (\d+) min (\d+)$")           # le propriétaire perd X vies, victoire ou défaite
 _R_CORROSION = re.compile(r"^corrosion (\d+) min (\d+)$")   # poison dont la valeur est multipliée par le numéro du round
 _R_REANIMATE = re.compile(r"^reanimate \+(\d+) life$")
 _R_RECOVER = re.compile(r"^recover (\d+) pillz out of (\d+)$")   # X pillz récupérées sur Y misées (fin de round)
@@ -177,6 +178,10 @@ def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacit
         players, effect, value, borne = match.groups()
         target = "both" if players else _PERSISTENT_TARGETS[effect]
         return error or _capacity(target, [_PERSISTENT_TYPES[effect]], int(value), how, int(borne), conditions)
+
+    match = _R_CORRUPT.match(core)
+    if match:
+        return error or _capacity("ally", ["life"], -int(match.group(1)), how, int(match.group(2)), conditions + ["victory_defeat"])
 
     match = _R_CORROSION.match(core)
     if match:
@@ -260,6 +265,9 @@ def parse_capacity(text: str) -> ParsedCapacity:
             conditions.append(f"bet{bet.group(1)}{bet.group(2)}")
         elif segment in _MULTIPLIER_PREFIXES:
             prefix_hows.append(segment)
+        elif segment == "xantiax":            # « Xantiax: -X Life, Min Y » : les deux joueurs, victoire ou défaite
+            conditions.append("victory_defeat")
+            segments[-1] = re.sub(r"^(-\d+) life", r"\1 players life", segments[-1])
         elif segment in _IGNORED_PREFIXES:
             pass
         elif segment in _UNSUPPORTED_PREFIXES:

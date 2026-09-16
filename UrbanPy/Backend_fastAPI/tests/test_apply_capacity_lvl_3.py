@@ -203,6 +203,20 @@ def test_perfect_does_not_fire_on_defeat(template_game):
     assert template_game.ally.life == 12 - 3
 
 
+# --- Xantiax / Corrupt : vie perdue en fin de round, victoire ou défaite --------------------------------------
+
+def test_xantiax_makes_both_players_lose_life_even_on_defeat(template_game):
+    play(template_game, ally_ability="Xantiax: -2 Life, Min. 0", ally_wins=False)   # Amelia perd (-3)
+
+    assert (template_game.ally.life, template_game.enemy.life) == (12 - 3 - 2, 12 - 2)
+
+
+def test_corrupt_costs_the_winner_his_own_life(template_game):
+    play(template_game, ally_ability="Corrupt 2 Min. 5", ally_wins=True)
+
+    assert template_game.ally.life == 10
+
+
 # --- Multiplicateur « per damage » ------------------------------------------------------------
 
 def test_life_per_damage_counts_the_damage_inflicted(template_game):

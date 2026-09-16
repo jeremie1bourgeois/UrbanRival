@@ -99,8 +99,8 @@ def test_cards_catalogue_lists_every_official_card_with_its_levels(client):
         (2, 4, 4, "Ability at Level 3", True),
         (3, 5, 4, "Growth: -1 Opp Power, Min 4", True),
     ]
-    mr_kitty = next(card for card in cards if card["name"] == "Mr Kitty")
-    assert next(level for level in mr_kitty["levels"] if level["stars"] == 4)["ability_supported"] is False
+    genesis = next(card for card in cards if card["name"] == "Genesis")
+    assert next(level for level in genesis["levels"] if level["stars"] == 5)["ability_supported"] is False
 
 
 def test_cards_catalogue_exposes_images(client, monkeypatch):

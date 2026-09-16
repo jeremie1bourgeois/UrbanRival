@@ -172,13 +172,6 @@ def test_versus_without_clan_is_unsupported():
     assert (result.supported, result.reason) == (False, "unsupported prefix: versus")
 
 
-@pytest.mark.parametrize("prefix", ["Xantiax"])
-def test_unsupported_prefixes(prefix):
-    result = parse_capacity(f"{prefix}: Power +2")
-
-    assert (result.capacity, result.supported, result.reason) == (None, False, f"unsupported prefix: {prefix.lower()}")
-
-
 def test_unknown_prefix():
     result = parse_capacity("Wibble: Power +2")
 
@@ -302,6 +295,14 @@ def test_new_persistent_effects(text, expected):
     assert parsed(text) == expected
 
 
+def test_xantiax_hits_both_players_win_or_lose():
+    assert parsed("Xantiax: -3 Life, Min. 5") == cap("both", ["life"], -3, borne=5, conditions=["victory_defeat"])
+
+
+def test_corrupt_costs_the_owner_life_win_or_lose():
+    assert parsed("Corrupt 2 Min. 5") == cap("ally", ["life"], -2, borne=5, conditions=["victory_defeat"])
+
+
 def test_growth_poison_keeps_multiplier():
     assert parsed("Growth: Poison 1, Min 2") == cap("enemy", ["poison"], 1, how="growth", borne=2)
 
@@ -317,7 +318,7 @@ from src.adapters.repositories.card_repository import all_capacity_descriptions
 
 @pytest.mark.parametrize("text, keyword", [
     ("-2 Cards Damage, Min 1", "cards"), ("Protection: Cards Power And Damage", "cards"),
-    ("Damage Impose", "impose"), ("Corrupt 2 Min. 1", "corrupt"),
+    ("Damage Impose", "impose"),
     ("Rebirth 2, Max. 10", "rebirth"),     ("Remove Ability Conditions", "remove ability conditions"), ("Beyond", "beyond"), ("Tie-break", "tie-break"),
     ("Counter-attack", "counter-attack"), ("Limitless", "limitless"),
 ])
@@ -333,7 +334,7 @@ def test_gibberish_is_unknown_core():
 
 # --- Couverture sur les descriptions officielles -----------------------------------------
 
-SUPPORTED_DESCRIPTIONS_FLOOR = 1225  # mesuré le 2026-09-16 sur 1310 descriptions ; à relever quand la couverture progresse
+SUPPORTED_DESCRIPTIONS_FLOOR = 1229  # mesuré le 2026-09-16 sur 1310 descriptions ; à relever quand la couverture progresse
 
 
 def test_every_official_description_parses_without_raising():
