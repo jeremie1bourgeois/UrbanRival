@@ -85,10 +85,12 @@ grandit avec le dépôt et la CI le rejoue à chaque changement du moteur. C'est
 - **Mesurer la couverture** : `scripts/capacity_coverage.py` liste les descriptions ; un script de couverture
   d'oracle (à écrire) peut croiser les cartes vues dans `data/ur_battles/` avec les 1 396 descriptions pour dire quels
   pouvoirs n'ont jamais été observés en combat réel.
-- **Le modèle `abilityData`** : si un appel API renvoie ce modèle pour toutes les cartes (probablement une méthode
-  `characters.*`), un scraping en session connectée donne un parseur exact par construction, et les combats réels
-  n'ont plus qu'à valider l'ordre d'application. Spike à faire : observer le corps des requêtes du client pour
-  connaître la convention d'appel.
+- **Le modèle `abilityData`** s'accumule **passivement** : chaque combat capturé livre la fiche structurée des 8
+  pouvoirs et 8 bonus en jeu (`urAbilities()`). Ne pas chercher à l'obtenir par des appels API directs : le spike du
+  2026-09-16 a montré que `characters.get` (catalogue) ne contient pas `abilityData`, qu'aucune méthode dédiée
+  connue n'existe, et que trouver son nom demanderait de fouiller le code du client — ce qui sort de la lecture
+  passive et expose le compte. Le jeu de données de combats reste le juge de l'ordre d'application, ce que
+  `abilityData` ne dirait de toute façon pas.
 
 ## 7. Limites connues
 

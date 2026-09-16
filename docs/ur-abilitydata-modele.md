@@ -47,4 +47,4 @@ règles du jeu, bien plus fiable que le texte. Champs vus :
   `roundPower`/`roundDamage` reviennent à la valeur de base (+ fury).
 - L'état `done` ne reflète pas la dernière perte de vie (KO).
 
-Piste : un scraping systématique de `abilityData` pour les 1 396 descriptions donnerait un parseur exact.
+Collecte : passivement, via les combats capturés (`urAbilities()` dans `scripts/ur_capture.js`). L'API du client (`POST /api/private/v2/`, `requests=[{"call":…,"params":…}]`) expose `characters.get` (catalogue paginé, sans `abilityData`) ; aucune méthode dédiée aux pouvoirs n'a été trouvée sans rétro-ingénierie du client — piste abandonnée le 2026-09-16.

@@ -67,7 +67,7 @@ Counter-attack refixe l'ordre à chaque round.
    `tests/test_ur_battles.py` rejoue chaque round et exige les valeurs officielles (puissance, dégâts, attaque,
    vainqueur, vies, pillz). Viser les points non tranchés (cycles de Stops, Leader et son Team, Tune Out + fury,
    Mindwipe / Combust, Limitless, Exchange contre Copy/Annul) et les clans à bonus méta. Le modèle `abilityData` du
-   client (`docs/ur-abilitydata-modele.md`) est la représentation interne des règles : à scraper pour un parseur exact.
+   client (`docs/ur-abilitydata-modele.md`) s'accumule passivement avec les combats (pas de scraping API : piste abandonnée).
 3. Le journal des effets (D2, fait) rend ces vérifications immédiates : comparer le journal au déroulé réel.
 
 ### C. Front — reste mineur
