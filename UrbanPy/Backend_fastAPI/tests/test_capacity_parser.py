@@ -371,7 +371,7 @@ def test_gibberish_is_unknown_core():
 
 # --- Couverture sur les descriptions officielles -----------------------------------------
 
-SUPPORTED_DESCRIPTIONS_FLOOR = 1382  # mesuré le 2026-09-16 sur 1396 descriptions ; à relever quand la couverture progresse
+SUPPORTED_DESCRIPTIONS_FLOOR = 1384  # mesuré le 2026-09-16 sur 1396 descriptions ; à relever quand la couverture progresse
 
 
 def test_every_official_description_parses_without_raising():
@@ -394,6 +394,15 @@ def test_every_official_description_parses_without_raising():
     ("Recover 1 Players Pillz Out Of 2", cap("both", ["recover"], 1, borne=2)),
 ])
 def test_leader_and_players_variants(text, expected):
+    assert parsed(text) == expected
+
+
+@pytest.mark.parametrize("text, expected", [
+    ("Fatal Killshot", cap("enemy", ["ko"], 0, conditions=["killshot"])),
+    ("Infiltrated GHEIST, Zenith: Fatal Killshot", cap("enemy", ["ko"], 0, conditions=["infiltrated:GHEIST|Zenith", "killshot"])),
+    ("Sinister Symmetry", cap("enemy", ["ko"], 0, conditions=["symmetry"])),
+])
+def test_instant_win_abilities(text, expected):
     assert parsed(text) == expected
 
 
@@ -427,8 +436,7 @@ def test_night_prefix_is_inert_since_day_is_always_valid():
 
 
 @pytest.mark.parametrize("text, keyword", [
-    ("Fatal Killshot", "fatal killshot"), ("Overdose", "overdose"), ("Perfection", "perfection"),
-    ("Sinister Symmetry", "sinister symmetry"), ])
+    ("Overdose", "overdose"), ("Perfection", "perfection"), ])
 def test_new_unsupported_cores_have_a_named_reason(text, keyword):
     assert parse_capacity(text).reason == f"unsupported core: {keyword}"
 

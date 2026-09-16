@@ -85,7 +85,7 @@ _CORE_STARTERS = ("copy", "protection", "reanimate")   # mots qui ouvrent un cœ
 # Cœurs connus mais hors moteur : testés avant les regex, raison groupable dans le rapport
 _UNSUPPORTED_CORE_KEYWORDS = (
     "remove ability conditions", "counter-attack",
-    "fatal killshot", "sinister symmetry", "overdose", "perfection",
+    "overdose", "perfection",
     "rebirth",
     "beyond", "bypass", "hazard", "illusion", "limitless",
 )
@@ -191,6 +191,12 @@ def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacit
     match = _R_EXCHANGE.match(core)
     if match:
         return error or _capacity("both", _types(match.group(1)), 0, "exchange", -1, conditions)
+
+    if core == "fatal killshot":   # « the match is over and you win by KO » dès que l'attaque vaut le double
+        return error or _capacity("enemy", ["ko"], 0, how, -1, list(conditions) + ["killshot"])
+
+    if core == "sinister symmetry":   # « If your card wins the round against the card in front of it, the match is over »
+        return error or _capacity("enemy", ["ko"], 0, how, -1, list(conditions) + ["symmetry"])
 
     if core == "tie-break":      # Leader (Solomon) : l'équipe gagne toutes les égalités d'attaque
         return error or _capacity("ally", ["tie_break"], 0, "tie_break", -1, list(conditions) + ["team"])

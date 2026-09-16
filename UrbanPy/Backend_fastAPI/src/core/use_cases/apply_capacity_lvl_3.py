@@ -27,6 +27,9 @@ def apply_capacity_lvl_3(game: Game, card1: Card, card2: Card) -> None:
                 setattr(card, slot, None)
                 continue
             capacity = check_capacity_condition_lvl_3(capacity, card.win)
+            if capacity is not None and "ko" in capacity.types:       # Fatal Killshot / Sinister Symmetry : KO immédiat
+                opp.life = 0
+                capacity = None
             if capacity is not None and "recover" in capacity.types:
                 own.pillz += recovered_pillz(card, capacity)
                 if capacity.target == "both":                       # « Recover X Players Pillz » : chacun sur sa propre mise

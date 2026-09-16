@@ -268,3 +268,32 @@ def test_recover_players_pillz_gives_both_players_part_of_their_own_bet(template
 
     assert template_game.ally.cards[AMELIA].win is False
     assert (template_game.ally.pillz, template_game.enemy.pillz) == (12 - 6 + 3, 12 - 2 + 1)   # chacun récupère la moitié de sa propre mise
+
+
+# --- Fatal Killshot / Sinister Symmetry : la partie est gagnée sur-le-champ (règles officielles) -----------------
+
+def test_fatal_killshot_knocks_the_opponent_out(template_game):
+    play(template_game, ally_ability="Fatal Killshot", ally_pillz=10, enemy_pillz=1)   # 10 >= 2 x 5
+
+    assert template_game.enemy.life == 0
+    assert check_end(template_game) is GameResult.ALLY
+
+
+def test_fatal_killshot_is_an_ordinary_win_below_double(template_game):
+    play(template_game, ally_ability="Fatal Killshot", ally_pillz=9, enemy_pillz=1)
+
+    assert template_game.enemy.life == 12 - 5
+
+
+def test_sinister_symmetry_wins_the_match_against_the_card_in_front(template_game):
+    template_game.enemy.cards[2].ability = None                                         # Bhudd (idx 2, P4)
+    play(template_game, ally_ability="Sinister Symmetry", enemy_index=2, ally_pillz=6, enemy_pillz=1)   # 6 > 4 - 2
+
+    assert template_game.enemy.life == 0
+
+
+def test_sinister_symmetry_does_nothing_off_symmetry(template_game):
+    play(template_game, ally_ability="Sinister Symmetry", ally_pillz=6, enemy_pillz=1)   # idx 2 contre idx 0
+
+    assert template_game.enemy.life == 12 - 5
+
