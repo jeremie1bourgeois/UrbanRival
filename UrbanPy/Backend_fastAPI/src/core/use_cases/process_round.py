@@ -64,6 +64,8 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
         # Killshot : la capacité n'agit que si l'attaque vaut au moins le double de l'attaque adverse
         apply_killshot_condition(player1_card, player2_card)
         apply_killshot_condition(player2_card, player1_card)
+        apply_perfect_condition(player1_card, player2_card)
+        apply_perfect_condition(player2_card, player1_card)
 
         # Créer une nouvelle instance de Round
         round_result = Round()
@@ -135,8 +137,8 @@ def resolve_combat(game: Game, player1_card: Card, player2_card: Card, round_res
 
 
 # Conditions évaluées plus tard qu'au début du round : "stop" au niveau 1 (l'ability a-t-elle été stoppée ?),
-# "killshot" après le calcul des attaques, les autres après le combat (niveau 3).
-DEFERRED_CONDITIONS = {"stop", "killshot", "defeat", "backlash", "victory_defeat"}
+# "killshot" et "perfect" après le calcul des attaques, les autres après le combat (niveau 3).
+DEFERRED_CONDITIONS = {"stop", "killshot", "perfect", "defeat", "backlash", "victory_defeat"}
 
 
 def check_capacity_condition(game: Game, capacity: Capacity, is_ally: bool, own_card_index: int, opp_card_index: int) -> bool:
@@ -206,6 +208,21 @@ def apply_killshot_condition(card: Card, opp_card: Card) -> None:
         if capacity is not None and "killshot" in capacity.effect_conditions:
             if is_killshot:
                 capacity.effect_conditions.remove("killshot")
+            else:
+                setattr(card, slot, None)
+
+
+def apply_perfect_condition(card: Card, opp_card: Card) -> None:
+    """
+    Consomme la condition « perfect » ou désactive la capacité. Règle officielle : l'écart d'attaque est strictement
+    inférieur à la puissance de la carte (une pillz de moins n'aurait pas gagné). La victoire est exigée au niveau 3.
+    """
+    is_perfect = card.attack - opp_card.attack < card.power_fight
+    for slot in FIGHT_SLOTS:
+        capacity = getattr(card, slot)
+        if capacity is not None and "perfect" in capacity.effect_conditions:
+            if is_perfect:
+                capacity.effect_conditions.remove("perfect")
             else:
                 setattr(card, slot, None)
 

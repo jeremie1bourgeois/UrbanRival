@@ -71,6 +71,7 @@ _CONDITION_PREFIXES = {
     "victory or defeat": "victory_defeat",
     "stop": "stop",           # l'ability n'agit que si elle a été stoppée (évalué au niveau 1)
     "killshot": "killshot",   # attaque >= 2 x attaque adverse (évalué après le calcul des attaques)
+    "perfect": "perfect",     # écart d'attaque < puissance : une pillz de moins n'aurait pas gagné (idem)
     "team": "team",           # ability de Leader : s'applique à chaque carte jouée de l'équipe (voir process_round)
     "unison": "unison",       # la main est exclusivement du clan de la carte
     "disunion": "disunion",   # au moins une carte d'un autre clan dans la main

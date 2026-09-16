@@ -150,6 +150,8 @@ def test_day_prefix_is_ignored_for_now():
     ("Stop: Equalizer: - 2 Opp. Life Min 0", cap("enemy", ["life"], -2, how="equalizer", borne=0, conditions=["stop"])),
     ("Killshot: +3 Life", cap("ally", ["life"], 3, conditions=["killshot"])),
     ("Killshot: Toxin 1, Min 0", cap("enemy", ["toxine"], 1, borne=0, conditions=["killshot"])),
+    ("Perfect: +2 Pillz", cap("ally", ["pillz"], 2, conditions=["perfect"])),
+    ("Team: Perfect: -2 Opp. Life Min 0", cap("enemy", ["life"], -2, borne=0, conditions=["team", "perfect"])),
 ])
 def test_stop_and_killshot_prefixes_are_deferred_conditions(text, expected):
     assert parsed(text) == expected
@@ -319,7 +321,7 @@ def test_gibberish_is_unknown_core():
 
 # --- Couverture sur les descriptions officielles -----------------------------------------
 
-SUPPORTED_DESCRIPTIONS_FLOOR = 1197  # mesuré le 2026-09-16 sur 1310 descriptions ; à relever quand la couverture progresse
+SUPPORTED_DESCRIPTIONS_FLOOR = 1203  # mesuré le 2026-09-16 sur 1310 descriptions ; à relever quand la couverture progresse
 
 
 def test_every_official_description_parses_without_raising():

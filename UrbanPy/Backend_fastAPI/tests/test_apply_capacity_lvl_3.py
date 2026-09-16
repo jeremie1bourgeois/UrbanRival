@@ -181,6 +181,28 @@ def test_killshot_gates_persistent_effects_too(template_game):
     assert template_game.enemy.effect_list == []
 
 
+# --- Perfect : victoire avec le nombre exact de pillz (règle officielle : « If the difference between your attack and
+# attack of the opponent is less than the power of your card you have a perfect pill ») ------------------------
+
+def test_perfect_fires_when_one_pillz_less_would_not_have_won(template_game):
+    play(template_game, ally_ability="Perfect: +2 Life", ally_pillz=5, enemy_pillz=1)   # 5 = 5 : égalité gagnée aux étoiles, écart 0 < puissance 1
+
+    assert template_game.ally.cards[AMELIA].win is True
+    assert template_game.ally.life == 14
+
+
+def test_perfect_does_not_fire_on_a_wasted_pillz(template_game):
+    play(template_game, ally_ability="Perfect: +2 Life", ally_pillz=6, enemy_pillz=1)   # 6 > 5, écart 1 >= puissance 1
+
+    assert template_game.ally.life == 12
+
+
+def test_perfect_does_not_fire_on_defeat(template_game):
+    play(template_game, ally_ability="Perfect: +2 Life", ally_pillz=4, enemy_pillz=1)   # 4 < 5
+
+    assert template_game.ally.life == 12 - 3
+
+
 # --- Multiplicateur « per damage » ------------------------------------------------------------
 
 def test_life_per_damage_counts_the_damage_inflicted(template_game):
