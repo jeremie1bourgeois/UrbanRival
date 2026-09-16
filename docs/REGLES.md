@@ -21,7 +21,7 @@ Hiérarchie de confiance : support officiel > glossaire officiel > texte de cart
 | Règle | Source | Moteur | Verdict |
 |---|---|---|---|
 | Attaque = Puissance × Pillz ; 1 pillz gratuite obligatoire par round ; 12 pillz au départ ; 12 vies | wiki *Pillz*, *Attack* | `process_round` | ✅ Confirmé |
-| Fury : 3 pillz pour +2 dégâts | wiki *Fury* | `process_round` | ✅ Confirmé (sur le coût et la valeur ; **ordre** : voir § 3.12) |
+| Fury : 3 pillz pour +2 dégâts, ajoutés après les réducteurs de dégâts | wiki *Fury* + utilisateur | `process_round` | ✅ Confirmé |
 | Égalité d'attaque : la carte de **niveau (étoiles) le plus bas** gagne ; à niveau égal, **celui qui a joué en premier** gagne | wiki *Power* (« the card with a lower star count wins ») + FAQ support | `resolve_combat` | ✅ Confirmé |
 | Bonus de clan actif avec **≥ 2 cartes du clan** dans la main. Précision : « This doesn't apply to the same Characters » — deux exemplaires de la même carte **ne comptent pas** | wiki *Bonus* | `is_clan_bonus_active` compte par clan, sans exclure les doublons | ⚠️ Écart si un deck contient deux fois la même carte (le deck builder l'autorise-t-il ? à vérifier) |
 | Fin de partie : KO à 0 vie ; sinon, après 4 rounds, plus de vie gagne ; vies égales = **match nul** | wiki *KO*, *Life* | `check_end` (`GameResult.DRAW`) | ✅ Confirmé |
@@ -191,13 +191,11 @@ damage-reducing abilities/bonuses (if any) are also taken into account ». Exemp
   include changes related to an Ability, Bonus or Fury » → copie de la **valeur imprimée**.
   `_apply_value_copies_and_exchanges` lit bien `opp.power` / `opp.damage` (valeurs imprimées) : confirmé.
 
-### 3.12 Fury ajoutée après les modificateurs de dégâts — ➖ NON DOCUMENTÉ, probablement contredit
+### 3.12 Fury ajoutée après les modificateurs de dégâts — ✅ CONFIRMÉ (utilisateur, 2026-09-16)
 
-Aucune source textuelle. L'expérience communautaire (les réducteurs de dégâts Pussycats/Uranus « mangent » la fury :
-une carte 2 dégâts + fury face à « −2 Opp Damage, Min 1 » inflige 2, pas 3) suggère que la fury est ajoutée **avant**
-les réducteurs adverses. Le moteur l'ajoute après (`process_round` : « Appliquer les fury » après `lvl_2`), ce qui
-donnerait 3. **Cas idéal pour le premier rejeu de combat réel** : une carte à faible dégât avec fury contre une
-Pussycats.
+Aucune source textuelle trouvée ; l'utilisateur confirme par connaissance du jeu que la fury s'applique **après** les
+réducteurs de dégâts (une carte 2 dégâts + fury face à « −2 Opp Damage, Min 1 » inflige 1 + 2 = 3). C'est ce que fait
+le moteur (`process_round` : « Appliquer les fury » après `lvl_2`).
 
 ### 3.13 `Day:` toujours valide, `Night:` jamais — ⚠️ DÉCISION UTILISATEUR
 
@@ -216,7 +214,8 @@ assumé, sans conséquence tant que le jeu n'est pas comparé à des combats ré
 | 3.5 | Recover : fury comprise / minimum 0 | ✅ fury / ⚠️ min 1 | trivial |
 | 3.9, 3.10, 3.11 | Killshot, per damage, Copy | ✅ confirmés | — |
 | 3.7 | Team | ✅ (Cancel Leader, immunité SoA) / ➖ (Leader inclus) | — |
-| 3.2, 3.12 | Protection cyclique, ordre de la fury | ➖ non documentés | combats réels |
+| 3.12 | Fury après les réducteurs | ✅ confirmé (utilisateur) | — |
+| 3.2 | Protection cyclique | ➖ non documenté | combats réels |
 | 3.13 | Day/Night | choix utilisateur | — |
 
 ## 4. Mécaniques non gérées : définitions retrouvées
@@ -265,13 +264,12 @@ Précisions utiles glanées au passage :
 ## 5. Ce que les textes ne tranchent pas — à régler par rejeu de combats réels
 
 Par ordre d'impact :
-1. Ordre fury / réducteurs de dégâts (3.12).
-2. Cycles de Stops et de Protections (3.2).
-3. Recover : pillz gratuite comptée ou non, minimum 1 (3.5).
-4. Le Leader bénéficie-t-il de son propre Team (3.7).
-5. Cancel Life Modif. : pose du poison empêchée, ou tic du round sauté (3.3).
-6. Tune Out : la fury compte-t-elle dans les pillz comparées.
-7. Combust contre Mindwipe : différence réelle.
+1. Cycles de Stops et de Protections (3.2).
+2. Recover : pillz gratuite comptée ou non, minimum 1 (3.5).
+3. Le Leader bénéficie-t-il de son propre Team (3.7).
+4. Cancel Life Modif. : pose du poison empêchée, ou tic du round sauté (3.3).
+5. Tune Out : la fury compte-t-elle dans les pillz comparées.
+6. Combust contre Mindwipe : différence réelle.
 
 Chaque combat rejoué se transcrit dans `data/test/` (voir ROADMAP § 2.B.2) ; le journal des effets (D2) rendra la
 localisation des écarts immédiate.
