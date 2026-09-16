@@ -6,12 +6,22 @@ from src.core.domain.card import Card, FIGHT_SLOTS
 from src.core.domain.player import Player
 from src.schemas.game_schemas import ProcessRoundInput
 from src.core.domain.game import Game, NB_ROUNDS
+from src.core.domain.journal import Journal, note, recording
 import src.core.use_cases.apply_capacity_lvl_1 as fct_lvl_1
 import src.core.use_cases.apply_capacity_lvl_2 as fct_lvl_2
 import src.core.use_cases.apply_capacity_lvl_3 as fct_lvl_3
 import src.core.use_cases.apply_capacity_lvl_4 as fct_lvl_4
 
 def process_round(game: Game, round_data: ProcessRoundInput) -> None:
+    player1_card = game.ally.cards[round_data.player1_card_index]
+    player2_card = game.enemy.cards[round_data.player2_card_index]
+    journal = Journal(ally_card=player1_card, enemy_card=player2_card)
+    with recording(journal):
+        _process_round(game, round_data)
+    game.history[-1].log = journal.entries
+
+
+def _process_round(game: Game, round_data: ProcessRoundInput) -> None:
     try:
         # Mise à jour des pillz
         game.ally.pillz -= ((round_data.player1_pillz - 1) + 3 * round_data.player1_fury) # -1 car 1 pillz est toujours consommée
@@ -103,54 +113,24 @@ def process_round(game: Game, round_data: ProcessRoundInput) -> None:
 
 
 def resolve_combat(game: Game, player1_card: Card, player2_card: Card, round_result: Round):
-    if player1_card.attack > player2_card.attack:
-        game.enemy.life = max(0, game.enemy.life - player1_card.damage_fight)
-        round_result.ally.win = True
-        round_result.enemy.win = False
-        player1_card.win = True
-        player2_card.win = False
-    elif player2_card.attack > player1_card.attack:
-        game.ally.life = max(0, game.ally.life - player2_card.damage_fight)
-        round_result.ally.win = False
-        round_result.enemy.win = True
-        player1_card.win = False
-        player2_card.win = True
-    elif has_tie_break(player1_card) and not has_tie_break(player2_card):     # Tie-break (Solomon) : gagne toute égalité
-        game.enemy.life = max(0, game.enemy.life - player1_card.damage_fight)
-        round_result.ally.win = True
-        round_result.enemy.win = False
-        player1_card.win = True
-        player2_card.win = False
-    elif has_tie_break(player2_card) and not has_tie_break(player1_card):
-        game.ally.life = max(0, game.ally.life - player2_card.damage_fight)
-        round_result.ally.win = False
-        round_result.enemy.win = True
-        player1_card.win = False
-        player2_card.win = True
-    elif player1_card.stars < player2_card.stars:
-        game.enemy.life = max(0, game.enemy.life - player1_card.damage_fight)
-        round_result.ally.win = True
-        round_result.enemy.win = False
-        player1_card.win = True
-        player2_card.win = False
-    elif player2_card.stars < player1_card.stars:
-        game.ally.life = max(0, game.ally.life - player2_card.damage_fight)
-        round_result.ally.win = False
-        round_result.enemy.win = True
-        player1_card.win = False
-        player2_card.win = True
-    elif game.turn:
-        game.enemy.life = max(0, game.enemy.life - player1_card.damage_fight)
-        round_result.ally.win = True
-        round_result.enemy.win = False
-        player1_card.win = True
-        player2_card.win = False
-    else:
-        game.ally.life = max(0, game.ally.life - player2_card.damage_fight)
-        round_result.ally.win = False
-        round_result.enemy.win = True
-        player1_card.win = False
-        player2_card.win = True
+    a1, a2 = player1_card.attack, player2_card.attack
+    if a1 != a2:
+        ally_wins, reason = a1 > a2, f"({max(a1, a2)} > {min(a1, a2)})"
+    elif has_tie_break(player1_card) != has_tie_break(player2_card):        # Tie-break (Solomon) : gagne toute égalité
+        ally_wins, reason = has_tie_break(player1_card), "(Tie-break)"
+    elif player1_card.stars != player2_card.stars:                          # moins d'étoiles gagne
+        ally_wins, reason = player1_card.stars < player2_card.stars, "(moins d'étoiles)"
+    else:                                                                   # sinon celui qui a joué en premier
+        ally_wins, reason = game.turn, "(a joué en premier)"
+
+    winner, loser, loser_player, loser_side = ((player1_card, player2_card, game.enemy, "l'ennemi") if ally_wins
+                                               else (player2_card, player1_card, game.ally, "l'allié"))
+    before = loser_player.life
+    loser_player.life = max(0, before - winner.damage_fight)
+    round_result.ally.win, round_result.enemy.win = ally_wins, not ally_wins
+    player1_card.win, player2_card.win = ally_wins, not ally_wins
+    tie = f"Égalité {a1} à {a2} : " if a1 == a2 else ""
+    note(None, "round", f"{tie}{winner.name} gagne {reason} : {loser_side} perd {winner.damage_fight} vies ({before} → {loser_player.life})")
 
 
 # Conditions évaluées plus tard qu'au début du round : "stop" au niveau 1 (l'ability a-t-elle été stoppée ?),
