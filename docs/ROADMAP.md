@@ -63,7 +63,7 @@ Counter-attack refixe l'ordre à chaque round.
 ### B. Fiabilité des règles existantes
 1. ~~Confirmer les décisions du tableau § 1 contre les règles officielles~~ → fait (`docs/REGLES.md`) ; appliquer les corrections listées en § 3 de ce document.
 2. **Oracle = combats réels** (fait le 2026-09-16, premier combat reproduit à l'identique) : jouer un combat dans le
-   client web d'Urban Rivals avec `scripts/ur_capture.js` chargé, sauvegarder `urRecord()` dans `data/ur_battles/<id>.json`,
+   client web d'Urban Rivals avec `scripts/ur_capture.js` chargé, importer `urRecords()` avec `scripts/import_ur_battles.py` (procédure complète : `docs/ORACLE.md`),
    `tests/test_ur_battles.py` rejoue chaque round et exige les valeurs officielles (puissance, dégâts, attaque,
    vainqueur, vies, pillz). Viser les points non tranchés (cycles de Stops, Leader et son Team, Tune Out + fury,
    Mindwipe / Combust, Limitless, Exchange contre Copy/Annul) et les clans à bonus méta. Le modèle `abilityData` du
