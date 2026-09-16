@@ -1,4 +1,6 @@
 import os
+import random
+from src.core.ai.opponent import STRATEGIES, Pick
 from src.core.use_cases.process_round import check_round_correct, process_round
 from src.core.domain.player import Player
 from src.schemas.game_schemas import GameResult, PlayerCards, ProcessRoundInput
@@ -7,26 +9,36 @@ from src.adapters.repositories.game_repository import get_new_game_id, get_new_t
 from src.core.domain.game import Game, NB_ROUNDS
 from src.utils.config import BASE_DIR
 
-def process_round_service(game_id: str, round_data: ProcessRoundInput):
-    # Charger le chemin du dossier de la partie
+def _game_directory(game_id) -> str:
     game_directory = os.path.join(BASE_DIR, "data/game/", f"game_{game_id}")
-
-    # Vérifier si le dossier existe
     if not os.path.exists(game_directory):
         raise FileNotFoundError(f"Game directory not found: {game_directory}")
+    return game_directory
 
-    # Trouver le fichier avec le nb_turn le plus élevé
+
+def load_latest_game(game_id) -> Game:
+    """Charge l'état le plus récent d'une partie (fichier au nb_turn le plus élevé)."""
+    game_directory = _game_directory(game_id)
     game_files = [f for f in os.listdir(game_directory) if f.startswith(f"game_data_{game_id}_") and f.endswith(".json")]
     if not game_files:
         raise FileNotFoundError(f"No game files found in directory: {game_directory}")
-
-    # Extraire le nb_turn de chaque fichier et trouver le maximum
     max_turn_file = max(game_files, key=lambda x: int(x.split("_")[3].split(".")[0]))
-    game_file_path = os.path.join(game_directory, max_turn_file)
+    return load_game_from_json(os.path.join(game_directory, max_turn_file))
 
-    # Charger la partie
-    game = load_game_from_json(game_file_path)
-    
+
+def ai_pick_service(game_id, strategy: str, side: str) -> Pick:
+    """Choix de l'adversaire automatique pour le round en cours."""
+    if strategy not in STRATEGIES:
+        raise ValueError(f"Unknown strategy: {strategy!r} (expected one of {sorted(STRATEGIES)})")
+    if side not in ("ally", "enemy"):
+        raise ValueError(f"Unknown side: {side!r}")
+    return STRATEGIES[strategy](load_latest_game(game_id), side, random.Random())
+
+
+def process_round_service(game_id: str, round_data: ProcessRoundInput):
+    game_directory = _game_directory(game_id)
+    game = load_latest_game(game_id)
+
     # Vérifier si le round est correct
     check_round_correct(game, round_data)
 
