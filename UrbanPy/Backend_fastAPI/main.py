@@ -3,10 +3,10 @@ import traceback
 from typing import Any, Dict, List
 
 from fastapi.responses import JSONResponse
-from src.schemas.game_schemas import PlayerCards, ProcessRoundInput
+from src.schemas.game_schemas import AiPickInput, PlayerCards, ProcessRoundInput
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException, Body, Request
-from src.core.services.game_service import create_game, process_round_service, init_game_from_template, save_for_test_service
+from src.core.services.game_service import ai_pick_service, create_game, process_round_service, init_game_from_template, save_for_test_service
 from src.adapters.repositories.card_repository import official_card_catalogue
 from src.utils.config import BASE_DIR
 
@@ -102,6 +102,21 @@ def init_game_template() -> Dict[str, Any]:
         return {"status": "success", "game": game.to_dict(), "game_id": new_id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/ai_pick/{game_id}", response_model=Dict[str, Any])
+def ai_pick(game_id: str, body: AiPickInput = Body(...)) -> Dict[str, Any]:
+    """
+    Choix de l'adversaire automatique (carte, pillz, fury) pour le round en cours, sans jouer le round :
+    le client l'envoie ensuite à /process_round avec le choix humain.
+    """
+    try:
+        pick = ai_pick_service(game_id, body.strategy, body.side)
+        return {"card_index": pick.card_index, "pillz": pick.pillz, "fury": pick.fury}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail=f"Game ID '{game_id}' not found.")
+
 
 @app.get("/cards", response_model=List[Dict[str, Any]])
 def cards_catalogue() -> List[Dict[str, Any]]:
