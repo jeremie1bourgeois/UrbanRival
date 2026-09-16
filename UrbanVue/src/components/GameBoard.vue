@@ -25,6 +25,13 @@ const banner = computed(
 	() => ({ "Ally Wins": "Victoire de l'allié !", "Enemy Wins": "Victoire de l'ennemi !", Draw: "Égalité.", "Game Not Finished": "" })[state.value],
 );
 const history = computed(() => roundSummaries(states.value));
+const openedLogs = ref<Set<number>>(new Set());
+function toggleLog(round: number) {
+	const next = new Set(openedLogs.value);
+	if (next.has(round)) next.delete(round);
+	else next.add(round);
+	openedLogs.value = next;
+}
 const enemyIsAi = opponent !== "human";
 
 const effectLabel = (kind: string, value: number, borne: number) =>
@@ -175,22 +182,49 @@ async function save() {
 						</tr>
 					</thead>
 					<tbody>
-						<tr v-for="round in history" :key="round.round" class="border-t border-gray-700">
-							<td class="py-1 pr-2">{{ round.round }}</td>
-							<td
-								v-for="(played, who) in { ally: round.ally, enemy: round.enemy }"
-								:key="who"
-								class="py-1 pr-2"
-								:class="played.win ? 'text-green-300' : 'text-gray-400'"
-							>
-								{{ played.name }} · {{ played.pillz }} pillz<template v-if="played.fury"> + fury</template> · P{{ played.power }} D{{
-									played.damage
-								}}
-								· attaque {{ played.attack }}
-								<span v-if="played.win">✓</span>
-							</td>
-							<td class="py-1">{{ round.lifeAfter.ally }} / {{ round.lifeAfter.enemy }}</td>
-						</tr>
+						<template v-for="round in history" :key="round.round">
+							<tr class="border-t border-gray-700">
+								<td class="py-1 pr-2">
+									{{ round.round }}
+									<button
+										v-if="round.log.length"
+										type="button"
+										class="ml-1 rounded border border-gray-600 px-1 text-gray-300 hover:bg-gray-700"
+										:aria-expanded="openedLogs.has(round.round)"
+										:title="openedLogs.has(round.round) ? 'Masquer les effets' : 'Voir les effets'"
+										@click="toggleLog(round.round)"
+									>
+										{{ openedLogs.has(round.round) ? "▾" : "▸" }} effets
+									</button>
+								</td>
+								<td
+									v-for="(played, who) in { ally: round.ally, enemy: round.enemy }"
+									:key="who"
+									class="py-1 pr-2"
+									:class="played.win ? 'text-green-300' : 'text-gray-400'"
+								>
+									{{ played.name }} · {{ played.pillz }} pillz<template v-if="played.fury"> + fury</template> · P{{ played.power }} D{{
+										played.damage
+									}}
+									· attaque {{ played.attack }}
+									<span v-if="played.win">✓</span>
+								</td>
+								<td class="py-1">{{ round.lifeAfter.ally }} / {{ round.lifeAfter.enemy }}</td>
+							</tr>
+							<tr v-if="openedLogs.has(round.round)" class="bg-gray-800/60">
+								<td colspan="4" class="px-2 py-1">
+									<ol class="list-none space-y-0.5 font-mono text-[11px]">
+										<li
+											v-for="(entry, index) in round.log"
+											:key="index"
+											:class="entry.side === 'ally' ? 'text-yellow-200' : entry.side === 'enemy' ? 'text-sky-200' : 'text-gray-100 font-semibold'"
+										>
+											{{ entry.text }}
+										</li>
+									</ol>
+								</td>
+							</tr>
+						</template>
 					</tbody>
 				</table>
 			</section>
