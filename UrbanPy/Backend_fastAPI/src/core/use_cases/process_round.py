@@ -114,6 +114,18 @@ def resolve_combat(game: Game, player1_card: Card, player2_card: Card, round_res
         round_result.enemy.win = True
         player1_card.win = False
         player2_card.win = True
+    elif has_tie_break(player1_card) and not has_tie_break(player2_card):     # Tie-break (Solomon) : gagne toute égalité
+        game.enemy.life = max(0, game.enemy.life - player1_card.damage_fight)
+        round_result.ally.win = True
+        round_result.enemy.win = False
+        player1_card.win = True
+        player2_card.win = False
+    elif has_tie_break(player2_card) and not has_tie_break(player1_card):
+        game.ally.life = max(0, game.ally.life - player2_card.damage_fight)
+        round_result.ally.win = False
+        round_result.enemy.win = True
+        player1_card.win = False
+        player2_card.win = True
     elif player1_card.stars < player2_card.stars:
         game.enemy.life = max(0, game.enemy.life - player1_card.damage_fight)
         round_result.ally.win = True
@@ -212,6 +224,10 @@ def leader_team_capacity(player: Player) -> Capacity:
     capacity = copy.deepcopy(leaders[0].ability)
     capacity.effect_conditions.remove("team")
     return capacity
+
+
+def has_tie_break(card: Card) -> bool:
+    return any(getattr(card, slot) is not None and getattr(card, slot).how == "tie_break" for slot in FIGHT_SLOTS)
 
 
 def consume_tune_out(card: Card) -> bool:

@@ -88,3 +88,44 @@ def test_leader_fight_round_trips_through_json(game):
     restored = Card.from_dict_template(card.to_dict())
 
     assert restored.leader_fight.to_dict() == card.leader_fight.to_dict()
+
+
+# --- Autres abilities de Leader ------------------------------------------------------------------
+
+def test_per_round_leader_ability_applies_every_round_win_or_lose(game):
+    game.ally.cards[AGUSTINO].ability = ability("+1 Pillz Per Round")   # Morphun
+
+    play(game)                                                          # Amelia perd
+
+    assert game.ally.pillz == 12 + 1
+
+
+def test_opp_pillz_per_round_leader_ability(game):
+    game.ally.cards[AGUSTINO].ability = ability("-1 Opp. Pillz, Per Round, Min 4")   # Eklore
+
+    play(game)
+
+    assert game.enemy.pillz == 12 - 1
+
+
+def test_team_cancel_players_damage_mod_cancels_both_sides(game):
+    game.ally.cards[AGUSTINO].ability = ability("Team: Cancel Players Dam. Mod.")   # Vholt-like
+    game.ally.cards[AMELIA].ability = ability("Damage +2")
+    game.enemy.cards[ASPOROV].ability = ability("-3 Opp Damage, Min 1")
+
+    amelia, asporov = play(game)
+
+    assert (amelia.damage_fight, asporov.damage_fight) == (5, 3)
+
+
+def test_tie_break_leader_wins_every_attack_tie(game):
+    game.ally.cards[AGUSTINO].ability = ability("Tie-break")   # Solomon
+    game.ally.cards[ALLISON].stars = 5                          # 5 étoiles > Asporov 4 : Allison perdrait l'égalité
+    game.ally.cards[ALLISON].ability = None
+    game.ally.cards[ALLISON].power = 7                          # 7 - 2 = 5 = Asporov 7 - 2 : égalité d'attaque
+
+    allison, asporov = play(game, ally_index=ALLISON)
+
+    assert (allison.attack, asporov.attack) == (5, 5)
+    assert allison.win is True                                  # sans Tie-break, Asporov (4 étoiles) gagnerait
+

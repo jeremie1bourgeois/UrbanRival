@@ -29,6 +29,8 @@ def apply_capacity_lvl_3(game: Game, card1: Card, card2: Card) -> None:
             capacity = check_capacity_condition_lvl_3(capacity, card.win)
             if capacity is not None and "recover" in capacity.types:
                 own.pillz += recovered_pillz(card, capacity)
+                if capacity.target == "both":                       # « Recover X Players Pillz » : chacun sur sa propre mise
+                    opp.pillz += recovered_pillz(opp_card, capacity)
                 capacity = None
             for apply in (apply_target_ally_effects, apply_target_both_effects, apply_target_enemy_effects):
                 if capacity is None:

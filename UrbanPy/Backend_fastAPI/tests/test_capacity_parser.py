@@ -220,7 +220,7 @@ def test_per_damage_multiplier(text, expected):
     assert parsed(text) == expected
 
 
-@pytest.mark.parametrize("suffix", ["Round"])
+@pytest.mark.parametrize("suffix", ["Moon"])
 def test_unsupported_per_multipliers(suffix):
     result = parse_capacity(f"+1 Life Per {suffix}")
 
@@ -356,7 +356,7 @@ from src.adapters.repositories.card_repository import all_capacity_descriptions
 
 
 @pytest.mark.parametrize("text, keyword", [
-    ("Rebirth 2, Max. 10", "rebirth"),     ("Remove Ability Conditions", "remove ability conditions"), ("Beyond", "beyond"), ("Tie-break", "tie-break"),
+    ("Rebirth 2, Max. 10", "rebirth"),     ("Remove Ability Conditions", "remove ability conditions"), ("Beyond", "beyond"),
     ("Counter-attack", "counter-attack"), ("Limitless", "limitless"),
 ])
 def test_explicitly_unsupported_cores(text, keyword):
@@ -371,7 +371,7 @@ def test_gibberish_is_unknown_core():
 
 # --- Couverture sur les descriptions officielles -----------------------------------------
 
-SUPPORTED_DESCRIPTIONS_FLOOR = 1374  # mesuré le 2026-09-16 sur 1396 descriptions ; à relever quand la couverture progresse
+SUPPORTED_DESCRIPTIONS_FLOOR = 1382  # mesuré le 2026-09-16 sur 1396 descriptions ; à relever quand la couverture progresse
 
 
 def test_every_official_description_parses_without_raising():
@@ -382,6 +382,19 @@ def test_every_official_description_parses_without_raising():
     assert all(r.reason for r in results.values() if not r.supported)
     supported = sum(1 for r in results.values() if r.supported)
     assert supported >= SUPPORTED_DESCRIPTIONS_FLOOR, f"couverture en baisse : {supported} < {SUPPORTED_DESCRIPTIONS_FLOOR}"
+
+
+@pytest.mark.parametrize("text, expected", [
+    # Leaders : « Per Round » = à chaque round, victoire ou défaite, pour la carte jouée (comme un Team:)
+    ("+1 Pillz Per Round", cap("ally", ["pillz"], 1, conditions=["team", "victory_defeat"])),
+    ("-1 Opp. Pillz, Per Round, Min 4", cap("enemy", ["pillz"], -1, borne=4, conditions=["team", "victory_defeat"])),
+    ("Team: Cancel Players Dam. Mod.", cap("both", ["damage"], 0, how="cancel", conditions=["team"])),
+    ("Team: Cancel Players Life Mod.", cap("both", ["life"], 0, how="cancel", conditions=["team"])),
+    ("Tie-break", cap("ally", ["tie_break"], 0, how="tie_break", conditions=["team"])),
+    ("Recover 1 Players Pillz Out Of 2", cap("both", ["recover"], 1, borne=2)),
+])
+def test_leader_and_players_variants(text, expected):
+    assert parsed(text) == expected
 
 
 def test_team_prefix_is_a_leader_condition():

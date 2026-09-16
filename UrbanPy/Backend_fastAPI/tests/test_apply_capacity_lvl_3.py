@@ -260,3 +260,11 @@ def test_unconditional_recover_applies_on_victory(template_game):
     play(template_game, ally_ability="Recover 1 Pillz Out Of 2", ally_wins=True)           # 5 misées -> 2
 
     assert template_game.ally.pillz == 12 - 5 + 2
+
+
+def test_recover_players_pillz_gives_both_players_part_of_their_own_bet(template_game):
+    # Amelia (P1) mise 6 (7 pillz) contre Asporov (P5) qui mise 2 (3 pillz) : 7 < 15, Amelia perd -> victoire requise, rien.
+    play(template_game, ally_ability="Victory Or Defeat: Recover 1 Players Pillz Out Of 2", ally_pillz=7, enemy_pillz=3)
+
+    assert template_game.ally.cards[AMELIA].win is False
+    assert (template_game.ally.pillz, template_game.enemy.pillz) == (12 - 6 + 3, 12 - 2 + 1)   # chacun récupère la moitié de sa propre mise

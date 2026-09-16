@@ -84,7 +84,7 @@ _CORE_STARTERS = ("copy", "protection", "reanimate")   # mots qui ouvrent un cœ
 
 # Cœurs connus mais hors moteur : testés avant les regex, raison groupable dans le rapport
 _UNSUPPORTED_CORE_KEYWORDS = (
-    "remove ability conditions", "counter-attack", "tie-break",
+    "remove ability conditions", "counter-attack",
     "fatal killshot", "sinister symmetry", "overdose", "perfection",
     "rebirth",
     "beyond", "bypass", "hazard", "illusion", "limitless",
@@ -110,14 +110,14 @@ _R_STOP = re.compile(r"^stop (?:opp )?(ability|bonus)$")
 _R_COPY = re.compile(r"^copy (?:opp )?(ability|bonus|power and damage|power|damage)(?: opp)?$")
 _R_PROTECTION = re.compile(r"^protection (ability|bonus|power and damage|power|damage|attack)$")
 _R_PROTECTION_SUFFIX = re.compile(r"^(ability|bonus) protection$")
-_R_CANCEL = re.compile(r"^cancel (?:opp )?(power and damage|pillz and life|power|damage|attack|life|pillz) modif$")
+_R_CANCEL = re.compile(r"^cancel (?:(opp|players) )?(power and damage|pillz and life|power|damage|attack|life|pillz) modif$")
 _R_EXCHANGE = re.compile(r"^(power and damage|power|damage) exchange$")
 _R_IMPOSE = re.compile(r"^(power|damage) impose$")   # la stat adverse prend la valeur imprimée de ma carte
 _R_PERSISTENT = re.compile(r"^(?:(players) )?(poison|toxin|heal|regen|dope|repair|consume|combust|mindwipe) (\d+) (?:min|max) (\d+)$")
 _R_CORRUPT = re.compile(r"^corrupt (\d+) min (\d+)$")           # le propriétaire perd X vies, victoire ou défaite
 _R_CORROSION = re.compile(r"^corrosion (\d+) min (\d+)$")   # poison dont la valeur est multipliée par le numéro du round
 _R_REANIMATE = re.compile(r"^reanimate \+(\d+) life$")
-_R_RECOVER = re.compile(r"^recover (\d+) pillz out of (\d+)$")   # X pillz récupérées sur Y misées (fin de round)
+_R_RECOVER = re.compile(r"^recover (\d+) (?:(players) )?pillz out of (\d+)$")   # X pillz récupérées sur Y misées (fin de round)
 _R_INFILTRATED = re.compile(r"^infiltrated$")                        # bonus Oculus : adopte le bonus du clan majoritaire de la main
 
 # Mindwipe : « lose X Life Points and Pillz, minimum Y, at the end of each of the following rounds » = Combust (textes officiels)
@@ -135,10 +135,13 @@ def _borne(group) -> int:
     return int(group) if group is not None else -1
 
 
+_PER_ROUND = "round"   # « +1 Pillz Per Round » (Leaders) : à chaque round, victoire ou défaite = Team: Victory Or Defeat: X
+
+
 def _resolve_how(prefix_hows: list, per: Optional[str]):
     """Retourne (how, erreur) : un seul multiplicateur autorisé."""
     hows = list(prefix_hows)
-    if per is not None:
+    if per is not None and per != _PER_ROUND:
         if per not in _PER_MULTIPLIERS:
             return None, _unsupported(f"unsupported multiplier: per {per}")
         hows.append(_PER_MULTIPLIERS[per])
@@ -148,6 +151,10 @@ def _resolve_how(prefix_hows: list, per: Optional[str]):
 
 
 _R_CARDS = re.compile(r"\bcards\b")
+
+
+def _per_round(conditions: list, per: Optional[str]) -> list:
+    return list(conditions) + ["team", "victory_defeat"] if per == _PER_ROUND else conditions
 
 
 def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacity:
@@ -178,11 +185,15 @@ def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacit
 
     match = _R_CANCEL.match(core)
     if match:
-        return error or _capacity("enemy", _types(match.group(1)), 0, "cancel", -1, conditions)
+        target = "both" if match.group(1) == "players" else "enemy"
+        return error or _capacity(target, _types(match.group(2)), 0, "cancel", -1, conditions)
 
     match = _R_EXCHANGE.match(core)
     if match:
         return error or _capacity("both", _types(match.group(1)), 0, "exchange", -1, conditions)
+
+    if core == "tie-break":      # Leader (Solomon) : l'équipe gagne toutes les égalités d'attaque
+        return error or _capacity("ally", ["tie_break"], 0, "tie_break", -1, list(conditions) + ["team"])
 
     if core == "tune out":       # bonus Cosmohnuts : le round se résout aux pillz misées, pas à l'attaque
         return error or _capacity("both", ["tune_out"], 0, "tune_out", -1, conditions)
@@ -212,7 +223,8 @@ def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacit
 
     match = _R_RECOVER.match(core)
     if match:
-        return error or _capacity("ally", ["recover"], int(match.group(1)), how, int(match.group(2)), conditions)
+        target = "both" if match.group(2) else "ally"
+        return error or _capacity(target, ["recover"], int(match.group(1)), how, int(match.group(3)), conditions)
 
     if _R_INFILTRATED.match(core):
         return error or _capacity("ally", ["infiltrated"], 0, how, -1, conditions)
@@ -228,13 +240,13 @@ def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacit
         value, who, stat, per, borne = match.groups()
         how, error = _resolve_how(prefix_hows, per)
         target = {"opp": "enemy", "players": "both"}.get(who, "ally")
-        return error or _capacity(target, _types(stat), int(value), how, _borne(borne), conditions)
+        return error or _capacity(target, _types(stat), int(value), how, _borne(borne), _per_round(conditions, per))
 
     match = _R_MINUS_OPP.match(core)
     if match:
         value, stat, per, borne = match.groups()
         how, error = _resolve_how(prefix_hows, per)
-        return error or _capacity("enemy", _types(stat), -int(value), how, int(borne), conditions)
+        return error or _capacity("enemy", _types(stat), -int(value), how, int(borne), _per_round(conditions, per))
 
     match = _R_MINUS_SELF.match(core)
     if match:

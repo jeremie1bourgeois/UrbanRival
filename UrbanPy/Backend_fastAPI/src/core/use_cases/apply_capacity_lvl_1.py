@@ -18,7 +18,7 @@ from typing import Optional, Set
 from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card, FIGHT_SLOTS
 
-META_HOWS = {"stop", "copy", "Protection", "cancel", "exchange", "impose", "tune_out"}
+META_HOWS = {"stop", "copy", "Protection", "cancel", "exchange", "impose", "tune_out", "tie_break"}
 SLOT_OF_KIND = {"ability": "ability_fight", "bonus": "bonus_fight"}
 KIND_OF_SLOT = {"ability_fight": "ability", "bonus_fight": "bonus"}
 STAT_TYPES = ("power", "damage", "attack")
@@ -174,6 +174,8 @@ def _apply_cancels(card1: Card, card2: Card) -> None:
                 for stat in capacity.types:
                     types |= PERSISTENT_TYPES_OF_STAT.get(stat, set())
                 _strip_types(opp, types, only_targeting_opponent=False)
+                if capacity.target == "both":                  # « Cancel Players X Mod. » (Leaders) : les deux côtés
+                    _strip_types(own, types, only_targeting_opponent=False)
 
 
 def _apply_stat_protections(card1: Card, card2: Card) -> None:
@@ -194,5 +196,5 @@ def _consume_meta_capacities(card1: Card, card2: Card) -> None:
     for card in (card1, card2):
         for slot in FIGHT_SLOTS:
             capacity = getattr(card, slot)
-            if capacity is not None and capacity.how in META_HOWS and capacity.how != "tune_out":   # Tune Out : lu par process_round
+            if capacity is not None and capacity.how in META_HOWS and capacity.how not in ("tune_out", "tie_break"):   # lus par process_round
                 setattr(card, slot, None)
