@@ -100,6 +100,8 @@ Deux règles ont été tranchées sans certitude et sont isolées dans le code a
 
 ## Feuille de route
 
+État des lieux détaillé, décisions de règles et travail restant : [docs/ROADMAP.md](docs/ROADMAP.md).
+
 1. Mécaniques restantes : Unison, After, Tune Out, Cards… (règles à documenter d'abord — elles se codent comme Killshot ou Bet)
 2. Backend : journal des effets appliqués à chaque round (explicabilité, débogage des règles), API moteur pure
    `step(state, action)` + `legal_actions(state)`, persistance en mémoire/SQLite, mise à jour FastAPI/Pydantic
