@@ -57,7 +57,8 @@ npm run dev
 
 Ouvrir http://localhost:5173 : choisir l'adversaire (second joueur sur le même écran, ou ordinateur), composer deux
 decks de 4 cartes (recherche, filtre par clan ou « aléatoire »), puis jouer. Le bouton « Sauvegarder le dernier round
-pour les tests » enregistre le round dans `data/test/test_N/` (voir ci-dessous).
+pour les tests » enregistre le round dans `data/test/test_N/` ; le bouton « figer » de chaque ligne de l'historique fait
+de même pour **n'importe quel round déjà joué**, y compris après coup (voir ci-dessous).
 
 ## Tests
 
@@ -73,8 +74,16 @@ joué dans un round, et le résultat attendu est calculé à la main d'après le
 
 Chaque dossier `data/test/test_N/` contient l'état d'une partie avant et après un round. `tests/test_fixtures_replay.py`
 rejoue le coup et exige l'état exact. Pour en ajouter : jouer un round dans l'interface, vérifier qu'il est juste,
-cliquer « Sauvegarder … pour les tests », commiter le dossier créé. `scripts/regenerate_example_fixtures.py` régénère les
-trois fixtures d'exemple quand le format de partie change.
+cliquer « Sauvegarder … pour les tests » (ou « figer » sur la ligne du round dans l'historique), commiter le dossier créé.
+
+Les états de **tous** les rounds d'une partie sont conservés dans `data/game/game_<id>/game_data_<id>_<nb_turn>.json` :
+un round repéré comme douteux plus tard peut donc encore être figé, via le bouton « figer » de son round ou directement
+avec `GET /save_for_test?game_id=<id>&nb_turn=<n>` (`nb_turn` = l'état d'**arrivée** du round ; sans lui, le dernier
+round joué). Attention : une fixture prise sur un état déjà faux fige le bug en vérité attendue — d'où le « vérifier
+qu'il est juste » ci-dessus, qui porte aussi sur l'état de départ. Pour juger le moteur plutôt que geler son
+comportement, c'est l'oracle des combats réels qu'il faut : [docs/ORACLE.md](docs/ORACLE.md).
+
+`scripts/regenerate_example_fixtures.py` régénère les trois fixtures d'exemple quand le format de partie change.
 
 ## Scripts utiles
 

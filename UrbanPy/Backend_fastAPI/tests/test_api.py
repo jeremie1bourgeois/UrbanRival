@@ -54,6 +54,30 @@ def test_save_for_test_stores_two_consecutive_states(client, tmp_path):
     assert len(prev["history"]) == 1 and len(curr["history"]) == 2
 
 
+def test_save_for_test_can_freeze_an_earlier_round_once_the_game_moved_on(client, tmp_path):
+    """Le cas qui bloquait : on repère au round 4 que le round 2 était douteux, et on le fige après coup."""
+    game_id = client.get("/init_game/template").json()["game_id"]
+    for i in range(4):
+        _play(client, game_id, i, i)
+
+    assert client.get("/save_for_test", params={"game_id": game_id, "nb_turn": 3}).status_code == 200
+
+    (prev_path,) = glob.glob(str(tmp_path / "data" / "test" / "test_1" / "game_data_prev_*.json"))
+    (curr_path,) = glob.glob(str(tmp_path / "data" / "test" / "test_1" / "game_data_curr_*.json"))
+    prev, curr = json.load(open(prev_path)), json.load(open(curr_path))
+    assert (prev["nb_turn"], curr["nb_turn"]) == (2, 3)
+
+
+def test_save_for_test_rejects_a_round_the_game_never_reached(client):
+    game_id = client.get("/init_game/template").json()["game_id"]
+    _play(client, game_id, 0, 0)
+
+    response = client.get("/save_for_test", params={"game_id": game_id, "nb_turn": 4})
+
+    assert response.status_code == 400
+    assert "not played" in response.json()["detail"]
+
+
 REAL_DECK = {
     "player1": [{"card_name": "Aamir", "nb_stars": 3}, {"card_name": "Allison", "nb_stars": 3},
                 {"card_name": "Amelia", "nb_stars": 3}, {"card_name": "Ashley", "nb_stars": 2}],

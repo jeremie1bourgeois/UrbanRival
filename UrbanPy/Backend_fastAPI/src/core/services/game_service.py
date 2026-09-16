@@ -130,35 +130,50 @@ def init_game_from_template():
 
     return (game, new_id)
 
-def save_for_test_service(game_id: int):
-    """
-    Crée une sauvegarde d'une situation A d'une partie, d'un play des joueurs et de la situation B qui en découle.
-    (Est appelé lorsque un round s'est déroulé comme prévue et que l'on souhaite sauvegarder les données pour les tests.)
-    """
-    # Charger le chemin du dossier de la partie
+def saved_turns(game_id: int) -> list[int]:
+    """Les nb_turn des états persistés d'une partie, dans l'ordre croissant."""
     game_directory = os.path.join(BASE_DIR, "data/game/", f"game_{game_id}")
-
-    # Vérifier si le dossier existe
     if not os.path.exists(game_directory):
         raise FileNotFoundError(f"Game directory not found: {game_directory}")
 
-    # Trouver le fichier avec le nb_turn le plus élevé
-    game_files = [f for f in os.listdir(game_directory) if f.startswith(f"game_data_{game_id}_") and f.endswith(".json")]
+    prefix = f"game_data_{game_id}_"
+    turns = []
+    for filename in os.listdir(game_directory):
+        if not (filename.startswith(prefix) and filename.endswith(".json")):
+            continue
+        try:
+            turns.append(int(filename[len(prefix):-len(".json")]))
+        except ValueError:
+            continue   # fichier hors convention de nommage : ignoré
+    return sorted(turns)
 
-    if not game_files:
+
+def save_for_test_service(game_id: int, nb_turn: int | None = None):
+    """
+    Crée une sauvegarde d'une situation A d'une partie, d'un play des joueurs et de la situation B qui en découle.
+
+    `nb_turn` est l'état d'*arrivée* du round à figer : la fixture contient l'état `nb_turn - 1` (prev) et l'état
+    `nb_turn` (curr). Par défaut, le round le plus récemment joué. Tous les rounds de la partie restent accessibles
+    tant que son dossier existe : on peut donc revenir figer un round antérieur après coup.
+    """
+    game_directory = os.path.join(BASE_DIR, "data/game/", f"game_{game_id}")
+    turns = saved_turns(game_id)
+
+    if not turns:
         raise FileNotFoundError(f"No game files found in directory: {game_directory}")
 
-    # Extraire le nb_turn de chaque fichier et trouver le maximum
-    curr_turn_file = max(game_files, key=lambda x: int(x.split("_")[3].split(".")[0]))
-    
-    curr_nb_round: int = int(curr_turn_file.split('_')[3].split('.')[0])
-    if curr_nb_round < 2:
+    if nb_turn is None:
+        nb_turn = turns[-1]
+
+    if nb_turn < 2:
         raise ValueError("Not enough turns to save for test.")
+    if nb_turn not in turns:
+        raise ValueError(f"Round {nb_turn} not played in game {game_id} (rounds available: {turns}).")
+    if nb_turn - 1 not in turns:
+        raise ValueError(f"State before round {nb_turn} is missing in game {game_id} (rounds available: {turns}).")
 
-    prev_turn_file = f"game_data_{game_id}_{curr_nb_round - 1}.json"
-
-    curr_game_file_path = os.path.join(game_directory, curr_turn_file)
-    prev_game_file_path = os.path.join(game_directory, prev_turn_file)
+    curr_game_file_path = os.path.join(game_directory, f"game_data_{game_id}_{nb_turn}.json")
+    prev_game_file_path = os.path.join(game_directory, f"game_data_{game_id}_{nb_turn - 1}.json")
 
     # Charger la partie
     curr_game_round = load_game_from_json(curr_game_file_path)

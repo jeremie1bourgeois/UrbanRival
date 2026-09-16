@@ -52,8 +52,9 @@ export async function processGameRound(gameId: string, roundData: RoundData): Pr
 	return { game: new Game(response.data.game), state: response.data.state };
 }
 
-export async function savePlayForTest(gameId: string): Promise<void> {
-	await apiClient.get("/save_for_test", { params: { game_id: gameId } });
+/** Fige un round en fixture de régression ; `nbTurn` est l'état d'arrivée du round (défaut : le dernier joué). */
+export async function savePlayForTest(gameId: string, nbTurn?: number): Promise<void> {
+	await apiClient.get("/save_for_test", { params: { game_id: gameId, ...(nbTurn === undefined ? {} : { nb_turn: nbTurn }) } });
 }
 
 /** Message d'erreur renvoyé par le backend (detail) ou message générique. */

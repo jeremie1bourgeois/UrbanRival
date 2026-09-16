@@ -58,3 +58,67 @@ def test_save_for_test_id_does_not_depend_on_current_directory(sandbox, template
     save_for_test_service(7)
 
     assert os.path.isdir(os.path.join(sandbox, "data", "test", "test_3"))
+
+
+def test_save_for_test_freezes_the_round_asked_for(sandbox, template_data):
+    game_dir = os.path.join(sandbox, "data", "game", "game_7")
+    for nb_turn, life in ((1, 12), (2, 9), (3, 5), (4, 2)):
+        _write_game_file(game_dir, 7, nb_turn=nb_turn, template_data=template_data, ally_life=life)
+
+    save_for_test_service(7, nb_turn=2)
+
+    test_dir = os.path.join(sandbox, "data", "test", "test_1")
+    prev, curr = _load_saved(test_dir, "prev"), _load_saved(test_dir, "curr")
+    assert (prev["nb_turn"], prev["ally"]["life"]) == (1, 12)
+    assert (curr["nb_turn"], curr["ally"]["life"]) == (2, 9)
+
+
+def test_save_for_test_without_nb_turn_still_takes_the_last_round(sandbox, template_data):
+    game_dir = os.path.join(sandbox, "data", "game", "game_7")
+    for nb_turn, life in ((1, 12), (2, 9), (3, 5)):
+        _write_game_file(game_dir, 7, nb_turn=nb_turn, template_data=template_data, ally_life=life)
+
+    save_for_test_service(7)
+
+    curr = _load_saved(os.path.join(sandbox, "data", "test", "test_1"), "curr")
+    assert curr["nb_turn"] == 3
+
+
+def test_save_for_test_rejects_the_first_state_which_has_no_round_before_it(sandbox, template_data):
+    game_dir = os.path.join(sandbox, "data", "game", "game_7")
+    _write_game_file(game_dir, 7, nb_turn=1, template_data=template_data, ally_life=12)
+    _write_game_file(game_dir, 7, nb_turn=2, template_data=template_data, ally_life=9)
+
+    with pytest.raises(ValueError, match="Not enough turns"):
+        save_for_test_service(7, nb_turn=1)
+
+
+def test_save_for_test_rejects_a_round_that_was_not_played(sandbox, template_data):
+    game_dir = os.path.join(sandbox, "data", "game", "game_7")
+    _write_game_file(game_dir, 7, nb_turn=1, template_data=template_data, ally_life=12)
+    _write_game_file(game_dir, 7, nb_turn=2, template_data=template_data, ally_life=9)
+
+    with pytest.raises(ValueError, match="not played"):
+        save_for_test_service(7, nb_turn=4)
+
+
+def test_save_for_test_reports_a_hole_in_the_saved_states(sandbox, template_data):
+    game_dir = os.path.join(sandbox, "data", "game", "game_7")
+    _write_game_file(game_dir, 7, nb_turn=1, template_data=template_data, ally_life=12)
+    _write_game_file(game_dir, 7, nb_turn=3, template_data=template_data, ally_life=5)
+
+    with pytest.raises(ValueError, match="State before round 3 is missing"):
+        save_for_test_service(7, nb_turn=3)
+
+
+def test_each_round_of_a_game_can_be_frozen_after_the_fact(sandbox, template_data):
+    game_dir = os.path.join(sandbox, "data", "game", "game_7")
+    for nb_turn, life in ((1, 12), (2, 9), (3, 5), (4, 2)):
+        _write_game_file(game_dir, 7, nb_turn=nb_turn, template_data=template_data, ally_life=life)
+
+    for nb_turn in (2, 3, 4):
+        save_for_test_service(7, nb_turn=nb_turn)
+
+    frozen = [_load_saved(os.path.join(sandbox, "data", "test", f"test_{test_id}"), "curr")["nb_turn"]
+              for test_id in (1, 2, 3)]
+    assert frozen == [2, 3, 4]

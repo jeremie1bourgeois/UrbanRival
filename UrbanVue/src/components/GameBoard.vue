@@ -15,7 +15,7 @@ const gameId = props.started.gameId;
 const opponent = props.started.opponent;
 const state = ref<GameState>("Game Not Finished");
 const error = ref<string | null>(null);
-const saved = ref(false);
+const savedRounds = ref<Set<number>>(new Set());
 const thinking = ref(false);
 let picker = new RoundPicker(game.value);
 const current = ref<Side | null>(picker.current);
@@ -58,7 +58,6 @@ async function submitIfComplete(pick: Pick) {
 		game.value = result.game;
 		states.value = [...states.value, result.game];
 		state.value = result.state;
-		saved.value = false;
 	} catch (err) {
 		error.value = errorMessage(err);
 	}
@@ -89,10 +88,15 @@ async function handleCombat(pillz: number, fury: boolean, index: number) {
 
 onMounted(letAiPlay);
 
-async function save() {
+/**
+ * Fige un round en fixture de régression. `nbTurn` est l'état d'*arrivée* du round : pour le round n de
+ * l'historique, c'est n + 1. Les états de tous les rounds étant conservés côté backend, un round déjà passé
+ * reste figeable après coup.
+ */
+async function saveRound(nbTurn: number) {
 	try {
-		await savePlayForTest(gameId);
-		saved.value = true;
+		await savePlayForTest(gameId, nbTurn);
+		savedRounds.value = new Set(savedRounds.value).add(nbTurn);
 	} catch (err) {
 		error.value = errorMessage(err);
 	}
@@ -178,7 +182,8 @@ async function save() {
 							<th class="py-1 pr-2">Round</th>
 							<th class="py-1 pr-2">Allié</th>
 							<th class="py-1 pr-2">Ennemi</th>
-							<th class="py-1">Vie après</th>
+							<th class="py-1 pr-2">Vie après</th>
+							<th class="py-1">Fixture</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -203,21 +208,42 @@ async function save() {
 									class="py-1 pr-2"
 									:class="played.win ? 'text-green-300' : 'text-gray-400'"
 								>
-									{{ played.name }} · {{ played.pillz }} pillz<template v-if="played.fury"> + fury</template> · P{{ played.power }} D{{
-										played.damage
+									{{ played.name }} · {{ played.pillz }} pillz<template v-if="played.fury"> + fury</template> · P{{
+										played.power
 									}}
-									· attaque {{ played.attack }}
+									D{{ played.damage }} · attaque {{ played.attack }}
 									<span v-if="played.win">✓</span>
 								</td>
-								<td class="py-1">{{ round.lifeAfter.ally }} / {{ round.lifeAfter.enemy }}</td>
+								<td class="py-1 pr-2">{{ round.lifeAfter.ally }} / {{ round.lifeAfter.enemy }}</td>
+								<td class="py-1">
+									<button
+										type="button"
+										:disabled="savedRounds.has(round.round + 1)"
+										class="rounded border border-gray-600 px-2 py-0.5 text-gray-200 hover:bg-gray-700 disabled:opacity-40"
+										:title="
+											savedRounds.has(round.round + 1)
+												? 'Round déjà figé en fixture'
+												: `Figer le round ${round.round} en fixture de régression (à ne faire qu'après l'avoir vérifié)`
+										"
+										@click="saveRound(round.round + 1)"
+									>
+										{{ savedRounds.has(round.round + 1) ? "figé ✓" : "figer" }}
+									</button>
+								</td>
 							</tr>
 							<tr v-if="openedLogs.has(round.round)" class="bg-gray-800/60">
-								<td colspan="4" class="px-2 py-1">
+								<td colspan="5" class="px-2 py-1">
 									<ol class="list-none space-y-0.5 font-mono text-[11px]">
 										<li
 											v-for="(entry, index) in round.log"
 											:key="index"
-											:class="entry.side === 'ally' ? 'text-yellow-200' : entry.side === 'enemy' ? 'text-sky-200' : 'text-gray-100 font-semibold'"
+											:class="
+												entry.side === 'ally'
+													? 'text-yellow-200'
+													: entry.side === 'enemy'
+														? 'text-sky-200'
+														: 'text-gray-100 font-semibold'
+											"
 										>
 											{{ entry.text }}
 										</li>
@@ -230,11 +256,11 @@ async function save() {
 			</section>
 
 			<button
-				:disabled="saved || game.nb_turn <= 1"
+				:disabled="savedRounds.has(game.nb_turn) || game.nb_turn <= 1"
 				class="mb-4 rounded bg-green-600 px-4 py-2 text-white hover:bg-green-500 disabled:opacity-40"
-				@click="save"
+				@click="saveRound(game.nb_turn)"
 			>
-				{{ saved ? "Round sauvegardé pour les tests" : "Sauvegarder le dernier round pour les tests" }}
+				{{ savedRounds.has(game.nb_turn) ? "Round sauvegardé pour les tests" : "Sauvegarder le dernier round pour les tests" }}
 			</button>
 		</div>
 	</div>

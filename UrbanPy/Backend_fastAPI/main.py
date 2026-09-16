@@ -1,6 +1,6 @@
 import logging
 import traceback
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from fastapi.responses import JSONResponse
 from src.schemas.game_schemas import AiPickInput, PlayerCards, ProcessRoundInput
@@ -128,14 +128,16 @@ def cards_catalogue() -> List[Dict[str, Any]]:
 
 
 @app.get("/save_for_test")
-def save_for_test(game_id: int) -> Dict[str, Any]:
+def save_for_test(game_id: int, nb_turn: Optional[int] = None) -> Dict[str, Any]:
     """
     Crée une sauvegarde d'une situation A d'une partie, d'un play des joueurs et de la situation B qui en découle.
-    (Est appelé lorsque un round s'est déroulé comme prévue et que l'on souhaite sauvegarder les données pour les tests.)
+
+    `nb_turn` désigne l'état d'arrivée du round à figer (la fixture contient `nb_turn - 1` et `nb_turn`) ; sans lui,
+    le dernier round joué. Les états de tous les rounds étant conservés, un round antérieur peut être figé après coup.
     """
     try:
         # Sauvegarder les données pour les tests
-        save_for_test_service(game_id)
+        save_for_test_service(game_id, nb_turn)
         
         return {"status": "success"}
     except ValueError as e:
