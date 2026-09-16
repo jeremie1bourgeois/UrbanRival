@@ -13,7 +13,7 @@ ce document décrit **où on en est et ce qui reste**, pour reprendre le travail
 | Moteur | 4 niveaux réécrits et testés (méta, stats, fin de round, persistants) ; bonus de clan (≥ 2 du clan, Oculus infiltré sur ses clans listés, Leaders), conditions Courage / Revenge / Confidence / Reprisal / Symmetry / Asymmetry / Stop / Killshot / Perfect / Bet / Versus / After / Unison / Disunion / Defeat / Backlash / Victory or Defeat / Team ; Tune Out, Impose, Cards, Consume / Combust / Mindwipe / Corrosion, Xantiax, Corrupt, Fatal Killshot, Sinister Symmetry, Leaders Tie-break / Counter-attack / Limitless / Per Round ; `scripts/engine_crash_sweep.py` : 0 exception |
 | API | `/cards`, `/init_game/`, `/init_game/template`, `/process_round/{id}`, `/ai_pick/{id}`, `/save_for_test` |
 | Front | deck builder (recherche, filtre clan, aléatoire, statut des bonus, decks mémorisés), partie à deux ou contre l'ordinateur (aléatoire / heuristique), historique des rounds, fin de partie, effets persistants, illustrations |
-| Tests | 436 backend (pytest) + 24 front (vitest) ; CI GitHub Actions (backend + front) ; 3 fixtures de rejeu `data/test/` |
+| Tests | 437 backend (pytest) + 24 front (vitest) ; CI GitHub Actions (backend + front) ; 3 fixtures de rejeu `data/test/` + 1 combat réel `data/ur_battles/` |
 | Dépôt | nettoyé (IDE, binaires, doublons), fins de ligne LF (`.gitattributes`), README |
 
 ### Décisions de règles prises sans certitude (à confirmer contre les règles officielles)
@@ -62,8 +62,12 @@ Counter-attack refixe l'ordre à chaque round.
 
 ### B. Fiabilité des règles existantes
 1. ~~Confirmer les décisions du tableau § 1 contre les règles officielles~~ → fait (`docs/REGLES.md`) ; appliquer les corrections listées en § 3 de ce document.
-2. Alimenter `data/test/` : jouer des rounds dans l'interface, vérifier à la main, « Sauvegarder … pour les tests », commiter.
-   Viser en priorité les clans à bonus méta (Nightmare, Skeelz, Piranas, Roots, GHEIST, Raptors, Oblivion, Oculus, Vortex, Montana).
+2. **Oracle = combats réels** (fait le 2026-09-16, premier combat reproduit à l'identique) : jouer un combat dans le
+   client web d'Urban Rivals avec `scripts/ur_capture.js` chargé, sauvegarder `urRecord()` dans `data/ur_battles/<id>.json`,
+   `tests/test_ur_battles.py` rejoue chaque round et exige les valeurs officielles (puissance, dégâts, attaque,
+   vainqueur, vies, pillz). Viser les points non tranchés (cycles de Stops, Leader et son Team, Tune Out + fury,
+   Mindwipe / Combust, Limitless, Exchange contre Copy/Annul) et les clans à bonus méta. Le modèle `abilityData` du
+   client (`docs/ur-abilitydata-modele.md`) est la représentation interne des règles : à scraper pour un parseur exact.
 3. Le journal des effets (D2, fait) rend ces vérifications immédiates : comparer le journal au déroulé réel.
 
 ### C. Front — reste mineur
