@@ -44,7 +44,7 @@ choisit les deux decks et les deux mains, donc le scénario exact à tester. Poi
 | Repair (immédiat ou différé ?) | une carte Repair gagnante, pillz au round même |
 | Combust / Mindwipe : immédiats ? | idem, vie et pillz au round même |
 
-### Decks prêts à jouer (2026-09-16)
+### Decks de référence (2026-09-16, toutes cartes du jeu)
 
 Un duel = deck A (vous) contre deck B (l'ami / le second compte), 8 cartes chacun composées autour du scénario pour que
 tout tirage de 4 convienne. Les cartes sont choisies petites (2-3★) et fréquentes ; remplacer par une équivalente
@@ -62,6 +62,49 @@ tout tirage de 4 convienne. Les cartes sont choisies petites (2-3★) et fréque
 | D8 | **Clans à condition de main** : Oculus, Tolvack (After), Unison, Xantiax/Corrupt/Corrosion | 1 Oculus (Dark Nunavik, Dark Kupanda…) + 3 cartes d'un clan qu'il infiltre + Frau Vanda, Rauta (Tolvack) + Jamtiax, Cameron | Almastine, Aquiline, Caballine, Carcharine (Unison, mono-clan impossible → tester la **non-activation**) + 4 quelconques | Oculus : main 1 Oculus + 3 clan X (bonus adopté), puis 2 + 1 (carte seule) ; After : jouer Tolvack après une carte du clan indiqué ; Xantiax/Corrosion : vies des deux joueurs en fin de round |
 
 Ordre de rentabilité : D4 (4 questions ouvertes en un duel), D1, D3, D6, puis D5, D7, D8, D2.
+
+### Decks jouables avec la collection du compte (relevée le 2026-09-17)
+
+La collection (1 234 cartes distinctes) est dans `UrbanPy/Backend_fastAPI/data/collection/ma_collection.json`, relevée
+**passivement** depuis la page « Ma collection » du site (filtre « Seulement possédés », lecture du DOM page par page ;
+la pagination est côté client, aucun appel API n'a été émis). Pour trouver une remplaçante possédée :
+
+```bash
+cd UrbanPy/Backend_fastAPI && .venv/bin/python scripts/collection_lookup.py "Copy: Opp\. Damage" --exclude Skeelz
+```
+
+Le script sépare les cartes dont le pouvoir est **actif au niveau possédé** de celles « à monter » : une carte au niveau 1
+dont le pouvoir se débloque au niveau 2 n'a *pas* de pouvoir en jeu. Tous les decks ci-dessous n'utilisent que des
+pouvoirs actifs, sauf mention « à monter ». Le niveau indiqué est le niveau possédé.
+
+Deux corrections par rapport aux decks de référence :
+
+- **D3** : deux Leaders dans la même main s'annulent (bonus « Cancel Leader », `docs/REGLES.md` § 5) ; le deck de
+  référence à 5 Leaders donnait des mains inexploitables. Ici : **un seul Leader par deck**, changé entre deux duels
+  (un Leader dans un deck de 8 est en main une fois sur deux).
+- **D4** : le bonus Tune Out de Jacob (seule Cosmohnuts possédée) n'est actif qu'avec une seconde Cosmohnuts en main ;
+  le test passe donc par **Noon Steevens** (Pussycats, Tune Out en *pouvoir*, sans condition de clan). Dark Yookie
+  (Oculus infiltrant Cosmohnuts) est ajoutée pour voir si l'infiltration active le bonus de Jacob.
+
+| # | Question | Deck A | Deck B | Consigne / remarques |
+|---|---|---|---|---|
+| D1 | **SoA contre SoA** et SoA contre SoB en pouvoir (clans sans Stop en bonus) | SoA : Cardigan (All Stars, niv 2), Cesare (All Stars, 2), Oxo (Sakrohm, 1), Brandon Cr (Junkz, 3) + SoB : Angora (Vortex, 2), Borss (Jungo, 2), Flanagan (Junkz, 2), Graziella (Freaks, 2) | SoA : Onyx (Vortex, 3), Randal (Bangers, 3), Simon (Montana, 3), Alexei (All Stars, 4) + SoB : Aisha (Jungo, 3), Bella Ld (Montana, 3), Mitch (La Junta, 3), Chlora (Bangers, 4) | comme la référence : SoA contre SoA, SoA contre SoB, SoB contre SoB, 1-2 pillz, noter la puissance finale des deux cartes |
+| D2a | **All-Stop contre Protection: Ability** (Skeelz) | 8 Skeelz : Sparkle (1, -5 Opp Power), Wan (1, +2 Attack par Opp Power), Danae (1, -10 Opp Attack), Sasha (2, Support: Attack +4), Henry (3, Support: -1 Opp Damage), Sopiket (3, Growth: Power +3), Minerva (5, -2 Opp Power & Damage), Tomas (5, **SoB** : cycle complet contre un All-Stop) | All-Stop : Dieter (Nightmare, 3), Glorg (Nightmare, 4), Madabook (Nightmare, 5), Baba (Piranas, 3, *Courage:* SoA — jouer Baba en premier) + Ksendra (GHEIST, 5), Methane Cr (GHEIST, 4), Bakko (Roots, 4), Kola (Roots, 1) | chaque Skeelz contre un All-Stop : le pouvoir Skeelz doit tomber ; Tomas contre Glorg = SoB protégé contre SoA + SoB, lire les deux cartes |
+| D2b | **Chaîne GHEIST/Roots (bonus SoA) contre Nightmare/Piranas (bonus SoB)** | GHEIST : Ksendra (5), Methane Cr (4), Rekt Ld (3), Jaxx Ld (4) + Roots : Bakko (4), Kola (1), Arno (2), Kalija (3) | Nightmare : Dieter (3), Glorg (4), Madabook (5) + Piranas : Baba (3), Sting (3), Taljion (3), Zulu (1), Calliope (4) | jouer bonus contre bonus dans les deux sens ; Morlha (GHEIST, SoB en pouvoir) est à monter du niveau 1 au 2 pour le double Stop |
+| D3 | **Le Leader profite-t-il de son Team ?** + Solomon (Tie-break) + Ashigaru (Counter-attack) | **1 Leader** + 7 La Junta (le deck « La junta » sans Natasha) : Eyrik (5) + Arnie (4), Brianna (3), Chiro (3), Naginata (4), Quormac (4), W4r Ld (2), Walker (3) | **1 Leader** + 7 Jungo : Solomon (5) + Odile (3), Nahema (5), Mindy (2), Cindy (3), Radek (3), Eduardo (5), Jalil (3) | jouer le Leader lui-même et lire sa puissance/dégâts ; duels suivants en remplaçant Eyrik par Ambre (Courage), Vholt, Timber, et Solomon par Ashigaru ; égalité d'attaque à provoquer contre Solomon |
+| D4 | **Tune Out et fury** ; Consume / Mindwipe / Repair immédiats ? Cancel Life Modif. contre Poison/Toxin | Noon Steevens (Pussycats, 1, **Tune Out**), Jacob (Cosmohnuts, 2, bonus Tune Out), Dark Yookie (Oculus, 3, infiltre Cosmohnuts), Wave Ld (Hive, 2, Consume 1 Min 4), Wilo Ld (Dominion, 2, Repair 1 Max 14), Merweiss Cr (Riots, 5, *Revenge:* Mindwipe 2 — après un round perdu), Artax (Dominion, 2, Poison 2 Min 2), Chopper Ld (Raptors, 3, Toxin 1 Min 0) | Flea (Jungo, 2, Cancel Opp. Life Modif.) + 7 La Junta à pouvoirs de stats, sans effet pillz/vie : Chiyoko (3), Glover (3), Leo (3), Myke (3), Victor (4), Winifred (4), Agent Spinal (5) | round 1 : Noon Steevens avec fury contre une carte à **une pillz de plus** ; faire gagner Wave Ld / Merweiss Cr (après une défaite) / Wilo Ld et lire vies et pillz au round même puis au suivant ; Flea contre un poison posé au round précédent. **Combust** : aucune carte active (Volkan Cr à monter du niveau 2 au 5) |
+| D5 | **Limitless** | — | — | **non réalisable** : Fractal est la seule carte Limitless du jeu et n'est pas possédée (les réducteurs Arno, Artus, Ashley, B Ball le sont) |
+| D6 | **Exchange contre Copy / Annul / Impose** | Damage Exchange : Blast (Bangers, 2), Homy (Montana, 2), Incubus Cr (Nightmare, 4), Waldegrin Cr (Skeelz, 5) + remplissage à monter : Blackfin (Piranas, 1 → 2), Taki (Rescue, 1 → 2), Mamba (Fang Pi Clang, 1 → 3), Joan Cena (Uppers, 1 → 3, **Power Exchange**) | Copy: Opp. Damage : Bettisia (Pussycats, 2), Natasha (La Junta, 2), Ward hg (Vortex, 2), Nagataa (Hive, 1) + Power Impose : Zwoosh (Bangers, 2), Mozaert (Junkz, 1) + Damage Impose : Jacob (Cosmohnuts, 2) + Lenora (Riots, 1 → 4, Cancel Opp. Damage Modif., à monter) | Exchange contre Copy, contre Impose ; **Annul** : en attendant Lenora, duel à part avec Mr Big Duke (Leader, *Team:* Cancel Opp. Damage Modif.) seul Leader d'un deck quelconque |
+| D7 | **Conditions numériques** : Per Pillz Left, Cards, Bet | Hundun (Freaks, 2, +1 Atk Per Pillz Left), Candy Jack (Nightmare, 4, +1 Power Per Pillz Left Max 8), Merrick Cr (Freaks, 3, -2 Cards Damage Min 1), M2 Sansot Cr (Vortex, 1, idem), Delija Cr (Roots, 1, -2 Cards Power Min 2), Pandemos Cr (Paradox, 5, -4 Cards Damage Min 0), Otium Cr (Jungo, 3, *Confidence:* -5 Cards Damage), Tyd (Piranas, 1, Bet > 6 Pillz : +2 Life) | 8 La Junta à gros dégâts : Dugan (5), Agent Spinal (5), Winifred (4), Victor (4), Isatis (4), Quormac (4), Ed 12 Cr (4), Chiyoko (3) | Per Pillz Left : lire l'attaque au round 1 ; Bet : Tyd avec exactement 6 pillz (gratuite comprise) puis 7 ; Cards : lire les dégâts selon le nombre de cartes. **Perfect** : aucune carte possédée (Ataoualpet et Mac Hen, Bet > 4, sont à monter au niveau 3) |
+| D8 | **Oculus** (infiltration) et Corrupt | Oculus infiltrant Fang Pi Clang : Dark Nunavik (2, Courage: Power +4), Dark Askai (3, Attack +9), Dark Eklore (3, +1 Atk Per Pillz Left) + Fang Pi Clang : Chan (2), Yoshito (3), Fei Cr (4), Macumba (4), Rimikaru (2) | Nega D Ld (Uppers, 5, Corrupt 2 Min 5) + les 7 La Junta de D4 | main 1 Oculus + 3 Fang Pi (bonus Damage +2 adopté ?), puis 2 Oculus + 2 Fang Pi, puis 3 + 1 (la Fang Pi seule garde-t-elle son bonus ?) ; Nega D Ld gagnant : vies/pillz des deux joueurs au round même. **Tolvack (After), Unison, Xantiax, Corrosion** : aucune carte possédée |
+
+Ordre de rentabilité avec la collection : D4 (Tune Out, Consume, Mindwipe, Repair, Cancel Life en un duel), D1, D2a, D3,
+D6, puis D7, D8, D2b.
+
+**Cartes à monter d'un ou deux niveaux** qui débloqueraient les tests manquants : Spycee (Piranas, 1 → 2, All-Stop
+Piranas), Morlha (GHEIST, 1 → 2, SoB en pouvoir sur bonus SoA), Blackfin et Taki (1 → 2, Damage Exchange), Joan Cena
+(1 → 3, Power Exchange), Ella et Klaus (1 → 2, réducteurs à minimum), Ataoualpet et Mac Hen (1 → 3, Bet > 4).
+Lenora (1 → 4) et Volkan Cr (2 → 5, Combust) sont plus longues.
 
 ## 3. Exporter
 
