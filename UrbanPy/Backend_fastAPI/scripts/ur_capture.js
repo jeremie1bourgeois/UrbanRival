@@ -49,6 +49,19 @@ function urStatuses() {
   return out;
 }
 
+// Camp qui joue en premier au round r : celui dont une carte est déjà posée dans le premier statut du round (un
+// adversaire qui joue instantanément — bot — a déjà joué quand le premier statut arrive et turnPlayerId pointe alors
+// sur nous) ; sinon turnPlayerId du premier statut où personne n'a joué.
+function urFirstOf(sts, r, p0id) {
+  for (const b of sts.filter((b) => b.round === r)) {
+    const a = b.player0.characters.some((x) => x.roundPlayed === r), c = b.player1.characters.some((x) => x.roundPlayed === r);
+    if (a && !c) return "p0";
+    if (c && !a) return "p1";
+    if (!a && !c) return b.turnPlayerId === p0id ? "p0" : "p1";
+  }
+  return null;
+}
+
 function urRecordOf(sts) {
   const first = sts[0];
   const pl = (p) => ({ name: p.player.name, base_life: p.baseLife, base_pillz: p.basePillz, cards: p.characters.map((x) => ({ id: x.id, level: x.level })) });
@@ -59,7 +72,7 @@ function urRecordOf(sts) {
     const next = sts.find((b) => b.round === r + 1);
     if (!start || !resolved) continue;
     const side = (p) => { const x = p.characters.find((x) => x.roundPlayed === r); return { index: x.index, pillz: x.pillzUsed, fury: !!x.isFury, power: x.roundPower, damage: x.roundDamage, attack: x.roundAttack, won: x.roundWon }; };
-    rounds.push({ round: r + 1, first: start.turnPlayerId === first.player0.player.id ? "p0" : "p1",
+    rounds.push({ round: r + 1, first: urFirstOf(sts, r, first.player0.player.id),
       before: { life: [start.player0.life, start.player1.life], pillz: [start.player0.pillz, start.player1.pillz] },
       p0: side(resolved.player0), p1: side(resolved.player1),
       post_round: [resolved.player0.postRoundAbilities, resolved.player1.postRoundAbilities],
