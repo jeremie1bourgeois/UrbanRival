@@ -285,6 +285,8 @@ Par ordre d'impact :
    rounds suivants.
 7. **Copy: Opp. Ability** (bonus Oblivion) copie un Stop et le retourne : combat `1211029`, le SoA copié stoppe le SoA
    adverse (Equalizer appliqué) — le moteur le reproduisait déjà.
+8. **Repair X, Max Y** (`1211702`) : « gagne X points de Vie ET Pillz, maximum Y », dès la fin du round gagné puis à chaque
+   round — le pendant en gain de Mindwipe. Corrigé (le moteur n'ajoutait que des pillz, aux rounds suivants).
 
 Chaque combat rejoué se transcrit dans `data/test/` (voir ROADMAP § 2.B.2) ; le journal des effets (D2) rendra la
 localisation des écarts immédiate.
@@ -297,7 +299,7 @@ Verdicts sur les points encore ouverts ou déjà codés :
 | Entrée | Règle officielle | Moteur (après les corrections du matin) | Verdict |
 |---|---|---|---|
 | 53 Récup | « arrondie à l'unité inférieure, **avec un minimum de 1** » | pas de minimum | ❌ → **corrigé** |
-| 51 Toxine / Régén, 52 Consume / Dope | « agissent **immédiatement à la fin du round** dans lequel ils ont été joués » (Drak au round 1 : vies aux rounds 1, 2, 3 et 4) | n'agissent qu'aux rounds suivants | ❌ → **corrigé** (Repair reste aux rounds suivants, par symétrie avec Heal : hypothèse) |
+| 51 Toxine / Régén, 52 Consume / Dope | « agissent **immédiatement à la fin du round** dans lequel ils ont été joués » (Drak au round 1 : vies aux rounds 1, 2, 3 et 4) | n'agissent qu'aux rounds suivants | ❌ → **corrigé**. Repair aussi immédiat, et **vie ET pillz** (texte de Wilo Ld, combat réel `1211702` : hypothèse « rounds suivants, par symétrie avec Heal » réfutée) |
 | 66 Par Pillz / Vie restante | pillz/vies « **avant de mettre des pillz** sur ton perso (sans compter la Pillz gratuite) » — Lady Ametia Cr : 13 de puissance au round 1 | `nb_pillz_left` lit les pillz **après** la mise | ❌ → **corrigé** (vie : inchangée pendant la mise, OK) |
 | 56 Annule (Vie / Pillz) | « n'annule un effet permanent (Poison, Soin, Toxine, Régén) que **pendant le round où il est joué. L'effet reprendra lors du round suivant** » ; idem Pillz face à Dope / Consume | la correction du matin **retire** le poison/heal/… de la carte adverse | ⚠️ → **corrigé** : le tic du round est sauté (y compris le tic immédiat d'une toxine posée ce round), l'effet subsiste |
 | 56 Annule (Dégâts) | « n'annule pas la Fury » | fury ajoutée après les modificateurs, jamais annulée | ✅ |

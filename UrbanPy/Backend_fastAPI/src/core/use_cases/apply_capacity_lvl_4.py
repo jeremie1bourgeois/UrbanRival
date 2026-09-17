@@ -7,8 +7,9 @@ Niveau 4 : effets persistants (poison / toxine / heal / regen / dope / repair / 
      est résolu à l'activation ; un effet remplace l'effet de même sorte (poison et toxine se cumulent,
      heal et regen aussi, dope et repair aussi) ;
   3. toxine, regen, dope et consume « agissent immédiatement à la fin du round dans lequel ils ont été joués »
-     (glossaire officiel 51, 52), mindwipe aussi (combat réel 1211279) : les effets de ces sortes enregistrés ce round
-     agissent aussitôt.
+     (glossaire officiel 51, 52), mindwipe (combat réel 1211279) et repair (« gagne X points de Vie ET Pillz, maximum Y »,
+     combat réel 1211702) aussi : les effets de ces sortes enregistrés ce round agissent aussitôt.
+Approximation : un effet vie + pillz (combust, mindwipe, repair) est suspendu en bloc par l'Annul de sa stat de référence.
 Un poison peut amener un joueur à 0 vie : la fin de partie est constatée par check_end.
 """
 from src.core.domain.card import Card, FIGHT_SLOTS
@@ -20,10 +21,11 @@ from src.core.use_cases.multipliers import multiplier
 
 _LIFE_LOSS = ("poison", "toxine")
 _LIFE_GAIN = ("heal", "regen")
-_PILLZ_GAIN = ("dope", "repair")
+_PILLZ_GAIN = ("dope",)
 _PILLZ_LOSS = ("consume",)
-IMMEDIATE_KINDS = ("toxine", "regen", "dope", "consume", "mindwipe")
+IMMEDIATE_KINDS = ("toxine", "regen", "dope", "consume", "mindwipe", "repair")
 _LIFE_LOSS_AND_PILLZ_LOSS = ("combust", "mindwipe")
+_LIFE_GAIN_AND_PILLZ_GAIN = ("repair",)
 
 
 _STAT_OF_KIND = {"poison": "life", "toxine": "life", "heal": "life", "regen": "life",
@@ -107,12 +109,17 @@ def _apply_tick(player: Player, effect: PersistentEffect) -> None:
         _lose(player, "life", effect.value, floor)
         _lose(player, "pillz", effect.value, floor)
     elif effect.kind in _LIFE_GAIN:
-        if unbounded:
-            player.life += effect.value
-        elif player.life < effect.borne:
-            player.life = min(effect.borne, player.life + effect.value)
+        _gain(player, "life", effect.value, effect.borne if not unbounded else None)
     elif effect.kind in _PILLZ_GAIN:
-        if unbounded:
-            player.pillz += effect.value
-        elif player.pillz < effect.borne:
-            player.pillz = min(effect.borne, player.pillz + effect.value)
+        _gain(player, "pillz", effect.value, effect.borne if not unbounded else None)
+    elif effect.kind in _LIFE_GAIN_AND_PILLZ_GAIN:
+        _gain(player, "life", effect.value, effect.borne if not unbounded else None)
+        _gain(player, "pillz", effect.value, effect.borne if not unbounded else None)
+
+
+def _gain(player: Player, attr: str, value: int, ceiling) -> None:
+    current = getattr(player, attr)
+    if ceiling is None:
+        setattr(player, attr, current + value)
+    elif current < ceiling:
+        setattr(player, attr, min(ceiling, current + value))

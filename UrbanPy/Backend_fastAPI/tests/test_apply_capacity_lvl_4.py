@@ -146,7 +146,7 @@ def test_dope_adds_pillz_up_to_its_maximum(game):
 
 
 # --- Glossaire officiel (51, 52) : Toxine, Régén, Consume et Dope « agissent immédiatement à la fin du round dans lequel
-# ils ont été joués » (Poison, Soin — et Repair, par symétrie — seulement aux rounds suivants) -------------------------
+# ils ont été joués » (Poison, Soin seulement aux rounds suivants ; Repair et Mindwipe immédiats : combats réels) ------
 
 def test_toxin_ticks_on_its_own_round(game):
     play(game, 1, ally_ability="Toxin 2, Min 0", ally_pillz=6)   # ennemi 12 - 5 = 7, toxine -> 5
@@ -223,11 +223,22 @@ def test_persistent_effects_survive_a_json_round_trip(game):
     assert restored.to_dict() == game.to_dict()
 
 
-def test_repair_adds_pillz_and_stacks_with_dope(game):
-    play(game, 1, ally_ability="Dope 1, Max. 12", ally_pillz=6)     # allié 7 pillz, dope immédiat -> 8
-    play(game, 2, ally_ability="Repair 2, Max. 12")                  # dope -> 9 (repair : rounds suivants)
+def test_repair_adds_life_and_pillz_at_once_then_each_following_round(game):
+    # Combat réel 1211702 (Wilo Ld) : « gagne X points de Vie ET Pillz, maximum Y. L'effet persiste à la fin de chacun des
+    # tours suivants » — immédiat, comme dope / regen ; la vie ne dépasse pas le maximum.
+    play(game, 1, ally_ability="Repair 2, Max. 12", ally_pillz=6)   # allié 12 vies (max), 7 pillz → repair : 9 pillz
 
-    play(game, 3)                                                    # dope 1 + repair 2 -> 12
+    assert (game.ally.life, game.ally.pillz, effects(game.ally)) == (12, 9, [("repair", 2, 12)])
+    play(game, 2, enemy_pillz=2)                                     # Bhudd gagne : allié 10 vies → repair : 12 vies, 11 pillz
+    assert (game.ally.life, game.ally.pillz) == (12, 11)
+
+
+def test_repair_stacks_with_dope(game):
+    play(game, 1, ally_ability="Dope 1, Max. 12", ally_pillz=6)     # allié 7 pillz, dope immédiat -> 8
+    play(game, 2, ally_ability="Repair 2, Max. 12")                  # dope -> 9, repair immédiat -> 11
+    assert game.ally.pillz == 11
+
+    play(game, 3)                                                    # dope 1 + repair 2 -> 12 (max)
 
     assert (game.ally.pillz, sorted(effects(game.ally))) == (12, [("dope", 1, 12), ("repair", 2, 12)])
 
