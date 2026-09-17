@@ -51,3 +51,17 @@ def test_a_symmetric_game_is_worth_zero_to_both():
     assert solution.value == pytest.approx(0)
     assert list(solution.row) == pytest.approx([1 / 3] * 3)
     assert list(solution.column) == pytest.approx([1 / 3] * 3)
+
+
+def test_a_saddle_point_is_found_without_the_linear_program(monkeypatch):
+    """Au dernier round, presque toutes les matrices ont un point-selle : le LP (1,5 ms de frais fixes) est évité."""
+    from src.core.ai import equilibrium
+    monkeypatch.setattr(equilibrium, "linprog", lambda *args, **kwargs: pytest.fail("LP appelé sur un point-selle"))
+
+    solution = solve_matrix([[1, 5, 2],
+                             [3, 4, 6],
+                             [0, 1, -1]])
+
+    assert solution.value == pytest.approx(3)
+    assert list(solution.row) == pytest.approx([0, 1, 0])
+    assert list(solution.column) == pytest.approx([1, 0, 0])

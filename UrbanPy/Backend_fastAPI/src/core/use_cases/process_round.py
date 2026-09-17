@@ -1,4 +1,3 @@
-import copy
 from collections import Counter
 from typing import Tuple
 from src.core.domain.round import Round
@@ -248,7 +247,7 @@ def leader_team_capacity(player: Player) -> Capacity:
     leaders = [card for card in player.cards if card.faction == "Leader"]
     if len(leaders) != 1 or leaders[0].ability is None or "team" not in leaders[0].ability.effect_conditions:
         return None
-    capacity = copy.deepcopy(leaders[0].ability)
+    capacity = leaders[0].ability.clone()
     capacity.effect_conditions.remove("team")
     capacity.label = f"Leader {leaders[0].name} « {leaders[0].ability_description} »"
     return capacity
@@ -389,7 +388,7 @@ def apply_infiltrated_bonus(player: Player, card: Card) -> None:
         return
     clan = infiltrated_clan(player)
     source = next((c for c in player.cards if c.faction == clan and c.bonus is not None), None)
-    card.bonus_fight = copy.deepcopy(source.bonus) if source else None
+    card.bonus_fight = source.bonus.clone() if source else None
 
 
 def is_clan_bonus_active(player: Player, card: Card) -> bool:
@@ -403,8 +402,8 @@ def is_clan_bonus_active(player: Player, card: Card) -> bool:
 def init_fight_data(card: Card, nb_pillz: int, fury: bool):
     card.power_fight = card.power
     card.damage_fight = card.damage
-    card.ability_fight = copy.deepcopy(card.ability)
-    card.bonus_fight = copy.deepcopy(card.bonus)
+    card.ability_fight = card.ability.clone() if card.ability is not None else None
+    card.bonus_fight = card.bonus.clone() if card.bonus is not None else None
     card.leader_fight = None
     if card.ability_fight is not None:
         card.ability_fight.label = f"pouvoir « {card.ability_description} »"

@@ -17,7 +17,7 @@ import random
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
-from src.core.ai import engine
+from src.core.ai import engine, round_matrix
 from src.core.ai.engine import Pick
 from src.core.ai.equilibrium import solve_matrix
 from src.core.domain.game import NB_ROUNDS, Game
@@ -78,7 +78,10 @@ def _solve(state: Game) -> Solution:
     columns = engine.legal_actions(state, second)
     card_values, bets_by_card, replies = {}, {}, {}
     for card, rows in _picks_by_card(engine.legal_actions(state, first)).items():
-        matrix = [[sign * value(engine.next_state(state, first, row, column)) for column in columns] for row in rows]
+        cells = {}
+        for second_card in _picks_by_card(columns):
+            cells.update(round_matrix.values(state, first, card, second_card, value))
+        matrix = [[sign * cells[(row, column)] for column in columns] for row in rows]
         equilibrium = solve_matrix(matrix)
         card_values[card] = sign * equilibrium.value
         bets_by_card[card] = _support(rows, equilibrium.row)

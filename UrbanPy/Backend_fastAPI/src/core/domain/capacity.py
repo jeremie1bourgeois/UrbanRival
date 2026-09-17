@@ -11,6 +11,18 @@ class Capacity:
         # stop: puissance et degat +2
         # effect_conditions: stop ; target: ally ; type = "puissance_dommage" ; value = 2
     
+    def clone(self) -> "Capacity":
+        """
+        Copie de combat : les listes (types, conditions) sont dupliquées car le moteur les consomme au fil du round ;
+        l'étiquette de journal éventuelle (`label`) est reprise. Bien plus rapide qu'un `deepcopy` — le moteur en
+        fait quatre par round, des centaines de milliers dans un solveur.
+        """
+        copied = Capacity(self.target, list(self.types), self.value, self.borne, self.how,
+                          list(self.effect_conditions), self.lvl_priority)
+        if hasattr(self, "label"):
+            copied.label = self.label
+        return copied
+
     def __str__(self) -> str:
         return f"Capacity(target={self.target}, types={self.types}, value={self.value}, how={self.how}, borne={self.borne}, effect_conditions={self.effect_conditions}, lvl_priority={self.lvl_priority})"
 

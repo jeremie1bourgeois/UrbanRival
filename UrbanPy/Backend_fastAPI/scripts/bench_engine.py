@@ -57,7 +57,7 @@ def main() -> None:
         measure(f"décision « {name} » (round 1)", lambda strategy=strategy: strategy(fresh, "ally", rng),
                 args.seconds, "décisions")
 
-    for round_number, pillz in ((NB_ROUNDS, 12), (NB_ROUNDS - 1, 6)):
+    for round_number, pillz in ((NB_ROUNDS, 12), (NB_ROUNDS - 1, 6), (NB_ROUNDS - 1, 12)):
         state = endgame(fresh, round_number, pillz)
         measure(f"solveur exact (round {round_number}, {pillz} pillz)",
                 lambda state=state: (solver.clear_cache(), solver.solve(state)), args.seconds, "résolutions")

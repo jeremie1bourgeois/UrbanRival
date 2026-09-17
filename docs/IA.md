@@ -178,30 +178,35 @@ l'étape 3).
 Non fait, et pourquoi : l'élimination des mises dominées avant le LP — le LP coûte ses frais fixes, pas sa
 taille ; elle ne rapporterait rien tant que `engine.step` domine.
 
-### Étape 3 — Matrice de round rapide (2-3 j, guidée par le profil)
+### Étape 3 — Matrice de round rapide — ✅ fait le 2026-09-17
 
-Le solveur de l'étape 2 passe la moitié de son temps dans `engine.step` (0,17 ms × ~300 000 rounds pour un
-round 3 à 12 pillz) : chaque cellule de chaque matrice rejoue le round entier. Le moteur reste la seule source
-de vérité — on ne réécrit pas ses règles, on évite de les rejouer :
+Le moteur reste la seule source de vérité : on ne réécrit pas ses règles, on évite de les rejouer.
 
-- **Le moteur en trois phases** (`process_round`) : préparation (mise à jour des pillz, pouvoirs, Stops,
-  modificateurs de puissance et dégâts, fury), attaques (puissance × pillz, modificateurs d'attaque, Tune Out,
-  Killshot / Perfect), résolution (combat, effets de fin de round, historique). Refactorisation sans changement de
-  comportement, sous les 497 tests et le balayage.
-- `round_matrix.py` : pour un état et un couple de cartes, **une** phase de préparation sur une copie, puis
-  les attaques de toutes les mises **en numpy** (les modificateurs d'attaque survivants sont lus sur les cartes
-  préparées et appliqués dans l'ordre du moteur, bornes comprises), d'où le vainqueur de chaque cellule.
-  Les cellules se groupent en **classes d'issue** (vainqueur, fury de chacun) : le moteur ne rejoue le round
-  qu'**une fois par classe** (≤ 8), et les autres cellules de la classe n'en diffèrent que par les pillz
-  restantes.
-- **Repli obligatoire** vers le moteur, cellule par cellule, dès qu'une capacité en jeu lit la mise ou les
-  pillz : types `pillz`, `recover`, `dope`, `consume`, `repair`, `combust`, `tune_out`, multiplicateurs
-  `nb_pillz_left` / `nb_pillz_lost`, conditions `bet`, `killshot`, `perfect`, effets persistants sur les pillz.
-  Liste fermée (le vocabulaire du parseur l'est) ; en cas de doute, le repli.
-- **Test qui autorise le raccourci** : identité cellule à cellule avec `engine.step` — sur des couples choisis
-  dans la suite de tests, sur toutes les descriptions gérées dans `scripts/round_matrix_sweep.py`.
-- Cible : round 4 en quelques ms, round 3 à 12 pillz en quelques secondes ; le LP devient alors le goulot
-  (point-selle pur détecté avant le LP, solveur dédié aux petites matrices si besoin).
+- **Le moteur en trois phases** (`process_round.prepare_fight` / `compute_attacks` / `resolve_fight`) :
+  refactorisation sans changement de comportement. Au passage, `Capacity.clone()` remplace les `deepcopy`
+  de combat (quatre par round, un tiers du temps du moteur).
+- `round_matrix.values(état, premier, carte, carte, feuille)` : **une** préparation du moteur sur une copie,
+  les attaques de toutes les mises **en numpy** (modificateurs d'attaque survivants lus sur les cartes
+  préparées, appliqués dans l'ordre du moteur, bornes comprises ; égalités comme `resolve_combat`), puis le
+  moteur ne rejoue le round qu'**une fois par classe d'issue** (fury × fury × vainqueur, ≤ 8) ; les autres
+  cellules de la classe n'en diffèrent que par les pillz restantes (ajustées le temps de l'appel à `feuille`).
+- **Repli** cellule à cellule vers le moteur si une capacité des deux mains ou un effet persistant lit la mise
+  ou les pillz (`bet_sensitive` : types `pillz`, `recover`, `dope`, `consume`, `repair`, `combust`, `tune_out`,
+  multiplicateurs `nb_pillz_*`, conditions `bet`, `killshot`, `perfect`). **280 des 1 380 descriptions** gérées
+  y passent (20 %) — traiter les effets sur les pillz analytiquement sera la suite si le repli pèse sur les
+  mains réelles.
+- **Identité prouvée** : `scripts/round_matrix_sweep.py` — les 1 380 descriptions, round 3 à 3 pillz, vies
+  basses, allié premier / second, sans / avec round précédent : **1 380 identiques au moteur cellule à cellule,
+  0 diffèrent** (sur la clé canonique de l'état suivant). Dans la suite de tests : 8 mains réelles à bonus
+  actifs (Montana, Uppers, Rescue, Raptors, Freaks, Leaders…), KO, Revenge.
+- `equilibrium.solve_matrix` détecte le **point-selle** avant le LP : au dernier round, les 1 512 matrices d'un
+  round 3 en ont un (structure à seuil) ; seul le round 3 lui-même passe par le LP.
+
+Mesures : round 4 à 12 pillz **95 ms → 3 ms** ; round 3 à 12 pillz **37 s → 2,2 s** (mêmes valeurs :
++0,389, +0,391, -1). Ce qui reste : les copies d'état du moteur (une préparation + ≤ 8 rounds par état de
+round 4). Solveur contre minimax : **56,5 % [49,6 ; 63,2] sur 200 parties** (8 min, 2,5 s la partie) — un
+avantage au mieux léger, attendu : la différence ne porte que sur les deux derniers rounds, et un équilibre de
+Nash ne cherche pas à punir un adversaire déterministe (c'est l'étape 6).
 
 ### Étape 3 bis — Le solveur complet, hors ligne : l'ébauche à temps illimité
 
@@ -293,7 +298,7 @@ de bans) sur `solver.value(main_a, main_b)`.
 
 ```bash
 cd UrbanPy/Backend_fastAPI
-.venv/bin/python -m pytest -q                      # 497 tests aujourd'hui
+.venv/bin/python -m pytest -q                      # 520 tests aujourd'hui
 .venv/bin/python scripts/engine_crash_sweep.py     # 0 exception
 .venv/bin/python scripts/capacity_coverage.py | head -1
 .venv/bin/python scripts/bench_engine.py           # débit moteur, coût d'une décision
@@ -312,8 +317,8 @@ Tests à écrire, dans l'esprit du dépôt (attentes calculées à la main) :
 - ✅ `exploitability` : sur un sous-jeu résolu, la meilleure réponse n'obtient que la valeur (ε = 0) ; une
   mise déterministe est exploitée.
 - ✅ `arena` : intervalle de Wilson juste sur des cas connus (0/10, 5/10, 1 000 parties).
-- `round_matrix` : identité cellule à cellule avec `engine.step` sur toutes les capacités gérées (chemin
-  lent de l'étape 2 = chemin rapide de l'étape 3, même valeur de solveur).
+- ✅ `round_matrix` : identité cellule à cellule avec `engine.step` — mains réelles dans la suite, toutes les
+  descriptions gérées dans `scripts/round_matrix_sweep.py`.
 - `policy` : distribution sur des coups légaux, reproductible à graine fixée, strictement mixte là où
   elle doit l'être.
 - Bout en bout : une partie ELO complète dans l'interface contre l'adversaire « nash » avant de déclarer

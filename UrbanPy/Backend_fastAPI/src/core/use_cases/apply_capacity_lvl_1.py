@@ -12,7 +12,6 @@ Règle officielle des Stops (support UR, art. 91) : un Stop stoppé ne stoppe ri
 rien ; les cycles (SoA contre SoA, deux Protections face à deux Stops) ne sont pas tranchés par la source : les Stops
 gagnent. Tune Out survit à la consommation : process_round le lit pour résoudre le round aux pillz.
 """
-import copy
 from typing import Optional, Set
 
 from src.core.domain.capacity import Capacity
@@ -74,7 +73,7 @@ def _apply_copies(card1: Card, card2: Card) -> None:
             if kind is None:
                 continue
             source = getattr(opp, SLOT_OF_KIND[kind])
-            copied = None if _is(source, "copy") and _kind_targeted(source) else copy.deepcopy(source)
+            copied = None if source is None or (_is(source, "copy") and _kind_targeted(source)) else source.clone()
             if copied is not None:
                 copied.label = f"copie du {_KIND_LABELS[kind]} {_of(opp)} « {_description(opp, kind)} »"
                 note(own, "copie", f"{own.name} : {label(capacity)} copie le {_KIND_LABELS[kind]} {_of(opp)} « {_description(opp, kind)} »")
