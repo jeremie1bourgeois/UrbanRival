@@ -235,7 +235,7 @@ ROADMAP § 2.A.
 
 | Mécanique | Définition | Type d'implémentation |
 |---|---|---|
-| **Tune Out** (bonus Cosmohnuts) | « When a Tune Out card is played, the Attack calculation is ignored and the winner of the round is the player who bet the most Pillz. In case of a tie in Pillz, the two cards are decided in the same way as for a tie in Attack. » | Combat réel `1211279` : le serveur **met les deux puissances à 1**, l'attaque vaut les pillz misées (`pillzUsed`, gratuite comprise, fury exclue) ; le moteur fait de même |
+| **Tune Out** (bonus Cosmohnuts) | « When a Tune Out card is played, the Attack calculation is ignored and the winner of the round is the player who bet the most Pillz. In case of a tie in Pillz, the two cards are decided in the same way as for a tie in Attack. » | Combats réels `1211279`, `1211570` : le serveur **met les deux puissances à 1**, l'attaque vaut les pillz misées (`pillzUsed`, gratuite comprise, **fury exclue** — 8 contre 8 avec fury = égalité) ; le moteur fait de même |
 | **Unison: X** | « only activates if the hand of the player contains EXCLUSIVELY cards of the same clan as the card which has the Unison effect » | Condition de début de round (main mono-clan) |
 | **Disunion: X** | « only activates if the hand of the player at least contains ONE card from a different clan » | Condition, négation d'Unison |
 | **After (Clan X[, Clan Y]): X** (bonus Tolvack + abilities) | « This effect only activates if you played a "Clan X" character in the previous round. Oculus characters, even when infiltrated "Clan X", do not count. » Ne s'active jamais au round 1. | Condition sur `history[-1]` (clan de la carte jouée par le même joueur au round précédent) |
@@ -278,8 +278,9 @@ Par ordre d'impact :
 2. Recover : pillz gratuite comptée ou non, minimum 1 (3.5).
 3. Le Leader bénéficie-t-il de son propre Team (3.7).
 4. Cancel Life Modif. : pose du poison empêchée, ou tic du round sauté (3.3).
-5. Tune Out : la fury compte-t-elle dans les pillz comparées — **très probablement non** (combat `1211279` : attaque =
-   `pillzUsed`, qui exclut la fury) ; reste à observer avec une fury.
+5. ~~Tune Out : la fury compte-t-elle dans les pillz comparées.~~ **Tranché** (`1211570`) : non — Chopper Ld avec fury et
+   8 pillz contre 8 pillz donne 8 contre 8, égalité perdue (niveau égal, premier joueur gagnant) ; l'attaque vaut
+   `pillzUsed`, gratuite comprise, fury exclue.
 6. ~~Combust contre Mindwipe : différence réelle.~~ **Tranché** (`1211279`) : Mindwipe agit dès le round gagné, Combust aux
    rounds suivants.
 7. **Copy: Opp. Ability** (bonus Oblivion) copie un Stop et le retourne : combat `1211029`, le SoA copié stoppe le SoA

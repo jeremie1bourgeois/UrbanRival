@@ -108,8 +108,8 @@ capturés (`data/ur_battles/12104*.json` à `1211279.json`), tous rejoués par `
   (`1210625`), quatre lectures de Stop en pouvoir contre bonus Stop. SoA contre SoA (et SoB contre SoB) en pouvoir est
   inobservable par construction : rien d'autre à stopper.
 - **D4 entamé** : Tune Out = puissances à 1, attaque = pillz (`1211279`) ; Mindwipe immédiat puis persistant, vie et pillz
-  (deux écarts moteur corrigés, commit 30f054c). Restent : Tune Out avec fury, Consume/Repair au round même, Cancel Life
-  Modif. contre poison, Combust (aucune carte).
+  (deux écarts moteur corrigés, commit 30f054c) ; Tune Out avec fury : la fury ne compte pas (`1211570`, égalité 8-8
+  perdue). Restent : Consume/Repair au round même, Cancel Life Modif. contre poison, Combust (aucune carte).
 - En prime : Copy: Opp. Ability (Oblivion) copie un Stop et le retourne (`1211029`) ; After (Tolvack) reproduit.
 - Capture : contre un bot qui joue instantanément, l'ordre de jeu se lit sur la carte déjà posée (correction de
   `ur_capture.js`) ; les `roundPower`/`roundDamage` des rounds passés reviennent aux valeurs de base dans les statuts
