@@ -256,6 +256,16 @@ def test_combust_removes_life_and_pillz_each_following_round(game):
     assert (game.enemy.life, game.enemy.pillz) == (6, 10)
 
 
+def test_mindwipe_removes_life_and_pillz_at_once_then_each_following_round(game):
+    # Combat réel 1211279 (round 3) : Mindwipe 2 gagnant → l'adversaire perd 2 vies et 2 pillz à la fin du round même,
+    # puis encore à la fin du round suivant (Min 0). Combust, lui, n'agit qu'aux rounds suivants.
+    play(game, 1, ally_ability="Mindwipe 2, Min 0", ally_pillz=6)   # ennemi 12 - 5 = 7 vies, 12 pillz → mindwipe : 5 vies, 10 pillz
+
+    assert (game.enemy.life, game.enemy.pillz, effects(game.enemy)) == (5, 10, [("mindwipe", 2, 0)])
+    play(game, 2, enemy_pillz=2)                                     # Bhudd gagne (allié -2) ; ennemi 5 → 3 vies, 9 → 7 pillz
+    assert (game.enemy.life, game.enemy.pillz) == (3, 7)
+
+
 def test_players_combust_hits_both_players(game):
     play(game, 1, ally_ability="Players Combust 1, Min 0", ally_pillz=6)   # allié 12 vies, 7 pillz ; ennemi 7 vies, 12 pillz
 

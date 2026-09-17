@@ -2,7 +2,8 @@
 Oracle : combats réels Urban Rivals capturés depuis le client officiel (data/ur_battles/*.json, voir
 docs/ur-abilitydata-modele.md). Chaque round est rejoué dans le moteur avec les mêmes choix (carte, pillz, fury, ordre
 de jeu) et les valeurs finales officielles sont exigées : puissance, dégâts, attaque, vainqueur, vies et pillz.
-p0 est l'allié, p1 l'ennemi ; `first` dit qui joue en premier.
+p0 est l'allié, p1 l'ennemi ; `first` dit qui joue en premier. Une valeur `null` (round reconstitué après coup,
+seuls les choix et l'état résultant sont connus) n'est pas vérifiée.
 """
 import glob
 import json
@@ -50,7 +51,10 @@ def test_the_engine_reproduces_a_real_urban_rivals_battle(path):
             "p0": {"power": ally.power_fight, "damage": ally.damage_fight, "attack": ally.attack, "won": ally.win},
             "p1": {"power": enemy.power_fight, "damage": enemy.damage_fight, "attack": enemy.attack, "won": enemy.win},
         }
-        expected = {side: {k: round_[side][k] for k in ("power", "damage", "attack", "won")} for side in ("p0", "p1")}
+        # Une valeur null dans le fichier = non observée (round reconstitué : seuls les choix sont connus) → non vérifiée.
+        expected = {side: {k: round_[side][k] for k in ("power", "damage", "attack", "won") if round_[side][k] is not None}
+                    for side in ("p0", "p1")}
+        observed = {side: {k: v for k, v in observed[side].items() if k in expected[side]} for side in observed}
         assert observed == expected, f"round {round_['round']} : {[e['text'] for e in game.history[-1].log]}"
         if round_["after"]["life"] is not None:
             assert [game.ally.life, game.enemy.life] == round_["after"]["life"], f"round {round_['round']} (vies)"

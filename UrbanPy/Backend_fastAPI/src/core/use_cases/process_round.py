@@ -99,6 +99,13 @@ def prepare_fight(game: Game, round_data: ProcessRoundInput) -> Tuple[Card, Card
 
 def compute_attacks(game: Game, player1_card: Card, player2_card: Card, round_data: ProcessRoundInput) -> None:
     """Phase 2 — attaque = puissance × pillz, modificateurs d'attaque, Tune Out, conditions Killshot / Perfect."""
+    # Tune Out (Cosmohnuts) : « the Attack calculation is ignored and the winner is the player who bet the most Pillz ».
+    # Le serveur l'implémente en mettant les deux puissances à 1 (combat réel 1211279, round 2 : roundPower = 1 des deux
+    # côtés, attaque = pillz) ; les modificateurs d'attaque sont ignorés.
+    tune_out = consume_tune_out(player1_card) | consume_tune_out(player2_card)
+    if tune_out:
+        player1_card.power_fight = player2_card.power_fight = 1
+
     for card, pillz in ((player1_card, round_data.player1_pillz), (player2_card, round_data.player2_pillz)):
         card.attack += card.power_fight * pillz
         note(card, "attaque", f"{card.name} : attaque = {card.power_fight} × {pillz} pillz = {card.attack}")
@@ -106,8 +113,7 @@ def compute_attacks(game: Game, player1_card: Card, player2_card: Card, round_da
     # Modificateurs d'attaque, une fois l'attaque de base connue
     fct_lvl_2.apply_capacity_lvl_2(game, player1_card, player2_card, stats=("attack",))
 
-    # Tune Out (Cosmohnuts) : « the Attack calculation is ignored and the winner is the player who bet the most Pillz »
-    if consume_tune_out(player1_card) | consume_tune_out(player2_card):
+    if tune_out:
         player1_card.attack, player2_card.attack = round_data.player1_pillz, round_data.player2_pillz
         note(None, "tune_out", f"Tune Out : le round se résout aux pillz ({player1_card.name} {player1_card.attack}, {player2_card.name} {player2_card.attack})")
 

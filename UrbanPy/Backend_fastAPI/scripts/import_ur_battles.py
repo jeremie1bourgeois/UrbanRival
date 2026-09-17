@@ -26,9 +26,12 @@ def replay(record: dict) -> str:
         process_round(game, ProcessRoundInput(player1_card_index=p0["index"], player1_pillz=p0["pillz"], player1_fury=p0["fury"],
                                               player2_card_index=p1["index"], player2_pillz=p1["pillz"], player2_fury=p1["fury"]))
         ally, enemy = game.ally.cards[p0["index"]], game.enemy.cards[p1["index"]]
-        observed = {"p0": [ally.power_fight, ally.damage_fight, ally.attack, ally.win],
-                    "p1": [enemy.power_fight, enemy.damage_fight, enemy.attack, enemy.win]}
-        expected = {side: [round_[side][k] for k in ("power", "damage", "attack", "won")] for side in ("p0", "p1")}
+        keys = ("power", "damage", "attack", "won")
+        values = {"p0": [ally.power_fight, ally.damage_fight, ally.attack, ally.win],
+                  "p1": [enemy.power_fight, enemy.damage_fight, enemy.attack, enemy.win]}
+        # null dans le fichier = valeur non observée (round reconstitué), non vérifiée
+        expected = {side: [round_[side][k] for k in keys if round_[side][k] is not None] for side in ("p0", "p1")}
+        observed = {side: [v for k, v in zip(keys, values[side]) if round_[side][k] is not None] for side in ("p0", "p1")}
         if observed != expected or (round_["after"]["life"] is not None and (
                 [game.ally.life, game.enemy.life] != round_["after"]["life"] or [game.ally.pillz, game.enemy.pillz] != round_["after"]["pillz"])):
             log = "\n      ".join(entry["text"] for entry in game.history[-1].log)

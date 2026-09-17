@@ -29,10 +29,10 @@ from src.schemas.game_schemas import ProcessRoundInput
 
 # Ce qui lit la mise ou les pillz restantes (vocabulaire fermé du parseur, voir docs/IA.md étape 3) :
 # la matrice rapide ne s'en mêle pas, le moteur rejoue chaque cellule.
-SENSITIVE_TYPES = {"pillz", "recover", "dope", "consume", "repair", "combust", "tune_out"}
+SENSITIVE_TYPES = {"pillz", "recover", "dope", "consume", "repair", "combust", "mindwipe", "tune_out"}
 SENSITIVE_HOWS = {"nb_pillz_left", "nb_pillz_lost", "tune_out"}
 SENSITIVE_CONDITIONS = ("bet", "killshot", "perfect")
-SENSITIVE_EFFECTS = {"dope", "repair", "consume", "combust"}
+SENSITIVE_EFFECTS = {"dope", "repair", "consume", "combust", "mindwipe"}
 
 Leaf = Callable[[Game], object]
 

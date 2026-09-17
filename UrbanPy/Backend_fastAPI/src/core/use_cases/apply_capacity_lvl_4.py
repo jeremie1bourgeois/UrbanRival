@@ -1,5 +1,5 @@
 """
-Niveau 4 : effets persistants (poison / toxine / heal / regen / dope / repair / consume / combust).
+Niveau 4 : effets persistants (poison / toxine / heal / regen / dope / repair / consume / combust / mindwipe).
 À la fin d'un round où les deux joueurs sont en vie :
   1. les effets déjà actifs agissent (« à la fin de chaque round suivant » leur activation) ;
   2. les capacités persistantes restantes (leur condition de fin de round a été validée au niveau 3) sont
@@ -7,7 +7,8 @@ Niveau 4 : effets persistants (poison / toxine / heal / regen / dope / repair / 
      est résolu à l'activation ; un effet remplace l'effet de même sorte (poison et toxine se cumulent,
      heal et regen aussi, dope et repair aussi) ;
   3. toxine, regen, dope et consume « agissent immédiatement à la fin du round dans lequel ils ont été joués »
-     (glossaire officiel 51, 52) : les effets de ces sortes enregistrés ce round agissent aussitôt.
+     (glossaire officiel 51, 52), mindwipe aussi (combat réel 1211279) : les effets de ces sortes enregistrés ce round
+     agissent aussitôt.
 Un poison peut amener un joueur à 0 vie : la fin de partie est constatée par check_end.
 """
 from src.core.domain.card import Card, FIGHT_SLOTS
@@ -21,13 +22,13 @@ _LIFE_LOSS = ("poison", "toxine")
 _LIFE_GAIN = ("heal", "regen")
 _PILLZ_GAIN = ("dope", "repair")
 _PILLZ_LOSS = ("consume",)
-IMMEDIATE_KINDS = ("toxine", "regen", "dope", "consume")
-_LIFE_LOSS_AND_PILLZ_LOSS = ("combust",)
+IMMEDIATE_KINDS = ("toxine", "regen", "dope", "consume", "mindwipe")
+_LIFE_LOSS_AND_PILLZ_LOSS = ("combust", "mindwipe")
 
 
 _STAT_OF_KIND = {"poison": "life", "toxine": "life", "heal": "life", "regen": "life",
-                 "dope": "pillz", "repair": "pillz", "consume": "pillz", "combust": "life"}
-_CAUSED_BY_OPPONENT = ("poison", "toxine", "consume", "combust")   # posés sur un joueur par son adversaire
+                 "dope": "pillz", "repair": "pillz", "consume": "pillz", "combust": "life", "mindwipe": "life"}
+_CAUSED_BY_OPPONENT = ("poison", "toxine", "consume", "combust", "mindwipe")   # posés sur un joueur par son adversaire
 
 
 def _suspended(effect: PersistentEffect, player_card: Card, opp_card: Card) -> bool:

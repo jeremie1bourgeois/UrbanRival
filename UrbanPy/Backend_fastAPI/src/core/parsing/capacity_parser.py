@@ -120,9 +120,10 @@ _R_REANIMATE = re.compile(r"^reanimate \+(\d+) life$")
 _R_RECOVER = re.compile(r"^recover (\d+) (?:(players) )?pillz out of (\d+)$")   # X pillz récupérées sur Y misées (fin de round)
 _R_INFILTRATED = re.compile(r"^infiltrated$")                        # bonus Oculus : adopte le bonus du clan majoritaire de la main
 
-# Mindwipe : « lose X Life Points and Pillz, minimum Y, at the end of each of the following rounds » = Combust (textes officiels)
+# Mindwipe : « lose X Life Points and Pillz, minimum Y. This effect will persist at the end of each of the following rounds »
+# = Combust qui agit dès la fin du round gagné (combat réel 1211279), comme toxine face à poison.
 _PERSISTENT_TYPES = {"poison": "poison", "toxin": "toxine", "heal": "heal", "regen": "regen", "dope": "dope", "repair": "repair",
-                     "consume": "consume", "combust": "combust", "mindwipe": "combust"}
+                     "consume": "consume", "combust": "combust", "mindwipe": "mindwipe"}
 _PERSISTENT_TARGETS = {"poison": "enemy", "toxin": "enemy", "heal": "ally", "regen": "ally", "dope": "ally", "repair": "ally",
                        "consume": "enemy", "combust": "enemy", "mindwipe": "enemy"}
 

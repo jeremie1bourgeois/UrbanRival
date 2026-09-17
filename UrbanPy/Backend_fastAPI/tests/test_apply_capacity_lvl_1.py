@@ -325,6 +325,15 @@ def test_tune_out_applies_when_only_the_opponent_has_it(template_game):
     assert amelia.win is True
 
 
+def test_tune_out_sets_both_powers_to_one(template_game):
+    # Combat réel 1211279 (round 2) : le serveur rapporte roundPower = 1 pour les deux cartes, l'attaque vaut les pillz.
+    amelia, asporov = play(template_game, ally_ability="Tune Out", enemy_ability="Power +3", ally_pillz=1, enemy_pillz=6)
+
+    assert (amelia.power_fight, asporov.power_fight) == (1, 1)
+    assert (amelia.attack, asporov.attack) == (1, 6)
+    assert asporov.win is True
+
+
 
 # --- Par Pillz restante : glossaire officiel (66) : « le nombre de Pillz qu'il te reste avant de mettre des pillz sur ton
 # perso (sans compter la Pillz gratuite) » — Lady Ametia Cr : 13 de puissance au round 1 ---------------------------
