@@ -11,9 +11,9 @@ ce document décrit **où on en est et ce qui reste**, pour reprendre le travail
 | Parseur de capacités | 1 386 / 1 396 descriptions gérées (99,3 %) ; `scripts/capacity_coverage.py` liste les 10 restantes (capacités uniques sans règle publiée) |
 | Cartes entièrement gérées | toutes sauf les porteuses des 10 descriptions restantes (Genesis, Robert Cobb, Bugamon, Memento, Kate, Glibon Cr, Hekate, Administrator, Nemo Cr, une carte Night) |
 | Moteur | 4 niveaux réécrits et testés (méta, stats, fin de round, persistants) ; bonus de clan (≥ 2 du clan, Oculus infiltré sur ses clans listés, Leaders), conditions Courage / Revenge / Confidence / Reprisal / Symmetry / Asymmetry / Stop / Killshot / Perfect / Bet / Versus / After / Unison / Disunion / Defeat / Backlash / Victory or Defeat / Team ; Tune Out, Impose, Cards, Consume / Combust / Mindwipe / Corrosion, Xantiax, Corrupt, Fatal Killshot, Sinister Symmetry, Leaders Tie-break / Counter-attack / Limitless / Per Round ; `scripts/engine_crash_sweep.py` : 0 exception |
-| API | `/cards`, `/init_game/`, `/init_game/template`, `/process_round/{id}`, `/ai_pick/{id}`, `/save_for_test` |
-| Front | deck builder (recherche, filtre clan, aléatoire, statut des bonus, decks mémorisés), partie à deux ou contre l'ordinateur (aléatoire / heuristique), historique des rounds, fin de partie, effets persistants, illustrations |
-| Tests | 437 backend (pytest) + 24 front (vitest) ; CI GitHub Actions (backend + front) ; 3 fixtures de rejeu `data/test/` + 1 combat réel `data/ur_battles/` |
+| API | `/cards`, `/init_game/`, `/init_game/template`, `/process_round/{id}`, `/save_for_test` |
+| Front | deck builder (recherche, filtre clan, aléatoire, statut des bonus, decks mémorisés), partie à deux, historique des rounds, fin de partie, effets persistants, illustrations |
+| Tests | 429 backend (pytest) + 24 front (vitest) ; CI GitHub Actions (backend + front) ; 3 fixtures de rejeu `data/test/` + 1 combat réel `data/ur_battles/` |
 | Dépôt | nettoyé (IDE, binaires, doublons), fins de ligne LF (`.gitattributes`), README |
 
 ### Décisions de règles prises sans certitude (à confirmer contre les règles officielles)
@@ -79,18 +79,18 @@ Counter-attack refixe l'ordre à chaque round.
 ### D. Backend — préparer l'IA (recommandé en premier)
 | # | Tâche | Détail |
 |---|---|---|
-| D1 | **API moteur pure** | `Engine.step(state, action) → (state, result)` et `legal_actions(state)` (déjà écrit pour l'IA : `src/core/ai/opponent.legal_picks`). `process_round` est pur ; extraire la persistance de `game_service`. Figer une représentation d'état (`Game.to_dict`) et d'action (`Pick`). |
+| D1 | **API moteur pure** | `Engine.step(state, action) → (state, result)` et `legal_actions(state)`. `process_round` est pur ; extraire la persistance de `game_service`. Figer une représentation d'état (`Game.to_dict`) et d'action (carte, pillz, fury). |
 | D2 | ~~**Journal des effets**~~ | **Fait le 2026-09-16** : `src/core/domain/journal.py` (`Journal`, `note`, `recording`), `Round.log` (entrées `{side, card, source, text}`), renvoyé par `/process_round`, déplié dans l'historique du front. Les fixtures de rejeu comparent l'état sans le journal. |
 | D3 | Performance | Mesurer `process_round` (deepcopy des capacités, sérialisation) ; le RL a besoin de milliers de parties/s. |
 | D4 | Persistance | Fichiers JSON par round (`data/game/`) → stockage mémoire + SQLite optionnel ; `get_new_game_id` est relatif au dossier courant (le serveur doit être lancé depuis `UrbanPy/Backend_fastAPI`). |
 | D5 | Dette | `requirements.txt` (FastAPI 0.100 de 2023, `@validator` Pydantic v1 déprécié → `field_validator`), CORS configurable, `print` de debug dans `main.py`, `debug=True`. Le front dépend du CDN d'Urban Rivals pour les images (option : script de téléchargement local). |
 
 ### E. IA
-1. Adversaires étalons : aléatoire et heuristique existent (`src/core/ai/opponent.py`) ; ajouter un glouton et un minimax à 1 coup.
-2. Environnement Gymnasium `UrbanRivalEnv` sur D1 : observation = état sérialisé, action = (carte, pillz, fury), masque des actions illégales (`legal_picks`).
-3. Self-play (PPO/DQN — Stable-Baselines3 ou CleanRL), d'abord contre l'aléatoire puis contre lui-même ; decks variés.
-4. Évaluation : taux de victoire contre chaque étalon, ELO interne.
-5. Intégration : l'agent devient une stratégie de `/ai_pick`.
+Plan détaillé, décisions et mesures : **`docs/IA.md`** (2026-09-18). En résumé : (0) API moteur pure, générateur de
+mains, arène d'évaluation, joueurs étalons ; (1) équilibre de Nash du round en cours par programme linéaire ;
+(2) solveur exact par induction à rebours, référence de mesure ; (3) fonction de valeur apprise sur les résultats du
+solveur, recherche + réseau ; (4) modèle d'adversaire, évaluation de decks, intégration dans l'interface.
+L'apprentissage par renforcement par essais-erreurs (Gymnasium, PPO/DQN) envisagé ici auparavant est abandonné.
 
 ### F. Divers
 - Branches distantes déjà fusionnées à supprimer : `chore/infra`, `feat/donnees-scraping`, `feat/front-c`, `feat/pouvoirs-vortex-oculus`, `fix/bugs-moteur-et-fixtures`, `gameStruct`.

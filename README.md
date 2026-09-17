@@ -1,7 +1,7 @@
 # UrbanRival
 
 Réimplémentation du jeu de cartes **Urban Rivals** : un moteur de règles en Python (FastAPI) et une interface web (Vue 3).
-Objectif à terme : une IA par apprentissage par renforcement.
+Objectif à terme : une IA capable de gagner un maximum de parties (plan détaillé : [docs/IA.md](docs/IA.md)).
 
 ## État du projet
 
@@ -10,8 +10,8 @@ Objectif à terme : une IA par apprentissage par renforcement.
 | Cartes jouables | **2 497** (36 clans), données scrapées d'iclintz.com le 2026-09-15, illustrations incluses |
 | Pouvoirs (abilities / bonus) | **1 132 / 1 310 descriptions gérées (86 %)**, 2 340 cartes sur 2 497 entièrement gérées — `python scripts/capacity_coverage.py` liste le reste |
 | Moteur | 4 niveaux d'effets (méta, stats, fin de round, persistants), bonus de clan, Leaders, conditions Courage/Revenge/Confidence/Reprisal/Symmetry/Asymmetry/Stop/Killshot/Bet/Versus/Defeat/Backlash/Victory or Defeat |
-| Tests | 332 backend (pytest) + 22 front (vitest) ; balayage de robustesse sur toutes les descriptions gérées |
-| Interface | composition de deck (recherche, filtre par clan, decks aléatoires, statut des bonus, decks mémorisés), partie de 4 rounds contre un second joueur ou **contre l'ordinateur** (aléatoire / heuristique), historique des rounds, fin de partie, effets persistants |
+| Tests | 429 backend (pytest) + 22 front (vitest) ; balayage de robustesse sur toutes les descriptions gérées |
+| Interface | composition de deck (recherche, filtre par clan, decks aléatoires, statut des bonus, decks mémorisés), partie de 4 rounds contre un second joueur, historique des rounds, fin de partie, effets persistants |
 
 Non gérés pour l'instant (par nombre de descriptions) : Unison (62), After (37), Tune Out (bonus Cosmohnuts), Cards (15), Mindwipe (7), Disunion (7), Perfect (7), Combust (6), Impose (5) et quelques mécaniques à 1-3 cartes. `Day:` est considéré toujours valide, `Night:` jamais.
 
@@ -19,11 +19,10 @@ Non gérés pour l'instant (par nombre de descriptions) : Unison (62), After (37
 
 ```
 UrbanPy/Backend_fastAPI/       backend FastAPI
-  main.py                      endpoints : /cards, /init_game/, /init_game/template, /process_round/{id}, /ai_pick/{id}, /save_for_test
+  main.py                      endpoints : /cards, /init_game/, /init_game/template, /process_round/{id}, /save_for_test
   src/core/domain/             Game, Player, Card, Capacity, PersistentEffect
   src/core/parsing/            capacity_parser.py : texte d'ability -> Capacity (vocabulaire du moteur)
   src/core/use_cases/          process_round.py + apply_capacity_lvl_1..4.py (le moteur) + multipliers.py
-  src/core/ai/                 adversaires automatiques (aléatoire, heuristique)
   src/core/services/           game_service.py : parties persistées en JSON (data/game/, ignoré par git)
   src/adapters/repositories/   accès aux données officielles, sauvegarde des parties
   src/adapters/scraping/       extracteur HTML iclintz (pur, testé)
@@ -55,14 +54,14 @@ npm ci
 npm run dev
 ```
 
-Ouvrir http://localhost:5173 : choisir l'adversaire (second joueur sur le même écran, ou ordinateur), composer deux
+Ouvrir http://localhost:5173 : le second joueur joue sur le même écran, composer deux
 decks de 4 cartes (recherche, filtre par clan ou « aléatoire »), puis jouer. Le bouton « Sauvegarder le dernier round
 pour les tests » enregistre le round dans `data/test/test_N/` (voir ci-dessous).
 
 ## Tests
 
 ```bash
-cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 332 tests
+cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 429 tests
 cd UrbanVue && npm test && npm run lint && npm run build           # 22 tests, lint, type-check + build
 ```
 
@@ -105,5 +104,5 @@ Deux règles ont été tranchées sans certitude et sont isolées dans le code a
 1. Mécaniques restantes : Unison, After, Tune Out, Cards… (règles à documenter d'abord — elles se codent comme Killshot ou Bet)
 2. Backend : journal des effets appliqués à chaque round (explicabilité, débogage des règles), API moteur pure
    `step(state, action)` + `legal_actions(state)`, persistance en mémoire/SQLite, mise à jour FastAPI/Pydantic
-3. IA : environnement Gymnasium sur cette API, self-play (PPO/DQN), évaluation contre les adversaires heuristiques,
-   intégration comme adversaire dans l'interface
+3. IA : équilibre de Nash par round, solveur exact de référence, fonction de valeur apprise sur ses résultats,
+   arène d'évaluation, intégration dans l'interface — étapes détaillées dans [docs/IA.md](docs/IA.md)
