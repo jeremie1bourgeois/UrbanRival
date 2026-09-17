@@ -81,7 +81,7 @@ Counter-attack refixe l'ordre à chaque round.
 |---|---|---|
 | D1 | **API moteur pure** | `Engine.step(state, action) → (state, result)` et `legal_actions(state)`. `process_round` est pur ; extraire la persistance de `game_service`. Figer une représentation d'état (`Game.to_dict`) et d'action (carte, pillz, fury). |
 | D2 | ~~**Journal des effets**~~ | **Fait le 2026-09-16** : `src/core/domain/journal.py` (`Journal`, `note`, `recording`), `Round.log` (entrées `{side, card, source, text}`), renvoyé par `/process_round`, déplié dans l'historique du front. Les fixtures de rejeu comparent l'état sans le journal. |
-| D3 | Performance | Mesurer `process_round` (deepcopy des capacités, sérialisation) ; le RL a besoin de milliers de parties/s. |
+| D3 | Performance | Mesuré le 2026-09-18 : ~1 ms par round (deepcopy + `process_round`). Le solveur exact et la génération d'exemples (`docs/IA.md` § 5.3-5.4) demandent ~10 µs par round : état compact, sans deepcopy ni re-parsing des capacités, code compilé. |
 | D4 | Persistance | Fichiers JSON par round (`data/game/`) → stockage mémoire + SQLite optionnel ; `get_new_game_id` est relatif au dossier courant (le serveur doit être lancé depuis `UrbanPy/Backend_fastAPI`). |
 | D5 | Dette | `requirements.txt` (FastAPI 0.100 de 2023, `@validator` Pydantic v1 déprécié → `field_validator`), CORS configurable, `print` de debug dans `main.py`, `debug=True`. Le front dépend du CDN d'Urban Rivals pour les images (option : script de téléchargement local). |
 
