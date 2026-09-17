@@ -1,6 +1,4 @@
 import os
-import random
-from src.core.ai.opponent import STRATEGIES, Pick
 from src.core.use_cases.process_round import check_round_correct, process_round
 from src.core.domain.player import Player
 from src.schemas.game_schemas import GameResult, PlayerCards, ProcessRoundInput
@@ -24,15 +22,6 @@ def load_latest_game(game_id) -> Game:
         raise FileNotFoundError(f"No game files found in directory: {game_directory}")
     max_turn_file = max(game_files, key=lambda x: int(x.split("_")[3].split(".")[0]))
     return load_game_from_json(os.path.join(game_directory, max_turn_file))
-
-
-def ai_pick_service(game_id, strategy: str, side: str) -> Pick:
-    """Choix de l'adversaire automatique pour le round en cours."""
-    if strategy not in STRATEGIES:
-        raise ValueError(f"Unknown strategy: {strategy!r} (expected one of {sorted(STRATEGIES)})")
-    if side not in ("ally", "enemy"):
-        raise ValueError(f"Unknown side: {side!r}")
-    return STRATEGIES[strategy](load_latest_game(game_id), side, random.Random())
 
 
 def process_round_service(game_id: str, round_data: ProcessRoundInput):

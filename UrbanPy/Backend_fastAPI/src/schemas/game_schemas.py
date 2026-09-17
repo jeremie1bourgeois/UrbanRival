@@ -67,7 +67,3 @@ class ProcessRoundInput(BaseModel):
         if values["player1_card_index"] < 0 or values["player2_card_index"] < 0:
             raise ValueError("Card indices must be non-negative.")
         return values
-
-class AiPickInput(BaseModel):
-    strategy: str = "heuristic"   # voir src/core/ai/opponent.STRATEGIES
-    side: str = "enemy"

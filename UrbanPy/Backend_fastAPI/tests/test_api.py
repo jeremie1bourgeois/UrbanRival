@@ -114,24 +114,3 @@ def test_cards_catalogue_exposes_images(client, monkeypatch):
     assert aamir["clan_image"] == "https://cdn.example/clan/ALLSTARS.png"
     assert aamir["levels"][0]["image"] == "https://cdn.example/aamir_3.png"
     card_repository.official_card_catalogue.cache_clear()
-
-
-def test_ai_pick_endpoint_returns_a_legal_pick(client):
-    game_id = client.get("/init_game/template").json()["game_id"]
-
-    response = client.post(f"/ai_pick/{game_id}", json={"strategy": "heuristic", "side": "enemy"})
-
-    assert response.status_code == 200, response.json()
-    pick = response.json()
-    assert pick["card_index"] in range(4) and pick["pillz"] >= 1 and isinstance(pick["fury"], bool)
-    played = client.post(f"/process_round/{game_id}", json={"player1_card_index": 0, "player1_pillz": 1, "player1_fury": False,
-                                                            "player2_card_index": pick["card_index"], "player2_pillz": pick["pillz"], "player2_fury": pick["fury"]})
-    assert played.status_code == 200, played.json()
-
-
-def test_ai_pick_rejects_an_unknown_strategy(client):
-    game_id = client.get("/init_game/template").json()["game_id"]
-
-    response = client.post(f"/ai_pick/{game_id}", json={"strategy": "psychic", "side": "enemy"})
-
-    assert response.status_code == 400
