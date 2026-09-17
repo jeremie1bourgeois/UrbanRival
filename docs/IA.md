@@ -180,21 +180,47 @@ taille ; elle ne rapporterait rien tant que `engine.step` domine.
 
 ### Étape 3 — Matrice de round rapide (2-3 j, guidée par le profil)
 
-L'étape 4 demande des millions de cellules : 0,17 ms l'unité est 100 à 1 000 fois trop lent. On optimise
-là où le profil de l'étape 2 le montre, le chemin lent restant l'oracle.
+Le solveur de l'étape 2 passe la moitié de son temps dans `engine.step` (0,17 ms × ~300 000 rounds pour un
+round 3 à 12 pillz) : chaque cellule de chaque matrice rejoue le round entier. Le moteur reste la seule source
+de vérité — on ne réécrit pas ses règles, on évite de les rejouer :
 
-- `round_matrix.py` : pour un couple de cartes, calculer **en une passe** puissances et dégâts après
-  pouvoirs (indépendants des pillz dans l'immense majorité des cas), puis dériver toute la matrice
-  (p₁ × p₂) analytiquement — `attaque = puissance × pillz`, comparaison, dégâts, effets de fin de round.
-  Vectorisé numpy.
-- **Repli obligatoire** vers le moteur, cellule par cellule, dès qu'une capacité en jeu dépend des
-  pillz : `Bet >/< N`, `per Pillz Left`, `Recover`, `Tune Out`, et les conditions `Killshot` / `Perfect`
-  (qui dépendent du rapport des attaques).
-- **Test qui autorise le raccourci** : balayage façon `scripts/engine_crash_sweep.py` sur toutes les
-  descriptions gérées — matrice rapide identique, cellule à cellule, à `engine.step`.
-- Cible : round 3 exact en ~0,1 s.
+- **Le moteur en trois phases** (`process_round`) : préparation (mise à jour des pillz, pouvoirs, Stops,
+  modificateurs de puissance et dégâts, fury), attaques (puissance × pillz, modificateurs d'attaque, Tune Out,
+  Killshot / Perfect), résolution (combat, effets de fin de round, historique). Refactorisation sans changement de
+  comportement, sous les 497 tests et le balayage.
+- `round_matrix.py` : pour un état et un couple de cartes, **une** phase de préparation sur une copie, puis
+  les attaques de toutes les mises **en numpy** (les modificateurs d'attaque survivants sont lus sur les cartes
+  préparées et appliqués dans l'ordre du moteur, bornes comprises), d'où le vainqueur de chaque cellule.
+  Les cellules se groupent en **classes d'issue** (vainqueur, fury de chacun) : le moteur ne rejoue le round
+  qu'**une fois par classe** (≤ 8), et les autres cellules de la classe n'en diffèrent que par les pillz
+  restantes.
+- **Repli obligatoire** vers le moteur, cellule par cellule, dès qu'une capacité en jeu lit la mise ou les
+  pillz : types `pillz`, `recover`, `dope`, `consume`, `repair`, `combust`, `tune_out`, multiplicateurs
+  `nb_pillz_left` / `nb_pillz_lost`, conditions `bet`, `killshot`, `perfect`, effets persistants sur les pillz.
+  Liste fermée (le vocabulaire du parseur l'est) ; en cas de doute, le repli.
+- **Test qui autorise le raccourci** : identité cellule à cellule avec `engine.step` — sur des couples choisis
+  dans la suite de tests, sur toutes les descriptions gérées dans `scripts/round_matrix_sweep.py`.
+- Cible : round 4 en quelques ms, round 3 à 12 pillz en quelques secondes ; le LP devient alors le goulot
+  (point-selle pur détecté avant le LP, solveur dédié aux petites matrices si besoin).
 
-### Étape 4 — Recherche à profondeur limitée (1-2 semaines)
+### Étape 3 bis — Le solveur complet, hors ligne : l'ébauche à temps illimité
+
+Le même `solver.py` avec `EXACT_ROUNDS = 4` résout un affrontement de mains de bout en bout : valeur du duel,
+stratégie exacte dès le round 1, ε = 0 vérifié sur les quatre rounds. Compte tenu de l'étape 3, de l'ordre de
+quelques centaines de milliers d'états de rounds 3-4 par affrontement — **des dizaines de minutes**, parallélisable
+par sous-jeu de round 2 ; sans l'étape 3, des dizaines d'heures.
+
+- `scripts/solve_matchup.py` : deux mains → valeur, stratégie de round 1, ε sur la partie entière, temps.
+- C'est **l'oracle** de l'étape 4 : chaque approximation (grille de mises, évaluation des feuilles) se mesure
+  contre lui — écart de valeur et ε réel — au lieu de se régler à l'aveugle.
+- Ce qu'il ne donne pas : une décision de round 1 en quelques secondes sur des mains jamais vues (on ne
+  précalcule pas 2 497² affrontements). C'est le rôle de l'étape 4.
+
+### Étape 4 — Recherche à profondeur limitée, dans le temps imparti (1-2 semaines)
+
+Le chrono qui compte : celui du tour sur le site, moins le temps de recopier le coup conseillé — quelques
+dizaines de secondes. Le round 4 y tient déjà, le round 3 après l'étape 3 ; les rounds 1-2 relèvent d'ici,
+chaque approximation mesurée contre l'oracle de l'étape 3 bis.
 
 - **Abstraction des mises** : grille (0, 1, 2, 3, 4, 6, 8, tout + variantes fury) au lieu de 0..12,
   affinée autour du coup retenu ; le round 2 tombe de ~4 700 à ~1 000 feuilles, le round 1 de ~8 500 à
@@ -216,6 +242,8 @@ là où le profil de l'étape 2 le montre, le chemin lent restant l'oracle.
 - Budget : < 1 s par décision dans l'interface, réglable (profondeur, finesse des deux grilles).
 
 ### Étape 5 — Prouver l'invincibilité (en parallèle des étapes 2-4)
+
+L'exploitabilité exacte existe déjà sur les rounds résolus (étape 2) ; l'étape 3 bis l'étend aux quatre rounds.
 
 - **Mesurer avec un intervalle, d'abord.** 60 parties → ±13 points, 100 → ±10 : les écarts mesurés jusqu'ici
   sont dans le bruit. `arena.MatchResult` affiche un intervalle de Wilson à 95 % ; les duels tournent sur
@@ -270,6 +298,8 @@ cd UrbanPy/Backend_fastAPI
 .venv/bin/python scripts/capacity_coverage.py | head -1
 .venv/bin/python scripts/bench_engine.py           # débit moteur, coût d'une décision
 .venv/bin/python scripts/ai_arena.py --games 1000  # échelle entre stratégies, avec intervalles
+.venv/bin/python scripts/round_matrix_sweep.py     # (étape 3) matrice rapide = moteur, cellule à cellule
+.venv/bin/python scripts/solve_matchup.py A B      # (étape 3 bis) un affrontement résolu de bout en bout
 .venv/bin/python scripts/exploitability.py         # (étape 5) LE critère : ε → 0
 ```
 
@@ -295,9 +325,10 @@ Tests à écrire, dans l'esprit du dépôt (attentes calculées à la main) :
    jamais les pillz ni la fury ; **et tout est public entre les rounds**. Conséquences : induction arrière
    exacte, un round = jeux matriciels par carte, pas de forme séquentielle.
 2. ~~**Le pool ELO**~~ → sans effet sur le jeu de l'IA ; à reprendre en phase 2 (composition de deck).
-3. **Le chemin analytique de l'étape 3** : c'est lui qui rend l'étape 4 possible. S'il ne tient pas
-   pour trop de capacités, il faudra un moteur de round dédié (numpy, sans objets) — plus de travail,
-   même résultat. L'étape 2 ne dépend pas de lui.
+3. **Le raccourci de l'étape 3** : il ne réécrit que le calcul des attaques ; tout le reste (pouvoirs, effets
+   de fin de round) reste au moteur, rejoué une fois par classe d'issue. Le risque est dans la liste des
+   capacités qui lisent la mise : elle est fermée, et le balayage cellule à cellule la vérifie. Si le repli est
+   trop fréquent sur les mains réelles (effets sur les pillz), traiter ces effets analytiquement sera la suite.
 4. **Les règles encore incertaines** : le solveur amplifie les erreurs du moteur ; l'oracle doit grossir
    au même rythme que l'IA.
 5. **Temps de calcul dans l'interface** : finesse des deux grilles (mises du sous-jeu, mises de l'évaluation
