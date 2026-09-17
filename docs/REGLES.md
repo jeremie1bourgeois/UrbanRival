@@ -277,7 +277,7 @@ Par ordre d'impact :
 1. Cycles de Stops et de Protections (3.2).
 2. Recover : pillz gratuite comptée ou non, minimum 1 (3.5).
 3. Le Leader bénéficie-t-il de son propre Team (3.7).
-4. Cancel Life Modif. : pose du poison empêchée, ou tic du round sauté (3.3).
+4. ~~Cancel Life Modif. : pose du poison empêchée, ou tic du round sauté (3.3).~~ Tranché, voir 9.
 5. ~~Tune Out : la fury compte-t-elle dans les pillz comparées.~~ **Tranché** (`1211570`) : non — Chopper Ld avec fury et
    8 pillz contre 8 pillz donne 8 contre 8, égalité perdue (niveau égal, premier joueur gagnant) ; l'attaque vaut
    `pillzUsed`, gratuite comprise, fury exclue.
@@ -287,6 +287,9 @@ Par ordre d'impact :
    adverse (Equalizer appliqué) — le moteur le reproduisait déjà.
 8. **Repair X, Max Y** (`1211702`) : « gagne X points de Vie ET Pillz, maximum Y », dès la fin du round gagné puis à chaque
    round — le pendant en gain de Mindwipe. Corrigé (le moteur n'ajoutait que des pillz, aux rounds suivants).
+9. ~~Cancel Life Modif. : pose du poison empêchée, ou tic du round sauté (3.3).~~ **Confirmé** (`1211922`) : Stoyan
+   « Cancel Opp. Life Modif. » face à un Repair actif → le tic de vie du round est sauté, le tic de pillz est versé, les
+   deux reprennent au round suivant. Un effet vie + pillz se suspend **attribut par attribut** (corrigé dans le moteur).
 
 Chaque combat rejoué se transcrit dans `data/test/` (voir ROADMAP § 2.B.2) ; le journal des effets (D2) rendra la
 localisation des écarts immédiate.

@@ -9,7 +9,8 @@ Niveau 4 : effets persistants (poison / toxine / heal / regen / dope / repair / 
   3. toxine, regen, dope et consume « agissent immédiatement à la fin du round dans lequel ils ont été joués »
      (glossaire officiel 51, 52), mindwipe (combat réel 1211279) et repair (« gagne X points de Vie ET Pillz, maximum Y »,
      combat réel 1211702) aussi : les effets de ces sortes enregistrés ce round agissent aussitôt.
-Approximation : un effet vie + pillz (combust, mindwipe, repair) est suspendu en bloc par l'Annul de sa stat de référence.
+Un Annul Modif. Vie / Pillz suspend l'effet attribut par attribut : sur un effet vie + pillz (combust, mindwipe, repair),
+seule la moitié annulée saute (combat réel 1211922 : Repair sous Annul Modif. Vie verse le pillz, pas la vie).
 Un poison peut amener un joueur à 0 vie : la fin de partie est constatée par check_end.
 """
 from src.core.domain.card import Card, FIGHT_SLOTS
@@ -19,24 +20,19 @@ from src.core.domain.player import Player
 from src.core.domain.journal import label, note
 from src.core.use_cases.multipliers import multiplier
 
-_LIFE_LOSS = ("poison", "toxine")
-_LIFE_GAIN = ("heal", "regen")
-_PILLZ_GAIN = ("dope",)
-_PILLZ_LOSS = ("consume",)
+LOSING_KINDS = ("poison", "toxine", "consume", "combust", "mindwipe")   # les autres (heal, regen, dope, repair) font gagner
 IMMEDIATE_KINDS = ("toxine", "regen", "dope", "consume", "mindwipe", "repair")
-_LIFE_LOSS_AND_PILLZ_LOSS = ("combust", "mindwipe")
-_LIFE_GAIN_AND_PILLZ_GAIN = ("repair",)
 
 
-_STAT_OF_KIND = {"poison": "life", "toxine": "life", "heal": "life", "regen": "life",
-                 "dope": "pillz", "repair": "pillz", "consume": "pillz", "combust": "life", "mindwipe": "life"}
+_STATS_OF_KIND = {"poison": ("life",), "toxine": ("life",), "heal": ("life",), "regen": ("life",), "dope": ("pillz",),
+                  "consume": ("pillz",), "repair": ("life", "pillz"), "combust": ("life", "pillz"), "mindwipe": ("life", "pillz")}
 _CAUSED_BY_OPPONENT = ("poison", "toxine", "consume", "combust", "mindwipe")   # posés sur un joueur par son adversaire
 
 
-def _suspended(effect: PersistentEffect, player_card: Card, opp_card: Card) -> bool:
-    """Un Annul Modif Vie/Pillz Adv. suspend pour le round les effets persistants de la carte annulée (glossaire 56)."""
+def _suspended(effect: PersistentEffect, player_card: Card, opp_card: Card) -> tuple:
+    """Attributs de l'effet suspendus ce round par un Annul Modif Vie/Pillz Adv. visant la carte auteur (glossaire 56)."""
     author = opp_card if effect.kind in _CAUSED_BY_OPPONENT else player_card
-    return _STAT_OF_KIND[effect.kind] in author.cancelled_modifs
+    return tuple(stat for stat in _STATS_OF_KIND[effect.kind] if stat in author.cancelled_modifs)
 
 
 def apply_capacity_lvl_4(game: Game, card1: Card, card2: Card) -> None:
@@ -44,10 +40,13 @@ def apply_capacity_lvl_4(game: Game, card1: Card, card2: Card) -> None:
     for card, opp_card, own, opp in sides:
         side = _side(game, own)
         for effect in own.effect_list:
-            if _suspended(effect, card, opp_card):
+            suspended = _suspended(effect, card, opp_card)
+            if suspended == _STATS_OF_KIND[effect.kind]:
                 note(None, "persistant", f"{effect.kind} {effect.value} sur {side} suspendu ce round (Annul)")
             else:
-                _tick(own, effect, side)
+                if suspended:
+                    note(None, "persistant", f"{effect.kind} {effect.value} sur {side} : {' et '.join(suspended)} suspendu ce round (Annul)")
+                _tick(own, effect, side, skip=suspended)
     for card, opp_card, own, opp in sides:
         for slot in FIGHT_SLOTS:
             capacity = getattr(card, slot)
@@ -61,10 +60,12 @@ def apply_capacity_lvl_4(game: Game, card1: Card, card2: Card) -> None:
             for player in affected:
                 effect = PersistentEffect(kind, value, capacity.borne)
                 register_persistent_effect(player, effect)
-                bound = "" if capacity.borne in (None, -1) else (f" (min {capacity.borne})" if kind in _LIFE_LOSS + _PILLZ_LOSS + _LIFE_LOSS_AND_PILLZ_LOSS else f" (max {capacity.borne})")
+                bound = "" if capacity.borne in (None, -1) else (f" (min {capacity.borne})" if kind in LOSING_KINDS else f" (max {capacity.borne})")
                 note(card, "persistant", f"{card.name} : {label(capacity)} → {kind} {value}{bound} sur {_side(game, player)}")
-                if kind in IMMEDIATE_KINDS and _STAT_OF_KIND[kind] not in card.cancelled_modifs:
-                    _tick(player, effect, _side(game, player))
+                if kind in IMMEDIATE_KINDS:
+                    skip = tuple(stat for stat in _STATS_OF_KIND[kind] if stat in card.cancelled_modifs)
+                    if skip != _STATS_OF_KIND[kind]:
+                        _tick(player, effect, _side(game, player), skip=skip)
             setattr(card, slot, None)
 
 
@@ -90,31 +91,27 @@ def tick_persistent_effects(player: Player, skip=None) -> None:
             _tick(player, effect)
 
 
-def _tick(player: Player, effect: PersistentEffect, side: str = None) -> None:
+def _tick(player: Player, effect: PersistentEffect, side: str = None, skip: tuple = ()) -> None:
     life, pillz = player.life, player.pillz
-    _apply_tick(player, effect)
+    _apply_tick(player, effect, skip)
     if side is not None:
         changes = [f"vie de {side} {life} → {player.life}"] * (player.life != life) + [f"pillz de {side} {pillz} → {player.pillz}"] * (player.pillz != pillz)
         note(None, "persistant", f"{effect.kind} {effect.value} → " + (", ".join(changes) if changes else f"rien (borne {effect.borne} atteinte)"))
 
 
-def _apply_tick(player: Player, effect: PersistentEffect) -> None:
+def _apply_tick(player: Player, effect: PersistentEffect, skip: tuple = ()) -> None:
+    """Applique l'effet à ses attributs (sauf ceux de `skip`, suspendus par un Annul ce round)."""
     unbounded = effect.borne is None or effect.borne == -1
     floor = 0 if unbounded else effect.borne
-    if effect.kind in _LIFE_LOSS:
-        _lose(player, "life", effect.value, floor)
-    elif effect.kind in _PILLZ_LOSS:
-        _lose(player, "pillz", effect.value, floor)
-    elif effect.kind in _LIFE_LOSS_AND_PILLZ_LOSS:
-        _lose(player, "life", effect.value, floor)
-        _lose(player, "pillz", effect.value, floor)
-    elif effect.kind in _LIFE_GAIN:
-        _gain(player, "life", effect.value, effect.borne if not unbounded else None)
-    elif effect.kind in _PILLZ_GAIN:
-        _gain(player, "pillz", effect.value, effect.borne if not unbounded else None)
-    elif effect.kind in _LIFE_GAIN_AND_PILLZ_GAIN:
-        _gain(player, "life", effect.value, effect.borne if not unbounded else None)
-        _gain(player, "pillz", effect.value, effect.borne if not unbounded else None)
+    ceiling = None if unbounded else effect.borne
+    losing = effect.kind in LOSING_KINDS
+    for attr in _STATS_OF_KIND[effect.kind]:
+        if attr in skip:
+            continue
+        if losing:
+            _lose(player, attr, effect.value, floor)
+        else:
+            _gain(player, attr, effect.value, ceiling)
 
 
 def _gain(player: Player, attr: str, value: int, ceiling) -> None:

@@ -327,6 +327,19 @@ def test_cancel_life_modif_skips_the_opponent_own_heal(game):
     assert game.enemy.life == 9
 
 
+def test_cancel_life_modif_skips_only_the_life_half_of_the_opponent_repair(game):
+    # Combat réel 1211922 (round 3) : Stoyan « Cancel Opp. Life Modif. » contre un Repair actif → le pillz est versé,
+    # la vie non ; les deux reprennent au round suivant.
+    play(game, 1, ally_ability="Repair 2, Max. 12", ally_pillz=6)               # allié 12 vies (max), 7 + 2 = 9 pillz
+    play(game, 2, enemy_ability="Cancel Opp. Life Modif.", enemy_pillz=2)       # Bhudd gagne : allié 10 vies ; repair : pillz 11, vie suspendue
+
+    assert (game.ally.life, game.ally.pillz) == (10, 11)
+
+    play(game, 3)                                                               # Agustino gagne : repair complet → 12 vies, 12 pillz (max)
+
+    assert (game.ally.life, game.ally.pillz) == (12, 12)
+
+
 def test_cancel_life_modif_does_not_touch_my_own_persistent_effects(game):
     play(game, 1, ally_ability="Poison 2, Min 0", ally_pillz=6)                 # ennemi 7
     play(game, 2, ally_ability="Cancel Opp. Life Modif.")                        # Allison gagne : 7 - 3, mon poison tique -> 2
