@@ -37,10 +37,12 @@ Hiérarchie de confiance : support officiel > glossaire officiel > texte de cart
 Les numéros suivent le tableau de `docs/ROADMAP.md` § 1. Les trois premiers points sont **prioritaires** : ce sont
 des erreurs avérées, fréquentes en jeu (tous les clans à Stop, Zenith, Oculus).
 
-### 3.1 Stop Opp. Ability contre Stop Opp. Bonus — ❌ CONTREDIT (source officielle)
+### 3.1 Stop Opp. Ability contre Stop Opp. Bonus — ✅ CORRIGÉ, CONFIRMÉ EN COMBAT RÉEL (2026-09-17)
 
-**Moteur** : résolution simultanée (`apply_capacity_lvl_1._apply_stops` : « simultané : calculé avant toute
-suppression ») — chaque Stop agit même s'il est lui-même stoppé.
+**Moteur (état initial de l'audit)** : résolution simultanée — chaque Stop agit même s'il est lui-même stoppé. Corrigé
+depuis (`_stopped_slots`, résolution en chaîne) et **confirmé par l'oracle** : combats `1210477` (SoA en pouvoir contre SoB
+en pouvoir : le SoB est stoppé, le bonus All Stars s'applique) et `1211029` (le miroir : SoB en pouvoir stoppé par un SoA,
+bonus −2 appliqué), `1210625` (bonus SoA stoppe un SoA en pouvoir, puis le pouvoir Support s'applique).
 
 **Règle officielle** (support, article 91, cité intégralement) :
 
@@ -233,14 +235,14 @@ ROADMAP § 2.A.
 
 | Mécanique | Définition | Type d'implémentation |
 |---|---|---|
-| **Tune Out** (bonus Cosmohnuts) | « When a Tune Out card is played, the Attack calculation is ignored and the winner of the round is the player who bet the most Pillz. In case of a tie in Pillz, the two cards are decided in the same way as for a tie in Attack. » | Nouveau mode de résolution dans `resolve_combat` (comparer les pillz, y compris la fury ? non précisé) |
+| **Tune Out** (bonus Cosmohnuts) | « When a Tune Out card is played, the Attack calculation is ignored and the winner of the round is the player who bet the most Pillz. In case of a tie in Pillz, the two cards are decided in the same way as for a tie in Attack. » | Combat réel `1211279` : le serveur **met les deux puissances à 1**, l'attaque vaut les pillz misées (`pillzUsed`, gratuite comprise, fury exclue) ; le moteur fait de même |
 | **Unison: X** | « only activates if the hand of the player contains EXCLUSIVELY cards of the same clan as the card which has the Unison effect » | Condition de début de round (main mono-clan) |
 | **Disunion: X** | « only activates if the hand of the player at least contains ONE card from a different clan » | Condition, négation d'Unison |
 | **After (Clan X[, Clan Y]): X** (bonus Tolvack + abilities) | « This effect only activates if you played a "Clan X" character in the previous round. Oculus characters, even when infiltrated "Clan X", do not count. » Ne s'active jamais au round 1. | Condition sur `history[-1]` (clan de la carte jouée par le même joueur au round précédent) |
 | **Perfect: X** | « your card has to have the exact amount of Pillz needed » — une pillz de moins aurait perdu, une de plus est gaspillée. Exemple : adversaire 25 d'attaque, puissance 8 → exactement 4 pillz (32). | Condition différée après le calcul des attaques (victoire et `attack − power_fight < opp.attack`) |
 | **Consume X, Min Y** | « If your card wins the round, the opponent will lose X Pillz, minimum Y. This effect will be felt at the end of each of the following rounds. (If two Consumes are applied, the second will replace the first.) » | Effet persistant sur les pillz adverses (comme Poison sur la vie ; remplace, ne cumule pas) |
 | **Combust X, Min Y** | « at the end of each of the following turns the opponent will lose X Life point(s) and Pillz if he/she/they have more than [Min] Life point(s)/Pillz » | Persistant vie + pillz ; « Players Combust » : les deux joueurs |
-| **Mindwipe X, Min Y** | « your opponent will lose X Life Points and Pillz, minimum of Y. This effect will persist at the end of each of the following rounds. » | Identique à Combust d'après ces textes (différence éventuelle non documentée) |
+| **Mindwipe X, Min Y** | « your opponent will lose X Life Points and Pillz, minimum of Y. This effect will persist at the end of each of the following rounds. » | Combat réel `1211279` : agit **dès la fin du round gagné** (−2 vies, −2 pillz, `isPermanent`), puis à chaque round suivant — le Combust immédiat, comme toxine face à poison. Sorte `mindwipe` distincte dans le moteur |
 | **Xantiax: −X Life, Min Y** | « Whether the character wins or loses the round, the two competing players lose X Life Points or up to a minimum of X » | Effet de fin de round, cible les deux joueurs, sans condition de victoire |
 | **Corrosion X, Min Y** | « the opponent will lose 1 multiplied by the number of the round in which your card was played. (Corrosion is considered a Poison.) » | Poison de valeur = numéro du round ; partage l'emplacement du poison |
 | **Corrupt X, Min Y** | « If your card wins or loses the fight, the number of Life points **you** have will be reduced by X, or up to a minimum » | Effet de fin de round sur soi, victoire ou défaite (Nega D Ld) |
@@ -276,8 +278,12 @@ Par ordre d'impact :
 2. Recover : pillz gratuite comptée ou non, minimum 1 (3.5).
 3. Le Leader bénéficie-t-il de son propre Team (3.7).
 4. Cancel Life Modif. : pose du poison empêchée, ou tic du round sauté (3.3).
-5. Tune Out : la fury compte-t-elle dans les pillz comparées.
-6. Combust contre Mindwipe : différence réelle.
+5. Tune Out : la fury compte-t-elle dans les pillz comparées — **très probablement non** (combat `1211279` : attaque =
+   `pillzUsed`, qui exclut la fury) ; reste à observer avec une fury.
+6. ~~Combust contre Mindwipe : différence réelle.~~ **Tranché** (`1211279`) : Mindwipe agit dès le round gagné, Combust aux
+   rounds suivants.
+7. **Copy: Opp. Ability** (bonus Oblivion) copie un Stop et le retourne : combat `1211029`, le SoA copié stoppe le SoA
+   adverse (Equalizer appliqué) — le moteur le reproduisait déjà.
 
 Chaque combat rejoué se transcrit dans `data/test/` (voir ROADMAP § 2.B.2) ; le journal des effets (D2) rendra la
 localisation des écarts immédiate.

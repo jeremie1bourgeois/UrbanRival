@@ -101,6 +101,20 @@ Deux corrections par rapport aux decks de référence :
 Ordre de rentabilité avec la collection : D4 (Tune Out, Consume, Mindwipe, Repair, Cancel Life en un duel), D1, D2a, D3,
 D6, puis D7, D8, D2b.
 
+**Journal (2026-09-17, parties contre l'adversaire d'entraînement « Smash Jabber », règle 2, 15 vies)** — 11 combats
+capturés (`data/ur_battles/12104*.json` à `1211279.json`), tous rejoués par `tests/test_ur_battles.py` :
+
+- **D1 clos** : chaîne SoA/SoB confirmée dans les deux sens (`1210477`, `1211029`), bonus SoA contre SoA en pouvoir
+  (`1210625`), quatre lectures de Stop en pouvoir contre bonus Stop. SoA contre SoA (et SoB contre SoB) en pouvoir est
+  inobservable par construction : rien d'autre à stopper.
+- **D4 entamé** : Tune Out = puissances à 1, attaque = pillz (`1211279`) ; Mindwipe immédiat puis persistant, vie et pillz
+  (deux écarts moteur corrigés, commit 30f054c). Restent : Tune Out avec fury, Consume/Repair au round même, Cancel Life
+  Modif. contre poison, Combust (aucune carte).
+- En prime : Copy: Opp. Ability (Oblivion) copie un Stop et le retourne (`1211029`) ; After (Tolvack) reproduit.
+- Capture : contre un bot qui joue instantanément, l'ordre de jeu se lit sur la carte déjà posée (correction de
+  `ur_capture.js`) ; les `roundPower`/`roundDamage` des rounds passés reviennent aux valeurs de base dans les statuts
+  suivants — un round manqué ne se reconstitue pas (mettre `null`, non vérifié).
+
 **Cartes à monter d'un ou deux niveaux** qui débloqueraient les tests manquants : Spycee (Piranas, 1 → 2, All-Stop
 Piranas), Morlha (GHEIST, 1 → 2, SoB en pouvoir sur bonus SoA), Blackfin et Taki (1 → 2, Damage Exchange), Joan Cena
 (1 → 3, Power Exchange), Ella et Klaus (1 → 2, réducteurs à minimum), Ataoualpet et Mac Hen (1 → 3, Bet > 4).
