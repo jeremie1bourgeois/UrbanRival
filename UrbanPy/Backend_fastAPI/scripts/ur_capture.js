@@ -41,7 +41,9 @@ function urStatuses() {
   let prev = null;
   for (const c of window.__urCapture) {
     if (!c.res || !c.res.startsWith('{"battles.status"')) continue;
-    const b = JSON.parse(c.res)["battles.status"].data.battle;
+    let b;
+    try { b = JSON.parse(c.res)["battles.status"].data.battle; } catch (e) { continue; }   // « Unknown battle. » entre deux combats
+    if (!b || !b.player0 || !b.player1) continue;
     const sig = JSON.stringify([b.id, b.round, b.status, b.turnPlayerId, b.player0.life, b.player1.life, b.player0.pillz, b.player1.pillz,
       b.player0.characters.map((x) => [x.roundPlayed, x.pillzUsed, x.roundAttack]), b.player1.characters.map((x) => [x.roundPlayed, x.pillzUsed, x.roundAttack])]);
     if (sig !== prev) { out.push(b); prev = sig; }
