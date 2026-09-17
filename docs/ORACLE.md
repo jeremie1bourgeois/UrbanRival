@@ -101,8 +101,8 @@ Deux corrections par rapport aux decks de référence :
 
 Ordre de rentabilité avec la collection : ~~D4, D1~~ (faits le 2026-09-17, voir journal), puis D2a, D3, D6, D7, D8, D2b.
 
-**Journal (2026-09-17, parties contre l'adversaire d'entraînement « Smash Jabber », règle 2, 15 vies)** — 16 combats
-capturés (`data/ur_battles/12104*.json` à `1214027.json`, plus `1181426.json` de la veille), tous rejoués par `tests/test_ur_battles.py` :
+**Journal (2026-09-17, parties contre l'adversaire d'entraînement « Smash Jabber », règle 2, 15 vies)** — 17 combats
+capturés (`data/ur_battles/12104*.json` à `1214141.json`, plus `1181426.json` de la veille), tous rejoués par `tests/test_ur_battles.py` :
 
 - **D1 clos** : chaîne SoA/SoB confirmée dans les deux sens (`1210477`, `1211029`), bonus SoA contre SoA en pouvoir
   (`1210625`), quatre lectures de Stop en pouvoir contre bonus Stop. SoA contre SoA (et SoB contre SoB) en pouvoir est
@@ -117,7 +117,11 @@ capturés (`data/ur_battles/12104*.json` à `1214027.json`, plus `1181426.json` 
   gratuite comprise → +2 vies (le texte de Tyd dit lui-même « Pillz gratuite comprise et Fury exclue ») ; Brawl compte
   les cartes du clan adverse en main adverse ; égalité 4-4 gagnée par le niveau 1 contre le niveau 4. « Cards » = les
   **deux** cartes du round (`1214027` : M2 Sansot Cr 3 → 1 et l'adverse 6 → 4 ; Pandemos Cr 8 → 4 et 7 → 3) ; « +1 Attack
-  Per Opp. Damage » compte les dégâts **imprimés** (42 + 8). Restent : Candy Jack, Otium Cr (Confiance) — D7 quasi clos.
+  Per Opp. Damage » compte les dégâts **imprimés** (42 + 8). Candy Jack : 3 + 10 pillz → **borné à 8** (`1214141`) ; Brawl
+  ×1. Reste Otium Cr (Confiance) — D7 clos pour l'essentiel.
+- **Oculus, cas « trois autres clans »** (`1211570`, `1214141`) : Dark Yookie / Dark Eklore avec une seule carte d'un clan
+  listé parmi trois clans → ni bonus ni pouvoir Infiltrated (le moteur fait pareil). Restent les mains 1 Oculus + 3 du même
+  clan et 1 + 2 + 1 (D8).
 - En prime : Copy: Opp. Ability (Oblivion) copie un Stop et le retourne (`1211029`) ; After (Tolvack) reproduit.
 - Capture : contre un bot qui joue instantanément, l'ordre de jeu se lit sur la carte déjà posée (correction de
   `ur_capture.js`) ; les `roundPower`/`roundDamage` des rounds passés reviennent aux valeurs de base dans les statuts
