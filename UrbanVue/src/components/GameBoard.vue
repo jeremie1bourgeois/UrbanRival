@@ -19,6 +19,8 @@ const saved = ref(false);
 const thinking = ref(false);
 let picker = new RoundPicker(game.value);
 const current = ref<Side | null>(picker.current);
+/** Carte posée par le premier joueur : le second la voit (règle UR), ses pillz restent cachées. */
+const revealed = ref<{ side: Side; index: number } | null>(picker.revealed);
 
 const finished = computed(() => state.value !== "Game Not Finished");
 const banner = computed(
@@ -33,6 +35,15 @@ function toggleLog(round: number) {
 	openedLogs.value = next;
 }
 const enemyIsAi = opponent !== "human";
+
+/** Nom de la carte posée par le premier joueur, à afficher au second (ses pillz restent cachées). */
+const revealedName = computed(() => {
+	const shown = revealed.value;
+	if (shown === null || finished.value) return null;
+	const card = (shown.side === "ally" ? game.value.ally : game.value.enemy).cards[shown.index];
+	return card?.name ?? null;
+});
+const isRevealed = (side: Side, index: number) => revealed.value?.side === side && revealed.value.index === index && !finished.value;
 
 const effectLabel = (kind: string, value: number, borne: number) =>
 	({
@@ -51,6 +62,7 @@ function effects(player: Player) {
 async function submitIfComplete(pick: Pick) {
 	const roundData = picker.pick(pick);
 	current.value = picker.current;
+	revealed.value = picker.revealed;
 	if (roundData === null) return;
 	error.value = null;
 	try {
@@ -64,6 +76,7 @@ async function submitIfComplete(pick: Pick) {
 	}
 	picker = new RoundPicker(game.value);
 	current.value = finished.value ? null : picker.current;
+	revealed.value = picker.revealed;
 }
 
 /** L'ordinateur joue tant que c'est à lui (il peut jouer en premier ou en second). */
@@ -71,7 +84,9 @@ async function letAiPlay() {
 	while (!finished.value && opponent !== "human" && current.value === "enemy") {
 		thinking.value = true;
 		try {
-			const pick = await aiPick(gameId, opponent);
+			// L'ordinateur ne voit la carte du joueur que s'il joue en second (ses pillz, jamais).
+			const seen = revealed.value?.side === "ally" ? revealed.value.index : undefined;
+			const pick = await aiPick(gameId, opponent, seen);
 			await submitIfComplete({ index: pick.card_index, pillz: pick.pillz, fury: pick.fury });
 		} catch (err) {
 			error.value = errorMessage(err);
@@ -107,8 +122,12 @@ async function save() {
 				<template v-if="thinking">L'ordinateur réfléchit…</template>
 				<template v-else
 					>Au tour de :
-					<strong class="text-yellow-400">{{ current === "ally" ? "toi" : enemyIsAi ? "l'ordinateur" : "l'ennemi" }}</strong></template
-				>
+					<strong class="text-yellow-400">{{ current === "ally" ? "toi" : enemyIsAi ? "l'ordinateur" : "l'ennemi" }}</strong>
+					<template v-if="revealedName">
+						· en face : <strong class="text-yellow-400">{{ revealedName }}</strong>
+						<span class="text-gray-400"> (pillz cachées)</span>
+					</template>
+				</template>
 			</span>
 			<button class="rounded bg-gray-700 px-3 py-1 hover:bg-gray-600" @click="emit('newGame')">Nouvelle partie</button>
 		</header>
@@ -134,14 +153,19 @@ async function save() {
 					<span v-for="label in effects(game.enemy)" :key="label" class="rounded bg-purple-800 px-2 py-0.5 text-xs">{{ label }}</span>
 				</div>
 				<div class="flex flex-wrap justify-center gap-3">
-					<Card
+					<div
 						v-for="(card, index) in game.enemy.cards"
 						:key="'enemy-' + index"
-						:card="card"
-						:pillz="game.enemy.pillz"
-						:turn="!enemyIsAi && current === 'enemy'"
-						@combat="(pillz, fury) => handleCombat(pillz, fury, index)"
-					/>
+						class="rounded-xl"
+						:class="{ 'ring-4 ring-yellow-400': isRevealed('enemy', index) }"
+					>
+						<Card
+							:card="card"
+							:pillz="game.enemy.pillz"
+							:turn="!enemyIsAi && current === 'enemy'"
+							@combat="(pillz, fury) => handleCombat(pillz, fury, index)"
+						/>
+					</div>
 				</div>
 			</section>
 
@@ -152,14 +176,19 @@ async function save() {
 				:class="{ 'bg-gradient-to-b from-gray-800 to-blue-900': current === 'ally' }"
 			>
 				<div class="flex flex-wrap justify-center gap-3">
-					<Card
+					<div
 						v-for="(card, index) in game.ally.cards"
 						:key="'ally-' + index"
-						:card="card"
-						:pillz="game.ally.pillz"
-						:turn="current === 'ally' && !thinking"
-						@combat="(pillz, fury) => handleCombat(pillz, fury, index)"
-					/>
+						class="rounded-xl"
+						:class="{ 'ring-4 ring-yellow-400': isRevealed('ally', index) }"
+					>
+						<Card
+							:card="card"
+							:pillz="game.ally.pillz"
+							:turn="current === 'ally' && !thinking"
+							@combat="(pillz, fury) => handleCombat(pillz, fury, index)"
+						/>
+					</div>
 				</div>
 				<div class="flex w-full flex-wrap items-center justify-end gap-4 pt-4">
 					<span v-for="label in effects(game.ally)" :key="label" class="rounded bg-purple-800 px-2 py-0.5 text-xs">{{ label }}</span>

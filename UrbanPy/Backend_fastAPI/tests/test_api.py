@@ -129,6 +129,27 @@ def test_ai_pick_endpoint_returns_a_legal_pick(client):
     assert played.status_code == 200, played.json()
 
 
+def test_ai_pick_accepts_the_card_revealed_to_the_second_player(client):
+    """Le template fait jouer l'ennemi en premier : l'allié, second, a le droit de voir la carte posée."""
+    game_id = client.get("/init_game/template").json()["game_id"]
+
+    response = client.post(f"/ai_pick/{game_id}",
+                           json={"strategy": "greedy", "side": "ally", "revealed_card_index": 2})
+
+    assert response.status_code == 200, response.json()
+    assert response.json()["card_index"] in range(4)
+
+
+def test_ai_pick_refuses_to_reveal_a_card_to_the_first_player(client):
+    game_id = client.get("/init_game/template").json()["game_id"]
+
+    response = client.post(f"/ai_pick/{game_id}",
+                           json={"strategy": "greedy", "side": "enemy", "revealed_card_index": 2})
+
+    assert response.status_code == 400
+    assert "first" in response.json()["detail"]
+
+
 def test_ai_pick_rejects_an_unknown_strategy(client):
     game_id = client.get("/init_game/template").json()["game_id"]
 

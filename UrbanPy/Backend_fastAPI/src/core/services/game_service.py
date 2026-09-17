@@ -27,13 +27,25 @@ def load_latest_game(game_id) -> Game:
     return load_game_from_json(os.path.join(game_directory, max_turn_file))
 
 
-def ai_pick_service(game_id, strategy: str, side: str) -> Pick:
-    """Choix de l'adversaire automatique pour le round en cours."""
+def ai_pick_service(game_id, strategy: str, side: str, revealed_card_index: int = None) -> Pick:
+    """
+    Choix de l'adversaire automatique pour le round en cours.
+
+    `revealed_card_index` : la carte que l'adversaire vient de poser, quand l'IA joue en second (règle du jeu :
+    sa carte est visible, ses pillz non). La donner à une IA qui joue en premier serait tricher : c'est refusé.
+    """
     if strategy not in STRATEGIES:
         raise ValueError(f"Unknown strategy: {strategy!r} (expected one of {sorted(STRATEGIES)})")
     if side not in ("ally", "enemy"):
         raise ValueError(f"Unknown side: {side!r}")
-    return STRATEGIES[strategy](load_latest_game(game_id), side, random.Random())
+    game = load_latest_game(game_id)
+    if revealed_card_index is not None:
+        opponent = engine.player(game, engine.other(side))
+        if engine.plays_first(game, side):
+            raise ValueError("Revealed card given to the player who plays first.")
+        if not 0 <= revealed_card_index < len(opponent.cards) or opponent.cards[revealed_card_index].played:
+            raise ValueError(f"Invalid revealed card index: {revealed_card_index}")
+    return STRATEGIES[strategy](game, side, random.Random(), revealed_card=revealed_card_index)
 
 
 def process_round_service(game_id: str, round_data: ProcessRoundInput):

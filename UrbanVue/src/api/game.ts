@@ -43,9 +43,17 @@ export async function initGame(deck: Deck, opponent: Opponent = "human"): Promis
 	return { game: new Game(response.data.game), gameId: String(response.data.game_id), opponent };
 }
 
-/** Choix de l'ordinateur pour le camp ennemi, sans jouer le round. */
-export async function aiPick(gameId: string, strategy: Exclude<Opponent, "human">): Promise<AiPick> {
-	const response = await apiClient.post<AiPick>(`/ai_pick/${gameId}`, { strategy, side: "enemy" });
+/**
+ * Choix de l'ordinateur pour le camp ennemi, sans jouer le round.
+ * `revealedCardIndex` : la carte que le joueur vient de poser, quand l'ordinateur joue en second — le backend
+ * refuse qu'on la lui donne s'il joue en premier (sa carte serait vue avant d'être posée).
+ */
+export async function aiPick(gameId: string, strategy: Exclude<Opponent, "human">, revealedCardIndex?: number): Promise<AiPick> {
+	const response = await apiClient.post<AiPick>(`/ai_pick/${gameId}`, {
+		strategy,
+		side: "enemy",
+		revealed_card_index: revealedCardIndex ?? null,
+	});
 	return response.data;
 }
 

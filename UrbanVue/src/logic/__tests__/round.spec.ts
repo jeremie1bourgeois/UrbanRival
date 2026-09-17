@@ -26,4 +26,22 @@ describe("RoundPicker", () => {
 		picker.pick({ index: 1, pillz: 2, fury: false });
 		expect(picker.current).toBe("ally");
 	});
+
+	// Règle Urban Rivals : le second joueur voit la carte posée par le premier, jamais ses pillz.
+	it("reveals the first player's card to the second one, and nothing before", () => {
+		const picker = new RoundPicker(new Game({ turn: false, ally: {}, enemy: {} }));
+
+		expect(picker.revealed).toBeNull();
+		picker.pick({ index: 3, pillz: 7, fury: true });
+
+		expect(picker.revealed).toEqual({ side: "enemy", index: 3 });
+	});
+
+	it("keeps the second player's card hidden from the first one", () => {
+		const picker = new RoundPicker(new Game({ turn: true, ally: {}, enemy: {} }));
+
+		picker.pick({ index: 1, pillz: 2, fury: false });
+
+		expect(picker.revealed).toEqual({ side: "ally", index: 1 });
+	});
 });

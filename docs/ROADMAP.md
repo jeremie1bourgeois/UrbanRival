@@ -74,8 +74,10 @@ Counter-attack refixe l'ordre à chaque round.
 ### C. Front — reste mineur
 - Tests de composants (aucun : seuls la logique pure et le modèle sont testés) ; éventuellement des tests de bout en bout (Playwright).
 - ~~Historique : afficher les effets appliqués~~ → fait (D2).
-- Montrer au second joueur la carte jouée par le premier (règle UR : la carte est visible, pas les pillz) — aujourd'hui rien n'est révélé avant la résolution.
-- Tirer un premier joueur aléatoire / laisser choisir.
+- ~~Montrer au second joueur la carte jouée par le premier (règle UR : la carte est visible, pas les pillz)~~ → fait
+  le 2026-09-17 : la carte posée est entourée et nommée dans l'en-tête, l'ordinateur ne la reçoit que s'il joue second.
+- Tirer un premier joueur aléatoire / laisser choisir : fait côté moteur (`engine.elo_game`), reste à exposer dans le
+  deck builder (les parties créées par `/init_game/` commencent toujours par l'allié).
 
 ### D. Backend — préparer l'IA (recommandé en premier)
 | # | Tâche | Détail |
@@ -96,8 +98,9 @@ parfait gagnerait contre nous), pas le taux de victoire contre l'heuristique.
 
 1. ~~Adversaires étalons : aléatoire, heuristique, glouton, minimax à 1 coup~~ → fait (`src/core/ai/opponent.py`,
    `evaluation.py`, banc d'essai `scripts/ai_arena.py`).
-2. Modéliser exactement le jeu ELO : 14 vies, premier joueur tiré au sort puis alterné, carte du premier joueur
-   **visible** et pillz cachées ; pool de cartes légales en ELO.
+2. ~~Modéliser exactement le jeu ELO~~ → fait le 2026-09-17 : `engine.elo_game` (14 vies, premier joueur tiré au
+   sort puis alterné) et la règle d'information (**la carte du premier joueur est visible, ses pillz non** —
+   confirmé par l'utilisateur) portée par `play_out`, les stratégies (`revealed_card`), `/ai_pick` et le front.
 3. Matrice de round rapide (chemin analytique vectorisé + repli moteur pour les capacités dépendant des pillz).
 4. Solveur d'équilibre (programmation linéaire, forme séquentielle) : rounds 4 et 3 exacts, mémoïsés.
 5. Rounds 1-2 : abstraction des mises + valeur `V̂` apprise sur les valeurs exactes du solveur.

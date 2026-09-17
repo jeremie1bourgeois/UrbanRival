@@ -81,22 +81,26 @@ Réglage mesuré : `evaluation.PILLZ_WEIGHT` à 1 faisait brader les pillz dès 
 Le modèle de réponses adverses compte autant que les poids : tirer les réponses uniformément parmi
 les coups légaux revient à supposer un adversaire qui mise n'importe comment.
 
-### Étape 1 — Modéliser exactement le jeu ELO (1-2 j)
+### Étape 1 — Modéliser exactement le jeu ELO — ✅ fait le 2026-09-17
 
-Sans ça, on résoudrait un autre jeu que celui qu'on veut gagner.
+Règle d'information **confirmée par l'utilisateur** : quels que soient la partie et le mode, le second
+joueur voit toujours la carte posée par le premier, jamais ses pillz. C'est donc la règle du moteur.
 
-1. **Paramètres de partie** : 14 vies (déjà paramétrable dans `engine.new_game`), premier joueur tiré
-   au sort puis alterné (`Game.turn` s'inverse déjà à chaque round ; il manque le tirage).
-2. **Information du round** : la vraie règle UR — le premier joueur pose une carte **visible**, pillz
-   cachées ; le second répond en la voyant. Le moteur garde son API à action jointe (indispensable au
-   solveur) ; la couche IA reçoit `legal_actions(state, side, revealed_card=None)` et une politique
-   `act(state, side, revealed_card)`.
-3. **Front** : révéler au second joueur la carte du premier (déjà listé en ROADMAP § C), sinon
-   l'humain joue à un jeu plus dur que l'IA.
-4. **Pool ELO** : charger la liste des cartes légales ; générer les mains d'entraînement et de mesure
-   dedans (`arena.random_hand` s'y branche).
-5. **À confirmer en combat réel** (10 min de capture, `docs/ORACLE.md`) : la carte du premier joueur
-   est-elle bien révélée avant que le second ne mise ? Toute la structure d'information en dépend.
+- `engine.elo_game(mains, rng)` : 14 vies, 12 pillz, **premier joueur tiré au sort** puis alterné
+  (`new_game(..., ally_first=...)`, `first_side`, `plays_first`). L'arène joue des parties ELO.
+- `engine.play_out` respecte l'ordre et l'information : le premier joue en aveugle, le second reçoit
+  `revealed_card`. Toutes les stratégies ont la signature `(game, side, rng, revealed_card=None)` ;
+  les recherches s'en servent pour n'envisager que les mises de l'adversaire **sur cette carte**.
+- `/ai_pick` accepte `revealed_card_index` et **refuse** qu'on le donne au joueur qui pose en premier
+  (ce serait tricher). Front : la carte posée est entourée et nommée (« en face : X (pillz cachées) »),
+  et l'ordinateur ne la reçoit que lorsqu'il joue en second.
+- Mesure du gain : la même stratégie, privée de l'information quand elle joue en second, perd —
+  glouton 55 %, minimax 60,5 % pour la version informée (100 parties). Le gain est réel mais modeste :
+  l'information ne sert que sur les rounds où l'on joue second, et une recherche à un coup n'en tire
+  qu'une partie de la valeur. C'est le solveur qui l'exploitera pleinement.
+
+Non nécessaire pour jouer : la **liste des bannis ELO** ne change rien à l'IA (l'utilisateur l'a
+confirmé) — elle ne concerne que la composition de deck, donc la phase 2.
 
 ### Étape 2 — Matrice de round rapide (2-3 j)
 
@@ -196,9 +200,9 @@ Tests à écrire, dans l'esprit du dépôt (attentes calculées à la main) :
 
 ## Risques et points à confirmer
 
-1. **La règle d'information** (carte révélée au second joueur) : à confirmer en combat réel avant
-   l'étape 3 — elle décide de la forme du solveur.
-2. **Le pool ELO** (bans, étoiles, Leaders, fury) : à établir à l'étape 1, il cadre tout le reste.
+1. ~~**La règle d'information**~~ → confirmée le 2026-09-17 : le second joueur voit toujours la carte,
+   jamais les pillz. Le solveur devra donc résoudre un jeu en forme séquentielle, pas une simple matrice.
+2. ~~**Le pool ELO**~~ → sans effet sur le jeu de l'IA ; à reprendre en phase 2 (composition de deck).
 3. **Le chemin analytique de l'étape 2** : c'est lui qui rend le solveur possible. S'il ne tient pas
    pour trop de capacités, il faudra un moteur de round dédié (numpy, sans objets) — plus de travail,
    même résultat.

@@ -5,10 +5,14 @@ la fury coûte 3 pillz de plus. Fonctions pures : elles lisent la partie sans la
 Quatre stratégies, de la plus faible à la plus forte : `random`, `heuristic` (règles simples, sans simulation),
 `greedy` et `minimax` (un coup d'avance, simulé par l'API moteur `src/core/ai/engine.py` — voir `search_pick`).
 `scripts/ai_arena.py` les fait s'affronter et donne leurs taux de victoire.
+
+Toutes ont la même signature `(game, side, rng, revealed_card=None)`. `revealed_card` est l'index de la carte
+que l'adversaire vient de poser quand on joue en second (règle du jeu : sa carte est visible, ses pillz non) ;
+seules les stratégies de recherche s'en servent, en n'envisageant plus que les mises sur cette carte.
 """
 import random
 import statistics
-from typing import Callable, List, Sequence
+from typing import Callable, List, Optional, Sequence
 
 from src.core.ai.engine import FURY_COST, Pick, legal_actions, step
 from src.core.ai.evaluation import evaluate
@@ -34,11 +38,11 @@ def legal_picks(game: Game, side: str) -> List[Pick]:
     return legal_actions(game, side)
 
 
-def random_pick(game: Game, side: str, rng: random.Random) -> Pick:
+def random_pick(game: Game, side: str, rng: random.Random, revealed_card: Optional[int] = None) -> Pick:
     return rng.choice(legal_picks(game, side))
 
 
-def heuristic_pick(game: Game, side: str, rng: random.Random) -> Pick:
+def heuristic_pick(game: Game, side: str, rng: random.Random, revealed_card: Optional[int] = None) -> Pick:
     """
     Joueur prudent : répartit ses pillz sur les rounds restants (tout au dernier), joue la carte au meilleur
     produit puissance x dégâts, garde la fury pour le dernier round s'il reste de quoi la payer.
@@ -56,19 +60,25 @@ def heuristic_pick(game: Game, side: str, rng: random.Random) -> Pick:
 
 
 def search_pick(game: Game, side: str, rng: random.Random, aggregate: Callable[[Sequence[float]], float],
-                max_candidates: int = MAX_CANDIDATES, nb_replies: int = NB_REPLIES) -> Pick:
+                max_candidates: int = MAX_CANDIDATES, nb_replies: int = NB_REPLIES,
+                revealed_card: Optional[int] = None) -> Pick:
     """
     Un coup d'avance : chaque coup candidat est joué contre un échantillon de réponses adverses, et les notes
     obtenues (`evaluation.evaluate`) sont résumées par `aggregate` — la moyenne pour un glouton (« en moyenne,
     quel coup rapporte le plus ? »), le minimum pour un minimax (« quel coup résiste à la pire réponse ? »).
 
+    `revealed_card` : quand on joue en second, la carte adverse est connue — on n'envisage plus que ses mises
+    sur cette carte, ce qui rend la recherche bien plus juste. Quand on joue en premier, on ignore sa carte,
+    et lui verra la nôtre : cette asymétrie n'est traitée correctement que par un solveur d'équilibre
+    (voir docs/IA.md) ; ici elle est simplement subie.
+
     L'échantillonnage borne le coût : le round 1 offre ~92 coups à chaque joueur, soit 8 500 rounds à simuler
     pour une recherche exhaustive. Les candidats sont pris régulièrement (donc étalés sur les cartes et les
-    mises), les réponses au hasard, la réponse heuristique de l'adversaire étant toujours du lot.
+    mises), les réponses parmi les coups plausibles de l'adversaire.
     À budget et graine égaux, la décision est reproductible.
     """
     candidates = _spread(legal_picks(game, side), max_candidates)
-    replies = _sample_replies(game, _other(side), rng, nb_replies)
+    replies = _sample_replies(game, _other(side), rng, nb_replies, revealed_card)
     best, best_score = None, None
     for candidate in candidates:
         scores = [evaluate(_step_for(game, side, candidate, reply), side) for reply in replies]
@@ -78,14 +88,14 @@ def search_pick(game: Game, side: str, rng: random.Random, aggregate: Callable[[
     return best
 
 
-def greedy_pick(game: Game, side: str, rng: random.Random) -> Pick:
+def greedy_pick(game: Game, side: str, rng: random.Random, revealed_card: Optional[int] = None) -> Pick:
     """Glouton : le coup qui rapporte le plus en moyenne contre les réponses envisagées."""
-    return search_pick(game, side, rng, statistics.fmean)
+    return search_pick(game, side, rng, statistics.fmean, revealed_card=revealed_card)
 
 
-def minimax_pick(game: Game, side: str, rng: random.Random) -> Pick:
+def minimax_pick(game: Game, side: str, rng: random.Random, revealed_card: Optional[int] = None) -> Pick:
     """Minimax à un coup : le coup dont la pire réponse adverse coûte le moins."""
-    return search_pick(game, side, rng, min)
+    return search_pick(game, side, rng, min, revealed_card=revealed_card)
 
 
 def _step_for(game: Game, side: str, own: Pick, opponent: Pick) -> Game:
@@ -101,20 +111,25 @@ def _spread(picks: List[Pick], maximum: int) -> List[Pick]:
     return [picks[round(index * (len(picks) - 1) / (maximum - 1))] for index in range(maximum)]
 
 
-def _sample_replies(game: Game, side: str, rng: random.Random, nb_replies: int) -> List[Pick]:
+def _sample_replies(game: Game, side: str, rng: random.Random, nb_replies: int,
+                    revealed_card: Optional[int] = None) -> List[Pick]:
     """
     Réponses adverses envisagées. Les tirer uniformément parmi les coups légaux modélise un adversaire qui mise
     n'importe comment, et fait jouer n'importe comment : on envisage les coups d'un joueur raisonnable — sa
     réponse heuristique, et pour chaque carte qui lui reste ne rien miser, miser sa part du budget, la dépasser
     un peu, ou tout miser (fury comprise).
+
+    `revealed_card` : sa carte est déjà posée, il ne reste que ses mises possibles sur celle-ci.
     """
     player = _player(game, side)
     rounds_left = max(1, NB_ROUNDS - game.nb_turn + 1)
     share = player.pillz // rounds_left
-    replies = [heuristic_pick(game, side, rng)]
-    for index, card in enumerate(player.cards):
-        if card.played:
-            continue
+    cards = [revealed_card] if revealed_card is not None else [
+        index for index, card in enumerate(player.cards) if not card.played]
+    replies = []
+    if revealed_card is None:
+        replies.append(heuristic_pick(game, side, rng))
+    for index in cards:
         for bet in sorted({0, share, share + 2, player.pillz}):
             if bet <= player.pillz:
                 replies.append(Pick(index, bet + 1, False))

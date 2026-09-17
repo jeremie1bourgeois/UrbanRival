@@ -40,8 +40,11 @@ class MatchResult:
 
 def play_game(hands: Tuple[Hand, Hand], ally_strategy: Strategy, enemy_strategy: Strategy,
               rng: random.Random) -> GameResult:
-    """Une partie complète entre deux stratégies. Renvoie le résultat du point de vue de l'allié."""
-    state = engine.new_game(*hands)
+    """
+    Une partie ELO complète entre deux stratégies (14 vies, premier joueur tiré au sort puis alterné,
+    carte du premier joueur révélée au second). Renvoie le résultat du point de vue de l'allié.
+    """
+    state = engine.elo_game(*hands, rng)
     final = engine.play_out(state, {"ally": ally_strategy, "enemy": enemy_strategy}, rng, in_place=True)
     return engine.result(final)
 

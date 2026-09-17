@@ -71,3 +71,5 @@ class ProcessRoundInput(BaseModel):
 class AiPickInput(BaseModel):
     strategy: str = "heuristic"   # voir src/core/ai/opponent.STRATEGIES
     side: str = "enemy"
+    # Carte posée par l'adversaire quand l'IA joue en second (sa carte est visible, ses pillz non) ; None sinon.
+    revealed_card_index: Union[int, None] = None

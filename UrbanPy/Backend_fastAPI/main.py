@@ -110,7 +110,7 @@ def ai_pick(game_id: str, body: AiPickInput = Body(...)) -> Dict[str, Any]:
     le client l'envoie ensuite à /process_round avec le choix humain.
     """
     try:
-        pick = ai_pick_service(game_id, body.strategy, body.side)
+        pick = ai_pick_service(game_id, body.strategy, body.side, body.revealed_card_index)
         return {"card_index": pick.card_index, "pillz": pick.pillz, "fury": pick.fury}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

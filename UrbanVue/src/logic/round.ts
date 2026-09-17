@@ -21,6 +21,16 @@ export class RoundPicker {
 		return this.order.find((side) => this.picks[side] === undefined) ?? null;
 	}
 
+	/**
+	 * Carte posée par le premier joueur, une fois qu'il a choisi : le second la voit avant de jouer
+	 * (règle Urban Rivals — la carte est visible, la mise en pillz non). Null tant que personne n'a joué.
+	 */
+	get revealed(): { side: Side; index: number } | null {
+		const [first] = this.order;
+		const pick = this.picks[first];
+		return pick === undefined ? null : { side: first, index: pick.index };
+	}
+
 	/** Enregistre le choix du joueur courant ; renvoie le RoundData quand les deux joueurs ont choisi. */
 	pick(pick: Pick): RoundData | null {
 		const side = this.current;

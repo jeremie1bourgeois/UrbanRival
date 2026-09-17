@@ -4,13 +4,17 @@ API moteur pure (feuille de route D1) : un état (`Game`), deux actions (`Pick`)
 Aucune persistance, aucun I/O, aucune dépendance à FastAPI : c'est la surface sur laquelle se branchent les
 adversaires de recherche (`src/core/ai/opponent.py`) et, plus tard, un environnement d'apprentissage.
 
-    state = engine.new_game(mes_cartes, ses_cartes)
+    state = engine.elo_game(mes_cartes, ses_cartes, rng)   # 14 vies, premier joueur tiré au sort
     while not engine.is_terminal(state):
         state, result = engine.step(state, mon_choix, son_choix)
     engine.reward(state, "ally")   # +1 victoire, -1 défaite, 0 nulle
 
 Convention des actions, identique à celle du moteur : `pillz` compte la pillz toujours consommée (attaque =
 puissance × pillz), donc `pillz = 1` signifie « aucune mise » ; la fury coûte 3 pillz de plus.
+
+Information du round (règle Urban Rivals, quel que soit le mode) : le premier joueur pose une carte
+**visible**, ses pillz restent cachées ; le second choisit en voyant cette carte. `play_out` passe donc la
+carte du premier joueur à la stratégie du second (`revealed_card`), et rien à celle du premier.
 """
 from dataclasses import dataclass, field
 from typing import Iterable, List, Sequence, Tuple
@@ -23,6 +27,7 @@ from src.schemas.game_schemas import GameResult, ProcessRoundInput
 
 FURY_COST = 3
 STARTING_LIFE = 12
+ELO_LIFE = 14          # mode ELO : 14 vies (confirmé par les combats réels capturés, data/ur_battles/)
 STARTING_PILLZ = 12
 SIDES = ("ally", "enemy")
 
@@ -45,7 +50,7 @@ class StepResult:
 
 
 def new_game(ally_cards: Sequence[Tuple[str, int]], enemy_cards: Sequence[Tuple[str, int]],
-             life: int = STARTING_LIFE, pillz: int = STARTING_PILLZ) -> Game:
+             life: int = STARTING_LIFE, pillz: int = STARTING_PILLZ, ally_first: bool = True) -> Game:
     """Partie prête à jouer (round 1) à partir de deux mains `[(nom de carte, étoiles), ...]`, sans rien écrire."""
     from src.core.domain.card import Card      # import local : Card lit les données officielles au chargement
 
@@ -53,7 +58,12 @@ def new_game(ally_cards: Sequence[Tuple[str, int]], enemy_cards: Sequence[Tuple[
                   cards=[Card(card_name=name, nb_stars=stars) for name, stars in ally_cards])
     enemy = Player(name="enemy", life=life, pillz=pillz,
                    cards=[Card(card_name=name, nb_stars=stars) for name, stars in enemy_cards])
-    return Game(1, True, ally, enemy, [])
+    return Game(1, ally_first, ally, enemy, [])
+
+
+def elo_game(ally_cards: Sequence[Tuple[str, int]], enemy_cards: Sequence[Tuple[str, int]], rng) -> Game:
+    """Partie du mode ELO : 14 vies, 12 pillz, premier joueur tiré au sort (puis alterné par le moteur)."""
+    return new_game(ally_cards, enemy_cards, life=ELO_LIFE, ally_first=rng.random() < 0.5)
 
 
 def clone(state: Game) -> Game:
@@ -65,6 +75,19 @@ def player(state: Game, side: str) -> Player:
     if side not in SIDES:
         raise ValueError(f"Unknown side: {side!r} (expected one of {SIDES})")
     return state.ally if side == "ally" else state.enemy
+
+
+def other(side: str) -> str:
+    return "enemy" if side == "ally" else "ally"
+
+
+def first_side(state: Game) -> str:
+    """Camp qui pose sa carte en premier ce round (`Game.turn`) : le second le voit avant de choisir."""
+    return "ally" if state.turn else "enemy"
+
+
+def plays_first(state: Game, side: str) -> bool:
+    return first_side(state) == side
 
 
 def legal_actions(state: Game, side: str) -> List[Pick]:
@@ -137,14 +160,20 @@ def reward(state: Game, side: str) -> int:
 
 def play_out(state: Game, strategies: dict, rng, in_place: bool = False) -> Game:
     """
-    Déroule la partie jusqu'à la fin, chaque camp jouant sa stratégie `(game, side, rng) -> Pick`
-    (voir `src/core/ai/opponent.STRATEGIES`). Renvoie l'état final.
+    Déroule la partie jusqu'à la fin, chaque camp jouant sa stratégie
+    `(game, side, rng, revealed_card=None) -> Pick` (voir `src/core/ai/opponent.STRATEGIES`).
+
+    L'ordre et l'information suivent la règle du jeu : le premier joueur choisit en aveugle, puis le second
+    choisit en voyant sa carte (jamais ses pillz). Renvoie l'état final.
     """
     current = state if in_place else clone(state)
     while not is_terminal(current):
-        ally_action = strategies["ally"](current, "ally", rng)
-        enemy_action = strategies["enemy"](current, "enemy", rng)
-        current, _ = step(current, ally_action, enemy_action, in_place=True, log=False)
+        first = first_side(current)
+        second = other(first)
+        first_action = strategies[first](current, first, rng)
+        second_action = strategies[second](current, second, rng, revealed_card=first_action.card_index)
+        actions = {first: first_action, second: second_action}
+        current, _ = step(current, actions["ally"], actions["enemy"], in_place=True, log=False)
     return current
 
 
