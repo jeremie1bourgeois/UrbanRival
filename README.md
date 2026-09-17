@@ -10,7 +10,7 @@ Objectif à terme : une IA par apprentissage par renforcement.
 | Cartes jouables | **2 497** (36 clans), données scrapées d'iclintz.com le 2026-09-15, illustrations incluses |
 | Pouvoirs (abilities / bonus) | **1 132 / 1 310 descriptions gérées (86 %)**, 2 340 cartes sur 2 497 entièrement gérées — `python scripts/capacity_coverage.py` liste le reste |
 | Moteur | 4 niveaux d'effets (méta, stats, fin de round, persistants), bonus de clan, Leaders, conditions Courage/Revenge/Confidence/Reprisal/Symmetry/Asymmetry/Stop/Killshot/Bet/Versus/Defeat/Backlash/Victory or Defeat |
-| Tests | 464 backend (pytest) + 24 front (vitest) ; balayage de robustesse sur toutes les descriptions gérées |
+| Tests | 540 backend (pytest) + 24 front (vitest) ; balayage de robustesse sur toutes les descriptions gérées |
 | Interface | composition de deck (recherche, filtre par clan, decks aléatoires, statut des bonus, decks mémorisés), partie de 4 rounds contre un second joueur ou **contre l'ordinateur** (aléatoire / heuristique / glouton / minimax), historique des rounds, fin de partie, effets persistants |
 | IA | API moteur pure (`step` / `legal_actions` / `result` / `reward`), adversaires qui simulent un coup d'avance, banc d'essai (taux de victoire) et mesure de débit — cible : un solveur d'équilibre, voir [docs/IA.md](docs/IA.md) |
 
@@ -64,7 +64,7 @@ pour les tests » enregistre le round dans `data/test/test_N/` (voir ci-dessous)
 ## Tests
 
 ```bash
-cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 464 tests
+cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 540 tests
 cd UrbanVue && npm test && npm run lint && npm run build           # 24 tests, lint, type-check + build
 ```
 
@@ -99,8 +99,9 @@ de round) → niveau 4 (Poison / Toxin / Heal / Regen / Dope / Repair, qui agiss
 Le bonus de clan n'est actif qu'avec au moins deux cartes du clan en main ; l'ability « Team: » d'un Leader s'applique à
 chaque carte jouée s'il est le seul Leader en main.
 
-Deux règles ont été tranchées sans certitude et sont isolées dans le code avec un test : « Stop Opp. Ability » contre
-« Stop Opp. Bonus » (les deux s'appliquent) et « Cancel Opp. Life Modif. » (ne touche pas au poison).
+Les règles incertaines sont tranchées contre des combats réels rejoués dans le moteur (15 combats dans
+`data/ur_battles/`, voir [docs/ORACLE.md](docs/ORACLE.md)) : les Stops se résolvent en chaîne (un Stop stoppé ne stoppe
+rien), un « Cancel Opp. Life Modif. » saute le tic du round d'un effet persistant sans le retirer.
 
 ## Feuille de route
 

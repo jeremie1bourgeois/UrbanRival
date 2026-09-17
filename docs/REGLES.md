@@ -82,7 +82,7 @@ officiels comme tests.
 Aucune source ne décrit le cas. Conserver le choix actuel (les Stops gagnent), à vérifier en combat réel avec par
 exemple Skeelz (Protection: Ability) + ability Protection: Bonus contre un All-Stop (Glorg, Shakra).
 
-### 3.3 « Cancel Opp. Life Modif. » et le poison — ❌ CONTREDIT (texte de carte, via wiki)
+### 3.3 « Cancel Opp. Life Modif. » et le poison — ✅ CORRIGÉ, CONFIRMÉ EN COMBAT RÉEL (glossaire 56, `1211922`)
 
 **Moteur** : le poison n'est pas annulé (`_strip_types` ne touche pas au type `poison`).
 
@@ -212,10 +212,10 @@ assumé, sans conséquence tant que le jeu n'est pas comparé à des combats ré
 
 | # | Décision | Verdict | Effort |
 |---|---|---|---|
-| 3.1 | Stops simultanés | ❌ contredit (source officielle, 2 exemples reproduits) | moyen : point fixe dans `_stopped_kinds` + 3 tests |
+| 3.1 | Stops simultanés | ❌ contredit → **corrigé (chaîne), confirmé en combat réel** | fait |
 | 3.8 | Bet sans la pillz gratuite | ❌ contredit | trivial : une ligne + tests |
 | 3.6 | Infiltrated = clan majoritaire | ❌ contredit (+ restriction de clans listés) | petit ; données à vérifier |
-| 3.3 | Cancel Life Modif. épargne le poison | ❌ contredit | petit |
+| 3.3 | Cancel Life Modif. épargne le poison | ❌ contredit → **corrigé (tic du round sauté), confirmé en combat réel** (`1211922`) | fait |
 | 3.4 | Reanimate seulement sur KO | ❌ contredit partiellement | petit |
 | 3.5 | Recover : fury comprise / minimum 0 | ✅ fury / ⚠️ min 1 | trivial |
 | 3.9, 3.10, 3.11 | Killshot, per damage, Copy | ✅ confirmés | — |
@@ -304,7 +304,7 @@ Verdicts sur les points encore ouverts ou déjà codés :
 | 53 Récup | « arrondie à l'unité inférieure, **avec un minimum de 1** » | pas de minimum | ❌ → **corrigé** |
 | 51 Toxine / Régén, 52 Consume / Dope | « agissent **immédiatement à la fin du round** dans lequel ils ont été joués » (Drak au round 1 : vies aux rounds 1, 2, 3 et 4) | n'agissent qu'aux rounds suivants | ❌ → **corrigé**. Repair aussi immédiat, et **vie ET pillz** (texte de Wilo Ld, combat réel `1211702` : hypothèse « rounds suivants, par symétrie avec Heal » réfutée) |
 | 66 Par Pillz / Vie restante | pillz/vies « **avant de mettre des pillz** sur ton perso (sans compter la Pillz gratuite) » — Lady Ametia Cr : 13 de puissance au round 1 | `nb_pillz_left` lit les pillz **après** la mise | ❌ → **corrigé** (vie : inchangée pendant la mise, OK) |
-| 56 Annule (Vie / Pillz) | « n'annule un effet permanent (Poison, Soin, Toxine, Régén) que **pendant le round où il est joué. L'effet reprendra lors du round suivant** » ; idem Pillz face à Dope / Consume | la correction du matin **retire** le poison/heal/… de la carte adverse | ⚠️ → **corrigé** : le tic du round est sauté (y compris le tic immédiat d'une toxine posée ce round), l'effet subsiste |
+| 56 Annule (Vie / Pillz) | « n'annule un effet permanent (Poison, Soin, Toxine, Régén) que **pendant le round où il est joué. L'effet reprendra lors du round suivant** » ; idem Pillz face à Dope / Consume | la correction du matin **retire** le poison/heal/… de la carte adverse | ⚠️ → **corrigé** : le tic du round est sauté (y compris le tic immédiat d'une toxine posée ce round), l'effet subsiste ; **confirmé** en combat réel (`1211922`, attribut par attribut) |
 | 56 Annule (Dégâts) | « n'annule pas la Fury » | fury ajoutée après les modificateurs, jamais annulée | ✅ |
 | 58 Stop | « la condition Stop ne s'active pas contre des cartes Annul » | « stop » consommé à la phase des Stops uniquement | ✅ |
 | 55 Protection | Protection: Bonus/Pouvoir protège des Stops « mais pas d'une carte Annul » ; « peut également annuler les effets négatifs d'un Leader » | Protection: X retire les modifs adverses ciblant ma carte, y compris `leader_fight` adverse | ✅ |
@@ -316,9 +316,10 @@ Verdicts sur les points encore ouverts ou déjà codés :
 | 61 Courage / Riposte, 62 Confiance / Revanche | ✅ | | ✅ |
 | 70 Jour / Nuit | cycle de 4 h dans le jeu | non modélisé (Day toujours vrai) | choix utilisateur |
 
-Non tranché par le glossaire : cycles de Stops/Protections (3.2), Leader bénéficiant de son Team (3.7 ; « la Protection
-peut annuler les effets négatifs d'un Leader » suggère que le Team touche bien les deux camps), Tune Out et fury,
-Mindwipe vs Combust, Limitless.
+Non tranché par le glossaire : cycles de Protections (3.2), Leader bénéficiant de son Team (3.7 ; « la Protection
+peut annuler les effets négatifs d'un Leader » suggère que le Team touche bien les deux camps), Limitless. Tranchés
+en combat réel le 2026-09-17 : chaîne des Stops, Tune Out et fury, Mindwipe vs Combust, Repair, Consume, Annul Modif.
+Vie (§ 5).
 
 **Historique de combats** : `player/history.php` ne donne que le score final de chaque combat (ex. « 12-3 »), sans détail
 de rounds ni rapport. Le jeu lui-même est un client Unity WebGL (`/game/play/`) ; les données de round transitent

@@ -33,16 +33,17 @@ dizaine de combats, soit 40 rounds vérifiés.
 choisit les deux decks et les deux mains, donc le scénario exact à tester. Points encore non tranchés (voir
 `docs/REGLES.md` § 5 et § 6) :
 
-| Question | Scénario à jouer |
-|---|---|
-| Cycles de Stops | GHEIST ou Roots (SoA en bonus) contre Nightmare ou Piranas (SoB en bonus) ; Skeelz + ability Protection: Bonus contre un All-Stop (Glorg, Shakra) |
-| Le Leader profite-t-il de son Team ? | jouer Ambre / Eyrik / Vholt lui-même |
-| Tune Out et fury | Cosmohnuts avec fury contre un adversaire à une pillz de plus |
-| Mindwipe vs Combust | une carte de chaque, observer les deux rounds suivants |
-| Limitless | Fractal en main + allié « −X Opp Damage, Min Y » gagnant |
-| Exchange contre Copy / Annul | Dominion « Damage Exchange » contre « Copy: Opp. Damage » puis contre « Cancel Opp. Damage Modif. » |
-| Repair (immédiat ou différé ?) | une carte Repair gagnante, pillz au round même |
-| Combust / Mindwipe : immédiats ? | idem, vie et pillz au round même |
+| Question | Scénario à jouer | État (2026-09-17) |
+|---|---|---|
+| Cycles de Stops | GHEIST ou Roots (SoA en bonus) contre Nightmare ou Piranas (SoB en bonus) ; Skeelz + ability Protection: Bonus contre un All-Stop (Glorg, Shakra) | chaîne SoA/SoB **tranchée** (`1210477`, `1211029`, `1210625`) ; reste Protection contre All-Stop (D2) |
+| Le Leader profite-t-il de son Team ? | jouer Ambre / Eyrik / Vholt lui-même | ouvert (D3) |
+| Tune Out et fury | Cosmohnuts avec fury contre un adversaire à une pillz de plus | **tranché** : fury exclue, puissances à 1 (`1211279`, `1211570`) |
+| Mindwipe vs Combust | une carte de chaque, observer les deux rounds suivants | **tranché** : Mindwipe immédiat, Combust différé (`1211279`, `1211702`) |
+| Limitless | Fractal en main + allié « −X Opp Damage, Min Y » gagnant | non réalisable (Fractal absente) |
+| Exchange contre Copy / Annul | Dominion « Damage Exchange » contre « Copy: Opp. Damage » puis contre « Cancel Opp. Damage Modif. » | ouvert (D6) |
+| Repair (immédiat ou différé ?) | une carte Repair gagnante, pillz au round même | **tranché** : immédiat, vie **et** pillz (`1211702`, `1211922`) |
+| Combust / Mindwipe : immédiats ? | idem, vie et pillz au round même | Mindwipe oui ; Combust : aucune carte possédée |
+| Consume : immédiat ? Cancel Life Modif. contre un effet posé ? | Wave Ld gagnant ; Annul face à un Repair actif | **tranchés** : Consume immédiat (`1212171`) ; Annul saute le tic de vie du round, effet conservé (`1211922`) |
 
 ### Decks de référence (2026-09-16, toutes cartes du jeu)
 
@@ -98,11 +99,10 @@ Deux corrections par rapport aux decks de référence :
 | D7 | **Conditions numériques** : Per Pillz Left, Cards, Bet | Hundun (Freaks, 2, +1 Atk Per Pillz Left), Candy Jack (Nightmare, 4, +1 Power Per Pillz Left Max 8), Merrick Cr (Freaks, 3, -2 Cards Damage Min 1), M2 Sansot Cr (Vortex, 1, idem), Delija Cr (Roots, 1, -2 Cards Power Min 2), Pandemos Cr (Paradox, 5, -4 Cards Damage Min 0), Otium Cr (Jungo, 3, *Confidence:* -5 Cards Damage), Tyd (Piranas, 1, Bet > 6 Pillz : +2 Life) | 8 La Junta à gros dégâts : Dugan (5), Agent Spinal (5), Winifred (4), Victor (4), Isatis (4), Quormac (4), Ed 12 Cr (4), Chiyoko (3) | Per Pillz Left : lire l'attaque au round 1 ; Bet : Tyd avec exactement 6 pillz (gratuite comprise) puis 7 ; Cards : lire les dégâts selon le nombre de cartes. **Perfect** : aucune carte possédée (Ataoualpet et Mac Hen, Bet > 4, sont à monter au niveau 3) |
 | D8 | **Oculus** (infiltration) et Corrupt | Oculus infiltrant Fang Pi Clang : Dark Nunavik (2, Courage: Power +4), Dark Askai (3, Attack +9), Dark Eklore (3, +1 Atk Per Pillz Left) + Fang Pi Clang : Chan (2), Yoshito (3), Fei Cr (4), Macumba (4), Rimikaru (2) | Nega D Ld (Uppers, 5, Corrupt 2 Min 5) + les 7 La Junta de D4 | main 1 Oculus + 3 Fang Pi (bonus Damage +2 adopté ?), puis 2 Oculus + 2 Fang Pi, puis 3 + 1 (la Fang Pi seule garde-t-elle son bonus ?) ; Nega D Ld gagnant : vies/pillz des deux joueurs au round même. **Tolvack (After), Unison, Xantiax, Corrosion** : aucune carte possédée |
 
-Ordre de rentabilité avec la collection : D4 (Tune Out, Consume, Mindwipe, Repair, Cancel Life en un duel), D1, D2a, D3,
-D6, puis D7, D8, D2b.
+Ordre de rentabilité avec la collection : ~~D4, D1~~ (faits le 2026-09-17, voir journal), puis D2a, D3, D6, D7, D8, D2b.
 
-**Journal (2026-09-17, parties contre l'adversaire d'entraînement « Smash Jabber », règle 2, 15 vies)** — 15 combats
-capturés (`data/ur_battles/12104*.json` à `1212171.json`), tous rejoués par `tests/test_ur_battles.py` :
+**Journal (2026-09-17, parties contre l'adversaire d'entraînement « Smash Jabber », règle 2, 15 vies)** — 14 combats
+capturés (`data/ur_battles/12104*.json` à `1212171.json`, plus `1181426.json` de la veille), tous rejoués par `tests/test_ur_battles.py` :
 
 - **D1 clos** : chaîne SoA/SoB confirmée dans les deux sens (`1210477`, `1211029`), bonus SoA contre SoA en pouvoir
   (`1210625`), quatre lectures de Stop en pouvoir contre bonus Stop. SoA contre SoA (et SoB contre SoB) en pouvoir est
