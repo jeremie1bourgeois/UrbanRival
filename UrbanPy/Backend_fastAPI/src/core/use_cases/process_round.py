@@ -1,5 +1,6 @@
 import copy
 from collections import Counter
+from typing import Tuple
 from src.core.domain.round import Round
 from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card, FIGHT_SLOTS
@@ -30,101 +31,120 @@ def process_round(game: Game, round_data: ProcessRoundInput, log: bool = True) -
 
 
 def _process_round(game: Game, round_data: ProcessRoundInput) -> None:
+    """Un round en trois phases : préparation des cartes, calcul des attaques, résolution (voir chaque phase)."""
     try:
-        # Mise à jour des pillz
-        game.ally.pillz -= ((round_data.player1_pillz - 1) + 3 * round_data.player1_fury) # -1 car 1 pillz est toujours consommée
-        game.enemy.pillz -= ((round_data.player2_pillz - 1) + 3 * round_data.player2_fury) # -1 car 1 pillz est toujours consommée
-
-        # Récupérer les cartes sélectionnées
-        player1_card = game.ally.cards[round_data.player1_card_index]
-        player2_card = game.enemy.cards[round_data.player2_card_index]
-
-        # Initialiser les données de combat
-        init_fight_data(player1_card, round_data.player1_pillz, round_data.player1_fury)
-        init_fight_data(player2_card, round_data.player2_pillz, round_data.player2_fury)
-
-        # Bonus de clan : un Oculus « Infiltrated » adopte le bonus du clan majoritaire de la main ;
-        # le bonus n'est actif que si la main compte au moins 2 cartes du clan (l'Oculus compris)
-        apply_infiltrated_bonus(game.ally, player1_card)
-        apply_infiltrated_bonus(game.enemy, player2_card)
-        for player, card in ((game.ally, player1_card), (game.enemy, player2_card)):
-            if card.bonus_fight is not None and not is_clan_bonus_active(player, card):
-                clan = clan_for_bonus(player, card)
-                why = f"une seule carte {clan} en main" if clan is not None else "aucun clan infiltrable"
-                note(card, "bonus", f"{card.name} : bonus « {card.bonus_description} » inactif ({why})")
-                card.bonus_fight = None
-
-        # L'ability « Team: » d'un Leader unique s'applique à la carte jouée
-        player1_card.leader_fight = leader_team_capacity(game.ally)
-        player2_card.leader_fight = leader_team_capacity(game.enemy)
-        apply_leader_modes(game, player1_card, player2_card)
-
-        for card, is_ally, own_index, opp_index in ((player1_card, True, round_data.player1_card_index, round_data.player2_card_index),
-                                                    (player2_card, False, round_data.player2_card_index, round_data.player1_card_index)):
-            for slot in FIGHT_SLOTS:
-                capacity = getattr(card, slot)
-                unmet = unmet_condition(game, capacity, is_ally, own_index, opp_index)
-                if unmet is not None:
-                    note(card, "condition", f"{card.name} : {journal_label(capacity)} inactif (condition {unmet} non remplie)")
-                    setattr(card, slot, None)
-
-        # Appliquer les effets de combat
-        fct_lvl_1.apply_capacity_lvl_1(player1_card, player2_card)
-        fct_lvl_2.apply_capacity_lvl_2(game, player1_card, player2_card, stats=("power", "damage"))
-
-        # Appliquer les fury
-        for card in (player1_card, player2_card):
-            if card.fury:
-                card.damage_fight += 2
-                note(card, "fury", f"{card.name} : fury → dégâts {card.damage_fight - 2} → {card.damage_fight}")
-
-        # Calculer les attaques
-        for card, pillz in ((player1_card, round_data.player1_pillz), (player2_card, round_data.player2_pillz)):
-            card.attack += card.power_fight * pillz
-            note(card, "attaque", f"{card.name} : attaque = {card.power_fight} × {pillz} pillz = {card.attack}")
-
-        # Modificateurs d'attaque, une fois l'attaque de base connue
-        fct_lvl_2.apply_capacity_lvl_2(game, player1_card, player2_card, stats=("attack",))
-
-        # Tune Out (Cosmohnuts) : « the Attack calculation is ignored and the winner is the player who bet the most Pillz »
-        if consume_tune_out(player1_card) | consume_tune_out(player2_card):
-            player1_card.attack, player2_card.attack = round_data.player1_pillz, round_data.player2_pillz
-            note(None, "tune_out", f"Tune Out : le round se résout aux pillz ({player1_card.name} {player1_card.attack}, {player2_card.name} {player2_card.attack})")
-
-        # Killshot : la capacité n'agit que si l'attaque vaut au moins le double de l'attaque adverse
-        apply_killshot_condition(player1_card, player2_card)
-        apply_killshot_condition(player2_card, player1_card)
-        apply_perfect_condition(player1_card, player2_card)
-        apply_perfect_condition(player2_card, player1_card)
-
-        # Créer une nouvelle instance de Round
-        round_result = Round()
-        round_result.ally.card_index = round_data.player1_card_index  # Stocker l'index de la carte
-        round_result.enemy.card_index = round_data.player2_card_index  # Stocker l'index de la carte
-
-        # Résoudre le combat
-        resolve_combat(game, player1_card, player2_card, round_result)
-        
-        # Un joueur tombé à 0 vie a perdu avant les effets de fin de round, sauf s'il est réanimé
-        if game.ally.life <= 0 or game.enemy.life <= 0:
-            fct_lvl_3.apply_reanimate(game, player1_card, player2_card)
-        if game.ally.life > 0 and game.enemy.life > 0:
-            fct_lvl_3.apply_capacity_lvl_3(game, player1_card, player2_card)
-            fct_lvl_4.apply_capacity_lvl_4(game, player1_card, player2_card)
-
-        # Ajouter le round au history
-        game.history.append(round_result)
-    
-        # Mettre à jour le tour
-        player1_card.played = True
-        player2_card.played = True
-
-        game.nb_turn += 1
-        game.turn = not game.turn
-
+        player1_card, player2_card = prepare_fight(game, round_data)
+        compute_attacks(game, player1_card, player2_card, round_data)
+        resolve_fight(game, player1_card, player2_card, round_data)
     except Exception as e:
         print(f"Exception in process_round: {e}")
         raise e
+
+
+def prepare_fight(game: Game, round_data: ProcessRoundInput) -> Tuple[Card, Card]:
+    """
+    Phase 1 — tout ce qui précède les attaques : mise à jour des pillz, données de combat, bonus de clan, Leader,
+    conditions de début de round, niveau 1 (Stops, copies, protections…), modificateurs de puissance et de
+    dégâts, fury. Renvoie les deux cartes en combat. La mise n'intervient ici que par les pillz retirées, la
+    fury et les capacités qui la lisent (conditions « Bet », multiplicateurs « per Pillz ») — ce qui permet à
+    `src/core/ai/round_matrix.py` de préparer une fois et de dériver les attaques de toutes les mises.
+    """
+    # Mise à jour des pillz
+    game.ally.pillz -= ((round_data.player1_pillz - 1) + 3 * round_data.player1_fury) # -1 car 1 pillz est toujours consommée
+    game.enemy.pillz -= ((round_data.player2_pillz - 1) + 3 * round_data.player2_fury) # -1 car 1 pillz est toujours consommée
+
+    # Récupérer les cartes sélectionnées
+    player1_card = game.ally.cards[round_data.player1_card_index]
+    player2_card = game.enemy.cards[round_data.player2_card_index]
+
+    # Initialiser les données de combat
+    init_fight_data(player1_card, round_data.player1_pillz, round_data.player1_fury)
+    init_fight_data(player2_card, round_data.player2_pillz, round_data.player2_fury)
+
+    # Bonus de clan : un Oculus « Infiltrated » adopte le bonus du clan majoritaire de la main ;
+    # le bonus n'est actif que si la main compte au moins 2 cartes du clan (l'Oculus compris)
+    apply_infiltrated_bonus(game.ally, player1_card)
+    apply_infiltrated_bonus(game.enemy, player2_card)
+    for player, card in ((game.ally, player1_card), (game.enemy, player2_card)):
+        if card.bonus_fight is not None and not is_clan_bonus_active(player, card):
+            clan = clan_for_bonus(player, card)
+            why = f"une seule carte {clan} en main" if clan is not None else "aucun clan infiltrable"
+            note(card, "bonus", f"{card.name} : bonus « {card.bonus_description} » inactif ({why})")
+            card.bonus_fight = None
+
+    # L'ability « Team: » d'un Leader unique s'applique à la carte jouée
+    player1_card.leader_fight = leader_team_capacity(game.ally)
+    player2_card.leader_fight = leader_team_capacity(game.enemy)
+    apply_leader_modes(game, player1_card, player2_card)
+
+    for card, is_ally, own_index, opp_index in ((player1_card, True, round_data.player1_card_index, round_data.player2_card_index),
+                                                (player2_card, False, round_data.player2_card_index, round_data.player1_card_index)):
+        for slot in FIGHT_SLOTS:
+            capacity = getattr(card, slot)
+            unmet = unmet_condition(game, capacity, is_ally, own_index, opp_index)
+            if unmet is not None:
+                note(card, "condition", f"{card.name} : {journal_label(capacity)} inactif (condition {unmet} non remplie)")
+                setattr(card, slot, None)
+
+    # Appliquer les effets de combat
+    fct_lvl_1.apply_capacity_lvl_1(player1_card, player2_card)
+    fct_lvl_2.apply_capacity_lvl_2(game, player1_card, player2_card, stats=("power", "damage"))
+
+    # Appliquer les fury
+    for card in (player1_card, player2_card):
+        if card.fury:
+            card.damage_fight += 2
+            note(card, "fury", f"{card.name} : fury → dégâts {card.damage_fight - 2} → {card.damage_fight}")
+    return player1_card, player2_card
+
+
+def compute_attacks(game: Game, player1_card: Card, player2_card: Card, round_data: ProcessRoundInput) -> None:
+    """Phase 2 — attaque = puissance × pillz, modificateurs d'attaque, Tune Out, conditions Killshot / Perfect."""
+    for card, pillz in ((player1_card, round_data.player1_pillz), (player2_card, round_data.player2_pillz)):
+        card.attack += card.power_fight * pillz
+        note(card, "attaque", f"{card.name} : attaque = {card.power_fight} × {pillz} pillz = {card.attack}")
+
+    # Modificateurs d'attaque, une fois l'attaque de base connue
+    fct_lvl_2.apply_capacity_lvl_2(game, player1_card, player2_card, stats=("attack",))
+
+    # Tune Out (Cosmohnuts) : « the Attack calculation is ignored and the winner is the player who bet the most Pillz »
+    if consume_tune_out(player1_card) | consume_tune_out(player2_card):
+        player1_card.attack, player2_card.attack = round_data.player1_pillz, round_data.player2_pillz
+        note(None, "tune_out", f"Tune Out : le round se résout aux pillz ({player1_card.name} {player1_card.attack}, {player2_card.name} {player2_card.attack})")
+
+    # Killshot : la capacité n'agit que si l'attaque vaut au moins le double de l'attaque adverse
+    apply_killshot_condition(player1_card, player2_card)
+    apply_killshot_condition(player2_card, player1_card)
+    apply_perfect_condition(player1_card, player2_card)
+    apply_perfect_condition(player2_card, player1_card)
+
+
+def resolve_fight(game: Game, player1_card: Card, player2_card: Card, round_data: ProcessRoundInput) -> None:
+    """Phase 3 — combat, réanimation, effets de fin de round, historique, cartes jouées, tour suivant."""
+    # Créer une nouvelle instance de Round
+    round_result = Round()
+    round_result.ally.card_index = round_data.player1_card_index  # Stocker l'index de la carte
+    round_result.enemy.card_index = round_data.player2_card_index  # Stocker l'index de la carte
+
+    # Résoudre le combat
+    resolve_combat(game, player1_card, player2_card, round_result)
+
+    # Un joueur tombé à 0 vie a perdu avant les effets de fin de round, sauf s'il est réanimé
+    if game.ally.life <= 0 or game.enemy.life <= 0:
+        fct_lvl_3.apply_reanimate(game, player1_card, player2_card)
+    if game.ally.life > 0 and game.enemy.life > 0:
+        fct_lvl_3.apply_capacity_lvl_3(game, player1_card, player2_card)
+        fct_lvl_4.apply_capacity_lvl_4(game, player1_card, player2_card)
+
+    # Ajouter le round au history
+    game.history.append(round_result)
+
+    # Mettre à jour le tour
+    player1_card.played = True
+    player2_card.played = True
+
+    game.nb_turn += 1
+    game.turn = not game.turn
 
 
 def resolve_combat(game: Game, player1_card: Card, player2_card: Card, round_result: Round):
