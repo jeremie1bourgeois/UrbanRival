@@ -290,6 +290,15 @@ Par ordre d'impact :
 9. ~~Cancel Life Modif. : pose du poison empêchée, ou tic du round sauté (3.3).~~ **Confirmé** (`1211922`) : Stoyan
    « Cancel Opp. Life Modif. » face à un Repair actif → le tic de vie du round est sauté, le tic de pillz est versé, les
    deux reprennent au round suivant. Un effet vie + pillz se suspend **attribut par attribut** (corrigé dans le moteur).
+10. **Confirmés sans écart** (deck D7 et divers, 2026-09-17) : Per Pillz Left = pillz au début du round, gratuite exclue
+    (`1213913`, Hundun 5 × 5 + 12) ; Bet > N compte la pillz gratuite (texte de Tyd : « Pillz gratuite comprise et Fury
+    exclue ») ; « Cards » réduit **les deux** cartes du round (`1214027`, `1214370`) ; « +X Attack Per Opp. Damage » lit
+    les dégâts imprimés ; Equalizer = × étoiles adverses (`1214370`, ×5) ; Brawl = × cartes du clan adverse en main
+    adverse ; « Max. » borne un multiplicateur (Candy Jack 3 + 10 → 8, `1214141`) ; égalité d'attaque au niveau le plus
+    bas (`1213913`), à niveau égal au premier joueur (`1211570`) ; Consume immédiat (`1212171`) ; Corrupt = perte de vie
+    du propriétaire, victoire ou défaite ; Copy: Opp. Ability copie un Stop et le retourne (`1211029`) ; After (Tolvack)
+    ; un Oculus avec trois autres clans en main n'infiltre rien (`1211570`, `1214141`). Le premier joueur du round 1 est
+    tiré au sort (`1214370`), puis l'ordre alterne.
 
 Chaque combat rejoué se transcrit dans `data/test/` (voir ROADMAP § 2.B.2) ; le journal des effets (D2) rendra la
 localisation des écarts immédiate.

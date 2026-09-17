@@ -53,7 +53,8 @@ def _nb_pillz_lost(game, player1, player2, card1, card2) -> int:
 
 
 def _nb_pillz_left(game, player1, player2, card1, card2) -> int:
-    """Pillz restantes « avant de mettre des pillz sur ton perso (sans compter la Pillz gratuite) » (glossaire 66)."""
+    """Pillz restantes « avant de mettre des pillz sur ton perso (sans compter la Pillz gratuite) » (glossaire 66 ;
+    combat réel 1213913 : Hundun 5 × 5 + 12 au round 1)."""
     return player1.pillz + (card1.pillz_fight - 1) + (3 if card1.fury else 0)   # process_round a déjà déduit la mise
 
 

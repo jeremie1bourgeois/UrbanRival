@@ -159,7 +159,8 @@ def _per_round(conditions: list, per: Optional[str]) -> list:
 
 
 def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacity:
-    """« Cards » (ex. « -2 Cards Damage, Min 1 », « Protection: Cards Power ») : l'effet porte sur les deux cartes du round."""
+    """« Cards » (ex. « -2 Cards Damage, Min 1 », « Protection: Cards Power ») : l'effet porte sur les deux cartes du round
+    (combats réels 1214027, 1214370 : la carte porteuse est réduite comme l'adverse)."""
     if _R_CARDS.search(core):
         stripped = _R_CARDS.sub("opp" if core.startswith("-") else "", core)
         parsed = _parse_core(re.sub(r"\s+", " ", stripped).strip(), conditions, prefix_hows)
