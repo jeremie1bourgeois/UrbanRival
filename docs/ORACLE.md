@@ -101,17 +101,18 @@ Deux corrections par rapport aux decks de référence :
 Ordre de rentabilité avec la collection : D4 (Tune Out, Consume, Mindwipe, Repair, Cancel Life en un duel), D1, D2a, D3,
 D6, puis D7, D8, D2b.
 
-**Journal (2026-09-17, parties contre l'adversaire d'entraînement « Smash Jabber », règle 2, 15 vies)** — 14 combats
-capturés (`data/ur_battles/12104*.json` à `1211922.json`), tous rejoués par `tests/test_ur_battles.py` :
+**Journal (2026-09-17, parties contre l'adversaire d'entraînement « Smash Jabber », règle 2, 15 vies)** — 15 combats
+capturés (`data/ur_battles/12104*.json` à `1212171.json`), tous rejoués par `tests/test_ur_battles.py` :
 
 - **D1 clos** : chaîne SoA/SoB confirmée dans les deux sens (`1210477`, `1211029`), bonus SoA contre SoA en pouvoir
   (`1210625`), quatre lectures de Stop en pouvoir contre bonus Stop. SoA contre SoA (et SoB contre SoB) en pouvoir est
   inobservable par construction : rien d'autre à stopper.
-- **D4 entamé** : Tune Out = puissances à 1, attaque = pillz (`1211279`) ; Mindwipe immédiat puis persistant, vie et pillz
+- **D4 clos** : Tune Out = puissances à 1, attaque = pillz (`1211279`) ; Mindwipe immédiat puis persistant, vie et pillz
   (deux écarts moteur corrigés, commit 30f054c) ; Tune Out avec fury : la fury ne compte pas (`1211570`, égalité 8-8
   perdue) ; Repair = +X vie **et** pillz dès le round gagné, max Y (`1211702`, troisième écart moteur corrigé) ; Cancel
   Life Modif. contre un Repair actif : la moitié vie du tic sautée, le pillz versé, reprise au round suivant (`1211922`,
-  quatrième écart corrigé : suspension par attribut). Restent : Consume au round même, Combust (aucune carte).
+  quatrième écart corrigé : suspension par attribut) ; Consume au round même (`1212171`, Wave Ld : 12 − 6 − 1 = 5) et
+  Corrupt (le propriétaire perd X vies en défaite). **D4 clos** hors Combust (aucune carte).
 - En prime : Copy: Opp. Ability (Oblivion) copie un Stop et le retourne (`1211029`) ; After (Tolvack) reproduit.
 - Capture : contre un bot qui joue instantanément, l'ordre de jeu se lit sur la carte déjà posée (correction de
   `ur_capture.js`) ; les `roundPower`/`roundDamage` des rounds passés reviennent aux valeurs de base dans les statuts
