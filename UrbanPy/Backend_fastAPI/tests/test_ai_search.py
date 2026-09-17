@@ -88,8 +88,8 @@ def test_search_does_not_burn_pillz_it_does_not_need(template_game):
     assert pick.pillz - 1 < state.ally.pillz
 
 
-def test_strategies_registry_exposes_the_four_opponents():
-    assert sorted(STRATEGIES) == ["greedy", "heuristic", "minimax", "random"]
+def test_strategies_registry_exposes_the_five_opponents():
+    assert sorted(STRATEGIES) == ["greedy", "heuristic", "minimax", "random", "solver"]
     assert STRATEGIES["greedy"] is greedy_pick and STRATEGIES["minimax"] is minimax_pick
 
 
@@ -102,6 +102,17 @@ def test_a_duel_plays_the_requested_number_of_games_and_swaps_sides():
 
     assert result.games == 6
     assert 0.0 <= result.win_rate <= 1.0
+
+
+def test_a_match_result_carries_a_wilson_interval():
+    """
+    Intervalle de Wilson à 95 % (z = 1,96), à la main : 5 victoires sur 10 → centre 0,5, demi-largeur
+    1,96·√(0,025 + 0,0096) / 1,384 = 0,263 → [0,237 ; 0,763] ; 0 sur 10 → [0 ; 0,278] ; 500 sur 1 000 → ±0,031.
+    """
+    assert arena.MatchResult(wins=5, losses=5).confidence_interval() == pytest.approx((0.237, 0.763), abs=1e-3)
+    assert arena.MatchResult(wins=0, losses=10).confidence_interval() == pytest.approx((0.0, 0.278), abs=1e-3)
+    assert arena.MatchResult(wins=500, losses=500).confidence_interval() == pytest.approx((0.469, 0.531), abs=1e-3)
+    assert "[23.7% ; 76.3%]" in str(arena.MatchResult(wins=5, losses=5))
 
 
 def test_greedy_beats_random_over_a_handful_of_games():

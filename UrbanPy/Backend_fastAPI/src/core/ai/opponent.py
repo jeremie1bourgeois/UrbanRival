@@ -2,8 +2,9 @@
 Adversaires automatiques. Un choix (Pick) suit la convention du moteur : pillz = 1 sans mise (attaque = puissance x pillz),
 la fury coûte 3 pillz de plus. Fonctions pures : elles lisent la partie sans la modifier.
 
-Quatre stratégies, de la plus faible à la plus forte : `random`, `heuristic` (règles simples, sans simulation),
-`greedy` et `minimax` (un coup d'avance, simulé par l'API moteur `src/core/ai/engine.py` — voir `search_pick`).
+Cinq stratégies, de la plus faible à la plus forte : `random`, `heuristic` (règles simples, sans simulation),
+`greedy` et `minimax` (un coup d'avance, simulé par l'API moteur `src/core/ai/engine.py` — voir `search_pick`),
+`solver` (équilibre de Nash exact sur les deux derniers rounds, minimax avant — `src/core/ai/solver.py`).
 `scripts/ai_arena.py` les fait s'affronter et donne leurs taux de victoire.
 
 Toutes ont la même signature `(game, side, rng, revealed_card=None)`. `revealed_card` est l'index de la carte
@@ -14,8 +15,9 @@ import random
 import statistics
 from typing import Callable, List, Optional, Sequence
 
-from src.core.ai.engine import FURY_COST, Pick, legal_actions, step
+from src.core.ai.engine import FURY_COST, Pick, legal_actions, next_state
 from src.core.ai.evaluation import evaluate
+from src.core.ai.solver import solver_pick
 from src.core.domain.game import NB_ROUNDS, Game
 from src.core.domain.player import Player
 
@@ -81,7 +83,7 @@ def search_pick(game: Game, side: str, rng: random.Random, aggregate: Callable[[
     replies = _sample_replies(game, _other(side), rng, nb_replies, revealed_card)
     best, best_score = None, None
     for candidate in candidates:
-        scores = [evaluate(_step_for(game, side, candidate, reply), side) for reply in replies]
+        scores = [evaluate(next_state(game, side, candidate, reply), side) for reply in replies]
         score = aggregate(scores)
         if best_score is None or (score, -candidate.pillz) > (best_score, -best.pillz):
             best, best_score = candidate, score
@@ -96,12 +98,6 @@ def greedy_pick(game: Game, side: str, rng: random.Random, revealed_card: Option
 def minimax_pick(game: Game, side: str, rng: random.Random, revealed_card: Optional[int] = None) -> Pick:
     """Minimax à un coup : le coup dont la pire réponse adverse coûte le moins."""
     return search_pick(game, side, rng, min, revealed_card=revealed_card)
-
-
-def _step_for(game: Game, side: str, own: Pick, opponent: Pick) -> Game:
-    """État après le round, vu du camp `side` (le moteur attend toujours (allié, ennemi))."""
-    ally, enemy = (own, opponent) if side == "ally" else (opponent, own)
-    return step(game, ally, enemy, log=False)[0]
 
 
 def _spread(picks: List[Pick], maximum: int) -> List[Pick]:
@@ -144,4 +140,5 @@ STRATEGIES = {
     "heuristic": heuristic_pick,
     "greedy": greedy_pick,
     "minimax": minimax_pick,
+    "solver": solver_pick,
 }

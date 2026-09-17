@@ -5,6 +5,7 @@ l'autre sur des mains tirées au hasard et compter les victoires. Les deux camps
 
 Tout passe par l'API moteur pure (`engine`) : aucune partie n'est écrite sur le disque.
 """
+import math
 import random
 from dataclasses import dataclass
 from typing import Callable, List, Tuple
@@ -34,8 +35,23 @@ class MatchResult:
         """Taux de victoire, les nulles comptant pour une demi-partie."""
         return (self.wins + 0.5 * self.draws) / self.games if self.games else 0.0
 
+    def confidence_interval(self, z: float = 1.96) -> Tuple[float, float]:
+        """
+        Intervalle de Wilson du taux de victoire (95 % par défaut). Sur 60 parties il fait ±13 points, sur 100
+        ±10, sur 1 000 ±3 : aucune comparaison de stratégies ne se lit sans lui (docs/IA.md, étape 5).
+        """
+        n = self.games
+        if n == 0:
+            return (0.0, 1.0)
+        p, z2 = self.win_rate, z * z
+        centre = (p + z2 / (2 * n)) / (1 + z2 / n)
+        half_width = z * math.sqrt(p * (1 - p) / n + z2 / (4 * n * n)) / (1 + z2 / n)
+        return (max(0.0, centre - half_width), min(1.0, centre + half_width))
+
     def __str__(self) -> str:
-        return f"{self.wins}V / {self.losses}D / {self.draws}N sur {self.games} parties ({self.win_rate:.1%})"
+        low, high = self.confidence_interval()
+        return (f"{self.wins}V / {self.losses}D / {self.draws}N sur {self.games} parties "
+                f"({self.win_rate:.1%} [{low:.1%} ; {high:.1%}])")
 
 
 def play_game(hands: Tuple[Hand, Hand], ally_strategy: Strategy, enemy_strategy: Strategy,

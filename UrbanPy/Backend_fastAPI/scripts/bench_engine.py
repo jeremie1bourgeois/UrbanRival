@@ -7,7 +7,8 @@ il faut savoir combien il en coûte un.
     python scripts/bench_engine.py --seconds 5
 
 Mesure, sur des mains tirées au hasard : la copie d'un état, un round avec et sans journal des effets, une
-partie complète jouée au hasard, et le coût d'une décision de chaque stratégie.
+partie complète jouée au hasard, le coût d'une décision de chaque stratégie au round 1, et celui du solveur
+exact sur les rounds qu'il résout (cache vidé avant chaque mesure : c'est le coût d'une fin de partie inédite).
 """
 import argparse
 import os
@@ -17,8 +18,9 @@ import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.core.ai import arena, engine                                # noqa: E402
+from src.core.ai import arena, engine, solver                        # noqa: E402
 from src.core.ai.opponent import STRATEGIES                          # noqa: E402
+from src.core.domain.game import NB_ROUNDS                           # noqa: E402
 
 
 def measure(label: str, action, seconds: float, unit: str = "appels") -> None:
@@ -54,6 +56,22 @@ def main() -> None:
     for name, strategy in STRATEGIES.items():
         measure(f"décision « {name} » (round 1)", lambda strategy=strategy: strategy(fresh, "ally", rng),
                 args.seconds, "décisions")
+
+    for round_number, pillz in ((NB_ROUNDS, 12), (NB_ROUNDS - 1, 6)):
+        state = endgame(fresh, round_number, pillz)
+        measure(f"solveur exact (round {round_number}, {pillz} pillz)",
+                lambda state=state: (solver.clear_cache(), solver.solve(state)), args.seconds, "résolutions")
+
+
+def endgame(game, round_number: int, pillz: int):
+    """La partie amenée au round demandé : premières cartes jouées, `pillz` restantes de chaque côté."""
+    state = engine.clone(game)
+    state.nb_turn = round_number
+    state.ally.pillz = state.enemy.pillz = pillz
+    for cards in (state.ally.cards, state.enemy.cards):
+        for index, card in enumerate(cards):
+            card.played = index < round_number - 1
+    return state
 
 
 if __name__ == "__main__":

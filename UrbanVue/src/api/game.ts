@@ -6,7 +6,7 @@ const apiClient = axios.create({
 	headers: { "Content-Type": "application/json" },
 });
 
-export type Opponent = "human" | "random" | "heuristic" | "greedy" | "minimax";
+export type Opponent = "human" | "random" | "heuristic" | "greedy" | "minimax" | "solver";
 
 export const OPPONENT_LABELS: Record<Opponent, string> = {
 	human: "Deux joueurs (même écran)",
@@ -14,6 +14,7 @@ export const OPPONENT_LABELS: Record<Opponent, string> = {
 	heuristic: "Ordinateur — heuristique",
 	greedy: "Ordinateur — glouton (simule un coup)",
 	minimax: "Ordinateur — minimax (simule un coup)",
+	solver: "Ordinateur — solveur (parfait sur les deux derniers rounds)",
 };
 
 export interface StartedGame {

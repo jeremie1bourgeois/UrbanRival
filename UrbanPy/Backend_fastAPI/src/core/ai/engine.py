@@ -126,6 +126,12 @@ def step(state: Game, ally_action: Pick, enemy_action: Pick, *, in_place: bool =
                                   done=is_terminal(next_state), log=played.log)
 
 
+def next_state(state: Game, side: str, own: Pick, opponent: Pick) -> Game:
+    """État après le round vu du camp `side` : `own` est son choix, `opponent` celui d'en face (sans journal)."""
+    ally, enemy = (own, opponent) if side == "ally" else (opponent, own)
+    return step(state, ally, enemy, log=False)[0]
+
+
 def is_terminal(state: Game) -> bool:
     """La partie est finie : quatre rounds joués, ou un joueur à 0 vie."""
     return result(state) is not GameResult.NONE

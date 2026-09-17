@@ -76,6 +76,7 @@ Leaders. Sans effet sur la façon de jouer une main donnée (confirmé par l'uti
         ├── solver.py         induction arrière mémoïsée : rounds 4 et 3 exacts
         ├── round_matrix.py   matrice de gains d'un round (chemin analytique rapide + repli moteur)
         ├── policy.py         nash_pick : résout le sous-jeu, tire la mise au sort dans la stratégie mixte
+        ├── exploitability.py meilleure réponse à une politique : la mesure ε
         └── exploit.py        modèle d'adversaire + meilleure réponse *sûre*
 ```
 
@@ -141,26 +142,41 @@ joueur voit toujours la carte posée par le premier, jamais ses pillz ni sa fury
 Non nécessaire pour jouer : la **liste des bannis ELO** ne change rien à l'IA (l'utilisateur l'a
 confirmé) — elle ne concerne que la composition de deck, donc la phase 2.
 
-### Étape 2 — Solveur exact de fin de partie, sur le moteur actuel (3-5 j)
+### Étape 2 — Solveur exact de fin de partie, sur le moteur actuel — ✅ fait le 2026-09-17
 
-Le solveur d'abord, la vitesse ensuite. Avec `engine.step` à 0,17 ms, un round 4 se résout en
-23 × 23 × 0,17 ms ≈ **90 ms** — jouable dans l'interface dès maintenant — et un round 3 en dizaines de
-secondes (2 116 feuilles, quelques centaines d'états de round 4 distincts après mémoïsation) : lent, mais
-testable. Ce chemin lent est l'oracle de l'étape 3, et il existe avant qu'on optimise quoi que ce soit.
+Le solveur d'abord, la vitesse ensuite : construit sur `engine.step` tel quel, le chemin lent est l'oracle de
+l'étape 3.
 
-- `equilibrium.py` : `solve_matrix(M) -> (valeur, stratégie ligne, stratégie colonne)` par programmation
-  linéaire (`scipy.optimize.linprog`, HiGHS). Élimination itérée des mises dominées avant le LP (l'attaque est
-  monotone en pillz : miser plus que nécessaire est dominé). Tests : pile ou face → 50/50, équilibre pur
-  connu, jeu symétrique → valeur 0, matrice à lignes dominées.
-- `solver.py` : induction arrière mémoïsée sur une clé canonique (round, vies, pillz, cartes restantes,
-  effets persistants, premier joueur). Par état : une matrice par carte du premier joueur, un LP chacune, max
-  sur les cartes. Round 4, puis round 3.
-- Livrables : une stratégie `solver` **parfaite sur les deux derniers rounds** — donc déjà imbattable
-  en fin de partie — exposée dans `STRATEGIES` et `/ai_pick` (jalon visible : le dernier round ne se perd
-  plus), et un **oracle de valeurs** pour tester le reste.
-- Point d'attention : `linprog` coûte 1 à 5 ms de frais fixes par appel. Si les dizaines de milliers de
-  petits LP de l'étape 4 le rendent trop lent, un solveur dédié aux petites matrices (ou un lot vectorisé)
-  le remplace — sans changer l'interface de `solve_matrix`.
+- `equilibrium.solve_matrix(M)` : valeur et stratégies mixtes d'un jeu matriciel par un **seul** LP
+  (`scipy.optimize.linprog`, HiGHS) — la stratégie de la colonne est lue dans le dual des contraintes par
+  colonne. ~1,5 ms par LP, quelle que soit la taille (5 × 5 ou 23 × 46) : ce sont des frais fixes.
+  Tests : pile ou face → 50/50, point-selle, mélange asymétrique (valeur 1/2, colonne 3/8), pierre-feuille-ciseaux.
+- `solver.solve(state)` : par carte du premier joueur, une matrice (ses mises) × (carte et mise du second) dont
+  les cellules valent `value(état suivant)` ; carte pure, mises mixtes, réponse du second par carte vue
+  (`Solution.bets`, `.replies`, `.card_values`). Mémoïsation sur `canonical_key` (round, premier joueur, vies,
+  pillz, cartes jouées, effets persistants, résultat et cartes du round précédent). Tests à la main : dernier
+  round gagné à coup sûr (+1), fury seule mise gagnante, round perdu (-1), et un **round 3 « pile ou face »**
+  (Wardog/Meroo contre Lilith/Natrang, 5 vies, 1 pillz) dont les 16 feuilles sont calculées dans la docstring :
+  valeur 0, mises 50/50, réponse de l'ennemi différente selon la carte vue.
+- Stratégie **`solver`** dans `STRATEGIES`, `/ai_pick` et l'interface : exacte sur les deux derniers rounds
+  (`EXACT_ROUNDS = 2`), minimax avant. Partie complète jouée dans l'interface : au round 4, l'ordinateur en
+  second a misé exactement ce qu'il fallait pour battre la plus haute attaque possible de la carte vue.
+- **Exploitabilité, déjà exacte sur les rounds résolus** : `exploitability.best_response_value(state, camp,
+  politique)` (meilleure réponse exhaustive à une politique donnée sous forme de probabilités). Test : sur le
+  round 3 « pile ou face », l'exploiteur n'obtient que la valeur du jeu de quelque côté qu'il joue (ε = 0), et
+  il gagne +1 contre l'heuristique (mise déterministe). `solver.distribution` expose la politique du solveur
+  sous cette forme ; c'est l'interface des politiques de l'étape 4.
+- `arena.MatchResult.confidence_interval()` : intervalle de Wilson à 95 %, affiché par `scripts/ai_arena.py`.
+
+Mesures (`scripts/bench_engine.py`) : round 4 à 12 pillz **95 ms** ; round 3 à 6 pillz 2,5 s (416 états),
+à 8 pillz 8,6 s, à 12 pillz **37 s** (1 512 états de round 4). Moitié du temps dans `engine.step`
+(0,17 ms × ~300 000 rounds), moitié dans les LP — l'étape 3 s'attaque à la première ; pour la seconde,
+un solveur dédié aux petites matrices reste l'option. Première mesure, **sans conclusion possible** :
+solveur contre minimax 58 % [41 ; 74] sur 30 parties (3 min, ~6 s la partie : pas de 1 000 parties avant
+l'étape 3).
+
+Non fait, et pourquoi : l'élimination des mises dominées avant le LP — le LP coûte ses frais fixes, pas sa
+taille ; elle ne rapporterait rien tant que `engine.step` domine.
 
 ### Étape 3 — Matrice de round rapide (2-3 j, guidée par le profil)
 
@@ -249,7 +265,7 @@ de bans) sur `solver.value(main_a, main_b)`.
 
 ```bash
 cd UrbanPy/Backend_fastAPI
-.venv/bin/python -m pytest -q                      # 450 tests aujourd'hui
+.venv/bin/python -m pytest -q                      # 497 tests aujourd'hui
 .venv/bin/python scripts/engine_crash_sweep.py     # 0 exception
 .venv/bin/python scripts/capacity_coverage.py | head -1
 .venv/bin/python scripts/bench_engine.py           # débit moteur, coût d'une décision
@@ -259,17 +275,17 @@ cd UrbanPy/Backend_fastAPI
 
 Tests à écrire, dans l'esprit du dépôt (attentes calculées à la main) :
 
-- `equilibrium` : jeux matriciels de référence (pile ou face → 50/50, équilibre pur, symétrie → 0), lignes
-  et colonnes dominées éliminées sans changer la valeur.
-- `solver` : sur des fins de partie minuscules, valeur trouvée = valeur calculée à la main (ex. dernier
-  round, 1 vie contre 2, 3 pillz contre 0) ; **en premier, la carte jouée est pure et seules les mises sont
-  mixtes ; en second, la réponse dépend de la carte vue** ; la politique optimale bat toute stratégie fixe
-  dans ce sous-jeu.
+- ✅ `equilibrium` : jeux matriciels de référence (pile ou face → 50/50, point-selle, mélange asymétrique,
+  pierre-feuille-ciseaux → 0).
+- ✅ `solver` : fins de partie minuscules, valeur trouvée = valeur calculée à la main ; en premier, la carte
+  jouée est pure et seules les mises sont mixtes ; en second, la réponse dépend de la carte vue ; mémoïsation.
+- ✅ `exploitability` : sur un sous-jeu résolu, la meilleure réponse n'obtient que la valeur (ε = 0) ; une
+  mise déterministe est exploitée.
+- ✅ `arena` : intervalle de Wilson juste sur des cas connus (0/10, 5/10, 1 000 parties).
 - `round_matrix` : identité cellule à cellule avec `engine.step` sur toutes les capacités gérées (chemin
   lent de l'étape 2 = chemin rapide de l'étape 3, même valeur de solveur).
 - `policy` : distribution sur des coups légaux, reproductible à graine fixée, strictement mixte là où
   elle doit l'être.
-- `arena` : intervalle de Wilson juste sur des cas connus (0/10, 5/10, 1 000 parties).
 - Bout en bout : une partie ELO complète dans l'interface contre l'adversaire « nash » avant de déclarer
   le chantier fini (convention du dépôt).
 
