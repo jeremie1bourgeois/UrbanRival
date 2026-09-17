@@ -14,6 +14,7 @@ import pytest
 from src.core.ai import engine, solver
 from src.core.ai.engine import Pick
 from src.core.ai.opponent import STRATEGIES, minimax_pick
+from src.core.domain.capacity import Capacity
 from src.core.domain.game import NB_ROUNDS
 
 
@@ -23,12 +24,14 @@ def fresh_cache():
     solver.clear_cache()
 
 
-def endgame(ally, enemy, life, pillz, ally_first, rounds_left=1):
+def endgame(ally, enemy, life, pillz, ally_first, rounds_left=1, history=None):
     """Fin de partie : `ally` / `enemy` sont les cartes restantes `[(nom, étoiles), ...]`, une par round restant."""
     state = engine.new_game(ally, enemy, life=1, pillz=0, ally_first=ally_first)
     state.nb_turn = NB_ROUNDS - rounds_left + 1
     state.ally.life, state.enemy.life = life
     state.ally.pillz, state.enemy.pillz = pillz
+    if history is not None:
+        state.history.extend(history)
     return state
 
 
@@ -146,3 +149,32 @@ def test_before_the_last_two_rounds_the_solver_plays_like_minimax(template_game)
 
 def test_the_solver_is_a_registered_strategy():
     assert STRATEGIES["solver"] is solver.solver_pick
+
+
+def test_the_previous_round_is_in_the_key_only_when_a_capacity_reads_it():
+    """
+    Revenge / Confidence / After lisent le round précédent ; sans elles, deux états qui n'en diffèrent que par
+    lui sont le même sous-jeu (moitié moins d'états de round 4 dans un solveur complet).
+    """
+    from src.core.domain.round import Round
+    lost, won = Round(), Round()
+    lost.ally.win, lost.enemy.win = False, True
+    won.ally.win, won.enemy.win = True, False
+    plain = [endgame([("Wardog", 2)], [("Lilith", 3)], (5, 5), (3, 3), True, history=[h]) for h in (lost, won)]
+    revenge = [endgame([("Wardog", 2)], [("Lilith", 3)], (5, 5), (3, 3), True, history=[h]) for h in (lost, won)]
+    for state in revenge:
+        state.ally.cards[0].ability = Capacity("ally", ["power"], 2, -1, "", ["revenge"])
+
+    assert solver.canonical_key(plain[0]) == solver.canonical_key(plain[1])
+    assert solver.canonical_key(revenge[0]) != solver.canonical_key(revenge[1])
+
+
+def test_last_round_states_are_remembered_by_value_only():
+    """Un solveur complet visite des centaines de milliers d'états de dernier round : on n'en garde que la valeur."""
+    state = coin_flip_third_round()
+
+    solver.solve(state)
+
+    assert len(solver._cache) == 1                       # la solution du round 3 lui-même
+    assert sum(key[0] == NB_ROUNDS for key in solver._values) == len(solver._values) - 1
+    assert len(solver._values) > 1

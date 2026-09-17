@@ -10,8 +10,9 @@ jeu ; le second répond à la carte vue par la stratégie colonne du jeu de cett
 Les valeurs sont celles de l'allié : +1 partie gagnée, -1 perdue, 0 nulle (`engine.reward`).
 
 Mémoïsation sur une clé canonique de l'état public (`canonical_key`) : deux chemins qui mènent au même état
-(mêmes mains, vies, pillz, cartes jouées, effets persistants, résultat du round précédent, premier joueur)
-partagent la solution. Le cache est global au processus ; `clear_cache()` le vide.
+(mêmes mains, vies, pillz, cartes jouées, effets persistants, premier joueur — et le résultat du round précédent
+quand une capacité le lit) partagent la solution. Les états du dernier round, de loin les plus nombreux, ne
+gardent que leur valeur. Le cache est global au processus ; `clear_cache()` le vide.
 """
 import random
 from dataclasses import dataclass
@@ -38,31 +39,46 @@ class Solution:
     card_values: Dict[int, float]           # valeur pour l'allié si le premier pose chaque carte
 
 
-_cache: Dict[tuple, Solution] = {}
+_cache: Dict[tuple, Solution] = {}      # solutions des rounds avant le dernier
+_values: Dict[tuple, float] = {}        # valeurs des états du dernier round (des centaines de milliers dans un solveur complet)
+
+# Conditions qui lisent le round précédent : lui seul justifie de le mettre dans la clé.
+HISTORY_CONDITIONS = ("revenge", "confidence", "after")
 
 
 def solve(state: Game) -> Solution:
     key = canonical_key(state)
     solution = _cache.get(key)
     if solution is None:
-        solution = _cache[key] = _solve(state)
+        solution = _solve(state)
+        if state.nb_turn < NB_ROUNDS:
+            _cache[key] = solution
+        _values[key] = solution.value
     return solution
 
 
 def clear_cache() -> None:
     _cache.clear()
+    _values.clear()
 
 
 def canonical_key(state: Game) -> tuple:
     """
     Tout ce que le moteur lit pour jouer la suite de la partie : round et premier joueur, puis par camp vies,
     pillz, cartes (identité et jouée ou non), effets persistants ; enfin le résultat et les cartes du round
-    précédent (conditions Revenge / Confidence / After).
+    précédent, seulement si une capacité des deux mains les lit (Revenge / Confidence / After).
     """
-    last = state.history[-1] if state.history else None
+    last = state.history[-1] if state.history and _history_matters(state) else None
     return (state.nb_turn, state.turn,
             _player_key(state.ally), _player_key(state.enemy),
             None if last is None else (last.ally.card_index, last.ally.win, last.enemy.card_index, last.enemy.win))
+
+
+def _history_matters(state: Game) -> bool:
+    return any(condition.startswith(HISTORY_CONDITIONS)
+               for player in (state.ally, state.enemy) for card in player.cards
+               for capacity in (card.ability, card.bonus) if capacity is not None
+               for condition in capacity.effect_conditions)
 
 
 def _player_key(player) -> tuple:
@@ -120,7 +136,8 @@ def value(state: Game) -> float:
     """Valeur de l'état pour l'allié : la récompense si la partie est finie, sinon celle de l'équilibre."""
     if engine.is_terminal(state):
         return engine.reward(state, "ally")
-    return solve(state).value
+    cached = _values.get(canonical_key(state))
+    return solve(state).value if cached is None else cached
 
 
 def _picks_by_card(picks: List[Pick]) -> Dict[int, List[Pick]]:

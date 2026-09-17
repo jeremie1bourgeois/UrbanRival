@@ -208,18 +208,27 @@ round 4). Solveur contre minimax : **56,5 % [49,6 ; 63,2] sur 200 parties** (8 m
 avantage au mieux léger, attendu : la différence ne porte que sur les deux derniers rounds, et un équilibre de
 Nash ne cherche pas à punir un adversaire déterministe (c'est l'étape 6).
 
-### Étape 3 bis — Le solveur complet, hors ligne : l'ébauche à temps illimité
+### Étape 3 bis — Le solveur complet, hors ligne : l'ébauche à temps illimité — ✅ fait le 2026-09-17
 
-Le même `solver.py` avec `EXACT_ROUNDS = 4` résout un affrontement de mains de bout en bout : valeur du duel,
-stratégie exacte dès le round 1, ε = 0 vérifié sur les quatre rounds. Compte tenu de l'étape 3, de l'ordre de
-quelques centaines de milliers d'états de rounds 3-4 par affrontement — **des dizaines de minutes**, parallélisable
-par sous-jeu de round 2 ; sans l'étape 3, des dizaines d'heures.
+Le même `solver.py` résout un affrontement de mains de bout en bout, exactement, dès le round 1 :
+`scripts/solve_matchup.py` (mains de la partie d'exemple, au hasard, ou nommées) donne pour chaque premier
+joueur la valeur de la partie, la carte et les mises du round 1, les états visités, et avec `--epsilon` la
+meilleure réponse à la politique de chaque côté.
 
-- `scripts/solve_matchup.py` : deux mains → valeur, stratégie de round 1, ε sur la partie entière, temps.
-- C'est **l'oracle** de l'étape 4 : chaque approximation (grille de mises, évaluation des feuilles) se mesure
-  contre lui — écart de valeur et ε réel — au lieu de se régler à l'aveugle.
-- Ce qu'il ne donne pas : une décision de round 1 en quelques secondes sur des mains jamais vues (on ne
-  précalcule pas 2 497² affrontements). C'est le rôle de l'étape 4.
+- Pour tenir en mémoire : les états du dernier round (les plus nombreux) ne gardent que leur **valeur**
+  (`solver._values`), et le round précédent n'entre dans la clé canonique que si une capacité le lit
+  (Revenge / Confidence / After) — ×4,7 états de round 4 en moins sur la partie d'exemple.
+- `exploitability.best_response_value` mémoïse sur l'état public : la meilleure réponse à une partie entière
+  coûte quelques secondes à 4 pillz.
+- **Vérifié** sur la partie d'exemple à 4 pillz : **ε = 0,000000** des deux côtés, allié premier
+  (valeur -0,775, 36 s, 20 000 états) comme ennemi premier (-0,437, 38 s, 40 000 états). Valeur du duel
+  -0,606 : la main ennemie est meilleure, et **poser en premier coûte** (-0,78 contre -0,44) — l'information
+  donnée à l'adversaire se paie. Le solveur ne prétend pas gagner ce duel, il le joue au mieux.
+- À 12 pillz : voir la mesure ci-dessous une fois faite.
+
+Ce qu'il ne donne pas : une décision de round 1 en quelques secondes sur des mains jamais vues (on ne
+précalcule pas 2 497² affrontements). C'est le rôle de l'étape 4, dont il est **l'oracle** : chaque
+approximation (grille de mises, évaluation des feuilles) se mesure contre lui — écart de valeur et ε réel.
 
 ### Étape 4 — Recherche à profondeur limitée, dans le temps imparti (1-2 semaines)
 
@@ -298,13 +307,13 @@ de bans) sur `solver.value(main_a, main_b)`.
 
 ```bash
 cd UrbanPy/Backend_fastAPI
-.venv/bin/python -m pytest -q                      # 520 tests aujourd'hui
+.venv/bin/python -m pytest -q                      # 523 tests aujourd'hui
 .venv/bin/python scripts/engine_crash_sweep.py     # 0 exception
 .venv/bin/python scripts/capacity_coverage.py | head -1
 .venv/bin/python scripts/bench_engine.py           # débit moteur, coût d'une décision
 .venv/bin/python scripts/ai_arena.py --games 1000  # échelle entre stratégies, avec intervalles
 .venv/bin/python scripts/round_matrix_sweep.py     # (étape 3) matrice rapide = moteur, cellule à cellule
-.venv/bin/python scripts/solve_matchup.py A B      # (étape 3 bis) un affrontement résolu de bout en bout
+.venv/bin/python scripts/solve_matchup.py --template --pillz 4 --epsilon   # (étape 3 bis) un affrontement résolu de bout en bout, ε = 0
 .venv/bin/python scripts/exploitability.py         # (étape 5) LE critère : ε → 0
 ```
 
