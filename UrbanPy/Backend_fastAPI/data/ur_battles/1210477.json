@@ -1,0 +1,231 @@
+{
+ "_comment": "Combat réel Urban Rivals capturé le 2026-09-17 via battles.status du client web (scripts/ur_capture.js), deck D1 A de docs/ORACLE.md. Round 2 : SoA en pouvoir (Cesare, bonus All Stars actif) contre SoB en pouvoir (Kobalth) — le SoA bloque le SoB, le bonus s'applique (résolution en chaîne, support art. 91). pillz = pillz jouées, gratuite comprise ; after.life null = non observé (fin de partie).",
+ "battle_id": 1210477,
+ "rule_id": 2,
+ "p0": {
+  "name": "jere'm",
+  "base_life": 15,
+  "base_pillz": 12,
+  "cards": [
+   {
+    "id": 1381,
+    "level": 2
+   },
+   {
+    "id": 677,
+    "level": 2
+   },
+   {
+    "id": 597,
+    "level": 2
+   },
+   {
+    "id": 137,
+    "level": 3
+   }
+  ]
+ },
+ "p1": {
+  "name": "Smash Jabber",
+  "base_life": 15,
+  "base_pillz": 12,
+  "cards": [
+   {
+    "id": 2612,
+    "level": 4
+   },
+   {
+    "id": 876,
+    "level": 2
+   },
+   {
+    "id": 151,
+    "level": 2
+   },
+   {
+    "id": 773,
+    "level": 3
+   }
+  ]
+ },
+ "rounds": [
+  {
+   "round": 1,
+   "first": "p1",
+   "before": {
+    "life": [
+     15,
+     15
+    ],
+    "pillz": [
+     12,
+     12
+    ]
+   },
+   "p0": {
+    "index": 0,
+    "pillz": 3,
+    "fury": false,
+    "power": 6,
+    "damage": 2,
+    "attack": 18,
+    "won": false
+   },
+   "p1": {
+    "index": 0,
+    "pillz": 6,
+    "fury": false,
+    "power": 6,
+    "damage": 6,
+    "attack": 36,
+    "won": true
+   },
+   "post_round": [
+    [],
+    []
+   ],
+   "after": {
+    "life": [
+     9,
+     15
+    ],
+    "pillz": [
+     10,
+     7
+    ]
+   }
+  },
+  {
+   "round": 2,
+   "first": "p0",
+   "before": {
+    "life": [
+     9,
+     15
+    ],
+    "pillz": [
+     10,
+     7
+    ]
+   },
+   "p0": {
+    "index": 1,
+    "pillz": 3,
+    "fury": false,
+    "power": 6,
+    "damage": 1,
+    "attack": 18,
+    "won": false
+   },
+   "p1": {
+    "index": 3,
+    "pillz": 5,
+    "fury": false,
+    "power": 4,
+    "damage": 4,
+    "attack": 20,
+    "won": true
+   },
+   "post_round": [
+    [],
+    []
+   ],
+   "after": {
+    "life": [
+     5,
+     15
+    ],
+    "pillz": [
+     8,
+     3
+    ]
+   }
+  },
+  {
+   "round": 3,
+   "first": "p0",
+   "before": {
+    "life": [
+     5,
+     15
+    ],
+    "pillz": [
+     8,
+     3
+    ]
+   },
+   "p0": {
+    "index": 3,
+    "pillz": 6,
+    "fury": false,
+    "power": 4,
+    "damage": 4,
+    "attack": 24,
+    "won": true
+   },
+   "p1": {
+    "index": 1,
+    "pillz": 1,
+    "fury": false,
+    "power": 7,
+    "damage": 4,
+    "attack": 7,
+    "won": false
+   },
+   "post_round": [
+    [],
+    []
+   ],
+   "after": {
+    "life": [
+     5,
+     11
+    ],
+    "pillz": [
+     3,
+     3
+    ]
+   }
+  },
+  {
+   "round": 4,
+   "first": "p0",
+   "before": {
+    "life": [
+     5,
+     11
+    ],
+    "pillz": [
+     3,
+     3
+    ]
+   },
+   "p0": {
+    "index": 2,
+    "pillz": 4,
+    "fury": false,
+    "power": 6,
+    "damage": 2,
+    "attack": 24,
+    "won": true
+   },
+   "p1": {
+    "index": 2,
+    "pillz": 4,
+    "fury": false,
+    "power": 4,
+    "damage": 3,
+    "attack": 16,
+    "won": false
+   },
+   "post_round": [
+    [],
+    []
+   ],
+   "after": {
+    "life": null,
+    "pillz": null
+   }
+  }
+ ]
+}
