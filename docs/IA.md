@@ -224,7 +224,11 @@ meilleure réponse à la politique de chaque côté.
   (valeur -0,775, 36 s, 20 000 états) comme ennemi premier (-0,437, 38 s, 40 000 états). Valeur du duel
   -0,606 : la main ennemie est meilleure, et **poser en premier coûte** (-0,78 contre -0,44) — l'information
   donnée à l'adversaire se paie. Le solveur ne prétend pas gagner ce duel, il le joue au mieux.
-- À 12 pillz : voir la mesure ci-dessous une fois faite.
+- **À 12 pillz, 14 vies** (la vraie partie d'exemple) : allié premier -0,763 en **20 min** (160 000 états de
+  round 4, 100 000 de round 3, 6 000 de round 2, 527 Mo) ; ennemi premier -0,495 en 21 min (320 000 / 204 000 /
+  12 000 états, 943 Mo). Valeur du duel **-0,629**. Au round 1, l'allié pose Allison et mélange neuf mises
+  (0 à 38 %, 9 à 16 %, 8 à 13 %…) ; l'ennemi pose Serafina et en mélange sept. C'est **une heure de calcul par
+  affrontement** sur un cœur, sans ε (des heures de plus) : un oracle, pas un joueur.
 
 Ce qu'il ne donne pas : une décision de round 1 en quelques secondes sur des mains jamais vues (on ne
 précalcule pas 2 497² affrontements). C'est le rôle de l'étape 4, dont il est **l'oracle** : chaque
