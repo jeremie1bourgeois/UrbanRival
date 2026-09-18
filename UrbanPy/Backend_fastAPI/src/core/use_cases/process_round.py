@@ -366,11 +366,13 @@ def apply_infiltrated_bonus(player: Player, card: Card) -> None:
 
 
 def is_clan_bonus_active(player: Player, card: Card) -> bool:
-    """Règle Urban Rivals : le bonus de clan s'active si la main (les 4 cartes) compte au moins 2 cartes du clan."""
+    """Règle Urban Rivals : le bonus de clan s'active si la main (les 4 cartes) compte au moins 2 personnages
+    distincts du clan — plusieurs exemplaires d'une même carte ne comptent que pour un."""
     clan = clan_for_bonus(player, card)
     if clan is None:
         return False
-    return sum(1 for c in player.cards if clan_for_bonus(player, c) == clan) >= MIN_CLAN_CARDS_FOR_BONUS
+    clan_mates = {c.name for c in player.cards if clan_for_bonus(player, c) == clan}
+    return len(clan_mates) >= MIN_CLAN_CARDS_FOR_BONUS
 
 
 def init_fight_data(card: Card, nb_pillz: int, fury: bool):
