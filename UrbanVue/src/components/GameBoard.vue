@@ -203,10 +203,10 @@ async function save() {
 									class="py-1 pr-2"
 									:class="played.win ? 'text-green-300' : 'text-gray-400'"
 								>
-									{{ played.name }} · {{ played.pillz }} pillz<template v-if="played.fury"> + fury</template> · P{{ played.power }} D{{
-										played.damage
+									{{ played.name }} · {{ played.pillz }} pillz<template v-if="played.fury"> + fury</template> · P{{
+										played.power
 									}}
-									· attaque {{ played.attack }}
+									D{{ played.damage }} · attaque {{ played.attack }}
 									<span v-if="played.win">✓</span>
 								</td>
 								<td class="py-1">{{ round.lifeAfter.ally }} / {{ round.lifeAfter.enemy }}</td>
@@ -217,7 +217,13 @@ async function save() {
 										<li
 											v-for="(entry, index) in round.log"
 											:key="index"
-											:class="entry.side === 'ally' ? 'text-yellow-200' : entry.side === 'enemy' ? 'text-sky-200' : 'text-gray-100 font-semibold'"
+											:class="
+												entry.side === 'ally'
+													? 'text-yellow-200'
+													: entry.side === 'enemy'
+														? 'text-sky-200'
+														: 'text-gray-100 font-semibold'
+											"
 										>
 											{{ entry.text }}
 										</li>

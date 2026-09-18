@@ -2,7 +2,8 @@
 
 Objectif : une IA qui gagne un maximum de parties d'Urban Rivals, capable de faire face à n'importe quelle situation
 que le moteur sait jouer. Le projet est aussi un projet d'apprentissage : **chaque étape doit être comprise avant de
-passer à la suivante**, et chaque étape produit une IA jouable et mesurable.
+passer à la suivante**, même si cela ralentit le projet. Cette exigence ne doit jamais brider la force de l'IA : la
+méthode choisie est celle qui donne l'IA la plus forte, et on prend le temps de la comprendre.
 
 Ce document est fait pour être relu à chaque doute sur la manière de faire, et pour évoluer : chaque étape porte un
 statut (⬜ à faire · 🟨 en cours · ✅ fait), un critère de fin, et une rubrique « ce que tu dois savoir expliquer ».
@@ -115,12 +116,13 @@ Le moteur (`process_round`) est déjà une fonction ; il manque une façade stab
 Le tout doit rester **indépendant des valeurs de départ** (vies, pillz) : l'IA doit faire face à n'importe quelle
 situation que le moteur sait jouer ; aucune constante « 12 » dans le code de l'IA.
 
-**Préalable moteur — doublons et bonus de clan.** Une main peut contenir plusieurs exemplaires d'une même carte
-(même niveau ou non) ; ils comptent **pour un seul** dans le « ≥ 2 cartes du clan » qui active le bonus (règle
-confirmée par l'utilisateur, cohérente avec le wiki : « This doesn't apply to the same Characters »). Le moteur actuel
-compte les exemplaires (`is_clan_bonus_active` somme les cartes du clan) : à corriger avant l'étape 0 — compter les
-**noms distincts** par clan, avec un test « deux exemplaires seuls de leur clan → bonus inactif ». Cas voisins non
-tranchés : Oculus infiltré avec doublons, deux exemplaires du même Leader (§ 9).
+**Doublons et bonus de clan.** Une main peut contenir plusieurs exemplaires d'une même carte (même niveau ou non) ;
+ils comptent **pour un seul** dans le « ≥ 2 cartes du clan » qui active le bonus (règle confirmée par l'utilisateur,
+cohérente avec le wiki : « This doesn't apply to the same Characters »). Le moteur compte les **noms distincts** par
+clan (`is_clan_bonus_active`, test « deux exemplaires seuls de leur clan → bonus inactif »). **Ne pas oublier le
+pouvoir `Support`** : il compte lui aussi les cartes du clan en main et fonctionne potentiellement comme le bonus
+(exemplaires ou noms distincts ?) — à tester en combat réel avant de le corriger. Cas voisins non tranchés : Oculus
+infiltré avec doublons, deux exemplaires du même Leader (§ 9).
 
 ### 3.2 Générateur de mains
 Des mains de 4 cartes au hasard parmi 2 497 n'activent presque jamais un bonus de clan (≥ 2 cartes du clan) : elles
@@ -298,8 +300,10 @@ Prototype branché sur `process_round` (deepcopy + `ProcessRoundInput`), mains r
 Le moteur fait ~1 000 `step`/s (~1 ms : deepcopy + `process_round`) et **99 % du temps est dans `step`** ; les LP
 sont négligeables tant que le moteur est lent.
 
-Conclusion : la résolution complète d'une partie n'est pas un outil de jeu ; c'est un outil de laboratoire
-(référence, étiquettes), et il exige les réductions ci-dessous.
+Conclusion : à ce coût, la résolution complète d'une partie est un outil de laboratoire (référence, étiquettes) ;
+elle ne devient un outil de jeu que si les réductions ci-dessous la ramènent dans le temps qu'on accepte par coup
+(question § 9). Le solveur exact reste l'IA la plus forte possible : tout ce qui suit n'est qu'une façon de s'en
+approcher là où il est trop lent.
 
 ### 5.4 Réductions de coût, dans l'ordre
 1. **Vitesse du moteur** (décision § 8 : à optimiser, chiffres cibles) : à 10 µs par `step`, la partie entière tombe
@@ -394,7 +398,7 @@ pourquoi on joue avec recherche + réseau, pas réseau seul.
 ### Critère de fin
 Erreur sur mains jamais vues journalisée et décroissante avec la quantité de données ; l'IA « Nash-1 + réseau » bat
 Nash-1 (heuristique) en arène, et n'est pas distinguable de Nash-exact sur les états de round 3 ; elle joue sur
-n'importe quelle main en moins d'une seconde.
+n'importe quelle main dans le temps par coup fixé par l'usage (§ 9).
 
 ### Ce que tu dois savoir expliquer
 Pourquoi l'encodage structuré vaut mieux que le texte ; pourquoi le découpage se fait par mains et non par états ;
@@ -428,13 +432,15 @@ ce que la recherche corrige ; pourquoi on n'a pas besoin de résoudre des partie
 | 2026-09-18 | **Mains données** (4 cartes par joueur, comme le moteur) ; le tirage 4 parmi 8 sera traité plus tard (étape 4, espérance sur les tirages). | Séparer le jeu de la main du choix de la main. |
 | 2026-09-18 | **La vitesse du moteur n'est pas un sujet bloquant** : elle sera optimisée (cibles § 5.4) ; GPU disponibles pour l'étape 3. | Les étapes 0-1 tournent avec le moteur actuel ; les mesures § 5.3 fixent les objectifs de l'optimisation. |
 | 2026-09-18 | L'ancienne IA (adversaire heuristique, `ia_old/`) n'est pas reprise : l'étape 0 repart de zéro. | Repartir sur une base pensée pour la recherche (pureté, clé d'état, arène). |
-| 2026-09-18 | **Tous les niveaux de chaque carte sont jouables ; les doublons sont possibles** (même carte plusieurs fois, niveaux identiques ou non, selon le mode) **et comptent pour un seul dans le bonus de clan**. | Règle du jeu confirmée par l'utilisateur. Conséquences : identité de carte = (nom, niveau) ; le générateur de mains produit niveaux et doublons ; le réseau encode la carte au niveau joué, sans le nom ; le moteur doit compter les noms distincts (correction préalable, § 3.1). |
+| 2026-09-18 | **Le budget de temps par coup n'est pas fixé maintenant.** Ordre : finir le moteur Python → le porter en Rust et l'optimiser à fond → résoudre une partie entière par Nash exact et mesurer le temps → trancher le budget sur ce chiffre réel. | Le budget décide où s'arrête l'exact et où commence l'approximation (§ 5.3, § 6) ; le fixer avant de connaître le coût réel du solveur, c'est risquer de brider l'IA pour rien. |
+| 2026-09-18 | **Tous les niveaux de chaque carte sont jouables ; les doublons sont possibles** (même carte plusieurs fois, niveaux identiques ou non, selon le mode) **et comptent pour un seul dans le bonus de clan**. | Règle du jeu confirmée par l'utilisateur. Conséquences : identité de carte = (nom, niveau) ; le générateur de mains produit niveaux et doublons ; le réseau encode la carte au niveau joué, sans le nom ; le moteur compte les noms distincts (`is_clan_bonus_active`, § 3.1). |
 
 ## 9. Questions ouvertes
 
 | Question | Où elle se pose | Piste |
 |---|---|---|
 | Coefficients `a`, `b` de l'heuristique de feuille | étape 1 | provisoires ; caducs à l'étape 2 |
+| Temps acceptable par coup (jeu en direct, conseiller, hors ligne ?) | étapes 2-3 | ce budget décide où s'arrête la résolution exacte et où commence l'approximation ; tranché après la mesure d'une partie entière sur le moteur Rust (décision § 8), jamais pour avoir une IA jouable plus tôt |
 | Que faut-il exactement dans `key` ? (effets persistants, `cancelled_modifs`, conditions lisant l'historique) | étape 0 | lire `process_round` et les niveaux 1-4 ; test : deux états de clés égales donnent les mêmes résultats pour toutes les actions |
 | Premier joueur du round 1 tiré au sort : à ajouter à `create_game` ? | étape 0 | oui, avec option de le fixer |
 | Distribution des mains pour l'arène et l'entraînement (mono-clan, 2+2, niveaux) | étapes 0, 3 | paramètres du générateur ; mesurer la sensibilité des résultats |
@@ -442,7 +448,7 @@ ce que la recherche corrige ; pourquoi on n'a pas besoin de résoudre des partie
 | Encodage des capacités non gérées (`Capacity = None`) | étape 3 | drapeau « non gérée » ; l'IA les joue à vide, comme le moteur |
 | Invariance à l'ordre des cartes dans une main | étape 3 | tri canonique d'abord |
 | Modes à règles spéciales (vies ≠ 12, bonus modifiés) | moteur | hors périmètre de l'IA tant que le moteur ne les modélise pas |
-| Doublons et cas voisins : un Oculus infiltré compte-t-il les exemplaires ou les noms (« carte seule ») ? Deux exemplaires du même Leader s'annulent-ils (« Cancel Leader ») ? Unison avec doublons ? | moteur (étape 0) | hypothèse : même règle que le bonus de clan (noms distincts) ; à confirmer en combat réel (`docs/ORACLE.md`) |
+| Doublons et cas voisins : `Support` compte-t-il les exemplaires ou les noms distincts (même mécanique que le bonus de clan ?) ; un Oculus infiltré compte-t-il les exemplaires ou les noms (« carte seule ») ? Deux exemplaires du même Leader s'annulent-ils (« Cancel Leader ») ? Unison avec doublons ? | moteur (étape 0) | hypothèse : même règle que le bonus de clan (noms distincts) ; à confirmer en combat réel (`docs/ORACLE.md`) |
 | Mémo et doublons : deux exemplaires identiques non joués rendent des états équivalents par permutation | étape 2 | canonicaliser la clé (trier les cartes restantes) — optimisation, pas une nécessité |
 
 ## 10. Journal des mesures
