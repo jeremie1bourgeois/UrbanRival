@@ -24,9 +24,11 @@ UrbanPy/Backend_fastAPI/       backend FastAPI
   src/core/parsing/            capacity_parser.py : texte d'ability -> Capacity (vocabulaire du moteur)
   src/core/use_cases/          process_round.py + apply_capacity_lvl_1..4.py (le moteur) + multipliers.py
   src/core/services/           game_service.py : parties persistées en JSON (data/game/, ignoré par git)
+  src/core/engine/             contrat du moteur pur (état compact, cartes compilées), API de référence step / legal_actions / terminal,
+                               mains aléatoires réalistes, corpus de non-régression pour un moteur compilé
   src/adapters/repositories/   accès aux données officielles, sauvegarde des parties
   src/adapters/scraping/       extracteur HTML iclintz (pur, testé)
-  scripts/                     scraper, rapport de couverture, balayage de robustesse, fixtures d'exemple
+  scripts/                     scraper, rapport de couverture, balayage de robustesse, fixtures d'exemple, corpus du moteur
   data/jsonData_officiel.json  les cartes (seule source de vérité)
   data/template_game_v1.json   partie d'exemple à 8 cartes
   data/test/                   fixtures de rejeu (voir « Tests de régression par fixtures »)

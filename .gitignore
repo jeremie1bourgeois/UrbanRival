@@ -8,6 +8,7 @@ venv/
 # Parties jouées et cache du scraper (données locales)
 UrbanPy/Backend_fastAPI/data/game
 UrbanPy/Backend_fastAPI/data/.scrape_cache
+UrbanPy/Backend_fastAPI/data/engine_corpus
 
 # IDE / outils locaux
 .vs/
