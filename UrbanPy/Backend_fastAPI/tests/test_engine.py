@@ -9,6 +9,8 @@ Rappel du template : nb_turn = 1, turn = False (l'ennemi joue en premier), 12 vi
            2 Bhudd 3★ P4 D2 (Stop Opp. Bonus)                | 3 Serafina (Rescue) 5★ P8 D8 (Support: Reanimate +1 Life ; bonus Support: Attack +3)
 Les pillz d'un round valent 1 au minimum (= aucune pillz ajoutée) : attaque = puissance x pillz, coût = pillz - 1 (+3 en fury).
 """
+import copy
+
 import pytest
 
 from src.core.services.game_service import check_end
@@ -111,6 +113,14 @@ def test_clan_bonus_counts_already_played_clan_mates(template_game):
     _, serafina = play(template_game, ASHLEY, SERAFINA, enemy_pillz=2)
 
     assert serafina.attack == (8 - 2) * 2 + 3 * 2                        # la main reste la référence, pas les cartes en jeu
+
+
+def test_clan_bonus_ignores_duplicates_of_the_same_card(template_game):
+    template_game.enemy.cards[0] = copy.deepcopy(template_game.enemy.cards[SERAFINA])  # deux Serafina, seules Rescue
+
+    _, serafina = play(template_game, ASHLEY, SERAFINA, enemy_pillz=2)
+
+    assert serafina.attack == (8 - 2) * 2                                # un même personnage ne compte qu'une fois
 
 
 def test_equalizer_scales_with_opponent_stars_and_respects_its_minimum(template_game):
