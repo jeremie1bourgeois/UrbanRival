@@ -10,7 +10,7 @@ Objectif à terme : une IA capable de gagner un maximum de parties (plan détail
 | Cartes jouables | **2 497** (36 clans), données scrapées d'iclintz.com le 2026-09-15, illustrations incluses |
 | Pouvoirs (abilities / bonus) | **1 386 / 1 396 descriptions gérées (99,3 %)**, 2 487 cartes sur 2 497 entièrement gérées — `python scripts/capacity_coverage.py` liste le reste |
 | Moteur | 4 niveaux d'effets (méta, stats, fin de round, persistants), bonus de clan (Oculus infiltré compris), Leaders (Team, Tie-break, Counter-attack, Limitless), conditions Courage/Revenge/Confidence/Reprisal/Symmetry/Asymmetry/Stop/Killshot/Perfect/Bet/Versus/After/Unison/Disunion/Defeat/Backlash/Victory or Defeat, Tune Out, Impose, Cards, Consume/Combust/Mindwipe/Corrosion, Xantiax, Corrupt, Fatal Killshot ; journal des effets de chaque round |
-| Tests | 453 backend (pytest) + 22 front (vitest) ; balayage de robustesse sur toutes les descriptions gérées ; 2 combats réels Urban Rivals rejoués à l'identique (`data/ur_battles/`) |
+| Tests | 453 backend (pytest) + 22 front (vitest) ; balayage de robustesse sur toutes les descriptions gérées ; 12 combats réels Urban Rivals rejoués à l'identique (`data/ur_battles/`) |
 | Interface | composition de deck (recherche, filtre par clan, decks aléatoires, statut des bonus, decks mémorisés), partie de 4 rounds contre un second joueur, historique des rounds, fin de partie, effets persistants |
 
 Non gérés : 10 capacités uniques sans règle publiée (Beyond, Bypass, Hazard, Illusion, Overdose, Perfection, Rebirth,
