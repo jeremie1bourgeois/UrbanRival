@@ -309,6 +309,7 @@ def test_stop_conditioned_end_of_round_effect(template_game):
 def test_tune_out_makes_the_most_pillz_win_whatever_the_attack(template_game):
     amelia, asporov = play(template_game, ally_bonus="Tune Out", ally_pillz=2, enemy_pillz=1)   # sans Tune Out : 3 x 2 = 6 > 5 x 1... mais Asporov P7 : 7
 
+    assert (amelia.power_fight, asporov.power_fight) == (1, 1)   # le client officiel affiche puissance 1 (combat 1248952)
     assert (amelia.attack, asporov.attack) == (2, 1)
     assert amelia.win is True
 

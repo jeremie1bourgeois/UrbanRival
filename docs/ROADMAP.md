@@ -56,16 +56,16 @@ wiki : **Beyond** (Genesis, 5e round — hors périmètre), **Bypass** (Robert C
 (Kate), **Overdose** (Hekate), **Perfection** (Glibon Cr), **Rebirth 1, Max. 1** (Nemo Cr), **Remove Ability Conditions**
 (Memento), `Growth: -1 Power And Damage, Min 4` (Bugamon, coquille probable) et `Night:` (ignoré volontairement).
 
-Choix de modélisation à confirmer en combat réel : Mindwipe = Combust (textes identiques) ; Tune Out compare
-`pillz_fight` sans la fury ; Perfect = écart d'attaque < puissance ; Limitless ne touche que l'ability de la carte jouée ;
-Counter-attack refixe l'ordre à chaque round.
+Choix de modélisation à confirmer en combat réel : Mindwipe = Combust (textes identiques) ; Perfect = écart d'attaque
+< puissance ; Limitless ne touche que l'ability de la carte jouée ; Counter-attack refixe l'ordre à chaque round.
+Confirmé le 2026-09-19 (combat 1248952) : Tune Out ramène la puissance des deux cartes à 1, attaque = pillz misées sans la fury.
 
 ### B. Fiabilité des règles existantes
 1. ~~Confirmer les décisions du tableau § 1 contre les règles officielles~~ → fait (`docs/REGLES.md`) ; appliquer les corrections listées en § 3 de ce document.
 2. **Oracle = combats réels** (fait le 2026-09-16, premier combat reproduit à l'identique) : jouer un combat dans le
    client web d'Urban Rivals avec `scripts/ur_capture.js` chargé, importer `urRecords()` avec `scripts/import_ur_battles.py` (procédure complète : `docs/ORACLE.md`),
    `tests/test_ur_battles.py` rejoue chaque round et exige les valeurs officielles (puissance, dégâts, attaque,
-   vainqueur, vies, pillz). Viser les points non tranchés (cycles de Stops, Leader et son Team, Tune Out + fury,
+   vainqueur, vies, pillz). Viser les points non tranchés (cycles de Stops, Leader et son Team,
    Mindwipe / Combust, Limitless, Exchange contre Copy/Annul) et les clans à bonus méta. Le modèle `abilityData` du
    client (`docs/ur-abilitydata-modele.md`) s'accumule passivement avec les combats (pas de scraping API : piste abandonnée).
 3. Le journal des effets (D2, fait) rend ces vérifications immédiates : comparer le journal au déroulé réel.

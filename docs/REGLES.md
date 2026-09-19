@@ -233,7 +233,7 @@ ROADMAP § 2.A.
 
 | Mécanique | Définition | Type d'implémentation |
 |---|---|---|
-| **Tune Out** (bonus Cosmohnuts) | « When a Tune Out card is played, the Attack calculation is ignored and the winner of the round is the player who bet the most Pillz. In case of a tie in Pillz, the two cards are decided in the same way as for a tie in Attack. » | Nouveau mode de résolution dans `resolve_combat` (comparer les pillz, y compris la fury ? non précisé) |
+| **Tune Out** (bonus Cosmohnuts) | « When a Tune Out card is played, the Attack calculation is ignored and the winner of the round is the player who bet the most Pillz. In case of a tie in Pillz, the two cards are decided in the same way as for a tie in Attack. » | Puissance des deux cartes ramenée à 1, attaque = pillz misées, fury non comptée (confirmé par le combat réel 1248952, 2026-09-19) |
 | **Unison: X** | « only activates if the hand of the player contains EXCLUSIVELY cards of the same clan as the card which has the Unison effect » | Condition de début de round (main mono-clan) |
 | **Disunion: X** | « only activates if the hand of the player at least contains ONE card from a different clan » | Condition, négation d'Unison |
 | **After (Clan X[, Clan Y]): X** (bonus Tolvack + abilities) | « This effect only activates if you played a "Clan X" character in the previous round. Oculus characters, even when infiltrated "Clan X", do not count. » Ne s'active jamais au round 1. | Condition sur `history[-1]` (clan de la carte jouée par le même joueur au round précédent) |
@@ -276,7 +276,8 @@ Par ordre d'impact :
 2. Recover : pillz gratuite comptée ou non, minimum 1 (3.5).
 3. Le Leader bénéficie-t-il de son propre Team (3.7).
 4. Cancel Life Modif. : pose du poison empêchée, ou tic du round sauté (3.3).
-5. Tune Out : la fury compte-t-elle dans les pillz comparées.
+5. ~~Tune Out : la fury compte-t-elle dans les pillz comparées.~~ → tranché par le combat 1248952 (2026-09-19) : non.
+   Le client affiche les deux cartes à puissance 1 et attaque = 1 × pillz misées (Sopiket avec fury et 1 pillz : attaque 1).
 6. Combust contre Mindwipe : différence réelle.
 
 Chaque combat rejoué se transcrit dans `data/test/` (voir ROADMAP § 2.B.2) ; le journal des effets (D2) rendra la
@@ -305,8 +306,8 @@ Verdicts sur les points encore ouverts ou déjà codés :
 | 70 Jour / Nuit | cycle de 4 h dans le jeu | non modélisé (Day toujours vrai) | choix utilisateur |
 
 Non tranché par le glossaire : cycles de Stops/Protections (3.2), Leader bénéficiant de son Team (3.7 ; « la Protection
-peut annuler les effets négatifs d'un Leader » suggère que le Team touche bien les deux camps), Tune Out et fury,
-Mindwipe vs Combust, Limitless.
+peut annuler les effets négatifs d'un Leader » suggère que le Team touche bien les deux camps), Mindwipe vs Combust,
+Limitless. Tune Out et fury : tranché depuis (§ 5, point 5).
 
 **Historique de combats** : `player/history.php` ne donne que le score final de chaque combat (ex. « 12-3 »), sans détail
 de rounds ni rapport. Le jeu lui-même est un client Unity WebGL (`/game/play/`) ; les données de round transitent

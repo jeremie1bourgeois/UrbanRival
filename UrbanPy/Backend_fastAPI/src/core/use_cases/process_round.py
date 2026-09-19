@@ -80,7 +80,9 @@ def _process_round(game: Game, round_data: ProcessRoundInput) -> None:
         fct_lvl_2.apply_capacity_lvl_2(game, player1_card, player2_card, stats=("attack",))
 
         # Tune Out (Cosmohnuts) : « the Attack calculation is ignored and the winner is the player who bet the most Pillz »
+        # Le client officiel affiche les deux cartes à puissance 1 (combat 1248952) : attaque = 1 × pillz, fury non comptée
         if consume_tune_out(player1_card) | consume_tune_out(player2_card):
+            player1_card.power_fight = player2_card.power_fight = 1
             player1_card.attack, player2_card.attack = round_data.player1_pillz, round_data.player2_pillz
             note(None, "tune_out", f"Tune Out : le round se résout aux pillz ({player1_card.name} {player1_card.attack}, {player2_card.name} {player2_card.attack})")
 
