@@ -66,6 +66,15 @@ def test_team_ability_keeps_its_own_conditions(game):
     assert amelia.power_fight == 3 - 2
 
 
+def test_leader_benefits_from_its_own_conditional_team_when_condition_met(game):
+    # Ambre : « Team: Courage: Power +3 ». Le Leader joué lui-même, en premier (courage actif), profite du bonus.
+    game.ally.cards[AGUSTINO].ability = ability("Team: Courage: Power +3")
+
+    agustino, _ = play(game, ally_index=AGUSTINO, turn=True)   # le Leader joue en premier -> courage
+
+    assert agustino.power_fight == 6 + 3 - 2
+
+
 def test_team_level_1_effect_goes_through_the_same_pipeline(game):
     game.ally.cards[AGUSTINO].ability = ability("Team: Cancel Opp. Damage Modif.")
     game.enemy.cards[ASPOROV].ability = ability("Damage +2")
