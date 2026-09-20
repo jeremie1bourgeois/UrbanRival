@@ -190,6 +190,14 @@ def test_damage_exchange_swaps_printed_damages(template_game):
     assert (amelia.damage_fight, asporov.damage_fight) == (3, 5)
 
 
+def test_cancel_opp_damage_modif_annuls_an_opponent_damage_exchange(template_game):
+    # Combat réel 1294992 : Pandora « Cancel Opp. Power And Damage Modif. » annule le « Damage Exchange » de Harrow Ld,
+    # les deux cartes gardent leurs dégâts imprimés (sans le Cancel : 3 et 5).
+    amelia, asporov = play(template_game, ally_ability="Damage Exchange", enemy_ability="Cancel Opp. Damage Modif.")
+
+    assert (amelia.damage_fight, asporov.damage_fight) == (5, 3)
+
+
 @pytest.mark.parametrize("text", ["Asymmetry: Copy: Opp. Power", "Confidence: Power Exchange", "Power And Damage Exchange"])
 def test_value_copies_and_exchanges_do_not_crash(template_game, text):
     template_game.turn = True

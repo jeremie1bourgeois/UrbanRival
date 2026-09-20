@@ -298,16 +298,31 @@ Verdicts sur les points encore ouverts ou déjà codés :
 | 58 Stop | « la condition Stop ne s'active pas contre des cartes Annul » | « stop » consommé à la phase des Stops uniquement | ✅ |
 | 55 Protection | Protection: Bonus/Pouvoir protège des Stops « mais pas d'une carte Annul » ; « peut également annuler les effets négatifs d'un Leader » | Protection: X retire les modifs adverses ciblant ma carte, y compris `leader_fight` adverse | ✅ |
 | 59 Copie, 172 Impose | valeurs **de base** ; Copie Bonus « s'il est actif » | ✅ | ✅ |
-| 60 Echange | échange des valeurs de base « même si la carte en face a une Protection appropriée » ; annulé par un Annul approprié ; Echange face à Copie/Echange du même type → seul l'Echange agit | Exchange est méta (non touché par Protection) ; Cancel : à vérifier ; Exchange vs Copy : non géré | ➖ à vérifier |
+| 60 Echange | échange des valeurs de base « même si la carte en face a une Protection appropriée » ; annulé par un Annul approprié ; Echange face à Copie/Echange du même type → seul l'Echange agit | Exchange est méta (non touché par Protection) ✅ ; **Cancel Opp. Dmg/Pow Modif. annule l'Exchange ✅** (corrigé le 2026-09-20, cf. addendum) ; Exchange vs Copie/Echange : non géré | ⚠️ → **partiellement corrigé** (reste Exchange vs Copie/Echange) |
 | 63 Support / Brawl, 64 Croissance, 65 Equalizer, 67 Par Puissance/Dégâts adv. (valeurs de base) | ✅ conformes | | ✅ |
 | 68 Killshot, 173 Versus (main adverse), 174 Symétrie, 175 Infiltration (carte seule, clans spécifiques) | ✅ conformes aux corrections du matin | | ✅ |
 | 50 Poison / Soin | le second remplace le premier ; Poison et Soin coexistent | ✅ | ✅ |
 | 61 Courage / Riposte, 62 Confiance / Revanche | ✅ | | ✅ |
 | 70 Jour / Nuit | cycle de 4 h dans le jeu | non modélisé (Day toujours vrai) | choix utilisateur |
 
-Non tranché par le glossaire : cycles de Stops/Protections (3.2), Leader bénéficiant de son Team (3.7 ; « la Protection
-peut annuler les effets négatifs d'un Leader » suggère que le Team touche bien les deux camps), Mindwipe vs Combust,
-Limitless. Tune Out et fury : tranché depuis (§ 5, point 5).
+Non tranché par le glossaire : cycles de Stops/Protections (3.2), Mindwipe vs Combust, Limitless. Tune Out et fury :
+tranché depuis (§ 5, point 5). Leader bénéficiant de son Team, égalité d'attaque, Exchange vs Cancel : tranchés par les
+combats réels (voir § 7).
+
+## 7. Combats réels capturés en duel privé (2026-09-19 → 2026-09-20)
+
+Duels privés capturés via `scripts/ur_capture.js` puis rejoués par le moteur (`tests/test_ur_battles.py`). Chaque point
+ci-dessous est confirmé par au moins un combat où le moteur reproduit exactement les valeurs du serveur.
+
+| Règle | Verdict serveur | Moteur | Combat |
+|---|---|---|---|
+| **Égalité d'attaque** | la carte avec le **moins d'étoiles** gagne ; à étoiles égales, le **premier joueur** gagne (Tie-break/Solomon prime) | ✅ conforme (`process_round.py`) | 1294088 (Glorg 4★ vs Davina 3★ → Davina) |
+| **All-Stop vs Protection: Bonus** | l'All-Stop l'emporte : le SoA retire d'abord la Protection, puis le SoB annule le bonus | ✅ conforme | 1294088 (Glorg vs Davina) |
+| **Le Leader profite-t-il de son Team ?** | **oui**, l'aura « Team: X » s'applique aussi au Leader lui-même | ✅ conforme (test `test_leader_team.py`) | confirmé par l'oracle utilisateur + tests |
+| **Exchange vs Cancel Opp. Modif.** | le Cancel **annule** l'Exchange : les deux cartes gardent leurs valeurs imprimées | ❌ → **corrigé le 2026-09-20** (`apply_capacity_lvl_1.py`, `_opp_cancels_stat`) | 1294992 (Harrow Ld *Damage Exchange* vs Pandora *Cancel Opp. Power And Damage Modif.*) |
+
+Portée du correctif Exchange/Cancel : limité à l'**Exchange** (seul cas prouvé). Exchange vs **Copie**/**Impose** et
+Copie/Impose vs Cancel restent non gérés, faute de combat réel les couvrant.
 
 **Historique de combats** : `player/history.php` ne donne que le score final de chaque combat (ex. « 12-3 »), sans détail
 de rounds ni rapport. Le jeu lui-même est un client Unity WebGL (`/game/play/`) ; les données de round transitent

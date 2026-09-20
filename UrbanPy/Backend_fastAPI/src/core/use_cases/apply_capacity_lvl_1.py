@@ -152,6 +152,15 @@ def _apply_stops(card1: Card, card2: Card) -> None:
 
 # --- Phase 3 : Copy / Exchange / Impose de power et damage ---------------------------------------------
 
+def _opp_cancels_stat(opp: Card, stat: str) -> bool:
+    """L'adversaire porte-t-il un « Cancel Opp. <stat> Modif. » actif (les Stops ont déjà retiré ceux stoppés) ?"""
+    for slot in FIGHT_SLOTS:
+        capacity = getattr(opp, slot)
+        if _is(capacity, "cancel") and stat in capacity.types and capacity.target in ("enemy", "both"):
+            return True
+    return False
+
+
 def _apply_value_copies_and_exchanges(card1: Card, card2: Card) -> None:
     for own, opp in _pairs(card1, card2):
         for slot in FIGHT_SLOTS:
@@ -160,6 +169,9 @@ def _apply_value_copies_and_exchanges(card1: Card, card2: Card) -> None:
                 continue
             for stat in ("power", "damage"):
                 if stat not in capacity.types:
+                    continue
+                if capacity.how == "exchange" and _opp_cancels_stat(opp, stat):   # combat réel 1294992 : le Cancel adverse annule l'Exchange
+                    note(own, "annule", f"{own.name} : {label(capacity)} sur {STAT_LABELS.get(stat, stat)} annulé par le Cancel {_of(opp)}")
                     continue
                 own_before, opp_before = getattr(own, f"{stat}_fight"), getattr(opp, f"{stat}_fight")
                 if capacity.how == "impose":                       # l'adversaire prend ma valeur imprimée
