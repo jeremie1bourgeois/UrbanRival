@@ -1,0 +1,231 @@
+{
+ "_comment": "Combat réel Urban Rivals capturé via battles.status (voir scripts/ur_capture.js).",
+ "battle_id": 1293539,
+ "rule_id": 1,
+ "p0": {
+  "name": "jere'm",
+  "base_life": 12,
+  "base_pillz": 12,
+  "cards": [
+   {
+    "id": 677,
+    "level": 2
+   },
+   {
+    "id": 597,
+    "level": 2
+   },
+   {
+    "id": 910,
+    "level": 2
+   },
+   {
+    "id": 1153,
+    "level": 1
+   }
+  ]
+ },
+ "p1": {
+  "name": "Damien Bourgeois99297",
+  "base_life": 12,
+  "base_pillz": 12,
+  "cards": [
+   {
+    "id": 1656,
+    "level": 3
+   },
+   {
+    "id": 597,
+    "level": 2
+   },
+   {
+    "id": 2447,
+    "level": 3
+   },
+   {
+    "id": 1025,
+    "level": 3
+   }
+  ]
+ },
+ "rounds": [
+  {
+   "round": 1,
+   "first": "p1",
+   "before": {
+    "life": [
+     12,
+     12
+    ],
+    "pillz": [
+     12,
+     12
+    ]
+   },
+   "p0": {
+    "index": 0,
+    "pillz": 1,
+    "fury": false,
+    "power": 6,
+    "damage": 1,
+    "attack": 6,
+    "won": false
+   },
+   "p1": {
+    "index": 0,
+    "pillz": 1,
+    "fury": false,
+    "power": 7,
+    "damage": 4,
+    "attack": 7,
+    "won": true
+   },
+   "post_round": [
+    [],
+    []
+   ],
+   "after": {
+    "life": [
+     8,
+     12
+    ],
+    "pillz": [
+     12,
+     12
+    ]
+   }
+  },
+  {
+   "round": 2,
+   "first": "p0",
+   "before": {
+    "life": [
+     8,
+     12
+    ],
+    "pillz": [
+     12,
+     12
+    ]
+   },
+   "p0": {
+    "index": 1,
+    "pillz": 2,
+    "fury": false,
+    "power": 6,
+    "damage": 2,
+    "attack": 12,
+    "won": false
+   },
+   "p1": {
+    "index": 3,
+    "pillz": 5,
+    "fury": false,
+    "power": 6,
+    "damage": 4,
+    "attack": 30,
+    "won": true
+   },
+   "post_round": [
+    [],
+    []
+   ],
+   "after": {
+    "life": [
+     4,
+     12
+    ],
+    "pillz": [
+     11,
+     8
+    ]
+   }
+  },
+  {
+   "round": 3,
+   "first": "p1",
+   "before": {
+    "life": [
+     4,
+     12
+    ],
+    "pillz": [
+     11,
+     8
+    ]
+   },
+   "p0": {
+    "index": 2,
+    "pillz": 5,
+    "fury": false,
+    "power": 7,
+    "damage": 2,
+    "attack": 35,
+    "won": true
+   },
+   "p1": {
+    "index": 1,
+    "pillz": 4,
+    "fury": false,
+    "power": 6,
+    "damage": 2,
+    "attack": 24,
+    "won": false
+   },
+   "post_round": [
+    [],
+    []
+   ],
+   "after": {
+    "life": [
+     4,
+     10
+    ],
+    "pillz": [
+     7,
+     5
+    ]
+   }
+  },
+  {
+   "round": 4,
+   "first": "p0",
+   "before": {
+    "life": [
+     4,
+     10
+    ],
+    "pillz": [
+     7,
+     5
+    ]
+   },
+   "p0": {
+    "index": 3,
+    "pillz": 7,
+    "fury": false,
+    "power": 6,
+    "damage": 2,
+    "attack": 42,
+    "won": true
+   },
+   "p1": {
+    "index": 2,
+    "pillz": 3,
+    "fury": false,
+    "power": 8,
+    "damage": 4,
+    "attack": 24,
+    "won": false
+   },
+   "post_round": [
+    [],
+    []
+   ],
+   "after": {
+    "life": null,
+    "pillz": null
+   }
+  }
+ ]
+}
