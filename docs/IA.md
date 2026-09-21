@@ -63,6 +63,7 @@ l'IA.
 | **V(état)** | probabilité de gagner la partie depuis cet état, si les deux joueurs jouent parfaitement (nul = 0,5) ; toujours exprimée pour l'allié, puis convertie (`1 − V`) quand il faut le point de vue de l'ennemi |
 | **Politique** | distribution de probabilité sur les actions dans un état |
 | **Jeu matriciel** | tableau des gains `M[action de F][action de S]` d'un round ; **équilibre de Nash** = couple de politiques dont aucun joueur ne peut s'écarter avec profit ; **valeur du jeu** = gain garanti en jouant l'équilibre |
+| **LP** (programme linéaire) | maximiser une quantité sous des contraintes toutes linéaires ; c'est ainsi qu'on calcule l'équilibre de Nash d'un jeu matriciel (§ 4.3 : maximiser la valeur `v` sous « chaque colonne rapporte au moins `v` »), avec `scipy.optimize.linprog` |
 | **Induction à rebours** | calculer les valeurs du dernier round d'abord, puis remonter |
 | **Mémoïsation** | table `état → V` pour ne jamais résoudre deux fois le même état |
 | **Heuristique de feuille** | score approximatif d'un état qu'on ne résout pas plus loin |
