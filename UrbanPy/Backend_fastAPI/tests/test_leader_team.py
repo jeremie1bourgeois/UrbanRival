@@ -4,6 +4,8 @@ uniquement s'il est le seul Leader en main. Scénario : Agustino (allié idx 0) 
 Amelia (idx 2, P3 D5, ability neutralisée) contre Asporov (idx 0, P7 D3, ability neutralisée), 1 pillz chacun.
 Bonus -2 opp power actifs (3 All Stars alliés restants, 3 ennemis).
 """
+import copy
+
 import pytest
 
 from src.core.domain.card import Card
@@ -52,6 +54,16 @@ def test_team_ability_applies_to_the_leader_itself(game):
 
 def test_two_leaders_cancel_the_team_ability(game):
     game.ally.cards[ALLISON].faction = "Leader"
+
+    amelia, _ = play(game)
+
+    assert amelia.power_fight == 3 - 2
+
+
+def test_two_copies_of_the_same_leader_cancel_the_team_ability(game):
+    # Modes avec doublons : deux exemplaires du même Leader s'annulent comme deux Leaders différents
+    # (confirmé par l'utilisateur, 2026-09-21).
+    game.ally.cards[ALLISON] = copy.deepcopy(game.ally.cards[AGUSTINO])
 
     amelia, _ = play(game)
 

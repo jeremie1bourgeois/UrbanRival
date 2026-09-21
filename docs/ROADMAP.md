@@ -26,12 +26,12 @@ Cancel Life Modif., Reanimate, Versus) ont été **corrigées** le même jour ; 
 | Règle retenue | Où |
 |---|---|
 | Stops résolus **en chaîne** (un Stop stoppé ne stoppe rien) — règle officielle, art. 91 du support | `apply_capacity_lvl_1._stopped_slots`, tests `test_official_example_1/2_*` |
-| Cycles (SoA contre SoA, Protection: Ability + Protection: Bonus face à SoA + SoB) : les Stops gagnent — non documenté | idem, `test_soa_versus_soa_is_a_cycle_where_both_stops_win` |
+| Cycles (SoA contre SoA, Protection: Ability + Protection: Bonus face à SoA + SoB) : les Stops gagnent — confirmé par l'utilisateur (2026-09-21) | idem, `test_soa_versus_soa_is_a_cycle_where_both_stops_win`, `test_double_protection_versus_all_stop_is_a_cycle_where_the_stops_win` |
 | « Cancel Opp. Life Modif. » **suspend pour le round** les effets persistants adverses (poison/toxin/heal/regen ; Pillz : dope/consume), qui reprennent au round suivant — glossaire officiel 56 | `Card.cancelled_modifs`, `apply_capacity_lvl_4._suspended` |
 | Reanimate = « Defeat: +X Life » qui marche aussi depuis 0 (règle officielle) ; les effets de fin de round sont sautés sur KO | `apply_capacity_lvl_3.apply_reanimate` + boucle de niveau 3, `process_round` |
 | Recover X out of Y : ⌊pillz misées × X / Y⌋, **minimum 1** (glossaire 53), fury comprise ; pillz gratuite exclue (non tranché) | `apply_capacity_lvl_3.recovered_pillz` |
 | Infiltrated (Oculus) — règle officielle : un seul autre clan → celui-là ; deux → celui de la **carte seule** ; trois ou deux Oculus → rien. Leaders hors décompte (hypothèse) ; la liste des clans infiltrables imprimée sur la carte n'est pas modélisée | `process_round.infiltrated_clan` |
-| Team (Leader) : s'applique à chaque carte jouée, Leader compris, seulement si Leader unique | `process_round.leader_team_capacity` |
+| Team (Leader) : s'applique à chaque carte jouée, Leader compris, seulement si Leader unique (deux exemplaires du même Leader s'annulent) — confirmé par l'utilisateur (2026-09-21) | `process_round.leader_team_capacity`, `tests/test_leader_team.py` |
 | Versus (clans) : s'active si la **main** adverse contient une carte du clan, pas seulement la carte en face — règle officielle | `process_round.check_capacity_condition` |
 | Bet > N / < N : compare `pillz_fight` (**pillz gratuite comprise**, fury exclue) — règle officielle | `process_round._bet_condition_met` |
 | Killshot : attaque > 0 et ≥ 2 × attaque adverse, évaluée après les modificateurs d'attaque | `process_round.apply_killshot_condition` |
@@ -56,17 +56,17 @@ wiki : **Beyond** (Genesis, 5e round — hors périmètre), **Bypass** (Robert C
 (Kate), **Overdose** (Hekate), **Perfection** (Glibon Cr), **Rebirth 1, Max. 1** (Nemo Cr), **Remove Ability Conditions**
 (Memento), `Growth: -1 Power And Damage, Min 4` (Bugamon, coquille probable) et `Night:` (ignoré volontairement).
 
-Choix de modélisation à confirmer en combat réel : Mindwipe = Combust (textes identiques) ; Tune Out compare
-`pillz_fight` sans la fury ; Perfect = écart d'attaque < puissance ; Limitless ne touche que l'ability de la carte jouée ;
-Counter-attack refixe l'ordre à chaque round.
+Choix de modélisation à confirmer en combat réel : Mindwipe = Combust (textes identiques) ; Perfect = écart
+d'attaque < puissance ; Limitless ne touche que l'ability de la carte jouée ; Counter-attack refixe l'ordre à chaque
+round. Confirmé par l'utilisateur (2026-09-21) : Tune Out compare les pillz **sans la fury**.
 
 ### B. Fiabilité des règles existantes
 1. ~~Confirmer les décisions du tableau § 1 contre les règles officielles~~ → fait (`docs/REGLES.md`) ; appliquer les corrections listées en § 3 de ce document.
 2. **Oracle = combats réels** (fait le 2026-09-16, premier combat reproduit à l'identique) : jouer un combat dans le
    client web d'Urban Rivals avec `scripts/ur_capture.js` chargé, importer `urRecords()` avec `scripts/import_ur_battles.py` (procédure complète : `docs/ORACLE.md`),
    `tests/test_ur_battles.py` rejoue chaque round et exige les valeurs officielles (puissance, dégâts, attaque,
-   vainqueur, vies, pillz). Viser les points non tranchés (cycles de Stops, Leader et son Team, Tune Out + fury,
-   Mindwipe / Combust, Limitless, Exchange contre Copy/Annul) et les clans à bonus méta. Le modèle `abilityData` du
+   vainqueur, vies, pillz). Viser les points non tranchés (Recover et pillz gratuite, Mindwipe / Combust, Limitless,
+   Exchange contre Copy/Annul, doublons dans Support / Oculus / Unison) et les clans à bonus méta. Le modèle `abilityData` du
    client (`docs/ur-abilitydata-modele.md`) s'accumule passivement avec les combats (pas de scraping API : piste abandonnée).
 3. Le journal des effets (D2, fait) rend ces vérifications immédiates : comparer le journal au déroulé réel.
 

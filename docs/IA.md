@@ -115,7 +115,7 @@ cohérente avec le wiki : « This doesn't apply to the same Characters »). Le m
 clan (`is_clan_bonus_active`, test « deux exemplaires seuls de leur clan → bonus inactif »). **Ne pas oublier le
 pouvoir `Support`** : il compte lui aussi les cartes du clan en main et fonctionne potentiellement comme le bonus
 (exemplaires ou noms distincts ?) — à tester en combat réel avant de le corriger. Cas voisins non tranchés : Oculus
-infiltré avec doublons, deux exemplaires du même Leader (§ 9).
+infiltré avec doublons (§ 9). Deux exemplaires du même Leader s'annulent (confirmé par l'utilisateur le 2026-09-21).
 
 ### 3.2 Générateur de mains
 Des mains de 4 cartes au hasard parmi 2 497 n'activent presque jamais un bonus de clan (≥ 2 cartes du clan) : elles
@@ -441,7 +441,7 @@ ce que la recherche corrige ; pourquoi on n'a pas besoin de résoudre des partie
 | Encodage des capacités non gérées (`Capacity = None`) | étape 3 | drapeau « non gérée » ; l'IA les joue à vide, comme le moteur |
 | Invariance à l'ordre des cartes dans une main | étape 3 | tri canonique d'abord |
 | Modes à règles spéciales (vies ≠ 12, bonus modifiés) | moteur | hors périmètre de l'IA tant que le moteur ne les modélise pas |
-| Doublons et cas voisins : `Support` compte-t-il les exemplaires ou les noms distincts (même mécanique que le bonus de clan ?) ; un Oculus infiltré compte-t-il les exemplaires ou les noms (« carte seule ») ? Deux exemplaires du même Leader s'annulent-ils (« Cancel Leader ») ? Unison avec doublons ? | moteur (étape 0) | hypothèse : même règle que le bonus de clan (noms distincts) ; à confirmer en combat réel (`docs/ORACLE.md`) |
+| Doublons et cas voisins : `Support` compte-t-il les exemplaires ou les noms distincts (même mécanique que le bonus de clan ?) ; un Oculus infiltré compte-t-il les exemplaires ou les noms (« carte seule ») ? Unison avec doublons ? | moteur (étape 0) | hypothèse : même règle que le bonus de clan (noms distincts) ; à confirmer en combat réel (`docs/ORACLE.md`). Deux exemplaires du même Leader s'annulent : confirmé par l'utilisateur (2026-09-21), testé |
 | Mémo et doublons : deux exemplaires identiques non joués rendent des états équivalents par permutation | étape 2 | canonicaliser la clé (trier les cartes restantes) — optimisation, pas une nécessité |
 
 ## 10. Journal des mesures

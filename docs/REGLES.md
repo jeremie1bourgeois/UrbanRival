@@ -26,7 +26,7 @@ Hiérarchie de confiance : support officiel > glossaire officiel > texte de cart
 | Bonus de clan actif avec **≥ 2 cartes du clan** dans la main. Précision : « This doesn't apply to the same Characters » — deux exemplaires de la même carte **ne comptent pas** | wiki *Bonus* | `is_clan_bonus_active` compte les noms distincts par clan | ✅ Confirmé (doublons possibles selon le mode, confirmé par l'utilisateur) |
 | Fin de partie : KO à 0 vie ; sinon, après 4 rounds, plus de vie gagne ; vies égales = **match nul** | wiki *KO*, *Life* | `check_end` (`GameResult.DRAW`) | ✅ Confirmé |
 | Premier joueur du round 1 : aléatoire dans le jeu, puis alternance | wiki *Strike Back* (« the order of play is decided randomly ») | toujours l'allié (`turn = True`) | ⚠️ Connu, non modélisé (ROADMAP § 1) |
-| Puissance minimale 1, pillz minimale 1 → attaque minimale 1 hors effets | wiki *Power* | à vérifier avec les réducteurs (min) | ➖ Non audité |
+| Puissance minimale 1, pillz minimale 1 → attaque minimale 1 hors effets ; mais un réducteur « Min 0 » (−X Opp Power / Attack, Min 0) descend bien à **0** | wiki *Power* + utilisateur (2026-09-21) | `apply_capacity_lvl_2` respecte la borne du texte, pas de plancher implicite ; `test_minus_opp_power_min_0_*`, `test_minus_opp_attack_min_0_*` | ✅ Confirmé |
 
 ## 3. Verdict sur les décisions prises sans certitude
 
@@ -68,17 +68,18 @@ Autrement dit : **un Stop stoppé ne stoppe rien** (résolution en chaîne, pas 
 
 **Cas non tranché par la source** : cycle pur (SoA contre SoA en ability, ou Protection: Ability + Protection: Bonus
 face à SoA + SoB). L'algorithme « en chaîne » ne termine pas ; le moteur fait gagner les Stops (« cycle : les Stops
-gagnent »), ce qui correspond à l'expérience communautaire (deux SoA face à face s'annulent) mais reste à confirmer en
-combat réel. Point 3.2 ci-dessous.
+gagnent »), ce qui correspond à l'expérience communautaire (deux SoA face à face s'annulent). **Confirmé par
+l'utilisateur le 2026-09-21** (les deux cycles). Point 3.2 ci-dessous.
 
 **Correction** : `_stopped_kinds` doit considérer qu'un Stop porté par un emplacement lui-même stoppé n'existe pas
 (point fixe : itérer jusqu'à stabilité, cycle → Stops gagnent). Réécrire le test cité et ajouter les deux exemples
 officiels comme tests.
 
-### 3.2 Protection cyclique — ➖ NON DOCUMENTÉ
+### 3.2 Protection cyclique — ✅ CONFIRMÉ (utilisateur, 2026-09-21)
 
-Aucune source ne décrit le cas. Conserver le choix actuel (les Stops gagnent), à vérifier en combat réel avec par
-exemple Skeelz (Protection: Ability) + ability Protection: Bonus contre un All-Stop (Glorg, Shakra).
+Aucune source écrite ne décrit le cas ; l'utilisateur confirme par connaissance du jeu que dans les deux cycles
+(SoA contre SoA ; Protection: Ability + Protection: Bonus face à SoA + SoB) **les Stops gagnent**. Tests
+`test_soa_versus_soa_is_a_cycle_where_both_stops_win` et `test_double_protection_versus_all_stop_is_a_cycle_where_the_stops_win`.
 
 ### 3.3 « Cancel Opp. Life Modif. » et le poison — ❌ CONTREDIT (texte de carte, via wiki)
 
@@ -147,12 +148,15 @@ listés sur sa carte**. À vérifier si les données scrapées d'iclintz contien
 
 **Cas Leader dans la main** : non traité par la source (le moteur exclut les Leaders du décompte, raisonnable).
 
-### 3.7 Team (Leader) — ✅ CONFIRMÉ en partie, ➖ NON DOCUMENTÉ pour le reste
+### 3.7 Team (Leader) — ✅ CONFIRMÉ
 
 - Deux Leaders s'annulent (bonus « Cancel Leader ») : wiki *Leader* — ✅ confirmé.
 - « Team abilities are not affected by SoA » (wiki *Team*) : le moteur porte la capacité dans `leader_fight`, hors
   des emplacements visés par `_apply_stops` — ✅ confirmé.
-- Le Leader lui-même bénéficie-t-il de son Team ? Non documenté. Le moteur dit oui.
+- Le Leader lui-même bénéficie de son Team : non documenté, **confirmé par l'utilisateur (2026-09-21)**. Le moteur dit oui
+  (`test_team_ability_applies_to_the_leader_itself`).
+- Deux exemplaires du **même** Leader (modes avec doublons) s'annulent comme deux Leaders différents : **confirmé par
+  l'utilisateur (2026-09-21)**, `test_two_copies_of_the_same_leader_cancel_the_team_ability`.
 
 ### 3.8 Bet > N / < N : pillz comptées — ❌ CONTREDIT (texte de carte, plusieurs occurrences)
 
@@ -217,9 +221,9 @@ assumé, sans conséquence tant que le jeu n'est pas comparé à des combats ré
 | 3.4 | Reanimate seulement sur KO | ❌ contredit partiellement | petit |
 | 3.5 | Recover : fury comprise / minimum 0 | ✅ fury / ⚠️ min 1 | trivial |
 | 3.9, 3.10, 3.11 | Killshot, per damage, Copy | ✅ confirmés | — |
-| 3.7 | Team | ✅ (Cancel Leader, immunité SoA) / ➖ (Leader inclus) | — |
+| 3.7 | Team | ✅ confirmé (Cancel Leader, immunité SoA, Leader inclus, doublons de Leader) | — |
 | 3.12 | Fury après les réducteurs | ✅ confirmé (utilisateur) | — |
-| 3.2 | Protection cyclique | ➖ non documenté | combats réels |
+| 3.2 | Protection cyclique | ✅ confirmé (utilisateur) : les Stops gagnent | — |
 | 3.13 | Day/Night | choix utilisateur | — |
 
 ## 4. Mécaniques non gérées : définitions retrouvées
@@ -233,7 +237,7 @@ ROADMAP § 2.A.
 
 | Mécanique | Définition | Type d'implémentation |
 |---|---|---|
-| **Tune Out** (bonus Cosmohnuts) | « When a Tune Out card is played, the Attack calculation is ignored and the winner of the round is the player who bet the most Pillz. In case of a tie in Pillz, the two cards are decided in the same way as for a tie in Attack. » | Nouveau mode de résolution dans `resolve_combat` (comparer les pillz, y compris la fury ? non précisé) |
+| **Tune Out** (bonus Cosmohnuts) | « When a Tune Out card is played, the Attack calculation is ignored and the winner of the round is the player who bet the most Pillz. In case of a tie in Pillz, the two cards are decided in the same way as for a tie in Attack. » | Nouveau mode de résolution dans `resolve_combat` ; la fury **ne compte pas** (utilisateur, 2026-09-21 ; `test_tune_out_ignores_the_fury_pillz`) |
 | **Unison: X** | « only activates if the hand of the player contains EXCLUSIVELY cards of the same clan as the card which has the Unison effect » | Condition de début de round (main mono-clan) |
 | **Disunion: X** | « only activates if the hand of the player at least contains ONE card from a different clan » | Condition, négation d'Unison |
 | **After (Clan X[, Clan Y]): X** (bonus Tolvack + abilities) | « This effect only activates if you played a "Clan X" character in the previous round. Oculus characters, even when infiltrated "Clan X", do not count. » Ne s'active jamais au round 1. | Condition sur `history[-1]` (clan de la carte jouée par le même joueur au round précédent) |
@@ -272,12 +276,13 @@ Précisions utiles glanées au passage :
 ## 5. Ce que les textes ne tranchent pas — à régler par rejeu de combats réels
 
 Par ordre d'impact :
-1. Cycles de Stops et de Protections (3.2).
-2. Recover : pillz gratuite comptée ou non, minimum 1 (3.5).
-3. Le Leader bénéficie-t-il de son propre Team (3.7).
-4. Cancel Life Modif. : pose du poison empêchée, ou tic du round sauté (3.3).
-5. Tune Out : la fury compte-t-elle dans les pillz comparées.
-6. Combust contre Mindwipe : différence réelle.
+1. Recover : pillz gratuite comptée ou non (3.5).
+2. Cancel Life Modif. : pose du poison empêchée, ou tic du round sauté (3.3).
+3. Combust contre Mindwipe : différence réelle.
+
+Tranchés par l'utilisateur le 2026-09-21 (connaissance du jeu, sans source écrite) : cycles de Stops et de Protections
+(3.2, les Stops gagnent), Leader bénéficiant de son propre Team (3.7, oui), deux exemplaires du même Leader
+s'annulent (3.7, oui), Tune Out ignore la fury (§ 4).
 
 Chaque combat rejoué se transcrit dans `data/test/` (voir ROADMAP § 2.B.2) ; le journal des effets (D2) rendra la
 localisation des écarts immédiate.
@@ -304,9 +309,8 @@ Verdicts sur les points encore ouverts ou déjà codés :
 | 61 Courage / Riposte, 62 Confiance / Revanche | ✅ | | ✅ |
 | 70 Jour / Nuit | cycle de 4 h dans le jeu | non modélisé (Day toujours vrai) | choix utilisateur |
 
-Non tranché par le glossaire : cycles de Stops/Protections (3.2), Leader bénéficiant de son Team (3.7 ; « la Protection
-peut annuler les effets négatifs d'un Leader » suggère que le Team touche bien les deux camps), Tune Out et fury,
-Mindwipe vs Combust, Limitless.
+Non tranché par le glossaire : Mindwipe vs Combust, Limitless. (Cycles de Stops/Protections, Leader et son Team,
+Tune Out et fury : tranchés par l'utilisateur, voir § 5.)
 
 **Historique de combats** : `player/history.php` ne donne que le score final de chaque combat (ex. « 12-3 »), sans détail
 de rounds ni rapport. Le jeu lui-même est un client Unity WebGL (`/game/play/`) ; les données de round transitent
