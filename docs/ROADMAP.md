@@ -37,7 +37,7 @@ Cancel Life Modif., Reanimate, Versus) ont été **corrigées** le même jour ; 
 | Bet > N / < N : compare `pillz_fight` (**pillz gratuite comprise**, fury exclue) — règle officielle | `process_round._bet_condition_met` |
 | Killshot : attaque > 0 et ≥ 2 × attaque adverse, évaluée après les modificateurs d'attaque | `process_round.apply_killshot_condition` |
 | per damage : dégâts réellement infligés (0 en défaite) | `multipliers._nb_damage_inflicted` |
-| Copy : copie l'emplacement adverse tel que joué (conditions déjà évaluées) ; Copy vs Copy → rien | `apply_capacity_lvl_1._apply_copies` |
+| Copy : copie le **texte** adverse (bonus seulement s'il est actif), ses conditions sont **réévaluées pour le copieur** — combat 1349481 ; Copy vs Copy → rien | `apply_capacity_lvl_1.apply_copies`, `process_round.drop_unmet_conditions` |
 | Fury : +2 dégâts ajoutés **après** les modificateurs de dégâts (utilisateur ; glossaire 56 : « Annul Modif Dégâts n'annule pas la Fury ») | `process_round` |
 | Toxine / Régén / Dope / Repair / Consume / Combust (Mindwipe) agissent **dès le round joué** (glossaire 51, 52 ; Repair, Combust : utilisateur) ; Poison / Heal aux rounds suivants | `apply_capacity_lvl_4.IMMEDIATE_KINDS` |
 | « Per Pillz Left » : pillz **avant la mise**, pillz gratuite exclue (glossaire 66) | `multipliers._nb_pillz_left` |
@@ -72,7 +72,7 @@ joué (si la carte gagne) ; Counter-attack (Ashigaru) ne joue que sur le **premi
    client web d'Urban Rivals avec `scripts/ur_capture.js` chargé, importer `urRecords()` avec `scripts/import_ur_battles.py` (procédure complète : `docs/ORACLE.md`),
    `tests/test_ur_battles.py` rejoue chaque round et exige les valeurs officielles (puissance, dégâts, attaque,
    vainqueur, vies, pillz). Viser les points non tranchés (Limitless,
-   Exchange contre Copy/Annul, doublons dans Unison) et les clans à bonus méta. Le modèle `abilityData` du
+   Exchange contre Copy/Annul) et les clans à bonus méta. Le modèle `abilityData` du
    client (`docs/ur-abilitydata-modele.md`) s'accumule passivement avec les combats (pas de scraping API : piste abandonnée).
 3. Le journal des effets (D2, fait) rend ces vérifications immédiates : comparer le journal au déroulé réel.
 

@@ -1,7 +1,8 @@
 """
 Niveau 1 : capacités « méta » qui agissent sur les autres capacités ou sur les valeurs imprimées, avant tout
 modificateur de stats. Quatre phases, puis les capacités méta sont consommées (None) :
-  1. Copy: Opp. Ability / Bonus  — l'emplacement copieur devient une copie de l'emplacement adverse
+  1. Copy: Opp. Ability / Bonus  — l'emplacement copieur devient une copie du texte adverse (apply_copies, appelé
+     par process_round avant l'évaluation des conditions de la copie : combat réel 1349481)
   2. Protection: Ability / Bonus puis Stop Opp. Ability / Bonus — résolution « en chaîne » (voir _stopped_slots) ;
      une capacité « Stop: X » s'active si son emplacement est stoppé, et reste inerte sinon
   3. Copy / Exchange / Impose de power et damage — sur les valeurs imprimées
@@ -26,7 +27,6 @@ STAT_TYPES = ("power", "damage", "attack")
 
 
 def apply_capacity_lvl_1(card1: Card, card2: Card) -> None:
-    _apply_copies(card1, card2)
     _apply_stops(card1, card2)
     _apply_value_copies_and_exchanges(card1, card2)
     _apply_cancels(card1, card2)
@@ -65,7 +65,12 @@ def _description(card: Card, kind: str) -> str:
 
 # --- Phase 1 : Copy: Opp. Ability / Bonus -----------------------------------------------------
 
-def _apply_copies(card1: Card, card2: Card) -> None:
+def apply_copies(card1: Card, card2: Card, sources: dict) -> None:
+    """
+    `sources[id(carte)][emplacement]` : les emplacements adverses **avant** l'évaluation des conditions de début de
+    round, pour que la copie garde ses conditions et qu'elles soient réévaluées pour le copieur (combat réel 1349481 :
+    Rohese copie « Unison : Recover 1 Pillz Out Of 2 » de Porcusite sans avoir de main mono-clan → rien).
+    """
     planned = []
     for own, opp in _pairs(card1, card2):
         for slot in SLOT_OF_KIND.values():
@@ -73,7 +78,7 @@ def _apply_copies(card1: Card, card2: Card) -> None:
             kind = _kind_targeted(capacity) if _is(capacity, "copy") else None
             if kind is None:
                 continue
-            source = getattr(opp, SLOT_OF_KIND[kind])
+            source = sources[id(opp)][SLOT_OF_KIND[kind]]
             copied = None if _is(source, "copy") and _kind_targeted(source) else copy.deepcopy(source)
             if copied is not None:
                 copied.label = f"copie du {_KIND_LABELS[kind]} {_of(opp)} « {_description(opp, kind)} »"

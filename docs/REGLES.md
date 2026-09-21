@@ -153,6 +153,9 @@ rien. Moteur : `clan.infiltrated_clan`.
   « Equalizer: Att. +3 » de l'Oculus actif (Freaks listé, Roots non), SoA Roots inactif → l'Oculus a rejoint les
   Freaks : la **carte seule se compte en exemplaires**, pas en noms distincts (les deux Miken Moose font deux cartes
   Roots). Moteur : `clan.infiltrated_clan` compte les cartes, test `test_the_sole_card_is_counted_in_copies…`.
+- 1349443, 1349464, 1349481, 1349511 (Freaks avec doublons, Unison, Recover sans condition, Copy, Dominion, Zenith) :
+  conformes, sauf Copy d'une capacité conditionnée (3.11, corrigé). 1349464 : Porcusite + Sofilia ×3 → **Unison actif**
+  avec deux noms distincts seulement — Unison est une condition « main mono-clan », les doublons n'y changent rien.
 - 1214141 (branche `feat/ia-tous-modes`) : trois autres clans → rien.
 
 Seule lecture compatible avec le texte et les cinq combats : **chaque Leader est son propre clan**. Un Leader seul face à
@@ -219,7 +222,13 @@ damage-reducing abilities/bonuses (if any) are also taken into account ». Exemp
 ### 3.11 Copy — ✅ CONFIRMÉ
 
 - Wiki *Copy: Opp. Bonus* : « If the opponent's Bonus is not activated, then this ability has no effect. This ability
-  cannot be copied. » → copier l'emplacement « tel que joué » et Copy contre Copy → rien : confirmé.
+  cannot be copied. » → bonus copié seulement s'il est actif, Copy contre Copy → rien : confirmé.
+- **Conditions de la capacité copiée** : combat réel 1349481 — Rohese (Oblivion, bonus « Copy: Opp. Ability », main
+  Oblivion ×3 + Ulu Watu) gagne contre Porcusite (« Unison : Recover 1 Pillz Out Of 2 », main mono-Freaks) et ne
+  récupère **rien**. La copie porte donc le texte adverse avec ses conditions, **réévaluées pour le copieur** (Unison
+  faux pour Rohese), et non l'emplacement « tel que joué » (le moteur faisait l'inverse, corrigé le 2026-09-21).
+  Cas symétrique (condition fausse pour l'adversaire, vraie pour le copieur → la copie s'active) : hypothèse du même
+  modèle, non observée. Moteur : `apply_capacity_lvl_1.apply_copies` + seconde passe de `drop_unmet_conditions`.
 - Wiki *Oblivion* (bonus « Copy: Opp. Ability ») : « Leader and Genesis abilities cannot be copied. » Le moteur ne joue
   jamais l'ability « Team » comme ability de carte (`check_capacity_condition` la refuse), donc rien à copier :
   confirmé. Genesis (« Beyond ») n'est pas géré.

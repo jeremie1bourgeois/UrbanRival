@@ -148,6 +148,21 @@ def test_copy_opp_ability_gains_the_opponent_ability(template_game):
     assert amelia.power_fight == 3 + 2 - 2
 
 
+def test_a_copied_ability_keeps_its_condition_which_is_evaluated_for_the_copier(template_game):
+    # Combat réel 1349481 : Rohese (main non mono-clan) copie « Unison : Recover … » de Porcusite -> rien.
+    # Ici : Asporov joue en premier, son Courage s'active ; Amelia copie « Courage: Power +2 » mais joue en second.
+    amelia, asporov = play(template_game, ally_ability="Copy: Opp. Ability", enemy_ability="Courage: Power +2", turn=False)
+
+    assert (amelia.power_fight, asporov.power_fight) == (3 - 2, 7 + 2 - 2)
+
+
+def test_a_copied_ability_is_the_printed_text_even_if_its_condition_failed_for_the_opponent(template_game):
+    # Hypothèse symétrique du cas précédent (non observée en combat réel) : Amelia joue en premier, le Courage copié s'active
+    amelia, asporov = play(template_game, ally_ability="Copy: Opp. Ability", enemy_ability="Courage: Power +2", turn=True)
+
+    assert (amelia.power_fight, asporov.power_fight) == (3 + 2 - 2, 7 - 2)
+
+
 def test_copy_versus_copy_yields_nothing(template_game):
     amelia, asporov = play(template_game, ally_ability="Copy: Opp. Ability", enemy_ability="Copy: Opp. Ability")
 

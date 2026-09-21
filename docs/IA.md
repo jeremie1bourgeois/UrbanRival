@@ -115,7 +115,7 @@ ils comptent **pour un seul** dans le « ≥ 2 cartes du clan » qui active le b
 cohérente avec le wiki : « This doesn't apply to the same Characters »). Le moteur compte les **noms distincts** par
 clan (`is_clan_bonus_active`, test « deux exemplaires seuls de leur clan → bonus inactif »). Le pouvoir `Support`, lui,
 compte **chaque exemplaire** (combat réel 1347602, `docs/REGLES.md` § 3.6). L'Oculus, lui aussi, compte les
-exemplaires pour trouver la carte seule (combat 1349230). Cas voisin non tranché : Unison (§ 9). Deux exemplaires du même Leader s'annulent (confirmé par l'utilisateur le 2026-09-21).
+exemplaires pour trouver la carte seule (combat 1349230). Unison est une condition « main mono-clan », les doublons n'y changent rien (combat 1349464). Deux exemplaires du même Leader s'annulent (confirmé par l'utilisateur le 2026-09-21).
 
 ### 3.2 Générateur de mains
 Des mains de 4 cartes au hasard parmi 2 497 n'activent presque jamais un bonus de clan (≥ 2 cartes du clan) : elles
@@ -441,7 +441,7 @@ ce que la recherche corrige ; pourquoi on n'a pas besoin de résoudre des partie
 | Encodage des capacités non gérées (`Capacity = None`) | étape 3 | drapeau « non gérée » ; l'IA les joue à vide, comme le moteur |
 | Invariance à l'ordre des cartes dans une main | étape 3 | tri canonique d'abord |
 | Modes à règles spéciales (vies ≠ 12, bonus modifiés) | moteur | hors périmètre de l'IA tant que le moteur ne les modélise pas |
-| Doublons et cas voisins : Unison avec doublons (exemplaires ou noms distincts ?) | moteur (étape 0) | à confirmer en combat réel (`docs/ORACLE.md`). Tranchés : bonus de clan = noms distincts (utilisateur) ; Support = exemplaires (combat 1347602) ; carte seule de l'Oculus = exemplaires (combat 1349230) ; deux exemplaires du même Leader s'annulent (utilisateur, 2026-09-21) |
+| Doublons et cas voisins | moteur (étape 0) | **tous tranchés** : bonus de clan = noms distincts (utilisateur) ; Support = exemplaires (combat 1347602) ; carte seule de l'Oculus = exemplaires (combat 1349230) ; Unison = main mono-clan, doublons sans effet (combat 1349464) ; deux exemplaires du même Leader s'annulent (utilisateur, 2026-09-21) |
 | Mémo et doublons : deux exemplaires identiques non joués rendent des états équivalents par permutation | étape 2 | canonicaliser la clé (trier les cartes restantes) — optimisation, pas une nécessité |
 
 ## 10. Journal des mesures

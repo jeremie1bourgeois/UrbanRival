@@ -52,14 +52,22 @@ def _process_round(game: Game, round_data: ProcessRoundInput) -> None:
         player2_card.leader_fight = leader_team_capacity(game.enemy)
         apply_leader_modes(game, player1_card, player2_card)
 
-        for card, is_ally, own_index, opp_index in ((player1_card, True, round_data.player1_card_index, round_data.player2_card_index),
-                                                    (player2_card, False, round_data.player2_card_index, round_data.player1_card_index)):
-            for slot in FIGHT_SLOTS:
-                capacity = getattr(card, slot)
-                unmet = unmet_condition(game, capacity, is_ally, own_index, opp_index)
-                if unmet is not None:
-                    note(card, "condition", f"{card.name} : {journal_label(capacity)} inactif (condition {unmet} non remplie)")
-                    setattr(card, slot, None)
+        def drop_unmet_conditions() -> None:
+            for card, is_ally, own_index, opp_index in ((player1_card, True, round_data.player1_card_index, round_data.player2_card_index),
+                                                        (player2_card, False, round_data.player2_card_index, round_data.player1_card_index)):
+                for slot in FIGHT_SLOTS:
+                    capacity = getattr(card, slot)
+                    unmet = unmet_condition(game, capacity, is_ally, own_index, opp_index)
+                    if unmet is not None:
+                        note(card, "condition", f"{card.name} : {journal_label(capacity)} inactif (condition {unmet} non remplie)")
+                        setattr(card, slot, None)
+
+        # Copy: Opp. Ability / Bonus copie le texte adverse, conditions comprises, puis les conditions de la copie sont
+        # évaluées pour le copieur (combat réel 1349481) : instantané avant la première passe, seconde passe après
+        copy_sources = {id(card): {slot: copy.deepcopy(getattr(card, slot)) for slot in FIGHT_SLOTS} for card in (player1_card, player2_card)}
+        drop_unmet_conditions()
+        fct_lvl_1.apply_copies(player1_card, player2_card, copy_sources)
+        drop_unmet_conditions()
 
         # Appliquer les effets de combat
         fct_lvl_1.apply_capacity_lvl_1(player1_card, player2_card)
