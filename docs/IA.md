@@ -113,10 +113,9 @@ situation que le moteur sait jouer ; aucune constante « 12 » dans le code de l
 **Doublons et bonus de clan.** Une main peut contenir plusieurs exemplaires d'une même carte (même niveau ou non) ;
 ils comptent **pour un seul** dans le « ≥ 2 cartes du clan » qui active le bonus (règle confirmée par l'utilisateur,
 cohérente avec le wiki : « This doesn't apply to the same Characters »). Le moteur compte les **noms distincts** par
-clan (`is_clan_bonus_active`, test « deux exemplaires seuls de leur clan → bonus inactif »). **Ne pas oublier le
-pouvoir `Support`** : il compte lui aussi les cartes du clan en main et fonctionne potentiellement comme le bonus
-(exemplaires ou noms distincts ?) — à tester en combat réel avant de le corriger. Cas voisins non tranchés : Oculus
-infiltré avec doublons (§ 9). Deux exemplaires du même Leader s'annulent (confirmé par l'utilisateur le 2026-09-21).
+clan (`is_clan_bonus_active`, test « deux exemplaires seuls de leur clan → bonus inactif »). Le pouvoir `Support`, lui,
+compte **chaque exemplaire** (combat réel 1347602, `docs/REGLES.md` § 3.6). Cas voisins non tranchés : Oculus
+infiltré avec doublons, Unison (§ 9). Deux exemplaires du même Leader s'annulent (confirmé par l'utilisateur le 2026-09-21).
 
 ### 3.2 Générateur de mains
 Des mains de 4 cartes au hasard parmi 2 497 n'activent presque jamais un bonus de clan (≥ 2 cartes du clan) : elles

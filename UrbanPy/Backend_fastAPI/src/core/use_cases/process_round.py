@@ -245,8 +245,8 @@ def consume_tune_out(card: Card) -> bool:
 
 def apply_leader_modes(game: Game, player1_card: Card, player2_card: Card) -> None:
     """
-    Modes de Leader lus avant les conditions : Counter-attack (Ashigaru) — « always plays second » : fixe l'ordre du
-    round si un seul camp l'a ; Limitless (Fractal) — les maximums des abilities de l'équipe tombent, les minimums
+    Modes de Leader lus avant les conditions : Counter-attack (Ashigaru) — son camp joue en second au premier round si
+    un seul camp l'a, puis alternance classique (utilisateur, 2026-09-21) ; Limitless (Fractal) — les maximums des abilities de l'équipe tombent, les minimums
     passent à 0 (pas les bonus).
     """
     modes = {}
@@ -256,7 +256,7 @@ def apply_leader_modes(game: Game, player1_card: Card, player2_card: Card) -> No
             modes[id(card)] = capacity.how
             card.leader_fight = None
     ally_counter, enemy_counter = modes.get(id(player1_card)) == "counter_attack", modes.get(id(player2_card)) == "counter_attack"
-    if ally_counter != enemy_counter:
+    if ally_counter != enemy_counter and game.nb_turn == 1:
         game.turn = enemy_counter                  # l'allié joue en premier seulement si c'est l'ennemi qui a Ashigaru
     for card in (player1_card, player2_card):
         if modes.get(id(card)) == "limitless" and card.ability_fight is not None and card.ability_fight.borne != -1:

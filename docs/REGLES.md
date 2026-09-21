@@ -267,8 +267,8 @@ ROADMAP § 2.A.
 | **After (Clan X[, Clan Y]): X** (bonus Tolvack + abilities) | « This effect only activates if you played a "Clan X" character in the previous round. Oculus characters, even when infiltrated "Clan X", do not count. » Ne s'active jamais au round 1. | Condition sur `history[-1]` (clan de la carte jouée par le même joueur au round précédent) |
 | **Perfect: X** | « your card has to have the exact amount of Pillz needed » — une pillz de moins aurait perdu, une de plus est gaspillée. Exemple : adversaire 25 d'attaque, puissance 8 → exactement 4 pillz (32). | Condition différée après le calcul des attaques (victoire et `attack − power_fight < opp.attack`) |
 | **Consume X, Min Y** | « If your card wins the round, the opponent will lose X Pillz, minimum Y. This effect will be felt at the end of each of the following rounds. (If two Consumes are applied, the second will replace the first.) » | Effet persistant sur les pillz adverses (comme Poison sur la vie ; remplace, ne cumule pas) |
-| **Combust X, Min Y** | « at the end of each of the following turns the opponent will lose X Life point(s) and Pillz if he/she/they have more than [Min] Life point(s)/Pillz » | Persistant vie + pillz ; « Players Combust » : les deux joueurs |
-| **Mindwipe X, Min Y** | « your opponent will lose X Life Points and Pillz, minimum of Y. This effect will persist at the end of each of the following rounds. » | Identique à Combust d'après ces textes (différence éventuelle non documentée) |
+| **Combust X, Min Y** | « at the end of each of the following turns the opponent will lose X Life point(s) and Pillz if he/she/they have more than [Min] Life point(s)/Pillz » | Persistant vie + pillz, tic **dès le round joué** (utilisateur, 2026-09-21) ; « Players Combust » : les deux joueurs |
+| **Mindwipe X, Min Y** | « your opponent will lose X Life Points and Pillz, minimum of Y. This effect will persist at the end of each of the following rounds. » | Identique à Combust — confirmé par le texte de carte fourni par l'utilisateur (2026-09-21) : « Si la carte gagne, votre adversaire perd X point(s) de vie et Pillz, minimum Y. L'effet persiste à la fin de chacun des tours suivants » |
 | **Xantiax: −X Life, Min Y** | « Whether the character wins or loses the round, the two competing players lose X Life Points or up to a minimum of X » | Effet de fin de round, cible les deux joueurs, sans condition de victoire |
 | **Corrosion X, Min Y** | « the opponent will lose 1 multiplied by the number of the round in which your card was played. (Corrosion is considered a Poison.) » | Poison de valeur = numéro du round ; partage l'emplacement du poison |
 | **Corrupt X, Min Y** | « If your card wins or loses the fight, the number of Life points **you** have will be reduced by X, or up to a minimum » | Effet de fin de round sur soi, victoire ou défaite (Nega D Ld) |
@@ -279,9 +279,13 @@ ROADMAP § 2.A.
 | **Sinister Symmetry** | « If your card wins the round against the card in front of it, the match is over and you win. » | Fin de partie immédiate |
 | **Limitless** (Fractal) | « For all the cards in your hand, the maximums on abilities are cancelled and the minimums are replaced by 0. […] This effect does not apply to bonuses. » | Modificateur global des bornes |
 | **Tie-Break** (Solomon) | Gagne toutes les égalités d'attaque (wiki *Power* : « unless Solomon is in play ») | Cas dans `resolve_combat` |
-| **Counter-Attack** (Ashigaru) | « The player who has Ashigaru in their team always plays second in the fight […]. If both players have Ashigaru, the order of play is decided in the usual way. » | Ordre de jeu |
-| **Rebirth** | Pas une mécanique : anciennes rééditions graphiques de cartes | Ignorer |
-| Hazard, Illusion, Bypass, Overdose, Remove Ability Conditions | Pages du wiki sans définition exploitable (cartes uniques) | Reporter |
+| **Counter-Attack** (Ashigaru) | « The player who has Ashigaru in their team always plays second in the fight […]. If both players have Ashigaru, the order of play is decided in the usual way. » | Ordre de jeu : le camp d'Ashigaru joue en second au **premier round** seulement, puis alternance classique ; les deux camps l'ont → ordre habituel (utilisateur, 2026-09-21) |
+| **Rebirth** (dont « Rebirth 1, Max. 1 », Nemo Cr) | Pas une mécanique : anciennes rééditions graphiques de cartes | **Exclu du moteur et de l'IA** (décision utilisateur, 2026-09-21) |
+| **Hazard** (Administrator, Leader) | « Les pouvoirs des trois cartes présentes dans le tirage avec Administrator sont remplacés par des pouvoirs aléatoires déjà utilisés dans le jeu (sauf pouvoir de Leader et Oculus). » (texte de carte, utilisateur 2026-09-21) | **Exclu du moteur et de l'IA** (décision utilisateur, 2026-09-21). Lecture antérieure : Effet de la **phase de tirage** (une fois par partie, comme le tirage de la main), pas du round : pool = abilities distinctes du jeu moins celles des Leaders et Oculus, tirage seedé à la création de la partie. Un combat réel se rejoue avec les pouvoirs tirés tels que le journal les montre. À trancher : avec/sans remise, pool pondéré ou non, cibles (autre Leader, Oculus ?). À coder avec le tirage de la main |
+| **Bypass** (Robert Cobb, Leader) | « Le bonus de vos autres cartes est actif même si vous n'avez pas d'autre carte du même clan. Leur bonus peut toujours être bloqué par les cartes "Stop Bonus Adv." de l'adversaire. » (idem) | **Exclu du moteur et de l'IA** (décision utilisateur, 2026-09-21). Lecture antérieure : Activation du bonus de clan forcée pour les autres cartes de la main (Leader unique) ; SoB s'applique normalement. À coder |
+| **Illusion** (Kate, Leader) | « Kate prend l'apparence et la position d'une des 3 autres cartes du tirage, choisie au hasard. Le joueur adverse ne découvre l'identité de Kate qu'au moment où les Pillz sont révélées. » (idem) | **Exclu du moteur et de l'IA** (décision utilisateur, 2026-09-21). Lecture antérieure : Information cachée seulement : sans effet sur la résolution d'un round (moteur à information parfaite). Concerne l'IA (`docs/IA.md`), pas le moteur |
+| **Overdose** (Hekate, Leader) | « Pour l'intégralité de la partie, la Fury est remplacée pour le joueur d'Hekate par une Fury inversée : l'Overdose. L'Overdose permet, si le joueur le souhaite, de sacrifier 2 Dégâts de sa carte (min. 0) pour obtenir 2 Pillz en échange. Les Pillz sont obtenues à la fin du round, quel que soit le résultat du round et même si la carte n'a pas assez de dégâts à sacrifier. Comme la Fury, cet effet ne peut pas être contré avec des cartes Annule. » (idem) | **Exclu du moteur et de l'IA** (décision utilisateur, 2026-09-21). Lecture antérieure : Nouvelle action de round (à la place de la fury) : −2 dégâts (min 0) après les modificateurs, +2 pillz en fin de round, victoire ou défaite, non annulable. À coder (entrée de round + front) |
+| Remove Ability Conditions (Memento) | Page du wiki sans définition exploitable | **Exclu du moteur et de l'IA** (décision utilisateur, 2026-09-21) |
 
 Précisions utiles glanées au passage :
 - **Poison / Toxin / Dope / Consume / Heal** : ne se cumulent pas, le second **remplace** le premier (wiki *Poison*,
@@ -300,13 +304,12 @@ Précisions utiles glanées au passage :
 ## 5. Ce que les textes ne tranchent pas — à régler par rejeu de combats réels
 
 Par ordre d'impact :
-1. Recover : pillz gratuite comptée ou non (3.5).
-2. Cancel Life Modif. : pose du poison empêchée, ou tic du round sauté (3.3).
-3. Combust contre Mindwipe : différence réelle.
+1. Cancel Life Modif. : pose du poison empêchée, ou tic du round sauté (3.3).
+2. Recover : plancher de 1 pillz (3.5), jamais observé en combat réel.
 
 Tranchés par l'utilisateur le 2026-09-21 (connaissance du jeu, sans source écrite) : cycles de Stops et de Protections
 (3.2, les Stops gagnent), Leader bénéficiant de son propre Team (3.7, oui), deux exemplaires du même Leader
-s'annulent (3.7, oui), Tune Out ignore la fury (§ 4).
+s'annulent (3.7, oui), Tune Out ignore la fury (§ 4), **Repair, Combust et Mindwipe agissent dès le round joué** (comme Dope ; Combust/Mindwipe si la carte gagne), Mindwipe = Combust (§ 4), Counter-attack limité au premier round (§ 4).
 
 Chaque combat rejoué se transcrit dans `data/test/` (voir ROADMAP § 2.B.2) ; le journal des effets (D2) rendra la
 localisation des écarts immédiate.
@@ -319,7 +322,7 @@ Verdicts sur les points encore ouverts ou déjà codés :
 | Entrée | Règle officielle | Moteur (après les corrections du matin) | Verdict |
 |---|---|---|---|
 | 53 Récup | « arrondie à l'unité inférieure, **avec un minimum de 1** » | pas de minimum | ❌ → **corrigé** |
-| 51 Toxine / Régén, 52 Consume / Dope | « agissent **immédiatement à la fin du round** dans lequel ils ont été joués » (Drak au round 1 : vies aux rounds 1, 2, 3 et 4) | n'agissent qu'aux rounds suivants | ❌ → **corrigé** (Repair reste aux rounds suivants, par symétrie avec Heal : hypothèse) |
+| 51 Toxine / Régén, 52 Consume / Dope | « agissent **immédiatement à la fin du round** dans lequel ils ont été joués » (Drak au round 1 : vies aux rounds 1, 2, 3 et 4) | n'agissent qu'aux rounds suivants | ❌ → **corrigé** (Repair et Combust/Mindwipe immédiats aussi : utilisateur, 2026-09-21) |
 | 66 Par Pillz / Vie restante | pillz/vies « **avant de mettre des pillz** sur ton perso (sans compter la Pillz gratuite) » — Lady Ametia Cr : 13 de puissance au round 1 | `nb_pillz_left` lit les pillz **après** la mise | ❌ → **corrigé** (vie : inchangée pendant la mise, OK) |
 | 56 Annule (Vie / Pillz) | « n'annule un effet permanent (Poison, Soin, Toxine, Régén) que **pendant le round où il est joué. L'effet reprendra lors du round suivant** » ; idem Pillz face à Dope / Consume | la correction du matin **retire** le poison/heal/… de la carte adverse | ⚠️ → **corrigé** : le tic du round est sauté (y compris le tic immédiat d'une toxine posée ce round), l'effet subsiste |
 | 56 Annule (Dégâts) | « n'annule pas la Fury » | fury ajoutée après les modificateurs, jamais annulée | ✅ |
@@ -333,8 +336,8 @@ Verdicts sur les points encore ouverts ou déjà codés :
 | 61 Courage / Riposte, 62 Confiance / Revanche | ✅ | | ✅ |
 | 70 Jour / Nuit | cycle de 4 h dans le jeu | non modélisé (Day toujours vrai) | choix utilisateur |
 
-Non tranché par le glossaire : Mindwipe vs Combust, Limitless. (Cycles de Stops/Protections, Leader et son Team,
-Tune Out et fury : tranchés par l'utilisateur, voir § 5.)
+Non tranché par le glossaire : Limitless. (Cycles de Stops/Protections, Leader et son Team, Tune Out et fury, Repair,
+Mindwipe : tranchés par l'utilisateur, voir § 5.)
 
 **Historique de combats** : `player/history.php` ne donne que le score final de chaque combat (ex. « 12-3 »), sans détail
 de rounds ni rapport. Le jeu lui-même est un client Unity WebGL (`/game/play/`) ; les données de round transitent

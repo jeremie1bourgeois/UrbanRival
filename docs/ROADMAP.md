@@ -39,7 +39,7 @@ Cancel Life Modif., Reanimate, Versus) ont été **corrigées** le même jour ; 
 | per damage : dégâts réellement infligés (0 en défaite) | `multipliers._nb_damage_inflicted` |
 | Copy : copie l'emplacement adverse tel que joué (conditions déjà évaluées) ; Copy vs Copy → rien | `apply_capacity_lvl_1._apply_copies` |
 | Fury : +2 dégâts ajoutés **après** les modificateurs de dégâts (utilisateur ; glossaire 56 : « Annul Modif Dégâts n'annule pas la Fury ») | `process_round` |
-| Toxine / Régén / Dope / Consume agissent **dès le round joué** (glossaire 51, 52) ; Poison / Heal / Repair / Combust aux rounds suivants | `apply_capacity_lvl_4.IMMEDIATE_KINDS` |
+| Toxine / Régén / Dope / Repair / Consume / Combust (Mindwipe) agissent **dès le round joué** (glossaire 51, 52 ; Repair, Combust : utilisateur) ; Poison / Heal aux rounds suivants | `apply_capacity_lvl_4.IMMEDIATE_KINDS` |
 | « Per Pillz Left » : pillz **avant la mise**, pillz gratuite exclue (glossaire 66) | `multipliers._nb_pillz_left` |
 | `Day:` toujours valide, `Night:` jamais (décision utilisateur, cycle jour/nuit non modélisé) | `capacity_parser._IGNORED_PREFIXES` |
 
@@ -50,23 +50,28 @@ Cancel Life Modif., Reanimate, Versus) ont été **corrigées** le même jour ; 
 
 ## 2. Travail restant
 
-### A. Pouvoirs non gérés — 10 descriptions, capacités uniques
+### A. Pouvoirs non gérés
 
 Tout ce qui a une règle publiée est codé (voir `docs/REGLES.md` § 4). Reste, sans règle trouvée ni sur le site ni sur le
-wiki : **Beyond** (Genesis, 5e round — hors périmètre), **Bypass** (Robert Cobb), **Hazard** (Administrator), **Illusion**
-(Kate), **Overdose** (Hekate), **Perfection** (Glibon Cr), **Rebirth 1, Max. 1** (Nemo Cr), **Remove Ability Conditions**
-(Memento), `Growth: -1 Power And Damage, Min 4` (Bugamon, coquille probable) et `Night:` (ignoré volontairement).
+wiki : **Beyond** (Genesis, 5e round — hors périmètre), **Perfection** (Glibon Cr), `Growth: -1 Power And Damage, Min 4`
+(Bugamon, coquille probable) et `Night:` (ignoré volontairement).
 
-Choix de modélisation à confirmer en combat réel : Mindwipe = Combust (textes identiques) ; Perfect = écart
-d'attaque < puissance ; Limitless ne touche que l'ability de la carte jouée ; Counter-attack refixe l'ordre à chaque
-round. Confirmé par l'utilisateur (2026-09-21) : Tune Out compare les pillz **sans la fury**.
+**Exclus définitivement du moteur et de l'IA** (décision utilisateur, 2026-09-21) : **Hazard** (Administrator),
+**Illusion** (Kate), **Bypass** (Robert Cobb), **Overdose** (Hekate), **Remove Ability Conditions** (Memento),
+**Rebirth 1, Max. 1** (Nemo Cr). Leurs définitions sont conservées dans `docs/REGLES.md` § 4 pour mémoire ; ne pas les
+compter parmi les pouvoirs restant à gérer.
+
+Choix de modélisation à confirmer en combat réel : Perfect = écart
+d'attaque < puissance ; Limitless ne touche que l'ability de la carte jouée. Confirmé par l'utilisateur (2026-09-21) :
+Tune Out compare les pillz **sans la fury** ; Mindwipe = Combust ; Repair, Combust et Mindwipe agissent dès le round
+joué (si la carte gagne) ; Counter-attack (Ashigaru) ne joue que sur le **premier round**, puis alternance classique.
 
 ### B. Fiabilité des règles existantes
 1. ~~Confirmer les décisions du tableau § 1 contre les règles officielles~~ → fait (`docs/REGLES.md`) ; appliquer les corrections listées en § 3 de ce document.
 2. **Oracle = combats réels** (fait le 2026-09-16, premier combat reproduit à l'identique) : jouer un combat dans le
    client web d'Urban Rivals avec `scripts/ur_capture.js` chargé, importer `urRecords()` avec `scripts/import_ur_battles.py` (procédure complète : `docs/ORACLE.md`),
    `tests/test_ur_battles.py` rejoue chaque round et exige les valeurs officielles (puissance, dégâts, attaque,
-   vainqueur, vies, pillz). Viser les points non tranchés (Recover et pillz gratuite, Mindwipe / Combust, Limitless,
+   vainqueur, vies, pillz). Viser les points non tranchés (Limitless,
    Exchange contre Copy/Annul, doublons dans Support / Oculus / Unison) et les clans à bonus méta. Le modèle `abilityData` du
    client (`docs/ur-abilitydata-modele.md`) s'accumule passivement avec les combats (pas de scraping API : piste abandonnée).
 3. Le journal des effets (D2, fait) rend ces vérifications immédiates : comparer le journal au déroulé réel.

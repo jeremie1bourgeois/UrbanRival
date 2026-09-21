@@ -142,8 +142,8 @@ def test_tie_break_leader_wins_every_attack_tie(game):
     assert allison.win is True                                  # sans Tie-break, Asporov (4 étoiles) gagnerait
 
 
-def test_counter_attack_leader_makes_his_team_always_play_second(game):
-    # Ashigaru : « The player who has Ashigaru in their team always plays second in the fight »
+def test_counter_attack_leader_makes_his_team_play_second_in_the_first_round(game):
+    # Ashigaru : son camp joue en second au premier round (utilisateur, 2026-09-21)
     game.ally.cards[AGUSTINO].ability = ability("Counter-attack")
     game.ally.cards[AMELIA].ability = ability("Reprisal: Power +2")
     game.enemy.cards[ASPOROV].ability = ability("Courage: Power +2")
@@ -151,7 +151,17 @@ def test_counter_attack_leader_makes_his_team_always_play_second(game):
     amelia, asporov = play(game, turn=True)                     # même si c'était le tour de l'allié
 
     assert (amelia.power_fight, asporov.power_fight) == (3 + 2 - 2, 7 + 2 - 2)
-    assert game.turn is True                                    # le tour suivant repart normalement (l'ordre est refixé à chaque round)
+    assert game.turn is True                                    # puis alternance classique : l'allié joue en premier au round 2
+
+
+def test_counter_attack_leader_does_not_change_the_order_after_the_first_round(game):
+    game.ally.cards[AGUSTINO].ability = ability("Counter-attack")
+    game.ally.cards[AMELIA].ability = ability("Courage: Power +2")
+    game.nb_turn = 2
+
+    amelia, _ = play(game, turn=True)                           # round 2, tour de l'allié : Ashigaru ne l'inverse plus
+
+    assert amelia.power_fight == 3 + 2 - 2
 
 
 def test_limitless_leader_removes_maximums_and_zeroes_minimums_of_abilities(game):

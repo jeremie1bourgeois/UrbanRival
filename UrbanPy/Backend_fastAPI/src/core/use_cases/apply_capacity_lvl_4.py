@@ -21,7 +21,7 @@ _LIFE_LOSS = ("poison", "toxine")
 _LIFE_GAIN = ("heal", "regen")
 _PILLZ_GAIN = ("dope", "repair")
 _PILLZ_LOSS = ("consume",)
-IMMEDIATE_KINDS = ("toxine", "regen", "dope", "consume")
+IMMEDIATE_KINDS = ("toxine", "regen", "dope", "repair", "consume", "combust")
 _LIFE_LOSS_AND_PILLZ_LOSS = ("combust",)
 
 
