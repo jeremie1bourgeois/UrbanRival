@@ -1,9 +1,9 @@
 import copy
-from collections import Counter
 from src.core.domain.round import Round
 from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card, FIGHT_SLOTS
 from src.core.domain.player import Player
+from src.core.use_cases.clan import LEADER, clan_for_bonus, infiltrable_clans, infiltrated_clan, is_infiltrated
 from src.schemas.game_schemas import ProcessRoundInput
 from src.core.domain.game import Game, NB_ROUNDS
 from src.core.domain.journal import Journal, note, recording
@@ -313,50 +313,6 @@ def hand_is_mono_clan(player: Player, card_index: int) -> bool:
 
 
 MIN_CLAN_CARDS_FOR_BONUS = 2
-OCULUS = "Oculus"
-LEADER = "Leader"
-
-
-def is_infiltrated(card: Card) -> bool:
-    return card.faction == OCULUS and card.bonus is not None and "infiltrated" in card.bonus.types
-
-
-def infiltrated_clan(player: Player):
-    """
-    Clan adopté par l'Oculus « Infiltrated » de la main (règle officielle du bonus) : un seul autre clan -> celui-là ;
-    deux autres clans -> celui de la carte seule ; trois autres clans ou plus d'un Oculus -> None.
-    Un Leader compte comme un clan (combat 1346878 : Bangers ×2 + Morphun -> l'Oculus rejoint le Leader, dont le
-    « Cancel Leader » annule Morphun, et non les Bangers).
-    """
-    oculus = [c for c in player.cards if c.faction == OCULUS]
-    if len(oculus) != 1:
-        return None
-    counts = Counter(c.faction for c in player.cards if c.faction != OCULUS)
-    if len(counts) == 1:
-        clan = next(iter(counts))
-    elif len(counts) == 2:
-        lone = [clan for clan, n in counts.items() if n == 1]
-        clan = lone[0] if len(lone) == 1 else None
-    else:
-        clan = None
-    return clan
-
-
-def infiltrable_clans(card: Card):
-    """Clans listés sur la carte Oculus (icônes de l'ability, condition « infiltrated:Clan|Clan ») ; None si inconnus."""
-    if card.ability is None:
-        return None
-    for condition in card.ability.effect_conditions:
-        if condition.startswith("infiltrated:"):
-            return condition[len("infiltrated:"):].split("|")
-    return None
-
-
-def clan_for_bonus(player: Player, card: Card):
-    """Clan dont la carte porte le bonus : son propre clan, ou le clan adopté pour un Oculus infiltré."""
-    return infiltrated_clan(player) if is_infiltrated(card) else card.faction
-
-
 def apply_infiltrated_bonus(player: Player, card: Card) -> None:
     """Remplace le bonus de combat d'un Oculus infiltré par celui du clan adopté (None s'il n'y en a pas)."""
     if not is_infiltrated(card):
