@@ -149,6 +149,10 @@ rien. Moteur : `clan.infiltrated_clan`.
 - 1347671, Sofilia (Freaks) + Administrator + Ashigaru + Dark Majestic : « Support: Attack +3 » de Sofilia donne +3
   (×1) → l'Oculus n'a **pas** rejoint les Freaks, alors que Freaks ×1 contre Leader ×2 en ferait la carte seule.
 - 1347602, Freaks ×3 + Dark Majestic : Support ×4 → l'Oculus a rejoint les Freaks.
+- 1349230, Boris Cr (Freaks) + Miken Moose ×2 (Roots, **deux exemplaires**) + Dark Majestic : poison Freaks actif,
+  « Equalizer: Att. +3 » de l'Oculus actif (Freaks listé, Roots non), SoA Roots inactif → l'Oculus a rejoint les
+  Freaks : la **carte seule se compte en exemplaires**, pas en noms distincts (les deux Miken Moose font deux cartes
+  Roots). Moteur : `clan.infiltrated_clan` compte les cartes, test `test_the_sole_card_is_counted_in_copies…`.
 - 1214141 (branche `feat/ia-tous-modes`) : trois autres clans → rien.
 
 Seule lecture compatible avec le texte et les cinq combats : **chaque Leader est son propre clan**. Un Leader seul face à

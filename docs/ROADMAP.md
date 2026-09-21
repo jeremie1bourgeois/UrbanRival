@@ -72,7 +72,7 @@ joué (si la carte gagne) ; Counter-attack (Ashigaru) ne joue que sur le **premi
    client web d'Urban Rivals avec `scripts/ur_capture.js` chargé, importer `urRecords()` avec `scripts/import_ur_battles.py` (procédure complète : `docs/ORACLE.md`),
    `tests/test_ur_battles.py` rejoue chaque round et exige les valeurs officielles (puissance, dégâts, attaque,
    vainqueur, vies, pillz). Viser les points non tranchés (Limitless,
-   Exchange contre Copy/Annul, doublons dans Support / Oculus / Unison) et les clans à bonus méta. Le modèle `abilityData` du
+   Exchange contre Copy/Annul, doublons dans Unison) et les clans à bonus méta. Le modèle `abilityData` du
    client (`docs/ur-abilitydata-modele.md`) s'accumule passivement avec les combats (pas de scraping API : piste abandonnée).
 3. Le journal des effets (D2, fait) rend ces vérifications immédiates : comparer le journal au déroulé réel.
 

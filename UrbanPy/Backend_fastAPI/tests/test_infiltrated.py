@@ -58,6 +58,17 @@ def test_oculus_joins_the_lone_card_clan_when_two_other_clans_are_present(game):
     assert (asporov.power_fight, asporov.attack) == (7, 8)           # Montana (14 - 12, min 8), pas All Stars
 
 
+def test_the_sole_card_is_counted_in_copies_not_in_distinct_names(game):
+    # Combat réel 1349230 : Oculus + Boris Cr (Freaks) + Miken Moose x2 (Roots) -> l'Oculus rejoint les Freaks
+    make(game.ally.cards[AMELIA], "Oculus", "Infiltrated")
+    make(game.ally.cards[AGUSTINO], "Montana", MONTANA_BONUS)
+    game.ally.cards[ASHLEY].name = game.ally.cards[ALLISON].name    # 1 Oculus + 1 Montana + 2 exemplaires du même All Stars
+
+    _, asporov = play(game, AMELIA, enemy_pillz=2)
+
+    assert (asporov.power_fight, asporov.attack) == (7, 8)           # Montana : la carte seule, malgré l'égalité des noms distincts
+
+
 def test_two_oculus_in_hand_get_nothing(game):
     # « […] or if you have more than one Oculus in your hand, the Infiltrated bonus has no effect. »
     make(game.ally.cards[AMELIA], "Oculus", "Infiltrated")
