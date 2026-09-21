@@ -124,8 +124,9 @@ Of 3 = spending **1** Pillz gives you **1** back ». Le moteur renvoie ⌊1 × 2
 page sont par ailleurs arithmétiquement incohérents (« 1 out of 2 = spending 2 gives you 2 back ») : source fragile,
 à confirmer en combat réel, mais deux mentions concordantes du minimum.
 
-**Pillz comptées** : « of the Pillz placed on your card » — la pillz gratuite est-elle comprise ? Non tranché (le
-moteur l'exclut). Voir 3.8 : pour Bet, l'officiel la compte explicitement.
+**Pillz comptées** : « of the Pillz placed on your card » — la pillz gratuite **est comprise** : combat réel 1347075,
+Pyro (Defeat: Recover 1 Pillz Out Of 2) pose 4 pillz (3 misées + la gratuite) et en récupère 2 (12 − 3 = 9 → 11), et
+non ⌊3/2⌋ = 1. Cohérent avec Bet (3.8). Le plancher de 1 reste non observé en combat réel.
 
 ### 3.6 Infiltrated (Oculus) — ❌ CONTREDIT (texte de bonus)
 
@@ -147,6 +148,13 @@ you which clans have to be infiltrated to activate its bonus » — chaque Oculu
 listés sur sa carte**. À vérifier si les données scrapées d'iclintz contiennent cette liste ; sinon, lacune de données.
 
 **Cas Leader dans la main** : tranché par le combat réel 1346878 (`data/ur_battles/`) — le Leader compte comme un clan. Main Bangers ×2 + Morphun + Dark Morphun : l'Oculus rejoint le Leader (carte seule), pas les Bangers (puissance 6, pas 8) ; et compte alors comme second Leader : « Cancel Leader » annule le +1 Pillz Per Round de Morphun (pillz 12 − 3 = 9, pas 10). La liste des clans de la carte ne restreint que le bonus adopté et l'ability, pas l'appartenance.
+
+### 3.6 bis Ordre bonus / pouvoir sur une même carte — ✅ TRANCHÉ (attaque)
+
+Combat réel 1347131, round 2 : Donna Black (bonus « -12 Opp Attack, Min 8 », pouvoir « Revenge: -10 Opp Attack, Min 3 »)
+contre Liona à 14 d'attaque → 3. Seul l'ordre **bonus puis pouvoir** le donne (14 → 8 → 3) ; pouvoir puis bonus donnerait
+4 (14 → 4, puis le Min 8 ne fait rien). Le moteur applique désormais le bonus avant le pouvoir pour tous les
+modificateurs de niveau 2 (puissance, dégâts, attaque) ; seule l'attaque est vérifiée en combat réel.
 
 ### 3.7 Team (Leader) — ✅ CONFIRMÉ
 

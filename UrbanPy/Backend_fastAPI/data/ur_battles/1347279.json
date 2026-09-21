@@ -1,61 +1,61 @@
 {
  "_comment": "Combat réel Urban Rivals capturé via battles.status (voir scripts/ur_capture.js).",
- "battle_id": 1346878,
- "rule_id": 2,
+ "battle_id": 1347279,
+ "rule_id": 3,
  "p0": {
-  "name": "jere'm",
-  "base_life": 15,
+  "name": "TamaRex",
+  "base_life": 14,
   "base_pillz": 12,
   "cards": [
    {
-    "id": 744,
+    "id": 2639,
+    "level": 4
+   },
+   {
+    "id": 1728,
+    "level": 2
+   },
+   {
+    "id": 1823,
     "level": 5
    },
    {
-    "id": 809,
-    "level": 3
-   },
-   {
-    "id": 274,
-    "level": 5
-   },
-   {
-    "id": 2141,
-    "level": 3
+    "id": 2681,
+    "level": 2
    }
   ]
  },
  "p1": {
-  "name": "Smash Jabber",
-  "base_life": 15,
+  "name": "jere'm",
+  "base_life": 14,
   "base_pillz": 12,
   "cards": [
    {
-    "id": 1007,
-    "level": 5
-   },
-   {
-    "id": 1149,
+    "id": 509,
     "level": 3
    },
    {
-    "id": 2479,
-    "level": 3
+    "id": 615,
+    "level": 4
    },
    {
-    "id": 1782,
-    "level": 5
+    "id": 2347,
+    "level": 4
+   },
+   {
+    "id": 1689,
+    "level": 2
    }
   ]
  },
  "rounds": [
   {
    "round": 1,
-   "first": "p0",
+   "first": "p1",
    "before": {
     "life": [
-     15,
-     15
+     14,
+     14
     ],
     "pillz": [
      12,
@@ -63,22 +63,22 @@
     ]
    },
    "p0": {
-    "index": 3,
-    "pillz": 4,
+    "index": 2,
+    "pillz": 5,
     "fury": false,
-    "power": 6,
-    "damage": 4,
-    "attack": 24,
-    "won": false
+    "power": 9,
+    "damage": 7,
+    "attack": 45,
+    "won": true
    },
    "p1": {
-    "index": 3,
-    "pillz": 5,
+    "index": 1,
+    "pillz": 3,
     "fury": false,
     "power": 8,
     "damage": 7,
-    "attack": 48,
-    "won": true
+    "attack": 24,
+    "won": false
    },
    "post_round": [
     [],
@@ -86,44 +86,44 @@
    ],
    "after": {
     "life": [
-     8,
-     15
+     14,
+     7
     ],
     "pillz": [
-     9,
-     8
+     8,
+     10
     ]
    }
   },
   {
    "round": 2,
-   "first": "p1",
+   "first": "p0",
    "before": {
     "life": [
-     8,
-     15
+     14,
+     7
     ],
     "pillz": [
-     9,
-     8
+     8,
+     10
     ]
    },
    "p0": {
-    "index": 2,
-    "pillz": 3,
+    "index": 0,
+    "pillz": 1,
     "fury": false,
-    "power": 9,
-    "damage": 6,
-    "attack": 27,
+    "power": 8,
+    "damage": 4,
+    "attack": 8,
     "won": false
    },
    "p1": {
     "index": 2,
-    "pillz": 7,
+    "pillz": 6,
     "fury": false,
-    "power": 8,
-    "damage": 4,
-    "attack": 64,
+    "power": 7,
+    "damage": 8,
+    "attack": 42,
     "won": true
    },
    "post_round": [
@@ -132,45 +132,45 @@
    ],
    "after": {
     "life": [
-     4,
-     15
+     6,
+     7
     ],
     "pillz": [
-     7,
-     2
+     8,
+     5
     ]
    }
   },
   {
    "round": 3,
-   "first": "p0",
+   "first": "p1",
    "before": {
     "life": [
-     4,
-     15
+     6,
+     7
     ],
     "pillz": [
-     7,
-     2
+     8,
+     5
     ]
    },
    "p0": {
     "index": 1,
-    "pillz": 4,
+    "pillz": 2,
     "fury": false,
-    "power": 11,
+    "power": 6,
     "damage": 3,
-    "attack": 44,
-    "won": true
+    "attack": 12,
+    "won": false
    },
    "p1": {
-    "index": 1,
-    "pillz": 1,
+    "index": 0,
+    "pillz": 3,
     "fury": false,
-    "power": 7,
-    "damage": 3,
-    "attack": 15,
-    "won": false
+    "power": 8,
+    "damage": 1,
+    "attack": 24,
+    "won": true
    },
    "post_round": [
     [],
@@ -178,44 +178,44 @@
    ],
    "after": {
     "life": [
-     4,
-     12
+     5,
+     7
     ],
     "pillz": [
-     4,
-     2
+     7,
+     3
     ]
    }
   },
   {
    "round": 4,
-   "first": "p1",
+   "first": "p0",
    "before": {
     "life": [
-     4,
-     12
+     5,
+     7
     ],
     "pillz": [
-     4,
-     2
+     7,
+     3
     ]
    },
    "p0": {
-    "index": 0,
-    "pillz": 5,
-    "fury": false,
-    "power": 9,
-    "damage": 8,
-    "attack": 45,
+    "index": 3,
+    "pillz": 4,
+    "fury": true,
+    "power": 6,
+    "damage": 5,
+    "attack": 24,
     "won": true
    },
    "p1": {
-    "index": 0,
-    "pillz": 3,
+    "index": 3,
+    "pillz": 4,
     "fury": false,
-    "power": 9,
-    "damage": 7,
-    "attack": 27,
+    "power": 4,
+    "damage": 3,
+    "attack": 16,
     "won": false
    },
    "post_round": [
