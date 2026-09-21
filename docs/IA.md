@@ -63,6 +63,7 @@ l'IA.
 | **V(état)** | probabilité de gagner la partie depuis cet état, si les deux joueurs jouent parfaitement (nul = 0,5) ; toujours exprimée pour l'allié, puis convertie (`1 − V`) quand il faut le point de vue de l'ennemi |
 | **Politique** | distribution de probabilité sur les actions dans un état |
 | **Jeu matriciel** | tableau des gains `M[action de F][action de S]` d'un round ; **équilibre de Nash** = couple de politiques dont aucun joueur ne peut s'écarter avec profit ; **valeur du jeu** = gain garanti en jouant l'équilibre |
+| **LP** (programme linéaire) | maximiser une quantité sous des contraintes toutes linéaires ; c'est ainsi qu'on calcule l'équilibre de Nash d'un jeu matriciel (§ 4.3 : maximiser la valeur `v` sous « chaque colonne rapporte au moins `v` »), avec `scipy.optimize.linprog` |
 | **Induction à rebours** | calculer les valeurs du dernier round d'abord, puis remonter |
 | **Mémoïsation** | table `état → V` pour ne jamais résoudre deux fois le même état |
 | **Heuristique de feuille** | score approximatif d'un état qu'on ne résout pas plus loin |
@@ -112,10 +113,9 @@ situation que le moteur sait jouer ; aucune constante « 12 » dans le code de l
 **Doublons et bonus de clan.** Une main peut contenir plusieurs exemplaires d'une même carte (même niveau ou non) ;
 ils comptent **pour un seul** dans le « ≥ 2 cartes du clan » qui active le bonus (règle confirmée par l'utilisateur,
 cohérente avec le wiki : « This doesn't apply to the same Characters »). Le moteur compte les **noms distincts** par
-clan (`is_clan_bonus_active`, test « deux exemplaires seuls de leur clan → bonus inactif »). **Ne pas oublier le
-pouvoir `Support`** : il compte lui aussi les cartes du clan en main et fonctionne potentiellement comme le bonus
-(exemplaires ou noms distincts ?) — à tester en combat réel avant de le corriger. Cas voisins non tranchés : Oculus
-infiltré avec doublons, deux exemplaires du même Leader (§ 9).
+clan (`is_clan_bonus_active`, test « deux exemplaires seuls de leur clan → bonus inactif »). Le pouvoir `Support`, lui,
+compte **chaque exemplaire** (combat réel 1347602, `docs/REGLES.md` § 3.6). Cas voisins non tranchés : Oculus
+infiltré avec doublons, Unison (§ 9). Deux exemplaires du même Leader s'annulent (confirmé par l'utilisateur le 2026-09-21).
 
 ### 3.2 Générateur de mains
 Des mains de 4 cartes au hasard parmi 2 497 n'activent presque jamais un bonus de clan (≥ 2 cartes du clan) : elles
@@ -441,7 +441,7 @@ ce que la recherche corrige ; pourquoi on n'a pas besoin de résoudre des partie
 | Encodage des capacités non gérées (`Capacity = None`) | étape 3 | drapeau « non gérée » ; l'IA les joue à vide, comme le moteur |
 | Invariance à l'ordre des cartes dans une main | étape 3 | tri canonique d'abord |
 | Modes à règles spéciales (vies ≠ 12, bonus modifiés) | moteur | hors périmètre de l'IA tant que le moteur ne les modélise pas |
-| Doublons et cas voisins : `Support` compte-t-il les exemplaires ou les noms distincts (même mécanique que le bonus de clan ?) ; un Oculus infiltré compte-t-il les exemplaires ou les noms (« carte seule ») ? Deux exemplaires du même Leader s'annulent-ils (« Cancel Leader ») ? Unison avec doublons ? | moteur (étape 0) | hypothèse : même règle que le bonus de clan (noms distincts) ; à confirmer en combat réel (`docs/ORACLE.md`) |
+| Doublons et cas voisins : `Support` compte-t-il les exemplaires ou les noms distincts (même mécanique que le bonus de clan ?) ; un Oculus infiltré compte-t-il les exemplaires ou les noms (« carte seule ») ? Unison avec doublons ? | moteur (étape 0) | hypothèse : même règle que le bonus de clan (noms distincts) ; à confirmer en combat réel (`docs/ORACLE.md`). Deux exemplaires du même Leader s'annulent : confirmé par l'utilisateur (2026-09-21), testé |
 | Mémo et doublons : deux exemplaires identiques non joués rendent des états équivalents par permutation | étape 2 | canonicaliser la clé (trier les cartes restantes) — optimisation, pas une nécessité |
 
 ## 10. Journal des mesures

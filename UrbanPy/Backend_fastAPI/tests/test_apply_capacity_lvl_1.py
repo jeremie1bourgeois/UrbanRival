@@ -79,7 +79,7 @@ def test_soa_ability_versus_sob_ability_the_soa_wins_the_chain(template_game):
 
 
 def test_soa_versus_soa_is_a_cycle_where_both_stops_win(template_game):
-    # Non tranché par la source (chaîne infinie) : les Stops gagnent, les deux abilities tombent.
+    # Chaîne infinie, non documentée : les Stops gagnent, les deux abilities tombent (confirmé par l'utilisateur, 2026-09-21).
     amelia, asporov = play(template_game, ally_ability="Stop Opp. Ability", enemy_ability="Stop Opp. Ability")
 
     assert (amelia.ability_fight, asporov.ability_fight) == (None, None)
@@ -122,6 +122,16 @@ def test_protection_bonus_survives_when_only_sob_is_present(template_game):
     amelia, _ = play(template_game, ally_ability="Stop Opp. Bonus", enemy_ability="Protection: Bonus", enemy_bonus="Protection: Ability")
 
     assert amelia.power_fight == 3   # le bonus ennemi est « Protection: Ability », pas un malus : Amelia garde 3
+
+
+def test_double_protection_versus_all_stop_is_a_cycle_where_the_stops_win(template_game):
+    # Protection: Ability (bonus) + Protection: Bonus (ability) face à SoA + SoB : chaîne infinie, les Stops gagnent
+    # (confirmé par l'utilisateur, 2026-09-21). Amelia n'a plus que Stop : son bonus -2 ne s'applique pas ; Asporov sans bonus.
+    amelia, asporov = play(template_game, ally_ability="Stop Opp. Ability", ally_bonus="Stop Opp. Bonus",
+                           enemy_ability="Protection: Bonus", enemy_bonus="Protection: Ability")
+
+    assert (asporov.ability_fight, asporov.bonus_fight) == (None, None)
+    assert (amelia.power_fight, asporov.power_fight) == (3, 7)
 
 
 # --- Copy: Opp. Ability / Bonus ---------------------------------------------------------------
@@ -323,6 +333,18 @@ def test_tune_out_applies_when_only_the_opponent_has_it(template_game):
     amelia, asporov = play(template_game, enemy_bonus="Tune Out", ally_pillz=3, enemy_pillz=2)   # Asporov aurait 7 x 2 = 14 > 3 x 3 = 9
 
     assert amelia.win is True
+
+
+def test_tune_out_ignores_the_fury_pillz(template_game):
+    # Confirmé par l'utilisateur (2026-09-21) : les 3 pillz de fury ne comptent pas dans la comparaison.
+    amelia, asporov = template_game.ally.cards[AMELIA], template_game.enemy.cards[ASPOROV]
+    amelia.ability, asporov.ability = None, None
+    amelia.bonus, asporov.bonus = capacity("Tune Out"), capacity("-2 Opp Power, Min 1")
+    process_round(template_game, ProcessRoundInput(player1_card_index=AMELIA, player1_pillz=2, player1_fury=True,
+                                                   player2_card_index=ASPOROV, player2_pillz=3))
+
+    assert (amelia.attack, asporov.attack) == (2, 3)
+    assert asporov.win is True
 
 
 

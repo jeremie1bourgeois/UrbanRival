@@ -26,19 +26,20 @@ Cancel Life Modif., Reanimate, Versus) ont été **corrigées** le même jour ; 
 | Règle retenue | Où |
 |---|---|
 | Stops résolus **en chaîne** (un Stop stoppé ne stoppe rien) — règle officielle, art. 91 du support | `apply_capacity_lvl_1._stopped_slots`, tests `test_official_example_1/2_*` |
-| Cycles (SoA contre SoA, Protection: Ability + Protection: Bonus face à SoA + SoB) : les Stops gagnent — non documenté | idem, `test_soa_versus_soa_is_a_cycle_where_both_stops_win` |
+| Cycles (SoA contre SoA, Protection: Ability + Protection: Bonus face à SoA + SoB) : les Stops gagnent — confirmé par l'utilisateur (2026-09-21) | idem, `test_soa_versus_soa_is_a_cycle_where_both_stops_win`, `test_double_protection_versus_all_stop_is_a_cycle_where_the_stops_win` |
 | « Cancel Opp. Life Modif. » **suspend pour le round** les effets persistants adverses (poison/toxin/heal/regen ; Pillz : dope/consume), qui reprennent au round suivant — glossaire officiel 56 | `Card.cancelled_modifs`, `apply_capacity_lvl_4._suspended` |
 | Reanimate = « Defeat: +X Life » qui marche aussi depuis 0 (règle officielle) ; les effets de fin de round sont sautés sur KO | `apply_capacity_lvl_3.apply_reanimate` + boucle de niveau 3, `process_round` |
-| Recover X out of Y : ⌊pillz misées × X / Y⌋, **minimum 1** (glossaire 53), fury comprise ; pillz gratuite exclue (non tranché) | `apply_capacity_lvl_3.recovered_pillz` |
-| Infiltrated (Oculus) — règle officielle : un seul autre clan → celui-là ; deux → celui de la **carte seule** ; trois ou deux Oculus → rien. Leaders hors décompte (hypothèse) ; la liste des clans infiltrables imprimée sur la carte n'est pas modélisée | `process_round.infiltrated_clan` |
-| Team (Leader) : s'applique à chaque carte jouée, Leader compris, seulement si Leader unique | `process_round.leader_team_capacity` |
+| Recover X out of Y : ⌊pillz posées × X / Y⌋, **minimum 1** (glossaire 53), fury et **pillz gratuite comprises** — combat réel 1347075 (2026-09-21) | `apply_capacity_lvl_3.recovered_pillz`, `data/ur_battles/1347075.json` |
+| Sur une même carte, le **bonus s'applique avant le pouvoir** (modificateurs de niveau 2) — combat réel 1347131 (2026-09-21), vérifié sur l'attaque | `apply_capacity_lvl_2._MODIFIER_SLOTS`, `data/ur_battles/1347131.json` |
+| Infiltrated (Oculus) — règle officielle : un seul autre clan → celui-là ; deux → celui de la **carte seule** ; trois ou deux Oculus → rien. Chaque Leader est son propre clan : un Leader seul est la carte seule (l'Oculus le rejoint et le Cancel Leader l'annule), deux Leaders + une carte = trois clans (rien) — combats réels 1346878, 1347500, 1347671, 1347602 (2026-09-21) ; la liste des clans imprimée sur la carte ne restreint que le bonus adopté et l'ability | `clan.infiltrated_clan`, `multipliers._support`, `data/ur_battles/1346878.json`, `1347671.json` |
+| Team (Leader) : s'applique à chaque carte jouée, Leader compris, seulement si Leader unique (deux exemplaires du même Leader s'annulent) — confirmé par l'utilisateur (2026-09-21) | `process_round.leader_team_capacity`, `tests/test_leader_team.py` |
 | Versus (clans) : s'active si la **main** adverse contient une carte du clan, pas seulement la carte en face — règle officielle | `process_round.check_capacity_condition` |
 | Bet > N / < N : compare `pillz_fight` (**pillz gratuite comprise**, fury exclue) — règle officielle | `process_round._bet_condition_met` |
 | Killshot : attaque > 0 et ≥ 2 × attaque adverse, évaluée après les modificateurs d'attaque | `process_round.apply_killshot_condition` |
 | per damage : dégâts réellement infligés (0 en défaite) | `multipliers._nb_damage_inflicted` |
 | Copy : copie l'emplacement adverse tel que joué (conditions déjà évaluées) ; Copy vs Copy → rien | `apply_capacity_lvl_1._apply_copies` |
 | Fury : +2 dégâts ajoutés **après** les modificateurs de dégâts (utilisateur ; glossaire 56 : « Annul Modif Dégâts n'annule pas la Fury ») | `process_round` |
-| Toxine / Régén / Dope / Consume agissent **dès le round joué** (glossaire 51, 52) ; Poison / Heal / Repair / Combust aux rounds suivants | `apply_capacity_lvl_4.IMMEDIATE_KINDS` |
+| Toxine / Régén / Dope / Repair / Consume / Combust (Mindwipe) agissent **dès le round joué** (glossaire 51, 52 ; Repair, Combust : utilisateur) ; Poison / Heal aux rounds suivants | `apply_capacity_lvl_4.IMMEDIATE_KINDS` |
 | « Per Pillz Left » : pillz **avant la mise**, pillz gratuite exclue (glossaire 66) | `multipliers._nb_pillz_left` |
 | `Day:` toujours valide, `Night:` jamais (décision utilisateur, cycle jour/nuit non modélisé) | `capacity_parser._IGNORED_PREFIXES` |
 
@@ -49,24 +50,29 @@ Cancel Life Modif., Reanimate, Versus) ont été **corrigées** le même jour ; 
 
 ## 2. Travail restant
 
-### A. Pouvoirs non gérés — 10 descriptions, capacités uniques
+### A. Pouvoirs non gérés
 
 Tout ce qui a une règle publiée est codé (voir `docs/REGLES.md` § 4). Reste, sans règle trouvée ni sur le site ni sur le
-wiki : **Beyond** (Genesis, 5e round — hors périmètre), **Bypass** (Robert Cobb), **Hazard** (Administrator), **Illusion**
-(Kate), **Overdose** (Hekate), **Perfection** (Glibon Cr), **Rebirth 1, Max. 1** (Nemo Cr), **Remove Ability Conditions**
-(Memento), `Growth: -1 Power And Damage, Min 4` (Bugamon, coquille probable) et `Night:` (ignoré volontairement).
+wiki : **Beyond** (Genesis, 5e round — hors périmètre), **Perfection** (Glibon Cr), `Growth: -1 Power And Damage, Min 4`
+(Bugamon, coquille probable) et `Night:` (ignoré volontairement).
 
-Choix de modélisation à confirmer en combat réel : Mindwipe = Combust (textes identiques) ; Tune Out compare
-`pillz_fight` sans la fury ; Perfect = écart d'attaque < puissance ; Limitless ne touche que l'ability de la carte jouée ;
-Counter-attack refixe l'ordre à chaque round.
+**Exclus définitivement du moteur et de l'IA** (décision utilisateur, 2026-09-21) : **Hazard** (Administrator),
+**Illusion** (Kate), **Bypass** (Robert Cobb), **Overdose** (Hekate), **Remove Ability Conditions** (Memento),
+**Rebirth 1, Max. 1** (Nemo Cr). Leurs définitions sont conservées dans `docs/REGLES.md` § 4 pour mémoire ; ne pas les
+compter parmi les pouvoirs restant à gérer.
+
+Choix de modélisation à confirmer en combat réel : Perfect = écart
+d'attaque < puissance ; Limitless ne touche que l'ability de la carte jouée. Confirmé par l'utilisateur (2026-09-21) :
+Tune Out compare les pillz **sans la fury** ; Mindwipe = Combust ; Repair, Combust et Mindwipe agissent dès le round
+joué (si la carte gagne) ; Counter-attack (Ashigaru) ne joue que sur le **premier round**, puis alternance classique.
 
 ### B. Fiabilité des règles existantes
 1. ~~Confirmer les décisions du tableau § 1 contre les règles officielles~~ → fait (`docs/REGLES.md`) ; appliquer les corrections listées en § 3 de ce document.
 2. **Oracle = combats réels** (fait le 2026-09-16, premier combat reproduit à l'identique) : jouer un combat dans le
    client web d'Urban Rivals avec `scripts/ur_capture.js` chargé, importer `urRecords()` avec `scripts/import_ur_battles.py` (procédure complète : `docs/ORACLE.md`),
    `tests/test_ur_battles.py` rejoue chaque round et exige les valeurs officielles (puissance, dégâts, attaque,
-   vainqueur, vies, pillz). Viser les points non tranchés (cycles de Stops, Leader et son Team, Tune Out + fury,
-   Mindwipe / Combust, Limitless, Exchange contre Copy/Annul) et les clans à bonus méta. Le modèle `abilityData` du
+   vainqueur, vies, pillz). Viser les points non tranchés (Limitless,
+   Exchange contre Copy/Annul, doublons dans Support / Oculus / Unison) et les clans à bonus méta. Le modèle `abilityData` du
    client (`docs/ur-abilitydata-modele.md`) s'accumule passivement avec les combats (pas de scraping API : piste abandonnée).
 3. Le journal des effets (D2, fait) rend ces vérifications immédiates : comparer le journal au déroulé réel.
 

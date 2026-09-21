@@ -1,13 +1,14 @@
 """
 Bonus Oculus « Infiltrated » (règle officielle) : un seul autre clan dans la main -> l'Oculus en fait partie ; deux autres
 clans -> il rejoint le clan de la carte seule (celui qui a besoin de lui) ; trois autres clans ou plus d'un Oculus ->
-rien. Les Leaders ne comptent pas comme clan (hypothèse). L'Oculus compte comme membre pour l'activation du bonus.
+rien. Chaque Leader est son propre clan (combats réels 1346878, 1347500, 1347671). L'Oculus compte comme membre pour l'activation du bonus.
 Scénario : main alliée du template (4 All Stars, bonus -2 opp power, abilities neutralisées) modifiée carte par
 carte ; Asporov (ennemi, P7, ability neutralisée) subit ou non le bonus adopté.
 """
 import pytest
 
 from src.core.parsing.capacity_parser import parse_capacity
+from src.core.use_cases.clan import infiltrated_clan
 from src.core.use_cases.process_round import process_round
 from src.schemas.game_schemas import ProcessRoundInput
 
@@ -79,13 +80,30 @@ def test_oculus_gets_nothing_with_three_other_clans(game):
 
 def test_oculus_counts_as_a_member_for_the_adopted_clan_activation(game):
     make(game.ally.cards[AMELIA], "Oculus", "Infiltrated")
-    make(game.ally.cards[AGUSTINO], "Montana", MONTANA_BONUS)
-    make(game.ally.cards[ALLISON], "Leader", "Cancel Leader")
-    make(game.ally.cards[ASHLEY], "Leader", "Cancel Leader")          # Montana seul + Oculus : le bonus Montana s'active
+    make(game.ally.cards[AGUSTINO], "Montana", MONTANA_BONUS)         # Montana seul face à 2 All Stars : l'Oculus le rejoint,
+                                                                      # et le bonus Montana s'active
 
     _, asporov = play(game, AGUSTINO, enemy_pillz=2)                  # Agustino (Montana) joue ; Asporov 7 x 2 = 14
 
     assert asporov.attack == 8                                        # 14 - 12, min 8
+
+
+def test_two_leaders_are_two_clans_and_the_oculus_infiltrates_nothing(game):
+    make(game.ally.cards[AMELIA], "Oculus", "Infiltrated")
+    make(game.ally.cards[AGUSTINO], "Montana", MONTANA_BONUS)
+    make(game.ally.cards[ALLISON], "Leader", "Cancel Leader")
+    make(game.ally.cards[ASHLEY], "Leader", "Cancel Leader")          # Montana, Allison, Ashley : trois clans (combat 1347671)
+
+    _, asporov = play(game, AGUSTINO, enemy_pillz=2)
+
+    assert asporov.attack == 14                                       # Montana seul : bonus inactif
+
+
+def test_a_lone_leader_is_the_sole_card_the_oculus_joins(game):
+    make(game.ally.cards[AMELIA], "Oculus", "Infiltrated")
+    make(game.ally.cards[AGUSTINO], "Leader", "Cancel Leader")        # All Stars ×2 + Leader ×1 (combat 1346878)
+
+    assert infiltrated_clan(game.ally) == "Leader"
 
 
 def test_lone_clan_card_without_oculus_has_no_bonus(game):

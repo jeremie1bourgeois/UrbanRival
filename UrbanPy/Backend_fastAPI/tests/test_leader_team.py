@@ -4,6 +4,8 @@ uniquement s'il est le seul Leader en main. Scénario : Agustino (allié idx 0) 
 Amelia (idx 2, P3 D5, ability neutralisée) contre Asporov (idx 0, P7 D3, ability neutralisée), 1 pillz chacun.
 Bonus -2 opp power actifs (3 All Stars alliés restants, 3 ennemis).
 """
+import copy
+
 import pytest
 
 from src.core.domain.card import Card
@@ -52,6 +54,16 @@ def test_team_ability_applies_to_the_leader_itself(game):
 
 def test_two_leaders_cancel_the_team_ability(game):
     game.ally.cards[ALLISON].faction = "Leader"
+
+    amelia, _ = play(game)
+
+    assert amelia.power_fight == 3 - 2
+
+
+def test_two_copies_of_the_same_leader_cancel_the_team_ability(game):
+    # Modes avec doublons : deux exemplaires du même Leader s'annulent comme deux Leaders différents
+    # (confirmé par l'utilisateur, 2026-09-21).
+    game.ally.cards[ALLISON] = copy.deepcopy(game.ally.cards[AGUSTINO])
 
     amelia, _ = play(game)
 
@@ -130,8 +142,8 @@ def test_tie_break_leader_wins_every_attack_tie(game):
     assert allison.win is True                                  # sans Tie-break, Asporov (4 étoiles) gagnerait
 
 
-def test_counter_attack_leader_makes_his_team_always_play_second(game):
-    # Ashigaru : « The player who has Ashigaru in their team always plays second in the fight »
+def test_counter_attack_leader_makes_his_team_play_second_in_the_first_round(game):
+    # Ashigaru : son camp joue en second au premier round (utilisateur, 2026-09-21)
     game.ally.cards[AGUSTINO].ability = ability("Counter-attack")
     game.ally.cards[AMELIA].ability = ability("Reprisal: Power +2")
     game.enemy.cards[ASPOROV].ability = ability("Courage: Power +2")
@@ -139,7 +151,17 @@ def test_counter_attack_leader_makes_his_team_always_play_second(game):
     amelia, asporov = play(game, turn=True)                     # même si c'était le tour de l'allié
 
     assert (amelia.power_fight, asporov.power_fight) == (3 + 2 - 2, 7 + 2 - 2)
-    assert game.turn is True                                    # le tour suivant repart normalement (l'ordre est refixé à chaque round)
+    assert game.turn is True                                    # puis alternance classique : l'allié joue en premier au round 2
+
+
+def test_counter_attack_leader_does_not_change_the_order_after_the_first_round(game):
+    game.ally.cards[AGUSTINO].ability = ability("Counter-attack")
+    game.ally.cards[AMELIA].ability = ability("Courage: Power +2")
+    game.nb_turn = 2
+
+    amelia, _ = play(game, turn=True)                           # round 2, tour de l'allié : Ashigaru ne l'inverse plus
+
+    assert amelia.power_fight == 3 + 2 - 2
 
 
 def test_limitless_leader_removes_maximums_and_zeroes_minimums_of_abilities(game):

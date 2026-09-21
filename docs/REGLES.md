@@ -26,7 +26,7 @@ Hiérarchie de confiance : support officiel > glossaire officiel > texte de cart
 | Bonus de clan actif avec **≥ 2 cartes du clan** dans la main. Précision : « This doesn't apply to the same Characters » — deux exemplaires de la même carte **ne comptent pas** | wiki *Bonus* | `is_clan_bonus_active` compte les noms distincts par clan | ✅ Confirmé (doublons possibles selon le mode, confirmé par l'utilisateur) |
 | Fin de partie : KO à 0 vie ; sinon, après 4 rounds, plus de vie gagne ; vies égales = **match nul** | wiki *KO*, *Life* | `check_end` (`GameResult.DRAW`) | ✅ Confirmé |
 | Premier joueur du round 1 : aléatoire dans le jeu, puis alternance | wiki *Strike Back* (« the order of play is decided randomly ») | toujours l'allié (`turn = True`) | ⚠️ Connu, non modélisé (ROADMAP § 1) |
-| Puissance minimale 1, pillz minimale 1 → attaque minimale 1 hors effets | wiki *Power* | à vérifier avec les réducteurs (min) | ➖ Non audité |
+| Puissance minimale 1, pillz minimale 1 → attaque minimale 1 hors effets ; mais un réducteur « Min 0 » (−X Opp Power / Attack, Min 0) descend bien à **0** | wiki *Power* + utilisateur (2026-09-21) | `apply_capacity_lvl_2` respecte la borne du texte, pas de plancher implicite ; `test_minus_opp_power_min_0_*`, `test_minus_opp_attack_min_0_*` | ✅ Confirmé |
 
 ## 3. Verdict sur les décisions prises sans certitude
 
@@ -68,17 +68,18 @@ Autrement dit : **un Stop stoppé ne stoppe rien** (résolution en chaîne, pas 
 
 **Cas non tranché par la source** : cycle pur (SoA contre SoA en ability, ou Protection: Ability + Protection: Bonus
 face à SoA + SoB). L'algorithme « en chaîne » ne termine pas ; le moteur fait gagner les Stops (« cycle : les Stops
-gagnent »), ce qui correspond à l'expérience communautaire (deux SoA face à face s'annulent) mais reste à confirmer en
-combat réel. Point 3.2 ci-dessous.
+gagnent »), ce qui correspond à l'expérience communautaire (deux SoA face à face s'annulent). **Confirmé par
+l'utilisateur le 2026-09-21** (les deux cycles). Point 3.2 ci-dessous.
 
 **Correction** : `_stopped_kinds` doit considérer qu'un Stop porté par un emplacement lui-même stoppé n'existe pas
 (point fixe : itérer jusqu'à stabilité, cycle → Stops gagnent). Réécrire le test cité et ajouter les deux exemples
 officiels comme tests.
 
-### 3.2 Protection cyclique — ➖ NON DOCUMENTÉ
+### 3.2 Protection cyclique — ✅ CONFIRMÉ (utilisateur, 2026-09-21)
 
-Aucune source ne décrit le cas. Conserver le choix actuel (les Stops gagnent), à vérifier en combat réel avec par
-exemple Skeelz (Protection: Ability) + ability Protection: Bonus contre un All-Stop (Glorg, Shakra).
+Aucune source écrite ne décrit le cas ; l'utilisateur confirme par connaissance du jeu que dans les deux cycles
+(SoA contre SoA ; Protection: Ability + Protection: Bonus face à SoA + SoB) **les Stops gagnent**. Tests
+`test_soa_versus_soa_is_a_cycle_where_both_stops_win` et `test_double_protection_versus_all_stop_is_a_cycle_where_the_stops_win`.
 
 ### 3.3 « Cancel Opp. Life Modif. » et le poison — ❌ CONTREDIT (texte de carte, via wiki)
 
@@ -123,36 +124,63 @@ Of 3 = spending **1** Pillz gives you **1** back ». Le moteur renvoie ⌊1 × 2
 page sont par ailleurs arithmétiquement incohérents (« 1 out of 2 = spending 2 gives you 2 back ») : source fragile,
 à confirmer en combat réel, mais deux mentions concordantes du minimum.
 
-**Pillz comptées** : « of the Pillz placed on your card » — la pillz gratuite est-elle comprise ? Non tranché (le
-moteur l'exclut). Voir 3.8 : pour Bet, l'officiel la compte explicitement.
+**Pillz comptées** : « of the Pillz placed on your card » — la pillz gratuite **est comprise** : combat réel 1347075,
+Pyro (Defeat: Recover 1 Pillz Out Of 2) pose 4 pillz (3 misées + la gratuite) et en récupère 2 (12 − 3 = 9 → 11), et
+non ⌊3/2⌋ = 1. Cohérent avec Bet (3.8). Le plancher de 1 reste non observé en combat réel.
 
-### 3.6 Infiltrated (Oculus) — ❌ CONTREDIT (texte de bonus)
+### 3.6 Infiltrated (Oculus) — ✅ TRANCHÉ (règle officielle + 5 combats réels)
 
-**Moteur** : clan **majoritaire** des autres cartes ; égalité → rien.
+**Source** (texte officiel du bonus « Infiltré », fourni par l'utilisateur le 2026-09-21 ; identique au wiki *Oculus*) :
 
-**Source** (wiki *Oculus*, texte du bonus, identique sur la page *Infiltrated*) :
+> Si un seul autre clan est présent dans le tirage, le personnage Oculus est considéré comme une carte de ce clan. Si
+> deux autres clans sont présents, le personnage Oculus appartiendra au clan du personnage seul, activant ainsi son
+> bonus. Si trois autres clans sont présents dans le tirage, ou si vous avez plus d'un Oculus dans le tirage, le bonus
+> Infiltré n'a pas d'effet.
 
-> If only one other clan is present in the draw, the Oculus card is considered to be a part of that clan. If two other
-> clans are present, the Oculus card will belong to the clan of **the sole card**, thus activating its bonus. If three
-> other clans are present in the draw, or if you have more than one Oculus in your hand, the Infiltrated bonus has no
-> effect.
+Avec 3 autres cartes : 1 clan (3 cartes) → ce clan ; 2 clans (2 + 1) → le clan de la **carte seule** (c'est le seul
+cas où l'infiltration change quelque chose : elle active un bonus qui ne l'était pas) ; 3 clans → rien ; deux Oculus →
+rien. Moteur : `clan.infiltrated_clan`.
 
-Avec 3 autres cartes : 1 clan (3 cartes) → ce clan ; 2 clans (2 + 1) → le clan **minoritaire** (celui de la carte
-seule — c'est le seul cas où l'infiltration change quelque chose : elle active un bonus qui ne l'était pas) ; 3 clans →
-rien ; deux Oculus → rien. Le moteur choisit l'inverse dans le cas 2 + 1.
+**Les Leaders** ne sont pas traités par le texte. Combats réels (`data/ur_battles/`) :
+- 1346878, Bangers ×2 + Morphun + Dark Morphun : pas de bonus Bangers (puissance 6, pas 8) et Morphun annulé (pillz
+  12 − 3 = 9, pas 10) → l'Oculus a rejoint le Leader, carte seule, et compte comme second Leader (« Cancel Leader »).
+- 1347500, Freaks ×2 + Ashigaru + Dark Majestic : Counter-attack annulé (ordre de jeu p0, p1, p0, p1 au lieu de
+  toujours second) → idem.
+- 1347671, Sofilia (Freaks) + Administrator + Ashigaru + Dark Majestic : « Support: Attack +3 » de Sofilia donne +3
+  (×1) → l'Oculus n'a **pas** rejoint les Freaks, alors que Freaks ×1 contre Leader ×2 en ferait la carte seule.
+- 1347602, Freaks ×3 + Dark Majestic : Support ×4 → l'Oculus a rejoint les Freaks.
+- 1214141 (branche `feat/ia-tous-modes`) : trois autres clans → rien.
 
-**Restriction supplémentaire** (wiki *Infiltrated*) : « The clan icons shown in the Ability section of your card show
-you which clans have to be infiltrated to activate its bonus » — chaque Oculus ne peut infiltrer que **4 ou 5 clans
-listés sur sa carte**. À vérifier si les données scrapées d'iclintz contiennent cette liste ; sinon, lacune de données.
+Seule lecture compatible avec le texte et les cinq combats : **chaque Leader est son propre clan**. Un Leader seul face à
+deux cartes d'un clan est la carte seule (l'Oculus le rejoint et le Cancel Leader l'annule) ; deux Leaders différents
+plus une carte font trois clans (rien). Moteur : `clan._clan_for_infiltration`, tests `test_infiltrated.py`.
+Cas non observé : deux clans différents + un Leader (trois clans selon cette lecture → rien).
 
-**Cas Leader dans la main** : non traité par la source (le moteur exclut les Leaders du décompte, raisonnable).
+**Clans listés sur la carte** (wiki *Infiltrated* : « les icônes de clan dans la section Pouvoir indiquent quels clans
+doivent être infiltrés pour activer son bonus ») : la liste, lue dans le texte du pouvoir (« Infiltrated Bangers,
+Cosmohnuts, … : ») restreint le **bonus adopté** et l'**ability**, pas l'appartenance au clan (1346878 : le Leader
+n'est listé nulle part, l'Oculus le rejoint quand même). Moteur : `clan.infiltrable_clans`, `process_round.apply_infiltrated_bonus`.
 
-### 3.7 Team (Leader) — ✅ CONFIRMÉ en partie, ➖ NON DOCUMENTÉ pour le reste
+**Support avec un Oculus** : 1347602 — l'Oculus rallié aux Freaks compte pour Support, et les deux exemplaires de
+Sofilia comptent chacun (contrairement à l'activation du bonus, qui compte les personnages distincts). Brawl aligné
+par symétrie, non vérifié. Moteur : `multipliers._support`, `_brawl`.
+
+### 3.6 bis Ordre bonus / pouvoir sur une même carte — ✅ TRANCHÉ (attaque)
+
+Combat réel 1347131, round 2 : Donna Black (bonus « -12 Opp Attack, Min 8 », pouvoir « Revenge: -10 Opp Attack, Min 3 »)
+contre Liona à 14 d'attaque → 3. Seul l'ordre **bonus puis pouvoir** le donne (14 → 8 → 3) ; pouvoir puis bonus donnerait
+4 (14 → 4, puis le Min 8 ne fait rien). Le moteur applique désormais le bonus avant le pouvoir pour tous les
+modificateurs de niveau 2 (puissance, dégâts, attaque) ; seule l'attaque est vérifiée en combat réel.
+
+### 3.7 Team (Leader) — ✅ CONFIRMÉ
 
 - Deux Leaders s'annulent (bonus « Cancel Leader ») : wiki *Leader* — ✅ confirmé.
 - « Team abilities are not affected by SoA » (wiki *Team*) : le moteur porte la capacité dans `leader_fight`, hors
   des emplacements visés par `_apply_stops` — ✅ confirmé.
-- Le Leader lui-même bénéficie-t-il de son Team ? Non documenté. Le moteur dit oui.
+- Le Leader lui-même bénéficie de son Team : non documenté, **confirmé par l'utilisateur (2026-09-21)**. Le moteur dit oui
+  (`test_team_ability_applies_to_the_leader_itself`).
+- Deux exemplaires du **même** Leader (modes avec doublons) s'annulent comme deux Leaders différents : **confirmé par
+  l'utilisateur (2026-09-21)**, `test_two_copies_of_the_same_leader_cancel_the_team_ability`.
 
 ### 3.8 Bet > N / < N : pillz comptées — ❌ CONTREDIT (texte de carte, plusieurs occurrences)
 
@@ -217,9 +245,9 @@ assumé, sans conséquence tant que le jeu n'est pas comparé à des combats ré
 | 3.4 | Reanimate seulement sur KO | ❌ contredit partiellement | petit |
 | 3.5 | Recover : fury comprise / minimum 0 | ✅ fury / ⚠️ min 1 | trivial |
 | 3.9, 3.10, 3.11 | Killshot, per damage, Copy | ✅ confirmés | — |
-| 3.7 | Team | ✅ (Cancel Leader, immunité SoA) / ➖ (Leader inclus) | — |
+| 3.7 | Team | ✅ confirmé (Cancel Leader, immunité SoA, Leader inclus, doublons de Leader) | — |
 | 3.12 | Fury après les réducteurs | ✅ confirmé (utilisateur) | — |
-| 3.2 | Protection cyclique | ➖ non documenté | combats réels |
+| 3.2 | Protection cyclique | ✅ confirmé (utilisateur) : les Stops gagnent | — |
 | 3.13 | Day/Night | choix utilisateur | — |
 
 ## 4. Mécaniques non gérées : définitions retrouvées
@@ -233,14 +261,14 @@ ROADMAP § 2.A.
 
 | Mécanique | Définition | Type d'implémentation |
 |---|---|---|
-| **Tune Out** (bonus Cosmohnuts) | « When a Tune Out card is played, the Attack calculation is ignored and the winner of the round is the player who bet the most Pillz. In case of a tie in Pillz, the two cards are decided in the same way as for a tie in Attack. » | Nouveau mode de résolution dans `resolve_combat` (comparer les pillz, y compris la fury ? non précisé) |
+| **Tune Out** (bonus Cosmohnuts) | « When a Tune Out card is played, the Attack calculation is ignored and the winner of the round is the player who bet the most Pillz. In case of a tie in Pillz, the two cards are decided in the same way as for a tie in Attack. » | Nouveau mode de résolution dans `resolve_combat` ; la fury **ne compte pas** (utilisateur, 2026-09-21 ; `test_tune_out_ignores_the_fury_pillz`) |
 | **Unison: X** | « only activates if the hand of the player contains EXCLUSIVELY cards of the same clan as the card which has the Unison effect » | Condition de début de round (main mono-clan) |
 | **Disunion: X** | « only activates if the hand of the player at least contains ONE card from a different clan » | Condition, négation d'Unison |
 | **After (Clan X[, Clan Y]): X** (bonus Tolvack + abilities) | « This effect only activates if you played a "Clan X" character in the previous round. Oculus characters, even when infiltrated "Clan X", do not count. » Ne s'active jamais au round 1. | Condition sur `history[-1]` (clan de la carte jouée par le même joueur au round précédent) |
 | **Perfect: X** | « your card has to have the exact amount of Pillz needed » — une pillz de moins aurait perdu, une de plus est gaspillée. Exemple : adversaire 25 d'attaque, puissance 8 → exactement 4 pillz (32). | Condition différée après le calcul des attaques (victoire et `attack − power_fight < opp.attack`) |
 | **Consume X, Min Y** | « If your card wins the round, the opponent will lose X Pillz, minimum Y. This effect will be felt at the end of each of the following rounds. (If two Consumes are applied, the second will replace the first.) » | Effet persistant sur les pillz adverses (comme Poison sur la vie ; remplace, ne cumule pas) |
-| **Combust X, Min Y** | « at the end of each of the following turns the opponent will lose X Life point(s) and Pillz if he/she/they have more than [Min] Life point(s)/Pillz » | Persistant vie + pillz ; « Players Combust » : les deux joueurs |
-| **Mindwipe X, Min Y** | « your opponent will lose X Life Points and Pillz, minimum of Y. This effect will persist at the end of each of the following rounds. » | Identique à Combust d'après ces textes (différence éventuelle non documentée) |
+| **Combust X, Min Y** | « at the end of each of the following turns the opponent will lose X Life point(s) and Pillz if he/she/they have more than [Min] Life point(s)/Pillz » | Persistant vie + pillz, tic **dès le round joué** (utilisateur, 2026-09-21) ; « Players Combust » : les deux joueurs |
+| **Mindwipe X, Min Y** | « your opponent will lose X Life Points and Pillz, minimum of Y. This effect will persist at the end of each of the following rounds. » | Identique à Combust — confirmé par le texte de carte fourni par l'utilisateur (2026-09-21) : « Si la carte gagne, votre adversaire perd X point(s) de vie et Pillz, minimum Y. L'effet persiste à la fin de chacun des tours suivants » |
 | **Xantiax: −X Life, Min Y** | « Whether the character wins or loses the round, the two competing players lose X Life Points or up to a minimum of X » | Effet de fin de round, cible les deux joueurs, sans condition de victoire |
 | **Corrosion X, Min Y** | « the opponent will lose 1 multiplied by the number of the round in which your card was played. (Corrosion is considered a Poison.) » | Poison de valeur = numéro du round ; partage l'emplacement du poison |
 | **Corrupt X, Min Y** | « If your card wins or loses the fight, the number of Life points **you** have will be reduced by X, or up to a minimum » | Effet de fin de round sur soi, victoire ou défaite (Nega D Ld) |
@@ -251,9 +279,13 @@ ROADMAP § 2.A.
 | **Sinister Symmetry** | « If your card wins the round against the card in front of it, the match is over and you win. » | Fin de partie immédiate |
 | **Limitless** (Fractal) | « For all the cards in your hand, the maximums on abilities are cancelled and the minimums are replaced by 0. […] This effect does not apply to bonuses. » | Modificateur global des bornes |
 | **Tie-Break** (Solomon) | Gagne toutes les égalités d'attaque (wiki *Power* : « unless Solomon is in play ») | Cas dans `resolve_combat` |
-| **Counter-Attack** (Ashigaru) | « The player who has Ashigaru in their team always plays second in the fight […]. If both players have Ashigaru, the order of play is decided in the usual way. » | Ordre de jeu |
-| **Rebirth** | Pas une mécanique : anciennes rééditions graphiques de cartes | Ignorer |
-| Hazard, Illusion, Bypass, Overdose, Remove Ability Conditions | Pages du wiki sans définition exploitable (cartes uniques) | Reporter |
+| **Counter-Attack** (Ashigaru) | « The player who has Ashigaru in their team always plays second in the fight […]. If both players have Ashigaru, the order of play is decided in the usual way. » | Ordre de jeu : le camp d'Ashigaru joue en second au **premier round** seulement, puis alternance classique ; les deux camps l'ont → ordre habituel (utilisateur, 2026-09-21) |
+| **Rebirth** (dont « Rebirth 1, Max. 1 », Nemo Cr) | Pas une mécanique : anciennes rééditions graphiques de cartes | **Exclu du moteur et de l'IA** (décision utilisateur, 2026-09-21) |
+| **Hazard** (Administrator, Leader) | « Les pouvoirs des trois cartes présentes dans le tirage avec Administrator sont remplacés par des pouvoirs aléatoires déjà utilisés dans le jeu (sauf pouvoir de Leader et Oculus). » (texte de carte, utilisateur 2026-09-21) | **Exclu du moteur et de l'IA** (décision utilisateur, 2026-09-21). Lecture antérieure : Effet de la **phase de tirage** (une fois par partie, comme le tirage de la main), pas du round : pool = abilities distinctes du jeu moins celles des Leaders et Oculus, tirage seedé à la création de la partie. Un combat réel se rejoue avec les pouvoirs tirés tels que le journal les montre. À trancher : avec/sans remise, pool pondéré ou non, cibles (autre Leader, Oculus ?). À coder avec le tirage de la main |
+| **Bypass** (Robert Cobb, Leader) | « Le bonus de vos autres cartes est actif même si vous n'avez pas d'autre carte du même clan. Leur bonus peut toujours être bloqué par les cartes "Stop Bonus Adv." de l'adversaire. » (idem) | **Exclu du moteur et de l'IA** (décision utilisateur, 2026-09-21). Lecture antérieure : Activation du bonus de clan forcée pour les autres cartes de la main (Leader unique) ; SoB s'applique normalement. À coder |
+| **Illusion** (Kate, Leader) | « Kate prend l'apparence et la position d'une des 3 autres cartes du tirage, choisie au hasard. Le joueur adverse ne découvre l'identité de Kate qu'au moment où les Pillz sont révélées. » (idem) | **Exclu du moteur et de l'IA** (décision utilisateur, 2026-09-21). Lecture antérieure : Information cachée seulement : sans effet sur la résolution d'un round (moteur à information parfaite). Concerne l'IA (`docs/IA.md`), pas le moteur |
+| **Overdose** (Hekate, Leader) | « Pour l'intégralité de la partie, la Fury est remplacée pour le joueur d'Hekate par une Fury inversée : l'Overdose. L'Overdose permet, si le joueur le souhaite, de sacrifier 2 Dégâts de sa carte (min. 0) pour obtenir 2 Pillz en échange. Les Pillz sont obtenues à la fin du round, quel que soit le résultat du round et même si la carte n'a pas assez de dégâts à sacrifier. Comme la Fury, cet effet ne peut pas être contré avec des cartes Annule. » (idem) | **Exclu du moteur et de l'IA** (décision utilisateur, 2026-09-21). Lecture antérieure : Nouvelle action de round (à la place de la fury) : −2 dégâts (min 0) après les modificateurs, +2 pillz en fin de round, victoire ou défaite, non annulable. À coder (entrée de round + front) |
+| Remove Ability Conditions (Memento) | Page du wiki sans définition exploitable | **Exclu du moteur et de l'IA** (décision utilisateur, 2026-09-21) |
 
 Précisions utiles glanées au passage :
 - **Poison / Toxin / Dope / Consume / Heal** : ne se cumulent pas, le second **remplace** le premier (wiki *Poison*,
@@ -272,12 +304,12 @@ Précisions utiles glanées au passage :
 ## 5. Ce que les textes ne tranchent pas — à régler par rejeu de combats réels
 
 Par ordre d'impact :
-1. Cycles de Stops et de Protections (3.2).
-2. Recover : pillz gratuite comptée ou non, minimum 1 (3.5).
-3. Le Leader bénéficie-t-il de son propre Team (3.7).
-4. Cancel Life Modif. : pose du poison empêchée, ou tic du round sauté (3.3).
-5. Tune Out : la fury compte-t-elle dans les pillz comparées.
-6. Combust contre Mindwipe : différence réelle.
+1. Cancel Life Modif. : pose du poison empêchée, ou tic du round sauté (3.3).
+2. Recover : plancher de 1 pillz (3.5), jamais observé en combat réel.
+
+Tranchés par l'utilisateur le 2026-09-21 (connaissance du jeu, sans source écrite) : cycles de Stops et de Protections
+(3.2, les Stops gagnent), Leader bénéficiant de son propre Team (3.7, oui), deux exemplaires du même Leader
+s'annulent (3.7, oui), Tune Out ignore la fury (§ 4), **Repair, Combust et Mindwipe agissent dès le round joué** (comme Dope ; Combust/Mindwipe si la carte gagne), Mindwipe = Combust (§ 4), Counter-attack limité au premier round (§ 4).
 
 Chaque combat rejoué se transcrit dans `data/test/` (voir ROADMAP § 2.B.2) ; le journal des effets (D2) rendra la
 localisation des écarts immédiate.
@@ -290,7 +322,7 @@ Verdicts sur les points encore ouverts ou déjà codés :
 | Entrée | Règle officielle | Moteur (après les corrections du matin) | Verdict |
 |---|---|---|---|
 | 53 Récup | « arrondie à l'unité inférieure, **avec un minimum de 1** » | pas de minimum | ❌ → **corrigé** |
-| 51 Toxine / Régén, 52 Consume / Dope | « agissent **immédiatement à la fin du round** dans lequel ils ont été joués » (Drak au round 1 : vies aux rounds 1, 2, 3 et 4) | n'agissent qu'aux rounds suivants | ❌ → **corrigé** (Repair reste aux rounds suivants, par symétrie avec Heal : hypothèse) |
+| 51 Toxine / Régén, 52 Consume / Dope | « agissent **immédiatement à la fin du round** dans lequel ils ont été joués » (Drak au round 1 : vies aux rounds 1, 2, 3 et 4) | n'agissent qu'aux rounds suivants | ❌ → **corrigé** (Repair et Combust/Mindwipe immédiats aussi : utilisateur, 2026-09-21) |
 | 66 Par Pillz / Vie restante | pillz/vies « **avant de mettre des pillz** sur ton perso (sans compter la Pillz gratuite) » — Lady Ametia Cr : 13 de puissance au round 1 | `nb_pillz_left` lit les pillz **après** la mise | ❌ → **corrigé** (vie : inchangée pendant la mise, OK) |
 | 56 Annule (Vie / Pillz) | « n'annule un effet permanent (Poison, Soin, Toxine, Régén) que **pendant le round où il est joué. L'effet reprendra lors du round suivant** » ; idem Pillz face à Dope / Consume | la correction du matin **retire** le poison/heal/… de la carte adverse | ⚠️ → **corrigé** : le tic du round est sauté (y compris le tic immédiat d'une toxine posée ce round), l'effet subsiste |
 | 56 Annule (Dégâts) | « n'annule pas la Fury » | fury ajoutée après les modificateurs, jamais annulée | ✅ |
@@ -304,9 +336,8 @@ Verdicts sur les points encore ouverts ou déjà codés :
 | 61 Courage / Riposte, 62 Confiance / Revanche | ✅ | | ✅ |
 | 70 Jour / Nuit | cycle de 4 h dans le jeu | non modélisé (Day toujours vrai) | choix utilisateur |
 
-Non tranché par le glossaire : cycles de Stops/Protections (3.2), Leader bénéficiant de son Team (3.7 ; « la Protection
-peut annuler les effets négatifs d'un Leader » suggère que le Team touche bien les deux camps), Tune Out et fury,
-Mindwipe vs Combust, Limitless.
+Non tranché par le glossaire : Limitless. (Cycles de Stops/Protections, Leader et son Team, Tune Out et fury, Repair,
+Mindwipe : tranchés par l'utilisateur, voir § 5.)
 
 **Historique de combats** : `player/history.php` ne donne que le score final de chaque combat (ex. « 12-3 »), sans détail
 de rounds ni rapport. Le jeu lui-même est un client Unity WebGL (`/game/play/`) ; les données de round transitent

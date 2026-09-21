@@ -38,11 +38,8 @@ choisit les deux decks et les deux mains, donc le scénario exact à tester. Poi
 | Cycles de Stops | GHEIST ou Roots (SoA en bonus) contre Nightmare ou Piranas (SoB en bonus) ; Skeelz + ability Protection: Bonus contre un All-Stop (Glorg, Shakra) |
 | Le Leader profite-t-il de son Team ? | jouer Ambre / Eyrik / Vholt lui-même |
 | Tune Out et fury | Cosmohnuts avec fury contre un adversaire à une pillz de plus |
-| Mindwipe vs Combust | une carte de chaque, observer les deux rounds suivants |
 | Limitless | Fractal en main + allié « −X Opp Damage, Min Y » gagnant |
 | Exchange contre Copy / Annul | Dominion « Damage Exchange » contre « Copy: Opp. Damage » puis contre « Cancel Opp. Damage Modif. » |
-| Repair (immédiat ou différé ?) | une carte Repair gagnante, pillz au round même |
-| Combust / Mindwipe : immédiats ? | idem, vie et pillz au round même |
 
 ### Decks prêts à jouer (2026-09-16)
 

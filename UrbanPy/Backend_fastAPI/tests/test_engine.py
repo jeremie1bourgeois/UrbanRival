@@ -126,7 +126,7 @@ def test_clan_bonus_ignores_duplicates_of_the_same_card(template_game):
 def test_equalizer_scales_with_opponent_stars_and_respects_its_minimum(template_game):
     agustino, _ = play(template_game, AGUSTINO, B_MAPPE)
 
-    assert agustino.power_fight == 6 - 2 - 2   # equalizer x 2★ puis bonus -2
+    assert agustino.power_fight == 6 - 2 - 2   # bonus -2 puis equalizer x 2★
     assert agustino.damage_fight == 1          # 2 - 2, min 1
 
 
@@ -135,15 +135,15 @@ def test_growth_scales_with_the_round_number(template_game):
 
     _, asporov = play(template_game, AGUSTINO, ASPOROV)
 
-    assert asporov.power_fight == 7 - 1 * 2 - 2  # growth x round 2 puis bonus -2
+    assert asporov.power_fight == max(4, 7 - 2 - 1 * 2)  # bonus -2 puis growth x round 2, min 4
 
 
-def test_growth_respects_its_minimum_before_the_bonus(template_game):
+def test_growth_respects_its_minimum_after_the_bonus(template_game):
     template_game.nb_turn = 4
 
     _, asporov = play(template_game, AGUSTINO, ASPOROV)
 
-    assert asporov.power_fight == 4 - 2  # 7 - 4 = 3 -> min 4, puis bonus -2
+    assert asporov.power_fight == 4  # bonus -2 -> 5, puis growth -4 -> 1, borné à 4 (le bonus s'applique avant le pouvoir)
 
 
 # --- Conditions de déclenchement --------------------------------------------------------------
@@ -264,3 +264,27 @@ def test_attack_bonus_then_opp_attack_malus(template_game):
     amelia, _ = play(template_game, AMELIA, ASPOROV, ally_pillz=2)   # (3 - 2) x 2 = 2, +6 = 8, -4 = 4
 
     assert amelia.attack == 4
+
+
+# Confirmé par l'utilisateur (2026-09-21) : pas de plancher implicite à 1, « Min 0 » réduit vraiment à 0.
+
+def test_minus_opp_power_min_0_brings_power_and_attack_down_to_0(template_game):
+    from src.core.parsing.capacity_parser import parse_capacity
+    amelia, asporov = template_game.ally.cards[AMELIA], template_game.enemy.cards[ASPOROV]
+    amelia.ability, amelia.bonus, asporov.bonus = None, None, None
+    asporov.ability = parse_capacity("-4 Opp Power, Min 0").capacity
+
+    play(template_game, AMELIA, ASPOROV)
+
+    assert (amelia.power_fight, amelia.attack, amelia.win) == (0, 0, False)
+
+
+def test_minus_opp_attack_min_0_brings_attack_down_to_0(template_game):
+    from src.core.parsing.capacity_parser import parse_capacity
+    amelia, asporov = template_game.ally.cards[AMELIA], template_game.enemy.cards[ASPOROV]
+    amelia.ability, amelia.bonus, asporov.bonus = None, None, None
+    asporov.ability = parse_capacity("-11 Opp Attack, Min 0").capacity
+
+    play(template_game, AMELIA, ASPOROV, ally_pillz=2)   # 3 x 2 = 6, -11 min 0
+
+    assert (amelia.power_fight, amelia.attack, amelia.win) == (3, 0, False)

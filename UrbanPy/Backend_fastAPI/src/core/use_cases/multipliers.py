@@ -3,6 +3,8 @@ Multiplicateurs de capacités (champ `how`) partagés par les niveaux du moteur.
 Chaque fonction reçoit (game, player1, player2, card1, card2) où player1/card1 sont le propriétaire
 de la capacité et player2/card2 son adversaire, et renvoie le facteur appliqué à `value`.
 """
+from src.core.use_cases.clan import clan_for_bonus
+
 MAX_LIFE = 12   # vie de départ ; à paramétrer avec la partie si elle devient variable
 MAX_PILLZ = 12
 
@@ -20,7 +22,8 @@ def _degrowth(game, player1, player2, card1, card2) -> int:
 
 
 def _support(game, player1, player2, card1, card2) -> int:
-    return sum(1 for c in player1.cards if c.faction == card1.faction)
+    # Un Oculus rallié au clan compte (combat 1347602 : Freaks ×3 + Dark Majestic -> Support ×4) ; les doublons aussi
+    return sum(1 for c in player1.cards if clan_for_bonus(player1, c) == clan_for_bonus(player1, card1))
 
 
 def _equalizer(game, player1, player2, card1, card2) -> int:
@@ -28,7 +31,7 @@ def _equalizer(game, player1, player2, card1, card2) -> int:
 
 
 def _brawl(game, player1, player2, card1, card2) -> int:
-    return sum(1 for c in player2.cards if c.faction == card2.faction)
+    return sum(1 for c in player2.cards if clan_for_bonus(player2, c) == clan_for_bonus(player2, card2))
 
 
 def _nb_damage_opp(game, player1, player2, card1, card2) -> int:
