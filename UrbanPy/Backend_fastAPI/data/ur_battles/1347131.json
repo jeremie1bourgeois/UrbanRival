@@ -1,0 +1,262 @@
+{
+ "_comment": "Combat réel Urban Rivals capturé via battles.status (voir scripts/ur_capture.js).",
+ "battle_id": 1347131,
+ "rule_id": 3,
+ "p0": {
+  "name": "- Kartos -",
+  "base_life": 14,
+  "base_pillz": 12,
+  "cards": [
+   {
+    "id": 1309,
+    "level": 5
+   },
+   {
+    "id": 2545,
+    "level": 4
+   },
+   {
+    "id": 2359,
+    "level": 2
+   },
+   {
+    "id": 413,
+    "level": 3
+   }
+  ]
+ },
+ "p1": {
+  "name": "jere'm",
+  "base_life": 14,
+  "base_pillz": 12,
+  "cards": [
+   {
+    "id": 893,
+    "level": 4
+   },
+   {
+    "id": 1193,
+    "level": 4
+   },
+   {
+    "id": 1688,
+    "level": 2
+   },
+   {
+    "id": 1484,
+    "level": 3
+   }
+  ]
+ },
+ "rounds": [
+  {
+   "round": 1,
+   "first": "p0",
+   "before": {
+    "life": [
+     14,
+     14
+    ],
+    "pillz": [
+     12,
+     12
+    ]
+   },
+   "p0": {
+    "index": 2,
+    "pillz": 2,
+    "fury": false,
+    "power": 9,
+    "damage": 3,
+    "attack": 18,
+    "won": false
+   },
+   "p1": {
+    "index": 3,
+    "pillz": 5,
+    "fury": false,
+    "power": 10,
+    "damage": 4,
+    "attack": 38,
+    "won": true
+   },
+   "post_round": [
+    [
+     {
+      "playerId": 500685,
+      "attributeAffected": "life",
+      "attributeAction": "decrease",
+      "isPermanent": true,
+      "quantity": 0
+     }
+    ],
+    []
+   ],
+   "after": {
+    "life": [
+     10,
+     14
+    ],
+    "pillz": [
+     11,
+     8
+    ]
+   }
+  },
+  {
+   "round": 2,
+   "first": "p1",
+   "before": {
+    "life": [
+     10,
+     14
+    ],
+    "pillz": [
+     11,
+     8
+    ]
+   },
+   "p0": {
+    "index": 1,
+    "pillz": 3,
+    "fury": false,
+    "power": 6,
+    "damage": 7,
+    "attack": 8,
+    "won": true
+   },
+   "p1": {
+    "index": 1,
+    "pillz": 2,
+    "fury": false,
+    "power": 7,
+    "damage": 5,
+    "attack": 3,
+    "won": false
+   },
+   "post_round": [
+    [
+     {
+      "playerId": 500685,
+      "attributeAffected": "life",
+      "attributeAction": "decrease",
+      "isPermanent": true,
+      "quantity": 2
+     }
+    ],
+    []
+   ],
+   "after": {
+    "life": [
+     8,
+     7
+    ],
+    "pillz": [
+     9,
+     7
+    ]
+   }
+  },
+  {
+   "round": 3,
+   "first": "p0",
+   "before": {
+    "life": [
+     8,
+     7
+    ],
+    "pillz": [
+     9,
+     7
+    ]
+   },
+   "p0": {
+    "index": 3,
+    "pillz": 1,
+    "fury": false,
+    "power": 6,
+    "damage": 4,
+    "attack": 6,
+    "won": false
+   },
+   "p1": {
+    "index": 2,
+    "pillz": 1,
+    "fury": false,
+    "power": 7,
+    "damage": 3,
+    "attack": 7,
+    "won": true
+   },
+   "post_round": [
+    [
+     {
+      "playerId": 500685,
+      "attributeAffected": "life",
+      "attributeAction": "decrease",
+      "isPermanent": true,
+      "quantity": 2
+     },
+     {
+      "playerId": 500685,
+      "attributeAffected": "life",
+      "attributeAction": "decrease",
+      "isPermanent": true,
+      "quantity": 0
+     }
+    ],
+    []
+   ],
+   "after": {
+    "life": [
+     3,
+     7
+    ],
+    "pillz": [
+     9,
+     7
+    ]
+   }
+  },
+  {
+   "round": 4,
+   "first": "p1",
+   "before": {
+    "life": [
+     3,
+     7
+    ],
+    "pillz": [
+     9,
+     7
+    ]
+   },
+   "p0": {
+    "index": 0,
+    "pillz": 7,
+    "fury": true,
+    "power": 8,
+    "damage": 8,
+    "attack": 56,
+    "won": true
+   },
+   "p1": {
+    "index": 0,
+    "pillz": 8,
+    "fury": false,
+    "power": 7,
+    "damage": 5,
+    "attack": 56,
+    "won": false
+   },
+   "post_round": [
+    [],
+    []
+   ],
+   "after": {
+    "life": null,
+    "pillz": null
+   }
+  }
+ ]
+}

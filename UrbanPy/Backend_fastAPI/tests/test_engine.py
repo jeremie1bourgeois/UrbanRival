@@ -126,7 +126,7 @@ def test_clan_bonus_ignores_duplicates_of_the_same_card(template_game):
 def test_equalizer_scales_with_opponent_stars_and_respects_its_minimum(template_game):
     agustino, _ = play(template_game, AGUSTINO, B_MAPPE)
 
-    assert agustino.power_fight == 6 - 2 - 2   # equalizer x 2★ puis bonus -2
+    assert agustino.power_fight == 6 - 2 - 2   # bonus -2 puis equalizer x 2★
     assert agustino.damage_fight == 1          # 2 - 2, min 1
 
 
@@ -135,15 +135,15 @@ def test_growth_scales_with_the_round_number(template_game):
 
     _, asporov = play(template_game, AGUSTINO, ASPOROV)
 
-    assert asporov.power_fight == 7 - 1 * 2 - 2  # growth x round 2 puis bonus -2
+    assert asporov.power_fight == max(4, 7 - 2 - 1 * 2)  # bonus -2 puis growth x round 2, min 4
 
 
-def test_growth_respects_its_minimum_before_the_bonus(template_game):
+def test_growth_respects_its_minimum_after_the_bonus(template_game):
     template_game.nb_turn = 4
 
     _, asporov = play(template_game, AGUSTINO, ASPOROV)
 
-    assert asporov.power_fight == 4 - 2  # 7 - 4 = 3 -> min 4, puis bonus -2
+    assert asporov.power_fight == 4  # bonus -2 -> 5, puis growth -4 -> 1, borné à 4 (le bonus s'applique avant le pouvoir)
 
 
 # --- Conditions de déclenchement --------------------------------------------------------------
