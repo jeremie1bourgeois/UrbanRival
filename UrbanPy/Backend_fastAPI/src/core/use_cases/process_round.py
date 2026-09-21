@@ -217,8 +217,9 @@ def leader_team_capacity(player: Player) -> Capacity:
     """
     Copie de l'ability « Team: X » du Leader de la main, à appliquer à la carte jouée — seulement si la main
     compte exactement un Leader (deux Leaders s'annulent : bonus « Cancel Leader »). None sinon.
+    Un Oculus rallié au Leader compte comme un second Leader (combat 1346878 : Morphun annulé par Dark Morphun).
     """
-    leaders = [card for card in player.cards if card.faction == "Leader"]
+    leaders = [card for card in player.cards if clan_for_bonus(player, card) == LEADER]
     if len(leaders) != 1 or leaders[0].ability is None or "team" not in leaders[0].ability.effect_conditions:
         return None
     capacity = copy.deepcopy(leaders[0].ability)
@@ -324,12 +325,13 @@ def infiltrated_clan(player: Player):
     """
     Clan adopté par l'Oculus « Infiltrated » de la main (règle officielle du bonus) : un seul autre clan -> celui-là ;
     deux autres clans -> celui de la carte seule ; trois autres clans ou plus d'un Oculus -> None.
-    Les Leaders ne comptent pas comme clan (hypothèse, non documentée).
+    Un Leader compte comme un clan (combat 1346878 : Bangers ×2 + Morphun -> l'Oculus rejoint le Leader, dont le
+    « Cancel Leader » annule Morphun, et non les Bangers).
     """
     oculus = [c for c in player.cards if c.faction == OCULUS]
     if len(oculus) != 1:
         return None
-    counts = Counter(c.faction for c in player.cards if c.faction not in (OCULUS, LEADER))
+    counts = Counter(c.faction for c in player.cards if c.faction != OCULUS)
     if len(counts) == 1:
         clan = next(iter(counts))
     elif len(counts) == 2:
@@ -337,8 +339,7 @@ def infiltrated_clan(player: Player):
         clan = lone[0] if len(lone) == 1 else None
     else:
         clan = None
-    allowed = infiltrable_clans(oculus[0])
-    return clan if clan is not None and (allowed is None or clan in allowed) else None
+    return clan
 
 
 def infiltrable_clans(card: Card):
@@ -360,9 +361,9 @@ def apply_infiltrated_bonus(player: Player, card: Card) -> None:
     """Remplace le bonus de combat d'un Oculus infiltré par celui du clan adopté (None s'il n'y en a pas)."""
     if not is_infiltrated(card):
         return
-    clan = infiltrated_clan(player)
+    clan, allowed = infiltrated_clan(player), infiltrable_clans(card)
     source = next((c for c in player.cards if c.faction == clan and c.bonus is not None), None)
-    card.bonus_fight = copy.deepcopy(source.bonus) if source else None
+    card.bonus_fight = copy.deepcopy(source.bonus) if source and (allowed is None or clan in allowed) else None
 
 
 def is_clan_bonus_active(player: Player, card: Card) -> bool:

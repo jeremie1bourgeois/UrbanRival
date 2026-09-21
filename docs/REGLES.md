@@ -146,7 +146,7 @@ rien ; deux Oculus → rien. Le moteur choisit l'inverse dans le cas 2 + 1.
 you which clans have to be infiltrated to activate its bonus » — chaque Oculus ne peut infiltrer que **4 ou 5 clans
 listés sur sa carte**. À vérifier si les données scrapées d'iclintz contiennent cette liste ; sinon, lacune de données.
 
-**Cas Leader dans la main** : non traité par la source (le moteur exclut les Leaders du décompte, raisonnable).
+**Cas Leader dans la main** : tranché par le combat réel 1346878 (`data/ur_battles/`) — le Leader compte comme un clan. Main Bangers ×2 + Morphun + Dark Morphun : l'Oculus rejoint le Leader (carte seule), pas les Bangers (puissance 6, pas 8) ; et compte alors comme second Leader : « Cancel Leader » annule le +1 Pillz Per Round de Morphun (pillz 12 − 3 = 9, pas 10). La liste des clans de la carte ne restreint que le bonus adopté et l'ability, pas l'appartenance.
 
 ### 3.7 Team (Leader) — ✅ CONFIRMÉ
 
