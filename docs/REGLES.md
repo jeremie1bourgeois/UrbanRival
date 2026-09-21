@@ -128,26 +128,42 @@ page sont par ailleurs arithmétiquement incohérents (« 1 out of 2 = spending 
 Pyro (Defeat: Recover 1 Pillz Out Of 2) pose 4 pillz (3 misées + la gratuite) et en récupère 2 (12 − 3 = 9 → 11), et
 non ⌊3/2⌋ = 1. Cohérent avec Bet (3.8). Le plancher de 1 reste non observé en combat réel.
 
-### 3.6 Infiltrated (Oculus) — ❌ CONTREDIT (texte de bonus)
+### 3.6 Infiltrated (Oculus) — ✅ TRANCHÉ (règle officielle + 5 combats réels)
 
-**Moteur** : clan **majoritaire** des autres cartes ; égalité → rien.
+**Source** (texte officiel du bonus « Infiltré », fourni par l'utilisateur le 2026-09-21 ; identique au wiki *Oculus*) :
 
-**Source** (wiki *Oculus*, texte du bonus, identique sur la page *Infiltrated*) :
+> Si un seul autre clan est présent dans le tirage, le personnage Oculus est considéré comme une carte de ce clan. Si
+> deux autres clans sont présents, le personnage Oculus appartiendra au clan du personnage seul, activant ainsi son
+> bonus. Si trois autres clans sont présents dans le tirage, ou si vous avez plus d'un Oculus dans le tirage, le bonus
+> Infiltré n'a pas d'effet.
 
-> If only one other clan is present in the draw, the Oculus card is considered to be a part of that clan. If two other
-> clans are present, the Oculus card will belong to the clan of **the sole card**, thus activating its bonus. If three
-> other clans are present in the draw, or if you have more than one Oculus in your hand, the Infiltrated bonus has no
-> effect.
+Avec 3 autres cartes : 1 clan (3 cartes) → ce clan ; 2 clans (2 + 1) → le clan de la **carte seule** (c'est le seul
+cas où l'infiltration change quelque chose : elle active un bonus qui ne l'était pas) ; 3 clans → rien ; deux Oculus →
+rien. Moteur : `clan.infiltrated_clan`.
 
-Avec 3 autres cartes : 1 clan (3 cartes) → ce clan ; 2 clans (2 + 1) → le clan **minoritaire** (celui de la carte
-seule — c'est le seul cas où l'infiltration change quelque chose : elle active un bonus qui ne l'était pas) ; 3 clans →
-rien ; deux Oculus → rien. Le moteur choisit l'inverse dans le cas 2 + 1.
+**Les Leaders** ne sont pas traités par le texte. Combats réels (`data/ur_battles/`) :
+- 1346878, Bangers ×2 + Morphun + Dark Morphun : pas de bonus Bangers (puissance 6, pas 8) et Morphun annulé (pillz
+  12 − 3 = 9, pas 10) → l'Oculus a rejoint le Leader, carte seule, et compte comme second Leader (« Cancel Leader »).
+- 1347500, Freaks ×2 + Ashigaru + Dark Majestic : Counter-attack annulé (ordre de jeu p0, p1, p0, p1 au lieu de
+  toujours second) → idem.
+- 1347671, Sofilia (Freaks) + Administrator + Ashigaru + Dark Majestic : « Support: Attack +3 » de Sofilia donne +3
+  (×1) → l'Oculus n'a **pas** rejoint les Freaks, alors que Freaks ×1 contre Leader ×2 en ferait la carte seule.
+- 1347602, Freaks ×3 + Dark Majestic : Support ×4 → l'Oculus a rejoint les Freaks.
+- 1214141 (branche `feat/ia-tous-modes`) : trois autres clans → rien.
 
-**Restriction supplémentaire** (wiki *Infiltrated*) : « The clan icons shown in the Ability section of your card show
-you which clans have to be infiltrated to activate its bonus » — chaque Oculus ne peut infiltrer que **4 ou 5 clans
-listés sur sa carte**. À vérifier si les données scrapées d'iclintz contiennent cette liste ; sinon, lacune de données.
+Seule lecture compatible avec le texte et les cinq combats : **chaque Leader est son propre clan**. Un Leader seul face à
+deux cartes d'un clan est la carte seule (l'Oculus le rejoint et le Cancel Leader l'annule) ; deux Leaders différents
+plus une carte font trois clans (rien). Moteur : `clan._clan_for_infiltration`, tests `test_infiltrated.py`.
+Cas non observé : deux clans différents + un Leader (trois clans selon cette lecture → rien).
 
-**Cas Leader dans la main** : tranché par le combat réel 1346878 (`data/ur_battles/`) — le Leader compte comme un clan. Main Bangers ×2 + Morphun + Dark Morphun : l'Oculus rejoint le Leader (carte seule), pas les Bangers (puissance 6, pas 8) ; et compte alors comme second Leader : « Cancel Leader » annule le +1 Pillz Per Round de Morphun (pillz 12 − 3 = 9, pas 10). La liste des clans de la carte ne restreint que le bonus adopté et l'ability, pas l'appartenance.
+**Clans listés sur la carte** (wiki *Infiltrated* : « les icônes de clan dans la section Pouvoir indiquent quels clans
+doivent être infiltrés pour activer son bonus ») : la liste, lue dans le texte du pouvoir (« Infiltrated Bangers,
+Cosmohnuts, … : ») restreint le **bonus adopté** et l'**ability**, pas l'appartenance au clan (1346878 : le Leader
+n'est listé nulle part, l'Oculus le rejoint quand même). Moteur : `clan.infiltrable_clans`, `process_round.apply_infiltrated_bonus`.
+
+**Support avec un Oculus** : 1347602 — l'Oculus rallié aux Freaks compte pour Support, et les deux exemplaires de
+Sofilia comptent chacun (contrairement à l'activation du bonus, qui compte les personnages distincts). Brawl aligné
+par symétrie, non vérifié. Moteur : `multipliers._support`, `_brawl`.
 
 ### 3.6 bis Ordre bonus / pouvoir sur une même carte — ✅ TRANCHÉ (attaque)
 
