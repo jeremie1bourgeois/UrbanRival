@@ -50,14 +50,15 @@ def apply_capacity_lvl_3(game: Game, card1: Card, card2: Card) -> None:
             setattr(card, slot, capacity)
 
 
-def pillz_bet(card: Card) -> int:
-    """Pillz misées sur la carte ce round : pillz_fight vaut 1 sans mise ; la fury coûte 3 pillz."""
-    return card.pillz_fight - 1 + (3 if card.fury else 0)
+def pillz_placed(card: Card) -> int:
+    """Pillz posées sur la carte ce round, gratuite comprise (combat réel 1347075 : 4 posées, Recover 1 Out Of 2 -> 2) ;
+    la fury coûte 3 pillz."""
+    return card.pillz_fight + (3 if card.fury else 0)
 
 
 def recovered_pillz(card: Card, capacity: Capacity) -> int:
-    """« Recover X Pillz Out Of Y » : floor(pillz misées x X / Y), minimum 1 (glossaire officiel 53) ; la fury compte."""
-    return max(1, pillz_bet(card) * capacity.value // capacity.borne) if capacity.borne > 0 else 0
+    """« Recover X Pillz Out Of Y » : floor(pillz posées x X / Y), minimum 1 (glossaire officiel 53) ; la fury compte."""
+    return max(1, pillz_placed(card) * capacity.value // capacity.borne) if capacity.borne > 0 else 0
 
 
 def apply_reanimate(game: Game, card1: Card, card2: Card) -> None:

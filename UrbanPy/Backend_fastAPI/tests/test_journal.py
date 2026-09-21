@@ -169,7 +169,7 @@ def test_end_of_round_life_and_pillz_effects_are_logged(template_game):
 
 
 def test_recover_and_reanimate_are_logged(template_game):
-    play(template_game, ally_ability="Defeat: Recover 2 Pillz Out Of 3", ally_pillz=4, enemy_pillz=8)   # Amelia perd, 3 misées -> 2
+    play(template_game, ally_ability="Defeat: Recover 2 Pillz Out Of 3", ally_pillz=4, enemy_pillz=8)   # Amelia perd, 4 posées -> 2
 
     assert "Amelia : pouvoir « Defeat: Recover 2 Pillz Out Of 3 » → pillz de l'allié 9 → 11" in texts(template_game)
 

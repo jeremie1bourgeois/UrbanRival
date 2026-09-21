@@ -233,26 +233,26 @@ def test_life_per_damage_is_zero_on_defeat(template_game):
 
 # --- Recover X Pillz Out Of Y ----------------------------------------------------------------
 
-def test_defeat_recover_returns_part_of_the_pillz_bet(template_game):
-    # Amelia mise 5 pillz (pillz_fight 6) et perd contre Asporov à 8 pillz : récupère floor(5 x 2 / 3) = 3
+def test_defeat_recover_returns_part_of_the_pillz_placed(template_game):
+    # Amelia pose 6 pillz (5 misées + la gratuite) et perd contre Asporov à 8 pillz : récupère floor(6 x 2 / 3) = 4
     play(template_game, ally_ability="Defeat: Recover 2 Pillz Out Of 3", ally_pillz=6, enemy_pillz=8)
 
     assert template_game.ally.cards[AMELIA].win is False
-    assert template_game.ally.pillz == 12 - 5 + 3
+    assert template_game.ally.pillz == 12 - 5 + 4
 
 
 def test_defeat_recover_counts_fury_pillz(template_game):
     amelia = template_game.ally.cards[AMELIA]
     amelia.ability = ability("Defeat: Recover 2 Pillz Out Of 3")
     process_round(template_game, ProcessRoundInput(player1_card_index=AMELIA, player1_pillz=3, player1_fury=True,
-                                                   player2_card_index=ASPOROV, player2_pillz=8))   # 2 + 3 fury = 5 misées
+                                                   player2_card_index=ASPOROV, player2_pillz=8))   # 3 posées + 3 fury = 6 -> 4
 
-    assert template_game.ally.pillz == 12 - 5 + 3
+    assert template_game.ally.pillz == 12 - 5 + 4
 
 
 def test_defeat_recover_gives_at_least_one_pillz(template_game):
     # Glossaire officiel (53) : « arrondie à l'unité inférieure, avec un minimum de 1 »
-    play(template_game, ally_ability="Defeat: Recover 1 Pillz Out Of 3", ally_pillz=2, enemy_pillz=8)   # 1 misée : floor(1/3) = 0 -> 1
+    play(template_game, ally_ability="Defeat: Recover 1 Pillz Out Of 3", ally_pillz=2, enemy_pillz=8)   # 2 posées : floor(2/3) = 0 -> 1
 
     assert template_game.ally.pillz == 12 - 1 + 1
 
@@ -264,17 +264,17 @@ def test_defeat_recover_does_nothing_on_victory(template_game):
 
 
 def test_unconditional_recover_applies_on_victory(template_game):
-    play(template_game, ally_ability="Recover 1 Pillz Out Of 2", ally_wins=True)           # 5 misées -> 2
+    play(template_game, ally_ability="Recover 1 Pillz Out Of 2", ally_wins=True)           # 6 posées -> 3
 
-    assert template_game.ally.pillz == 12 - 5 + 2
+    assert template_game.ally.pillz == 12 - 5 + 3
 
 
 def test_recover_players_pillz_gives_both_players_part_of_their_own_bet(template_game):
-    # Amelia (P1) mise 6 (7 pillz) contre Asporov (P5) qui mise 2 (3 pillz) : 7 < 15, Amelia perd -> victoire requise, rien.
+    # Amelia (P1) pose 7 pillz contre Asporov (P5) qui en pose 3 : 7 < 15, Amelia perd -> victoire requise, rien.
     play(template_game, ally_ability="Victory Or Defeat: Recover 1 Players Pillz Out Of 2", ally_pillz=7, enemy_pillz=3)
 
     assert template_game.ally.cards[AMELIA].win is False
-    assert (template_game.ally.pillz, template_game.enemy.pillz) == (12 - 6 + 3, 12 - 2 + 1)   # chacun récupère la moitié de sa propre mise
+    assert (template_game.ally.pillz, template_game.enemy.pillz) == (12 - 6 + 3, 12 - 2 + 1)   # chacun récupère la moitié de ses pillz posées
 
 
 # --- Fatal Killshot / Sinister Symmetry : la partie est gagnée sur-le-champ (règles officielles) -----------------
