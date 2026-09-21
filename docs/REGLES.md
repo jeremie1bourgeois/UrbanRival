@@ -170,7 +170,8 @@ n'est listé nulle part, l'Oculus le rejoint quand même). Moteur : `clan.infilt
 
 **Support avec un Oculus** : 1347602 — l'Oculus rallié aux Freaks compte pour Support, et les deux exemplaires de
 Sofilia comptent chacun (contrairement à l'activation du bonus, qui compte les personnages distincts). Brawl aligné
-par symétrie, non vérifié. Moteur : `multipliers._support`, `_brawl`.
+sur Support (exemplaires comptés) : confirmé par l'utilisateur (2026-09-21), test `test_brawl_counts_every_copy…`.
+Moteur : `multipliers._support`, `_brawl`.
 
 ### 3.6 bis Ordre bonus / pouvoir sur une même carte — ✅ TRANCHÉ (attaque)
 
@@ -242,10 +243,13 @@ Aucune source textuelle trouvée ; l'utilisateur confirme par connaissance du je
 réducteurs de dégâts (une carte 2 dégâts + fury face à « −2 Opp Damage, Min 1 » inflige 1 + 2 = 3). C'est ce que fait
 le moteur (`process_round` : « Appliquer les fury » après `lvl_2`).
 
-### 3.13 `Day:` toujours valide, `Night:` jamais — ⚠️ DÉCISION UTILISATEUR
+### 3.13 `Day:` / `Night:` — ⚠️ RÈGLE CONNUE, NON MODÉLISÉE
 
-Wiki *Day/Night* : les deux conditions dépendent de l'heure dans le jeu. Le moteur ne modélise pas le cycle ; choix
-assumé, sans conséquence tant que le jeu n'est pas comparé à des combats réels joués de nuit.
+Règle (utilisateur, 2026-09-21) : jour ou nuit est **tiré au sort au début de la partie** ; les cartes à `Day:` /
+`Night:` ont un pouvoir différent selon la valeur tirée. Moteur : `Day:` toujours valide, `Night:` jamais (partie
+toujours de jour). **Lacune de données** : `jsonData_officiel.json` ne contient que les 55 textes `Day:` d'un pouvoir,
+aucun texte `Night:` — modéliser le tirage n'aurait de sens qu'avec les pouvoirs de nuit. À reprendre avec le tirage de
+la main et du premier joueur (aléatoire seedé à la création de la partie).
 
 ### Synthèse
 
@@ -261,7 +265,7 @@ assumé, sans conséquence tant que le jeu n'est pas comparé à des combats ré
 | 3.7 | Team | ✅ confirmé (Cancel Leader, immunité SoA, Leader inclus, doublons de Leader) | — |
 | 3.12 | Fury après les réducteurs | ✅ confirmé (utilisateur) | — |
 | 3.2 | Protection cyclique | ✅ confirmé (utilisateur) : les Stops gagnent | — |
-| 3.13 | Day/Night | choix utilisateur | — |
+| 3.13 | Day/Night | règle connue (tirage en début de partie), non modélisée : textes de nuit absents des données | données |
 
 ## 4. Mécaniques non gérées : définitions retrouvées
 
@@ -278,7 +282,7 @@ ROADMAP § 2.A.
 | **Unison: X** | « only activates if the hand of the player contains EXCLUSIVELY cards of the same clan as the card which has the Unison effect » | Condition de début de round (main mono-clan) |
 | **Disunion: X** | « only activates if the hand of the player at least contains ONE card from a different clan » | Condition, négation d'Unison |
 | **After (Clan X[, Clan Y]): X** (bonus Tolvack + abilities) | « This effect only activates if you played a "Clan X" character in the previous round. Oculus characters, even when infiltrated "Clan X", do not count. » Ne s'active jamais au round 1. | Condition sur `history[-1]` (clan de la carte jouée par le même joueur au round précédent) |
-| **Perfect: X** | « your card has to have the exact amount of Pillz needed » — une pillz de moins aurait perdu, une de plus est gaspillée. Exemple : adversaire 25 d'attaque, puissance 8 → exactement 4 pillz (32). | Condition différée après le calcul des attaques (victoire et `attack − power_fight < opp.attack`) |
+| **Perfect: X** | « your card has to have the exact amount of Pillz needed » — une pillz de moins aurait perdu, une de plus est gaspillée. Exemple : adversaire 25 d'attaque, puissance 8 → exactement 4 pillz (32). | Condition différée après le calcul des attaques (victoire et `attack − power_fight < opp.attack`) — confirmé par l'utilisateur (2026-09-21) |
 | **Consume X, Min Y** | « If your card wins the round, the opponent will lose X Pillz, minimum Y. This effect will be felt at the end of each of the following rounds. (If two Consumes are applied, the second will replace the first.) » | Effet persistant sur les pillz adverses (comme Poison sur la vie ; remplace, ne cumule pas) |
 | **Combust X, Min Y** | « at the end of each of the following turns the opponent will lose X Life point(s) and Pillz if he/she/they have more than [Min] Life point(s)/Pillz » | Persistant vie + pillz, tic **dès le round joué** (utilisateur, 2026-09-21) ; « Players Combust » : les deux joueurs |
 | **Mindwipe X, Min Y** | « your opponent will lose X Life Points and Pillz, minimum of Y. This effect will persist at the end of each of the following rounds. » | Identique à Combust — confirmé par le texte de carte fourni par l'utilisateur (2026-09-21) : « Si la carte gagne, votre adversaire perd X point(s) de vie et Pillz, minimum Y. L'effet persiste à la fin de chacun des tours suivants » |
@@ -290,7 +294,7 @@ ROADMAP § 2.A.
 | **Beyond** (Genesis) | « If no player is left KO at the end of the 4 rounds, a card will be randomly selected from the two players remaining decks and a 5th round will be held. […] Your card's ability cannot be stopped. » | Hors périmètre (5e round) |
 | **Fatal Killshot** | « If the Attack of your card is equal or higher than the double of the opposing character's attack, the match is over and you win by KO. » | Fin de partie immédiate |
 | **Sinister Symmetry** | « If your card wins the round against the card in front of it, the match is over and you win. » | Fin de partie immédiate |
-| **Limitless** (Fractal) | « For all the cards in your hand, the maximums on abilities are cancelled and the minimums are replaced by 0. […] This effect does not apply to bonuses. » | Modificateur global des bornes |
+| **Limitless** (Fractal) | « For all the cards in your hand, the maximums on abilities are cancelled and the minimums are replaced by 0. […] This effect does not apply to bonuses. » | **Exclu du moteur et de l'IA** (décision utilisateur, 2026-09-21). Code conservé : bornes de l'ability de la carte jouée |
 | **Tie-Break** (Solomon) | Gagne toutes les égalités d'attaque (wiki *Power* : « unless Solomon is in play ») | Cas dans `resolve_combat` |
 | **Counter-Attack** (Ashigaru) | « The player who has Ashigaru in their team always plays second in the fight […]. If both players have Ashigaru, the order of play is decided in the usual way. » | **Exclu du moteur et de l'IA** (décision utilisateur, 2026-09-21 ; le combat 1349159 montrait le camp d'Ashigaru jouer en premier). Code conservé : le camp d'Ashigaru joue en second au premier round seulement, puis alternance classique |
 | **Rebirth** (dont « Rebirth 1, Max. 1 », Nemo Cr) | Pas une mécanique : anciennes rééditions graphiques de cartes | **Exclu du moteur et de l'IA** (décision utilisateur, 2026-09-21) |
@@ -317,8 +321,12 @@ Précisions utiles glanées au passage :
 ## 5. Ce que les textes ne tranchent pas — à régler par rejeu de combats réels
 
 Par ordre d'impact :
-1. Cancel Life Modif. : pose du poison empêchée, ou tic du round sauté (3.3).
+1. Exchange contre Cancel Opp. X Modif. : échange annulé en entier ou seulement pour la carte qui annule (§ 6, entrée 60).
 2. Recover : plancher de 1 pillz (3.5), jamais observé en combat réel.
+
+Confirmés par l'utilisateur le 2026-09-21 : Cancel Opp. Life Modif. saute aussi le tic immédiat d'une Toxine posée ce
+round (3.3, testé) ; Perfect = victoire avec `attack − power_fight < attaque adverse` (§ 4) ; Brawl compte les
+exemplaires comme Support (3.6) ; premier joueur du round 1 tiré au sort (§ 2, non modélisé).
 
 Tranchés par l'utilisateur le 2026-09-21 (connaissance du jeu, sans source écrite) : cycles de Stops et de Protections
 (3.2, les Stops gagnent), Leader bénéficiant de son propre Team (3.7, oui), deux exemplaires du même Leader
@@ -342,14 +350,14 @@ Verdicts sur les points encore ouverts ou déjà codés :
 | 58 Stop | « la condition Stop ne s'active pas contre des cartes Annul » | « stop » consommé à la phase des Stops uniquement | ✅ |
 | 55 Protection | Protection: Bonus/Pouvoir protège des Stops « mais pas d'une carte Annul » ; « peut également annuler les effets négatifs d'un Leader » | Protection: X retire les modifs adverses ciblant ma carte, y compris `leader_fight` adverse | ✅ |
 | 59 Copie, 172 Impose | valeurs **de base** ; Copie Bonus « s'il est actif » | ✅ | ✅ |
-| 60 Echange | échange des valeurs de base « même si la carte en face a une Protection appropriée » ; annulé par un Annul approprié ; Echange face à Copie/Echange du même type → seul l'Echange agit | Exchange est méta (non touché par Protection) ; Cancel : à vérifier ; Exchange vs Copy : non géré | ➖ à vérifier |
+| 60 Echange | échange des valeurs de base « même si la carte en face a une Protection appropriée » ; annulé par un Annul approprié ; Echange face à Copie/Echange du même type → seul l'Echange agit | Exchange est méta (non touché par Protection) ; Exchange vs Copy : seul l'Echange agit (les deux lisent les valeurs imprimées, testé dans les deux sens) ; Cancel : **à vérifier** (utilisateur) | ➖ Cancel à vérifier |
 | 63 Support / Brawl, 64 Croissance, 65 Equalizer, 67 Par Puissance/Dégâts adv. (valeurs de base) | ✅ conformes | | ✅ |
 | 68 Killshot, 173 Versus (main adverse), 174 Symétrie, 175 Infiltration (carte seule, clans spécifiques) | ✅ conformes aux corrections du matin | | ✅ |
 | 50 Poison / Soin | le second remplace le premier ; Poison et Soin coexistent | ✅ | ✅ |
 | 61 Courage / Riposte, 62 Confiance / Revanche | ✅ | | ✅ |
 | 70 Jour / Nuit | cycle de 4 h dans le jeu | non modélisé (Day toujours vrai) | choix utilisateur |
 
-Non tranché par le glossaire : Limitless. (Cycles de Stops/Protections, Leader et son Team, Tune Out et fury, Repair,
+Limitless : exclu du moteur et de l'IA (utilisateur, 2026-09-21). (Cycles de Stops/Protections, Leader et son Team, Tune Out et fury, Repair,
 Mindwipe : tranchés par l'utilisateur, voir § 5.)
 
 **Historique de combats** : `player/history.php` ne donne que le score final de chaque combat (ex. « 12-3 »), sans détail

@@ -215,6 +215,14 @@ def test_damage_exchange_swaps_printed_damages(template_game):
     assert (amelia.damage_fight, asporov.damage_fight) == (3, 5)
 
 
+@pytest.mark.parametrize("ally_ability, enemy_ability", [("Power Exchange", "Copy: Opp. Power"), ("Copy: Opp. Power", "Power Exchange")])
+def test_exchange_versus_copy_of_the_same_stat_only_the_exchange_acts(template_game, ally_ability, enemy_ability):
+    # Glossaire officiel 60 : « Echange face à Copie du même type -> seul l'Echange agit » (les deux lisent les valeurs imprimées)
+    amelia, asporov = play(template_game, ally_ability=ally_ability, enemy_ability=enemy_ability)
+
+    assert (amelia.power_fight, asporov.power_fight) == (7 - 2, 3 - 2)
+
+
 @pytest.mark.parametrize("text", ["Asymmetry: Copy: Opp. Power", "Confidence: Power Exchange", "Power And Damage Exchange"])
 def test_value_copies_and_exchanges_do_not_crash(template_game, text):
     template_game.turn = True

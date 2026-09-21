@@ -38,7 +38,6 @@ choisit les deux decks et les deux mains, donc le scénario exact à tester. Poi
 | Cycles de Stops | GHEIST ou Roots (SoA en bonus) contre Nightmare ou Piranas (SoB en bonus) ; Skeelz + ability Protection: Bonus contre un All-Stop (Glorg, Shakra) |
 | Le Leader profite-t-il de son Team ? | jouer Ambre / Eyrik / Vholt lui-même |
 | Tune Out et fury | Cosmohnuts avec fury contre un adversaire à une pillz de plus |
-| Limitless | Fractal en main + allié « −X Opp Damage, Min Y » gagnant |
 | Exchange contre Copy / Annul | Dominion « Damage Exchange » contre « Copy: Opp. Damage » puis contre « Cancel Opp. Damage Modif. » |
 
 ### Decks prêts à jouer (2026-09-16)

@@ -41,11 +41,11 @@ Cancel Life Modif., Reanimate, Versus) ont été **corrigées** le même jour ; 
 | Fury : +2 dégâts ajoutés **après** les modificateurs de dégâts (utilisateur ; glossaire 56 : « Annul Modif Dégâts n'annule pas la Fury ») | `process_round` |
 | Toxine / Régén / Dope / Repair / Consume / Combust (Mindwipe) agissent **dès le round joué** (glossaire 51, 52 ; Repair, Combust : utilisateur) ; Poison / Heal aux rounds suivants | `apply_capacity_lvl_4.IMMEDIATE_KINDS` |
 | « Per Pillz Left » : pillz **avant la mise**, pillz gratuite exclue (glossaire 66) | `multipliers._nb_pillz_left` |
-| `Day:` toujours valide, `Night:` jamais (décision utilisateur, cycle jour/nuit non modélisé) | `capacity_parser._IGNORED_PREFIXES` |
+| `Day:` toujours valide, `Night:` jamais — règle réelle : jour/nuit tiré au sort en début de partie, non modélisé (textes de nuit absents des données, REGLES 3.13) | `capacity_parser._IGNORED_PREFIXES` |
 
 ### Ce que le moteur ne modélise pas du tout
 - Le tirage de la main : les decks sont composés carte par carte (pas de collection, pas de tirage 8 → 4).
-- Le premier joueur d'une partie est toujours l'allié (`turn = True` dans `create_game`).
+- Le premier joueur d'une partie est toujours l'allié (`turn = True` dans `create_game`) ; dans le jeu il est tiré au sort (utilisateur, 2026-09-21), comme jour/nuit.
 - Les pouvoirs ci-dessous (§ 2.A).
 
 ## 2. Travail restant
@@ -59,21 +59,22 @@ wiki : **Beyond** (Genesis, 5e round — hors périmètre), **Perfection** (Glib
 **Exclus définitivement du moteur et de l'IA** (décision utilisateur, 2026-09-21) : **Hazard** (Administrator),
 **Illusion** (Kate), **Bypass** (Robert Cobb), **Overdose** (Hekate), **Remove Ability Conditions** (Memento),
 **Rebirth 1, Max. 1** (Nemo Cr), **Counter-attack** (Ashigaru — le code existant reste, mais la règle n'est plus à
-vérifier ni à traiter par l'IA ; le premier joueur du combat 1349159 contredisait la règle énoncée). Leurs définitions sont conservées dans `docs/REGLES.md` § 4 pour mémoire ; ne pas les
+vérifier ni à traiter par l'IA ; le premier joueur du combat 1349159 contredisait la règle énoncée), **Limitless**
+(Fractal — même statut : code conservé, règle plus à vérifier). Leurs définitions sont conservées dans `docs/REGLES.md` § 4 pour mémoire ; ne pas les
 compter parmi les pouvoirs restant à gérer.
 
-Choix de modélisation à confirmer en combat réel : Perfect = écart
-d'attaque < puissance ; Limitless ne touche que l'ability de la carte jouée. Confirmé par l'utilisateur (2026-09-21) :
-Tune Out compare les pillz **sans la fury** ; Mindwipe = Combust ; Repair, Combust et Mindwipe agissent dès le round
-joué (si la carte gagne) ; Counter-attack (Ashigaru) ne joue que sur le **premier round**, puis alternance classique.
+Choix de modélisation à confirmer en combat réel : Exchange face à Cancel Opp. X Modif. (échange annulé en entier ?).
+Confirmé par l'utilisateur (2026-09-21) : Tune Out compare les pillz **sans la fury** ; Mindwipe = Combust ; Repair,
+Combust et Mindwipe agissent dès le round joué (si la carte gagne) ; Perfect = écart d'attaque < puissance ; Brawl
+compte les exemplaires comme Support ; Cancel Opp. Life Modif. saute le tic immédiat d'une Toxine.
 
 ### B. Fiabilité des règles existantes
 1. ~~Confirmer les décisions du tableau § 1 contre les règles officielles~~ → fait (`docs/REGLES.md`) ; appliquer les corrections listées en § 3 de ce document.
 2. **Oracle = combats réels** (fait le 2026-09-16, premier combat reproduit à l'identique) : jouer un combat dans le
    client web d'Urban Rivals avec `scripts/ur_capture.js` chargé, importer `urRecords()` avec `scripts/import_ur_battles.py` (procédure complète : `docs/ORACLE.md`),
    `tests/test_ur_battles.py` rejoue chaque round et exige les valeurs officielles (puissance, dégâts, attaque,
-   vainqueur, vies, pillz). Viser les points non tranchés (Limitless,
-   Exchange contre Copy/Annul) et les clans à bonus méta. Le modèle `abilityData` du
+   vainqueur, vies, pillz). Viser les points non tranchés (Exchange contre Annul,
+   plancher de Recover) et les clans à bonus méta. Le modèle `abilityData` du
    client (`docs/ur-abilitydata-modele.md`) s'accumule passivement avec les combats (pas de scraping API : piste abandonnée).
 3. Le journal des effets (D2, fait) rend ces vérifications immédiates : comparer le journal au déroulé réel.
 

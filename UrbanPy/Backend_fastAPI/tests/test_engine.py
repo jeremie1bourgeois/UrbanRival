@@ -13,6 +13,7 @@ import copy
 
 import pytest
 
+from src.core.parsing.capacity_parser import parse_capacity
 from src.core.services.game_service import check_end
 from src.core.use_cases.process_round import check_round_correct, process_round
 from src.schemas.game_schemas import GameResult, ProcessRoundInput
@@ -88,6 +89,16 @@ def test_support_counts_every_card_of_the_clan_in_hand(template_game):
     _, asporov = play(template_game, ALLISON, ASPOROV)
 
     assert asporov.damage_fight == 3 + 1 * 3  # Asporov, B Mappe, Bhudd sont All Stars
+
+
+def test_brawl_counts_every_copy_of_the_opponent_clan_like_support(template_game):
+    # Utilisateur (2026-09-21) : Brawl suit la règle de Support, les exemplaires comptent chacun
+    template_game.ally.cards[AMELIA].ability = parse_capacity("Brawl: Damage +1").capacity
+    template_game.enemy.cards[BHUDD].name = "Asporov"                     # Asporov x2 + B Mappe : 3 All Stars
+
+    amelia, _ = play(template_game, AMELIA, ASPOROV)
+
+    assert amelia.damage_fight == 5 + 1 * 3
 
 
 # --- Activation du bonus de clan (>= 2 cartes du clan en main) --------------------------------
