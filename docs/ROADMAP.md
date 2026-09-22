@@ -58,10 +58,12 @@ wiki : **Beyond** (Genesis, 5e round — hors périmètre), **Perfection** (Glib
 
 **Exclus définitivement du moteur et de l'IA** (décision utilisateur, 2026-09-21) : **Hazard** (Administrator),
 **Illusion** (Kate), **Bypass** (Robert Cobb), **Overdose** (Hekate), **Remove Ability Conditions** (Memento),
-**Rebirth 1, Max. 1** (Nemo Cr), **Counter-attack** (Ashigaru — le code existant reste, mais la règle n'est plus à
-vérifier ni à traiter par l'IA ; le premier joueur du combat 1349159 contredisait la règle énoncée), **Limitless**
-(Fractal — même statut : code conservé, règle plus à vérifier). Leurs définitions sont conservées dans `docs/REGLES.md` § 4 pour mémoire ; ne pas les
+**Rebirth 1, Max. 1** (Nemo Cr). Leurs définitions sont conservées dans `docs/REGLES.md` § 4 pour mémoire ; ne pas les
 compter parmi les pouvoirs restant à gérer.
+
+**Counter-attack** (Ashigaru) et **Limitless** (Fractal) sont codés et testés (`process_round.apply_leader_modes`) ;
+seule leur vérification en combat réel est abandonnée (le premier joueur du combat 1349159 contredisait la règle
+énoncée pour Ashigaru).
 
 Tranché par combat réel (1294992, 2026-09-20) : un Cancel Opp. X Modif. adverse annule le X Exchange, les deux cartes
 gardent leurs valeurs imprimées (REGLES § 7).
