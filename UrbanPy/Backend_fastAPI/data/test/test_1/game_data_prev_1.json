@@ -6,6 +6,8 @@
         "name": "ally",
         "life": 12,
         "pillz": 12,
+        "start_life": 12,
+        "start_pillz": 12,
         "cards": [
             {
                 "name": "Agustino",
@@ -192,6 +194,8 @@
         "name": "enemy",
         "life": 12,
         "pillz": 12,
+        "start_life": 12,
+        "start_pillz": 12,
         "cards": [
             {
                 "name": "Asporov",

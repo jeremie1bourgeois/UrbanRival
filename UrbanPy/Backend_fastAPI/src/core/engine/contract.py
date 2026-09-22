@@ -2,7 +2,8 @@
 Contrat du moteur pur : la représentation compacte (entiers, booléens, aucun texte) d'une partie, que tout moteur —
 le moteur Python de référence comme un moteur compilé — doit savoir jouer à l'identique. Deux moitiés :
   - le deck, immuable pendant la partie : 8 cartes compilées, dont les capacités sont des indices dans un vocabulaire
-    figé et des masques de bits ;
+    figé et des masques de bits, plus la situation de départ de chaque camp (vie et pillz, lues par « Par Vie /
+    Pillz perdue ») ;
   - l'état, qui change à chaque round : round, premier joueur, vies, pillz, cartes jouées, effets persistants (dans
     l'ordre d'activation : le niveau 4 les applique dans cet ordre), dernier round (lu par Revenge / Confidence / After).
 Un état contient exactement ce que process_round lit, rien de plus : test_engine_contract rejoue des parties depuis la
@@ -66,6 +67,8 @@ class CompiledCard:
 class Deck:
     ally: Tuple[CompiledCard, ...]
     enemy: Tuple[CompiledCard, ...]
+    ally_start: Tuple[int, int] = (12, 12)      # vie et pillz de départ, figées pour la partie
+    enemy_start: Tuple[int, int] = (12, 12)
 
 
 @dataclass(frozen=True)
@@ -173,7 +176,9 @@ def card_from_compiled(compiled: CompiledCard, played: bool) -> Card:
 
 def deck_from_game(game: Game) -> Deck:
     return Deck(ally=tuple(compile_card(card) for card in game.ally.cards),
-                enemy=tuple(compile_card(card) for card in game.enemy.cards))
+                enemy=tuple(compile_card(card) for card in game.enemy.cards),
+                ally_start=(game.ally.start_life, game.ally.start_pillz),
+                enemy_start=(game.enemy.start_life, game.enemy.start_pillz))
 
 
 def _player_state(player: Player) -> PlayerState:
@@ -189,8 +194,8 @@ def state_from_game(game: Game) -> State:
                  last_round=None if last is None else (last.ally.card_index, last.enemy.card_index, last.ally.win))
 
 
-def _player(name: str, cards: Tuple[CompiledCard, ...], state: PlayerState) -> Player:
-    return Player(name=name, life=state.life, pillz=state.pillz,
+def _player(name: str, cards: Tuple[CompiledCard, ...], state: PlayerState, start: Tuple[int, int]) -> Player:
+    return Player(name=name, life=state.life, pillz=state.pillz, start_life=start[0], start_pillz=start[1],
                   cards=[card_from_compiled(card, played) for card, played in zip(cards, state.played)],
                   effect_list=[PersistentEffect(EFFECT_KINDS[kind], value, borne) for kind, value, borne in state.effects])
 
@@ -204,8 +209,8 @@ def game_from_state(deck: Deck, state: State) -> Game:
         last.ally.card_index, last.ally.win = ally_index, ally_won
         last.enemy.card_index, last.enemy.win = enemy_index, not ally_won
         history.append(last)
-    return Game(nb_turn=state.nb_turn, turn=state.ally_first, ally=_player("ally", deck.ally, state.ally),
-                enemy=_player("enemy", deck.enemy, state.enemy), history=history)
+    return Game(nb_turn=state.nb_turn, turn=state.ally_first, ally=_player("ally", deck.ally, state.ally, deck.ally_start),
+                enemy=_player("enemy", deck.enemy, state.enemy, deck.enemy_start), history=history)
 
 
 # --- JSON (l'écriture est dataclasses.asdict ; les tuples y deviennent des listes) ------------
@@ -220,7 +225,8 @@ def _card_from_dict(fields: dict) -> CompiledCard:
 
 
 def deck_from_dict(fields: dict) -> Deck:
-    return Deck(ally=tuple(map(_card_from_dict, fields["ally"])), enemy=tuple(map(_card_from_dict, fields["enemy"])))
+    return Deck(ally=tuple(map(_card_from_dict, fields["ally"])), enemy=tuple(map(_card_from_dict, fields["enemy"])),
+                ally_start=tuple(fields["ally_start"]), enemy_start=tuple(fields["enemy_start"]))
 
 
 def _player_state_from_dict(fields: dict) -> PlayerState:

@@ -237,6 +237,31 @@ def test_refuses_a_card_already_played(template_game):
         play(template_game, AMELIA, ASPOROV)
 
 
+def test_per_life_lost_counts_from_the_starting_life_of_the_game(template_game):
+    """Un mode à 14 ou 15 vies ne doit pas rendre le multiplicateur faux (ni négatif) : il compte les vies perdues."""
+    template_game.ally.life = template_game.ally.start_life = 15
+    template_game.ally.cards[AMELIA].ability = parse_capacity("+1 Power Per Life Lost Max. 9").capacity
+
+    amelia, _ = play(template_game, AMELIA, BHUDD)
+
+    assert amelia.power_fight == 3 - 2        # 3 imprimée, 0 vie perdue, bonus adverse -2 : pas de multiplicateur
+
+    template_game.ally.life = 11              # 4 vies perdues sur 15
+    template_game.ally.cards[ASHLEY].ability = parse_capacity("+1 Power Per Life Lost Max. 9").capacity
+    ashley, _ = play(template_game, ASHLEY, ASPOROV)
+
+    assert ashley.power_fight == 5 + 4 - 2
+
+
+def test_per_pillz_lost_counts_from_the_starting_pillz_of_the_game(template_game):
+    template_game.ally.pillz = template_game.ally.start_pillz = 8
+    template_game.ally.cards[AMELIA].ability = parse_capacity("-1 Opp Power Per Pillz Lost, Min 1").capacity
+
+    _, bhudd = play(template_game, AMELIA, BHUDD)
+
+    assert bhudd.power_fight == 4             # aucune pillz perdue : la puissance adverse ne bouge pas
+
+
 def test_schema_refuses_an_out_of_range_card_index_or_a_bet_below_the_free_pillz(template_game):
     for invalide in ({"player1_card_index": 4}, {"player1_card_index": -1}, {"player1_pillz": 0}, {"player2_pillz": -3}):
         with pytest.raises(ValueError):
