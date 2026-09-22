@@ -13,7 +13,7 @@ from src.core.domain.game import Game
 from src.core.domain.player import Player
 from src.core.services.game_service import create_game
 from src.core.use_cases.process_round import check_round_correct, process_round
-from src.schemas.game_schemas import CardInput, PlayerCards, ProcessRoundInput
+from src.schemas.game_schemas import CardInput, GameSetup, ProcessRoundInput
 
 HOLLOW_SPYKE = 0
 
@@ -49,7 +49,7 @@ def test_by_night_the_night_ability_and_night_bonus_apply():
 
 # --- Tirage à la création de la partie ---------------------------------------------------------
 
-DECK = PlayerCards(
+DECK = GameSetup(
     player1=[CardInput(card_name="Hollow Spyke", nb_stars=4), CardInput(card_name="Gunslinger", nb_stars=1),
              CardInput(card_name="Aamir", nb_stars=1), CardInput(card_name="Zodiack", nb_stars=1)],
     player2=[CardInput(card_name="Hollow Spyke", nb_stars=3), CardInput(card_name="Aamir", nb_stars=1),
