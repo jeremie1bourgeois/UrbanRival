@@ -3,8 +3,9 @@ Moteur de référence sur le contrat : les fonctions pures que l'IA appelle (leg
 par process_round. Sans effet de bord : step reconstruit une partie depuis l'état compact, la joue et renvoie le
 nouvel état. Un moteur compilé expose les mêmes fonctions sur les mêmes types et doit donner les mêmes résultats.
 """
-from typing import List, Optional
+from typing import List, NamedTuple, Optional, Tuple
 
+from src.core.domain.card import Card
 from src.core.domain.game import NB_ROUNDS
 from src.core.engine.contract import Action, Deck, State, game_from_state, state_from_game
 from src.core.use_cases.process_round import check_round_correct, process_round
@@ -27,14 +28,37 @@ def legal_actions(state: State, side: str) -> List[Action]:
     return actions
 
 
-def step(deck: Deck, state: State, ally_action: Action, enemy_action: Action) -> State:
+class SideOutcome(NamedTuple):
+    """Valeurs de combat d'une carte à la fin du round : ce qu'un moteur compilé doit retrouver pour être comparable."""
+    power: int
+    damage: int
+    attack: int
+    win: bool
+
+
+class Outcome(NamedTuple):
+    ally: SideOutcome
+    enemy: SideOutcome
+
+
+def _side_outcome(card: Card) -> SideOutcome:
+    return SideOutcome(card.power_fight, card.damage_fight, card.attack, card.win)
+
+
+def play(deck: Deck, state: State, ally_action: Action, enemy_action: Action) -> Tuple[State, Outcome]:
+    """Comme step, avec en plus l'issue du round (puissance, dégâts, attaque, vainqueur de chaque carte)."""
     game = game_from_state(deck, state)
     round_data = ProcessRoundInput(player1_card_index=ally_action.card, player1_pillz=ally_action.pillz,
                                    player1_fury=ally_action.fury, player2_card_index=enemy_action.card,
                                    player2_pillz=enemy_action.pillz, player2_fury=enemy_action.fury)
     check_round_correct(game, round_data)
     process_round(game, round_data)
-    return state_from_game(game)
+    outcome = Outcome(_side_outcome(game.ally.cards[ally_action.card]), _side_outcome(game.enemy.cards[enemy_action.card]))
+    return state_from_game(game), outcome
+
+
+def step(deck: Deck, state: State, ally_action: Action, enemy_action: Action) -> State:
+    return play(deck, state, ally_action, enemy_action)[0]
 
 
 def terminal(state: State) -> Optional[float]:

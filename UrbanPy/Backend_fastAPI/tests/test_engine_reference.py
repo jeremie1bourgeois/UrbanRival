@@ -11,9 +11,9 @@ from src.core.domain.game import Game
 from src.core.domain.player import Player
 from src.core.engine.contract import Action, deck_from_game, game_from_state, state_from_game
 from src.core.engine.hands import random_hand
-from src.core.engine.reference import legal_actions, step, terminal
+from src.core.engine.reference import legal_actions, play, step, terminal
 from src.core.services.game_service import check_end
-from src.core.use_cases.process_round import check_round_correct
+from src.core.use_cases.process_round import check_round_correct, process_round
 from src.schemas.game_schemas import GameResult, ProcessRoundInput
 
 SCORE_OF_RESULT = {GameResult.ALLY: 1.0, GameResult.ENEMY: 0.0, GameResult.DRAW: 0.5, GameResult.NONE: None}
@@ -78,6 +78,23 @@ def test_step_is_deterministic_and_leaves_the_state_untouched():
             actions = rng.choice(legal_actions(state, "ally")), rng.choice(legal_actions(state, "enemy"))
             assert step(deck, state, *actions) == step(deck, state, *actions)
             assert state == before
+
+
+def test_play_reports_the_fight_values_of_both_cards():
+    rng = random.Random(4)
+    for deck, state in _random_playout(rng):
+        if terminal(state) is not None:
+            break
+        ally_action, enemy_action = rng.choice(legal_actions(state, "ally")), rng.choice(legal_actions(state, "enemy"))
+        next_state, outcome = play(deck, state, ally_action, enemy_action)
+        game = game_from_state(deck, state)
+        process_round(game, ProcessRoundInput(player1_card_index=ally_action.card, player1_pillz=ally_action.pillz, player1_fury=ally_action.fury,
+                                              player2_card_index=enemy_action.card, player2_pillz=enemy_action.pillz, player2_fury=enemy_action.fury))
+        ally_card, enemy_card = game.ally.cards[ally_action.card], game.enemy.cards[enemy_action.card]
+        assert next_state == step(deck, state, ally_action, enemy_action) == state_from_game(game)
+        assert tuple(outcome.ally) == (ally_card.power_fight, ally_card.damage_fight, ally_card.attack, ally_card.win)
+        assert tuple(outcome.enemy) == (enemy_card.power_fight, enemy_card.damage_fight, enemy_card.attack, enemy_card.win)
+        assert outcome.ally.win != outcome.enemy.win
 
 
 def test_terminal_matches_check_end():
