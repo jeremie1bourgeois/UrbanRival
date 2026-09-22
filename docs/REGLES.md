@@ -350,6 +350,48 @@ s'annulent (3.7, oui), Tune Out ignore la fury (§ 4), **Repair, Combust et Mind
 Chaque combat rejoué se transcrit dans `data/test/` (voir ROADMAP § 2.B.2) ; le journal des effets (D2) rendra la
 localisation des écarts immédiate.
 
+### 5.1 Points ouverts révélés par le corpus combinatoire (2026-09-22)
+
+Le corpus (`src/core/engine/scenarios.py`, README « Corpus combinatoire ») fige le comportement actuel ; chacun des
+quatre points ci-dessous est **à trancher par un combat réel** (scénarios C1-C4 dans `docs/ORACLE.md` § 2) avant de toucher
+au moteur, puis à régénérer (`scripts/build_engine_corpus.py`).
+
+1. **Ordre entre les deux camps** : le moteur traite toujours la carte alliée avant la carte ennemie. Quand les deux
+   camps portent des effets à plancher sur la même stat (« -2 Cards Damage, Min 4 » contre « -4 Cards Damage, Min 0 »,
+   niveau 2), touchent la vie ou les pillz du même joueur (« Defeat: Recover 2 Pillz Out Of 3 » contre
+   « Victory Or Defeat: -2 Opp Pillz And Life, Min 0 », niveau 3) ou enregistrent des effets persistants (ordre de la
+   liste, niveau 4), le résultat dépend du camp qui s'appelle « allié » — ce qui n'a pas de sens dans le vrai jeu.
+   25 scénarios asymétriques sont épinglés dans `tests/test_engine_properties.py`. Trois exemples minimaux :
+   - **niveau 2** — Rajesh (« -2 Cards Damage, Min 4 », D6) contre Pandemos Cr (« -4 Cards Damage, Min 0 », D8) :
+     Rajesh résolu en premier → 6→4 et 8→6, puis −4 → **Rajesh 0, Pandemos 2** ; Pandemos en premier → 8→4 et 6→2,
+     puis le « Min 4 » ne mord plus → **Rajesh 2, Pandemos 4**. Du simple au double, selon le seul label « allié ».
+   - **niveau 3** — Kusuri (« Defeat: +2 Life ») perd à 6 vies contre Phyllis (« -3 Opp. Life Min 4 ») : le gain
+     résolu en premier donne 5 → 7 → **4** ; la perte en premier donne 5 → 4 (plancher) → **6**.
+   - **niveau 4** — Willow (« Defeat : Heal 1 Max. 10 ») perd à 10 vies contre un Freaks (bonus « Poison 2, Min 3 ») :
+     les deux effets se posent sur elle le même round et la liste garde l'ordre d'enregistrement. Au round suivant,
+     poison-puis-soin donne **9**, soin-puis-poison **8** (le soin ne fait rien à 10, plafond atteint).
+
+   Options : (a) garder « allié d'abord » ; (b) « le premier joueur d'abord » — symétrique, et cohérent avec l'ordre de
+   jeu ; (c) au niveau 2, étendre 3.6 bis à toutes les réductions d'une stat, quelle que soit la carte qui les porte
+   (plancher le plus haut d'abord, puis bonus / pouvoir / Leader, puis premier joueur).
+   Scénarios de vérification en combat réel, avec les cartes : `docs/ORACLE.md` § 2, C3.
+2. **« Per Damage » en défaite** : `multipliers._nb_damage_inflicted` vaut 0 quand la carte perd (3.10, décision sans
+   source pour la défaite). Or trois cartes réelles portent « Defeat: +1 Life Per Damage » (Zalindra) et « Victory Or
+   Defeat: +1 Life Per Damage » (Griffonmor Cr, Senestra) : leur volet « défaite » ne peut jamais rien faire, ce
+   qu'aucune carte imprimée ne ferait. Lecture probable : les dégâts (après modificateurs) de la carte, gagnante ou non ;
+   le glossaire 49 (« pour chaque dégât infligé ») décrit le cas courant. **À vérifier en combat réel**
+   (`docs/ORACLE.md` § 2, C1) ; puis un test (`test_life_per_damage_is_zero_on_defeat`) et le corpus à mettre à jour.
+3. **« Per Life Lost » au-delà de la vie de départ** : `multipliers.MAX_LIFE = 12` ; à 14 vies (Heal, ou un format à
+   14 vies), « +1 Damage Per Life Lost » donne −2 dégâts. Origine : `12 - player1.life` écrit en dur dans
+   `apply_capacity_lvl_2` le 2024-12-30 (commit `7ae5f73`, avec le commentaire « change le hardcode 12 »), simplement
+   renommé `MAX_LIFE` lors du partage des multiplicateurs (`f43c0a8`, 2026-09-15) — ce n'est pas une règle, c'est une
+   constante jamais reprise (`MAX_PILLZ` de même). Le moteur ne connaît pas la vie de départ de la partie ;
+   à minima, borner le multiplicateur à 0. Scénario : `docs/ORACLE.md` § 2, C4.
+4. **Protection: <stat> contre « Cards »** : `_apply_stat_protections` ne retire que les modificateurs adverses qui
+   ciblent l'adversaire (`target == "enemy"`) ; « -2 Cards Damage, Min 1 » (cible les deux cartes) traverse
+   « Protection: Damage » (dégâts 4 → 2). L'utilisateur penche pour **la Protection bloque** (2026-09-22) ;
+   à confirmer en combat réel (`docs/ORACLE.md` § 2, C2) avant de changer le moteur.
+
 ## 6. Glossaire officiel lu en session connectée (2026-09-16, après-midi)
 
 Les 35 entrées de `urban-rivals.com/game/rules/` ont été lues connecté (texte intégral : `docs/REGLES-glossaire-officiel.md`).
