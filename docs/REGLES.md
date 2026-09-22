@@ -339,6 +339,11 @@ Par ordre d'impact :
 
 Tranché par combat réel (1294992, 2026-09-20, § 7) : Cancel Opp. X Modif. annule le X Exchange en entier.
 
+Tranchés par combat réel (2026-09-22, combats du 17 septembre récupérés de la branche `feat/ia-tous-modes`) :
+**Repair X, Max Y verse X vies ET X pillz**, chacune plafonnée à Y (1211702, Wilo Ld — le moteur ne versait que les
+pillz) ; un **Annul Modif. Vie / Pillz suspend un effet persistant attribut par attribut**, donc un Annul Vie contre un
+Repair verse les pillz mais pas la vie (1211922, round 3 — le moteur suspendait tout ou rien).
+
 Confirmés par l'utilisateur le 2026-09-21 : Cancel Opp. Life Modif. saute aussi le tic immédiat d'une Toxine posée ce
 round (3.3, testé) ; Perfect = victoire avec `attack − power_fight < attaque adverse` (§ 4) ; Brawl compte les
 exemplaires comme Support (3.6) ; premier joueur du round 1 tiré au sort (§ 2, non modélisé).

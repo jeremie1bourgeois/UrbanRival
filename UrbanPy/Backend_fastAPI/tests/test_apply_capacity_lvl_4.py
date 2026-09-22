@@ -229,6 +229,18 @@ def test_persistent_effects_survive_a_json_round_trip(game):
     assert restored.to_dict() == game.to_dict()
 
 
+def test_repair_adds_life_and_pillz_at_once_then_each_following_round(game):
+    # Combat réel 1211702 (Wilo Ld « Repair 1, Max. 14 ») : Repair verse X vies ET X pillz, chacune plafonnée à Y,
+    # dès le round joué puis à la fin de chaque round suivant.
+    play(game, 1, ally_ability="Repair 2, Max. 12", ally_pillz=6)   # allié déjà à 12 vies (plafond) ; 7 pillz -> 9
+
+    assert (game.ally.life, game.ally.pillz, effects(game.ally)) == (12, 9, [("repair", 2, 12)])
+
+    play(game, 2, enemy_pillz=2)                                     # Bhudd gagne : allié 10 vies -> repair : 12 vies, 11 pillz
+
+    assert (game.ally.life, game.ally.pillz) == (12, 11)
+
+
 def test_repair_adds_pillz_and_stacks_with_dope(game):
     play(game, 1, ally_ability="Dope 1, Max. 12", ally_pillz=6)     # allié 7 pillz, dope immédiat -> 8
     play(game, 2, ally_ability="Repair 2, Max. 12")                  # dope 1 + repair immédiat 2 -> 11
@@ -316,6 +328,19 @@ def test_cancel_life_modif_skips_the_opponent_own_heal(game):
     play(game, 3)                                                               # Agustino gagne : 9 - 2 + 2 (heal)
 
     assert game.enemy.life == 9
+
+
+def test_cancel_life_modif_skips_only_the_life_half_of_the_opponent_repair(game):
+    # Combat réel 1211922 (round 3) : un « Cancel Opp. Life Modif. » contre un Repair adverse actif suspend la vie,
+    # pas les pillz — la suspension se fait attribut par attribut (glossaire 56).
+    play(game, 1, ally_ability="Repair 2, Max. 12", ally_pillz=6)               # allié 12 vies (plafond), 7 + 2 = 9 pillz
+    play(game, 2, enemy_ability="Cancel Opp. Life Modif.", enemy_pillz=2)       # Bhudd gagne : allié 10 vies ; repair : 11 pillz, vie suspendue
+
+    assert (game.ally.life, game.ally.pillz) == (10, 11)
+
+    play(game, 3)                                                               # Agustino gagne : repair entier -> 12 vies, 12 pillz (plafond)
+
+    assert (game.ally.life, game.ally.pillz) == (12, 12)
 
 
 def test_cancel_life_modif_does_not_touch_my_own_persistent_effects(game):

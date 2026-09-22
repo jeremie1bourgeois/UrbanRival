@@ -10,7 +10,7 @@ Objectif à terme : une IA capable de gagner un maximum de parties (plan détail
 | Cartes jouables | **2 497** (36 clans), données scrapées d'iclintz.com le 2026-09-15, illustrations incluses |
 | Pouvoirs (abilities / bonus) | **1 386 / 1 396 descriptions gérées (99,3 %)**, 2 487 cartes sur 2 497 entièrement gérées — `python scripts/capacity_coverage.py` liste le reste |
 | Moteur | 4 niveaux d'effets (méta, stats, fin de round, persistants), bonus de clan (Oculus infiltré compris), Leaders (Team, Tie-break, Counter-attack, Limitless), conditions Courage/Revenge/Confidence/Reprisal/Symmetry/Asymmetry/Stop/Killshot/Perfect/Bet/Versus/After/Unison/Disunion/Defeat/Backlash/Victory or Defeat, Tune Out, Impose, Cards, Consume/Combust/Mindwipe/Corrosion, Xantiax, Corrupt, Fatal Killshot ; journal des effets de chaque round |
-| Tests | 535 backend (pytest) + 24 front (vitest) ; **corpus combinatoire du moteur** : 113 501 rounds (chaque capacité, chaque interaction méta, chaque condition, effets persistants, Leaders, Oculus, égalités/KO, parties aléatoires) rejoués contre des digests versionnés ; balayage de robustesse sur toutes les descriptions gérées ; 33 combats réels Urban Rivals rejoués à l'identique (`data/ur_battles/`) |
+| Tests | 556 backend (pytest) + 24 front (vitest) ; **corpus combinatoire du moteur** : 113 501 rounds (chaque capacité, chaque interaction méta, chaque condition, effets persistants, Leaders, Oculus, égalités/KO, parties aléatoires) rejoués contre des digests versionnés ; balayage de robustesse sur toutes les descriptions gérées ; 51 combats réels Urban Rivals rejoués à l'identique (`data/ur_battles/`) |
 | Interface | composition de deck (recherche, filtre par clan, decks aléatoires, statut des bonus, decks mémorisés), partie de 4 rounds contre un second joueur, historique des rounds, fin de partie, effets persistants |
 
 Non gérés : 9 capacités uniques sans règle publiée (Beyond, Bypass, Hazard, Illusion, Overdose, Perfection, Rebirth,
@@ -68,7 +68,7 @@ pour les tests » enregistre le round dans `data/test/test_N/` (voir ci-dessous)
 ## Tests
 
 ```bash
-cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 535 tests (~70 s) ; -m "not corpus" : 507 tests en 4 s
+cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 556 tests (~70 s) ; -m "not corpus" : 528 tests en 4 s
 cd UrbanVue && npm test && npm run lint && npm run build           # 24 tests, lint, type-check + build
 ```
 
