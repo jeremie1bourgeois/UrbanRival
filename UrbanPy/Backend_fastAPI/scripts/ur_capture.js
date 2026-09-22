@@ -41,12 +41,27 @@ function urStatuses() {
   let prev = null;
   for (const c of window.__urCapture) {
     if (!c.res || !c.res.startsWith('{"battles.status"')) continue;
-    const b = JSON.parse(c.res)["battles.status"].data.battle;
+    let b;
+    try { b = JSON.parse(c.res)["battles.status"].data.battle; } catch (e) { continue; }   // « Unknown battle. » entre deux combats
+    if (!b || !b.player0 || !b.player1) continue;
     const sig = JSON.stringify([b.id, b.round, b.status, b.turnPlayerId, b.player0.life, b.player1.life, b.player0.pillz, b.player1.pillz,
       b.player0.characters.map((x) => [x.roundPlayed, x.pillzUsed, x.roundAttack]), b.player1.characters.map((x) => [x.roundPlayed, x.pillzUsed, x.roundAttack])]);
     if (sig !== prev) { out.push(b); prev = sig; }
   }
   return out;
+}
+
+// Camp qui joue en premier au round r : celui dont une carte est déjà posée dans le premier statut du round (un
+// adversaire qui joue instantanément — bot — a déjà joué quand le premier statut arrive et turnPlayerId pointe alors
+// sur nous) ; sinon turnPlayerId du premier statut où personne n'a joué.
+function urFirstOf(sts, r, p0id) {
+  for (const b of sts.filter((b) => b.round === r)) {
+    const a = b.player0.characters.some((x) => x.roundPlayed === r), c = b.player1.characters.some((x) => x.roundPlayed === r);
+    if (a && !c) return "p0";
+    if (c && !a) return "p1";
+    if (!a && !c) return b.turnPlayerId === p0id ? "p0" : "p1";
+  }
+  return null;
 }
 
 function urRecordOf(sts) {
@@ -59,7 +74,7 @@ function urRecordOf(sts) {
     const next = sts.find((b) => b.round === r + 1);
     if (!start || !resolved) continue;
     const side = (p) => { const x = p.characters.find((x) => x.roundPlayed === r); return { index: x.index, pillz: x.pillzUsed, fury: !!x.isFury, power: x.roundPower, damage: x.roundDamage, attack: x.roundAttack, won: x.roundWon }; };
-    rounds.push({ round: r + 1, first: start.turnPlayerId === first.player0.player.id ? "p0" : "p1",
+    rounds.push({ round: r + 1, first: urFirstOf(sts, r, first.player0.player.id),
       before: { life: [start.player0.life, start.player1.life], pillz: [start.player0.pillz, start.player1.pillz] },
       p0: side(resolved.player0), p1: side(resolved.player1),
       post_round: [resolved.player0.postRoundAbilities, resolved.player1.postRoundAbilities],
