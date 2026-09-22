@@ -331,11 +331,136 @@ Précisions utiles glanées au passage :
 - **Cancel Opp. Attack Modif.** : « the Attack gained by your opponent through Pillz does not constitute a
   modification ».
 
-## 5. Ce que les textes ne tranchent pas — à régler par rejeu de combats réels
+## 5. Registre des règles non tranchées
 
-Par ordre d'impact :
-1. Recover : plancher de 1 pillz (3.5), jamais observé en combat réel.
-2. Exchange contre Copie/Impose, Copie/Impose contre Cancel (§ 7).
+**C'est le seul endroit où sont écrites les questions de règles ouvertes.** `docs/ORACLE.md` ne décrit que la
+logistique des captures, `docs/ROADMAP.md` renvoie ici. Chaque entrée dit ce que fait le moteur aujourd'hui, pourquoi
+c'est incertain, la manipulation qui tranche (avec des cartes réelles) et la retouche à appliquer si le serveur dit le
+contraire. Après chaque décision : corriger, ajouter un test de bout en bout, régénérer les digests du corpus
+(`python scripts/build_engine_corpus.py`), et déplacer l'entrée en § 5.3.
+
+| # | Question | Ce que fait le moteur aujourd'hui | Comment trancher |
+|---|---|---|---|
+| **R1** | Ordre de résolution entre les deux cartes | la carte **alliée** d'abord, aux niveaux 2, 3 et 4 | duel, 3 manips |
+| **R2** | « Par Dégât » quand la carte perd | multiplicateur **0** | duel |
+| **R3** | « Par Vie perdue » au-dessus de la vie de départ | borné à **0** (pas de malus) | duel avec un soin |
+| **R4** | Protection de stat contre un « Cards » | la Protection **ne bloque pas** | duel |
+| **R5** | Exchange contre Copie / Impose, Copie / Impose contre Cancel | non géré (aucune interaction) | duel |
+| **R6** | Beyond (Genesis) et Perfection (Glibon Cr) | pouvoirs non parsés, cartes injouables | aucune règle publiée |
+
+### R1 — Ordre de résolution entre les deux cartes
+
+Le moteur résout toujours la carte **alliée** avant la carte ennemie. Tant qu'aucun plancher, plafond ou liste
+n'intervient, l'ordre est sans effet ; dès qu'il y en a un, le résultat dépend du camp qui s'appelle « allié » — ce qui
+n'existe pas dans le vrai jeu. 25 scénarios asymétriques sont épinglés dans `tests/test_engine_properties.py`
+(`KNOWN_ASYMMETRIES`) : une décision ici les fera disparaître.
+
+Trois manipulations, chacune à **rejouer en inversant le premier joueur** : si le résultat suit l'ordre de jeu, la
+règle est « le premier joueur d'abord ».
+
+- **R1a, niveau 2 (stats)** — **Rajesh** (Uppers 2★ P5 D6, « -2 Cards Damage, Min 4 ») contre **Pandemos Cr**
+  (Paradox 5★ P9 D8, « -4 Cards Damage, Min 0 »), 1 pillz chacun. Rajesh résolu en premier : 6→4 et 8→6, puis −4 →
+  **Rajesh 0, Pandemos 2**. Pandemos en premier : 8→4 et 6→2, puis le « Min 4 » ne mord plus → **Rajesh 2,
+  Pandemos 4**. Du simple au double.
+- **R1b, niveau 3 (vie / pillz)** — faire **perdre** **Kusuri** (Fang Pi Clang 2★ P7 D2, « Defeat: +2 Life ») face à
+  **Phyllis** (Nightmare 2★ P7 D1, « -3 Opp. Life Min 4 »), le joueur de Kusuri **à 6 vies**. Le gain résolu en
+  premier donne 5 → 7 → **4** ; la perte en premier donne 5 → 4 (plancher) → **6**. Variantes : **Melinda** ou
+  **Wonald** (« Defeat: +2 Life ») contre **Oxen** ou **Jeyn** (« -3 Opp. Life Min 5 »).
+- **R1c, niveau 4 (effets persistants)** — faire **perdre** **Willow** (Roots 2★ P7 D2, « Defeat : Heal 1 Max. 10 »)
+  contre une carte **Freaks** (bonus « Poison 2, Min 3 ») qui gagne, de sorte que le joueur de Willow soit à
+  **exactement 10 vies après les dégâts du round** (le plafond du soin). Les deux effets se posent sur le même joueur
+  le même round et la liste garde l'ordre d'enregistrement. Au round suivant : **8** (soin d'abord, sans effet à 10,
+  puis poison) ou **9** (poison 10 → 8, puis soin).
+
+Options si le moteur a tort : (a) garder « allié d'abord » ; (b) **« le premier joueur d'abord »** — symétrique et
+cohérent avec l'ordre de jeu, à appliquer dans `apply_capacity_lvl_2`, `_3` et `_4` ; (c) au niveau 2, étendre la
+règle 3.6 bis (plancher le plus haut d'abord) aux deux cartes à la fois.
+
+### R2 — « Par Dégât » quand la carte perd
+
+`multipliers._nb_damage_inflicted` vaut 0 quand la carte perd le round (3.10 : la victoire est confirmée par une
+source, la défaite non). Conséquence : le volet « défaite » de trois cartes réelles ne peut jamais rien faire, ce
+qu'aucune carte imprimée ne ferait — **Zalindra** (Zenith 3★ P9 D4, « Defeat: +1 Life Per Damage »),
+**Griffonmor Cr** (Skeelz 4★ P8 D4) et **Senestra** (Nightmare 3★ P8 D2), ces deux dernières en
+« Victory Or Defeat: +1 Life Per Damage ».
+
+Manipulation : faire **perdre** Zalindra (1 pillz contre une grosse mise) et lire les vies gagnées ; puis
+Griffonmor Cr ou Senestra en victoire (témoin) **puis** en défaite ; refaire une défaite face à un réducteur de dégâts
+(Pussycats « -2 Opp Damage, Min 1 ») pour savoir si ce sont les dégâts imprimés ou les dégâts après modificateurs.
+
+Lecture probable : les dégâts de la carte après modificateurs, gagnante ou non ; le glossaire 49 (« pour chaque dégât
+infligé ») ne décrit que le cas courant. Si le moteur a tort : `_nb_damage_inflicted` renvoie `card1.damage_fight`
+sans regarder `card1.win`, et `test_life_per_damage_is_zero_on_defeat` est à réécrire.
+
+### R3 — « Par Vie / Pillz perdue » au-dessus de la situation de départ
+
+Depuis le 2026-09-22 le multiplicateur vaut l'écart avec la **situation de départ de la partie**
+(`Player.start_life` / `start_pillz`), et non plus `12 − vie` : un mode à 14 ou 15 vies est donc juste. Reste une
+hypothèse : au-dessus de la vie de départ (un soin qui dépasse), le moteur **borne à 0**, faute de quoi le pouvoir se
+retournerait en malus.
+
+Manipulation : monter au-dessus de la vie de départ avec un soin (bonus Jungo « +2 Life », ou **Dallas**, All Stars 3★
+« Heal 1 Max. 14 »), puis jouer **Razor** (Ulu Watu 4★ P5), **Zell** (Berzerk 1★ P6), **Padre Nido** (Paradox 3★ P6)
+ou **Miss Donna Luna** (Pussycats 2★ P3), toutes « +1 Power Per Life Lost », et lire la **puissance** : inchangée si
+le plancher à 0 est juste, réduite si le jeu compte vraiment un écart négatif. Même question côté pillz avec un
+« Per Pillz Lost » après un Dope ou un Recover.
+
+### R4 — Protection de stat contre un « Cards »
+
+`apply_capacity_lvl_1._apply_stat_protections` ne retire que les modificateurs adverses qui ciblent explicitement
+l'adversaire (`target == "enemy"`). Un « -X Cards <stat> », qui vise **les deux** cartes, traverse donc la Protection.
+L'utilisateur penche pour l'inverse (2026-09-22), sans source écrite.
+
+Manipulation : **Vivian** (Berzerk 3★ P7 D4, « Protection : Damage ») face à **Giovanni** (Montana 3★,
+« -2 Cards Damage, Min 1 »), 1 pillz chacun ; lire les **dégâts de Vivian** — le moteur donne **2**, la Protection
+donnerait **4**. Idem **Fixit** (Bangers 5★ P7 D6, « Protection: Power And Damage ») face à Giovanni : moteur **4**,
+attendu **6**. Attention, **Eyrton Cr** n'a sa Protection qu'à 2★ (à 5★ c'est un Cancel). Refaire une fois sur la
+puissance avec **Delija Cr** (Roots 1★, « -2 Cards Power, Min 2 ») contre un « Protection: Power ».
+
+Si le moteur a tort : `_strip_types(..., only_targeting_opponent=True)` doit aussi retirer les capacités
+`target == "both"` quand la carte protégée est visée.
+
+### R5 — Exchange contre Copie / Impose, et Copie / Impose contre Cancel
+
+Le combat 1294992 a tranché un seul cas : un **Cancel Opp. X Modif. annule le X Exchange** en entier, les deux cartes
+gardant leurs valeurs imprimées (§ 7). Les autres croisements de ces trois pouvoirs qui réécrivent les valeurs
+imprimées ne sont couverts par aucun combat et le moteur les traite dans l'ordre où il les rencontre.
+
+Manipulation (duel D6 de `docs/ORACLE.md`) : un **Damage Exchange** (Blast, Homy, Serleena, Incubus Cr, Duchess,
+Waldegrin Cr) contre **Copy: Opp. Damage** (Angelina, Bettisia, Darril, Dash), puis contre **Damage Impose**
+(Zwoosh, Zombiyaki) ; puis Copie contre Cancel et Impose contre Cancel (Shaker, Lenora).
+
+### R6 — Pouvoirs sans règle publiée
+
+**Beyond** (Genesis, un 5ᵉ round — le moteur fixe `NB_ROUNDS = 4`) et **Perfection** (Glibon Cr) n'ont de règle ni sur
+le site ni sur le wiki. Les cartes qui les portent sont injouables. S'y ajoute une coquille probable du scraping,
+`Growth: -1 Power And Damage, Min 4` (Bugamon), qui n'est pas une question de règle mais de parsing.
+
+Six autres pouvoirs uniques sont **exclus par décision** du 2026-09-21 et ne sont pas des questions ouvertes :
+Hazard (Administrator), Illusion (Kate), Bypass (Robert Cobb), Overdose (Hekate), Remove Ability Conditions (Memento),
+Rebirth (Nemo Cr).
+
+### 5.1 Confirmations souhaitables (règles tranchées, jamais vues en combat réel)
+
+Elles ne bloquent rien : une source ou l'utilisateur les a tranchées et le moteur les applique. Un combat réel les
+confirmerait. Les duels correspondants sont décrits dans `docs/ORACLE.md` § 2.
+
+| Règle | Source | Duel |
+|---|---|---|
+| Cycles de Stops et de Protections : les Stops gagnent | utilisateur (2026-09-21) | D1, D2 |
+| Le Leader profite de son propre « Team: » ; deux exemplaires du même Leader s'annulent | utilisateur (2026-09-21) | D3 |
+| Counter-attack (Ashigaru) limité au premier round ; Limitless (Fractal) | utilisateur (2026-09-21) ; vérification réelle abandonnée | D3, D5 (Fractal non possédé) |
+| Oculus : clan adopté selon la composition de la main | règle officielle + combats 1346878, 1347500, 1347671, 1347602 | D8 |
+| Tune Out ignore la fury ; Mindwipe = Combust ; Repair, Combust, Mindwipe immédiats | utilisateur (2026-09-21) + combats 1211279, 1211702 | D4 (aucun Combust possédé) |
+
+### 5.2 Ce que le moteur ne modélise pas (hors règles de round)
+
+Le tirage de la main (deck de 8 → 4 cartes au hasard), les contraintes de composition (plafond d'étoiles, cartes
+interdites par mode), les scores de tournoi / ELO / Deathmatch, la progression Survivor, les modificateurs Coliseum et
+les chronomètres. Un mode se réduit dans le moteur à sa **situation de départ** (vies et pillz par camp, premier
+joueur), réglable depuis le 2026-09-22.
+
+### 5.3 Tranchées (historique)
 
 Tranché par combat réel (1294992, 2026-09-20, § 7) : Cancel Opp. X Modif. annule le X Exchange en entier.
 
@@ -344,58 +469,22 @@ Tranchés par combat réel (2026-09-22, combats du 17 septembre récupérés de 
 pillz) ; un **Annul Modif. Vie / Pillz suspend un effet persistant attribut par attribut**, donc un Annul Vie contre un
 Repair verse les pillz mais pas la vie (1211922, round 3 — le moteur suspendait tout ou rien).
 
+Tranché par le glossaire officiel 53 et le combat 1347075 : **Recover X pillz sur Y = ⌊pillz posées × X / Y⌋, minimum
+1** (« arrondie à l'unité inférieure, avec un minimum de 1 »), fury et pillz gratuite comprises. Ce point figurait à
+tort parmi les questions ouvertes jusqu'au 2026-09-22.
+
 Confirmés par l'utilisateur le 2026-09-21 : Cancel Opp. Life Modif. saute aussi le tic immédiat d'une Toxine posée ce
 round (3.3, testé) ; Perfect = victoire avec `attack − power_fight < attaque adverse` (§ 4) ; Brawl compte les
-exemplaires comme Support (3.6) ; premier joueur du round 1 tiré au sort (§ 2, non modélisé).
+exemplaires comme Support (3.6) ; premier joueur du round 1 tiré au sort (§ 2, modélisé depuis le 2026-09-22).
 
 Tranchés par l'utilisateur le 2026-09-21 (connaissance du jeu, sans source écrite) : cycles de Stops et de Protections
 (3.2, les Stops gagnent), Leader bénéficiant de son propre Team (3.7, oui), deux exemplaires du même Leader
-s'annulent (3.7, oui), Tune Out ignore la fury (§ 4), **Repair, Combust et Mindwipe agissent dès le round joué** (comme Dope ; Combust/Mindwipe si la carte gagne), Mindwipe = Combust (§ 4), Counter-attack limité au premier round (§ 4).
+s'annulent (3.7, oui), Tune Out ignore la fury (§ 4), **Repair, Combust et Mindwipe agissent dès le round joué**
+(comme Dope ; Combust/Mindwipe si la carte gagne), Mindwipe = Combust (§ 4), Counter-attack limité au premier
+round (§ 4).
 
-Chaque combat rejoué se transcrit dans `data/test/` (voir ROADMAP § 2.B.2) ; le journal des effets (D2) rendra la
-localisation des écarts immédiate.
-
-### 5.1 Points ouverts révélés par le corpus combinatoire (2026-09-22)
-
-Le corpus (`src/core/engine/scenarios.py`, README « Corpus combinatoire ») fige le comportement actuel ; chacun des
-quatre points ci-dessous est **à trancher par un combat réel** (scénarios C1-C4 dans `docs/ORACLE.md` § 2) avant de toucher
-au moteur, puis à régénérer (`scripts/build_engine_corpus.py`).
-
-1. **Ordre entre les deux camps** : le moteur traite toujours la carte alliée avant la carte ennemie. Quand les deux
-   camps portent des effets à plancher sur la même stat (« -2 Cards Damage, Min 4 » contre « -4 Cards Damage, Min 0 »,
-   niveau 2), touchent la vie ou les pillz du même joueur (« Defeat: Recover 2 Pillz Out Of 3 » contre
-   « Victory Or Defeat: -2 Opp Pillz And Life, Min 0 », niveau 3) ou enregistrent des effets persistants (ordre de la
-   liste, niveau 4), le résultat dépend du camp qui s'appelle « allié » — ce qui n'a pas de sens dans le vrai jeu.
-   25 scénarios asymétriques sont épinglés dans `tests/test_engine_properties.py`. Trois exemples minimaux :
-   - **niveau 2** — Rajesh (« -2 Cards Damage, Min 4 », D6) contre Pandemos Cr (« -4 Cards Damage, Min 0 », D8) :
-     Rajesh résolu en premier → 6→4 et 8→6, puis −4 → **Rajesh 0, Pandemos 2** ; Pandemos en premier → 8→4 et 6→2,
-     puis le « Min 4 » ne mord plus → **Rajesh 2, Pandemos 4**. Du simple au double, selon le seul label « allié ».
-   - **niveau 3** — Kusuri (« Defeat: +2 Life ») perd à 6 vies contre Phyllis (« -3 Opp. Life Min 4 ») : le gain
-     résolu en premier donne 5 → 7 → **4** ; la perte en premier donne 5 → 4 (plancher) → **6**.
-   - **niveau 4** — Willow (« Defeat : Heal 1 Max. 10 ») perd à 10 vies contre un Freaks (bonus « Poison 2, Min 3 ») :
-     les deux effets se posent sur elle le même round et la liste garde l'ordre d'enregistrement. Au round suivant,
-     poison-puis-soin donne **9**, soin-puis-poison **8** (le soin ne fait rien à 10, plafond atteint).
-
-   Options : (a) garder « allié d'abord » ; (b) « le premier joueur d'abord » — symétrique, et cohérent avec l'ordre de
-   jeu ; (c) au niveau 2, étendre 3.6 bis à toutes les réductions d'une stat, quelle que soit la carte qui les porte
-   (plancher le plus haut d'abord, puis bonus / pouvoir / Leader, puis premier joueur).
-   Scénarios de vérification en combat réel, avec les cartes : `docs/ORACLE.md` § 2, C3.
-2. **« Per Damage » en défaite** : `multipliers._nb_damage_inflicted` vaut 0 quand la carte perd (3.10, décision sans
-   source pour la défaite). Or trois cartes réelles portent « Defeat: +1 Life Per Damage » (Zalindra) et « Victory Or
-   Defeat: +1 Life Per Damage » (Griffonmor Cr, Senestra) : leur volet « défaite » ne peut jamais rien faire, ce
-   qu'aucune carte imprimée ne ferait. Lecture probable : les dégâts (après modificateurs) de la carte, gagnante ou non ;
-   le glossaire 49 (« pour chaque dégât infligé ») décrit le cas courant. **À vérifier en combat réel**
-   (`docs/ORACLE.md` § 2, C1) ; puis un test (`test_life_per_damage_is_zero_on_defeat`) et le corpus à mettre à jour.
-3. **« Per Life Lost » au-delà de la vie de départ** : `multipliers.MAX_LIFE = 12` ; à 14 vies (Heal, ou un format à
-   14 vies), « +1 Damage Per Life Lost » donne −2 dégâts. Origine : `12 - player1.life` écrit en dur dans
-   `apply_capacity_lvl_2` le 2024-12-30 (commit `7ae5f73`, avec le commentaire « change le hardcode 12 »), simplement
-   renommé `MAX_LIFE` lors du partage des multiplicateurs (`f43c0a8`, 2026-09-15) — ce n'est pas une règle, c'est une
-   constante jamais reprise (`MAX_PILLZ` de même). Le moteur ne connaît pas la vie de départ de la partie ;
-   à minima, borner le multiplicateur à 0. Scénario : `docs/ORACLE.md` § 2, C4.
-4. **Protection: <stat> contre « Cards »** : `_apply_stat_protections` ne retire que les modificateurs adverses qui
-   ciblent l'adversaire (`target == "enemy"`) ; « -2 Cards Damage, Min 1 » (cible les deux cartes) traverse
-   « Protection: Damage » (dégâts 4 → 2). L'utilisateur penche pour **la Protection bloque** (2026-09-22) ;
-   à confirmer en combat réel (`docs/ORACLE.md` § 2, C2) avant de changer le moteur.
+Chaque combat rejoué se transcrit dans `data/ur_battles/` ; le journal des effets rend la localisation des écarts
+immédiate.
 
 ## 6. Glossaire officiel lu en session connectée (2026-09-16, après-midi)
 

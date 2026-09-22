@@ -10,7 +10,7 @@ Objectif à terme : une IA capable de gagner un maximum de parties (plan détail
 | Cartes jouables | **2 497** (36 clans), données scrapées d'iclintz.com le 2026-09-15, illustrations incluses |
 | Pouvoirs (abilities / bonus) | **1 386 / 1 396 descriptions gérées (99,3 %)**, 2 487 cartes sur 2 497 entièrement gérées — `python scripts/capacity_coverage.py` liste le reste |
 | Moteur | 4 niveaux d'effets (méta, stats, fin de round, persistants), bonus de clan (Oculus infiltré compris), Leaders (Team, Tie-break, Counter-attack, Limitless), conditions Courage/Revenge/Confidence/Reprisal/Symmetry/Asymmetry/Stop/Killshot/Perfect/Bet/Versus/After/Unison/Disunion/Defeat/Backlash/Victory or Defeat, Tune Out, Impose, Cards, Consume/Combust/Mindwipe/Corrosion, Xantiax, Corrupt, Fatal Killshot ; journal des effets de chaque round |
-| Tests | 560 backend (pytest) + 28 front (vitest) ; **corpus combinatoire du moteur** : 113 501 rounds (chaque capacité, chaque interaction méta, chaque condition, effets persistants, Leaders, Oculus, égalités/KO, parties aléatoires) rejoués contre des digests versionnés ; balayage de robustesse sur toutes les descriptions gérées ; 51 combats réels Urban Rivals rejoués à l'identique (`data/ur_battles/`) |
+| Tests | 564 backend (pytest) + 28 front (vitest) ; **corpus combinatoire du moteur** : 113 501 rounds (chaque capacité, chaque interaction méta, chaque condition, effets persistants, Leaders, Oculus, égalités/KO, parties aléatoires) rejoués contre des digests versionnés ; balayage de robustesse sur toutes les descriptions gérées ; 51 combats réels Urban Rivals rejoués à l'identique (`data/ur_battles/`) |
 | Interface | composition de deck (recherche, filtre par clan, decks aléatoires, statut des bonus, decks mémorisés), **choix du mode** (Classic, ELO, duel, personnalisé : vies et pillz par camp, premier joueur), partie de 4 rounds à deux sur le même écran, historique des rounds, fin de partie, effets persistants |
 
 Non gérés : 9 capacités uniques sans règle publiée (Beyond, Bypass, Hazard, Illusion, Overdose, Perfection, Rebirth,
@@ -69,7 +69,7 @@ pour les tests » enregistre le round dans `data/test/test_N/` (voir ci-dessous)
 ## Tests
 
 ```bash
-cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 560 tests (~70 s) ; -m "not corpus" : 532 tests en 4 s
+cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 564 tests (~70 s) ; -m "not corpus" : 536 tests en 4 s
 cd UrbanVue && npm test && npm run lint && npm run build           # 28 tests, lint, type-check + build
 ```
 
@@ -135,14 +135,16 @@ Le bonus de clan n'est actif qu'avec au moins deux cartes du clan en main ; l'ab
 chaque carte jouée s'il est le seul Leader en main.
 
 Les décisions de règles prises sans source, leur vérification contre le glossaire officiel et les points encore
-ouverts sont consignés dans [docs/REGLES.md](docs/REGLES.md) ; les combats réels (`docs/ORACLE.md`) les tranchent.
+ouverts sont consignés dans [docs/REGLES.md](docs/REGLES.md) — son **§ 5 est le registre unique des règles non
+tranchées** (R1-R6 : ce que fait le moteur, les cartes à jouer, la retouche à appliquer). Les combats réels
+(`docs/ORACLE.md`, logistique de capture) les tranchent.
 
 ## Feuille de route
 
 État des lieux détaillé, décisions de règles et travail restant : [docs/ROADMAP.md](docs/ROADMAP.md).
 
-1. Règles : trancher les points encore ouverts de `docs/REGLES.md` § 5 (cycles de Stops, Leader et son Team,
-   Mindwipe / Combust, Limitless…) par des combats réels capturés selon `docs/ORACLE.md`
+1. Règles : trancher les six points du registre `docs/REGLES.md` § 5 par des combats réels capturés selon
+   `docs/ORACLE.md`
 2. Backend : moteur compilé rapide derrière le contrat `src/core/engine/` (~1 ms par round aujourd'hui, ~10 µs visés
    pour le solveur), persistance en mémoire/SQLite, mise à jour FastAPI/Pydantic
 3. IA : équilibre de Nash par round, solveur exact de référence, fonction de valeur apprise sur ses résultats,

@@ -30,18 +30,11 @@ Enchaîner les combats normalement (n'importe quel mode). Un combat dure ~4 minu
 dizaine de combats, soit 40 rounds vérifiés.
 
 **Pour cibler une règle précise**, le mode le plus efficace est le **duel contre un ami** (ou un second compte) : on
-choisit les deux decks et les deux mains, donc le scénario exact à tester. Points encore non tranchés (voir
-`docs/REGLES.md` § 5 et § 6) :
+choisit les deux decks et les deux mains, donc le scénario exact à tester.
 
-| Question | Scénario à jouer |
-|---|---|
-| Cycles de Stops | GHEIST ou Roots (SoA en bonus) contre Nightmare ou Piranas (SoB en bonus) ; Skeelz + ability Protection: Bonus contre un All-Stop (Glorg, Shakra) |
-| Le Leader profite-t-il de son Team ? | jouer Ambre / Eyrik / Vholt lui-même |
-| Exchange contre Copy / Annul | Dominion « Damage Exchange » contre « Copy: Opp. Damage » puis contre « Cancel Opp. Damage Modif. » |
-| **« Per Damage » en défaite** (2026-09-22) | voir C1 ci-dessous |
-| **Protection: \<stat\> contre « Cards »** (2026-09-22) | voir C2 ci-dessous |
-| **Ordre entre les deux cartes** (2026-09-22) | voir C3 ci-dessous |
-| **« Per Life Lost » au-delà de 12 vies** (2026-09-22) | voir C4 ci-dessous |
+> Les questions de règles ouvertes ne sont pas listées ici : elles sont toutes écrites dans **`docs/REGLES.md` § 5**
+> (registre R1-R6), avec pour chacune ce que fait le moteur, les cartes à jouer, la valeur à lire et la retouche à
+> appliquer. Ce document ne décrit que la logistique : comment capturer, quels decks composer, comment importer.
 
 ### Decks prêts à jouer (2026-09-16)
 
@@ -67,99 +60,12 @@ tout tirage de 4 convienne. Les cartes sont choisies petites (2-3★) et fréque
 
 Ordre de rentabilité (théorique) : D4 (3 questions ouvertes en un duel), D1, D3, D6, puis D5, D7, D8, D2.
 
-### Points relevés par le corpus combinatoire (C1-C4, 2026-09-22)
+### Les duels et le registre des règles
 
-Quatre comportements que le moteur applique sans source : le corpus les a mis au jour, aucun n'a été modifié. Chacun
-dit ce que fait le moteur aujourd'hui, la manip qui tranche, et la retouche à appliquer si le serveur dit le
-contraire. Détail et exemples chiffrés : `docs/REGLES.md` § 5.1. Après chaque décision : corriger, ajouter un test,
-puis régénérer les digests (`python scripts/build_engine_corpus.py`).
-
-#### C1 — « Per Damage » en défaite
-
-- **Moteur aujourd'hui** : le multiplicateur vaut 0 quand la carte perd (`multipliers._nb_damage_inflicted`). Résultat :
-  le volet « défaite » de trois cartes réelles ne peut jamais rien faire, ce qu'aucune carte imprimée ne ferait.
-- **Cartes** : **Zalindra** (Zenith 3★ P9 D4, « Defeat: +1 Life Per Damage ») ; **Griffonmor Cr** (Skeelz 4★ P8 D4) et
-  **Senestra** (Nightmare 3★ P8 D2), toutes deux « Victory Or Defeat: +1 Life Per Damage ».
-- **Manip** : faire **perdre** Zalindra (1 pillz contre une grosse mise adverse) et lire les vies gagnées. Puis
-  Griffonmor Cr / Senestra en victoire (témoin) **puis** en défaite. Refaire une défaite face à un réducteur de dégâts
-  (Pussycats « -2 Opp Damage, Min 1 ») pour savoir si ce sont les dégâts imprimés ou les dégâts après modificateurs.
-- **Attendu si le moteur a tort** : `_nb_damage_inflicted` renvoie `card1.damage_fight` sans regarder `card1.win`.
-
-#### C2 — Protection: \<stat\> contre « Cards »
-
-- **Moteur aujourd'hui** : `apply_capacity_lvl_1._apply_stat_protections` ne retire que les modificateurs adverses qui
-  ciblent explicitement l'adversaire (`target == "enemy"`). Un « -X Cards <stat> » (cible **les deux** cartes) traverse
-  donc la Protection. L'utilisateur penche pour l'inverse.
-- **Cartes** : protégés — **Vivian** (Berzerk 3★ P7 D4, « Protection : Damage »), **Fixit** (Bangers 5★ P7 D6,
-  « Protection: Power And Damage »), **Eyrton Cr** (All Stars **2★** P8 D2, « Protection : Damage » — à 5★ son pouvoir
-  est un Cancel, pas une Protection) ; réducteurs « Cards » — **Giovanni** (Montana 3★, « -2 Cards Damage, Min 1 »),
-  **Pandemos Cr** (Paradox, « -4 Cards Damage, Min 1/0 »), **Rajesh** (Uppers 2★, « -2 Cards Damage, Min 4 »),
-  **Delija Cr** (Roots 1★, « -2 Cards Power, Min 2 »).
-- **Manip** : Vivian face à Giovanni, 1 pillz chacun, et lire les **dégâts de Vivian** : le moteur donne **2**
-  (la Protection ne bloque pas) ; **4** si elle bloque. Idem Fixit face à Giovanni : moteur **4**, attendu **6**.
-  Refaire une fois sur la puissance (Delija Cr contre un « Protection: Power »).
-- **Attendu si le moteur a tort** : `_strip_types(..., only_targeting_opponent=True)` doit aussi retirer les capacités
-  `target == "both"` quand la carte protégée est visée.
-
-#### C3 — Ordre entre les deux cartes
-
-- **Moteur aujourd'hui** : la carte **alliée** est toujours résolue avant la carte ennemie, aux niveaux 2, 3 et 4. Dès
-  qu'un plancher, un plafond ou une liste entre en jeu, le résultat dépend du camp qui s'appelle « allié » — ce qui
-  n'existe pas dans le vrai jeu. 25 scénarios asymétriques sont épinglés dans `tests/test_engine_properties.py`.
-  **Rejouer chaque manip en inversant le premier joueur** : si le résultat suit l'ordre de jeu, la règle est « le
-  premier joueur d'abord ».
-- **C3a, niveau 2 (stats)** : **Rajesh** (Uppers 2★ P5 D6, « -2 Cards Damage, Min 4 ») contre **Pandemos Cr**
-  (Paradox 5★ P9 D8, « -4 Cards Damage, Min 0 »), 1 pillz chacun. Selon la carte résolue en premier, le moteur donne
-  **Rajesh 0 / Pandemos 2** (Rajesh d'abord : 6→4 et 8→6, puis −4) ou **Rajesh 2 / Pandemos 4** (Pandemos d'abord :
-  8→4 et 6→2, puis le « Min 4 » ne mord plus). Lire les dégâts des deux cartes.
-- **C3b, niveau 3 (vie / pillz)** : faire **perdre** **Kusuri** (Fang Pi Clang 2★ P7 D2, « Defeat: +2 Life ») face à
-  **Phyllis** (Nightmare 2★ P7 D1, « -3 Opp. Life Min 4 »), le joueur de Kusuri **à 6 vies**. Le moteur donne **4**
-  (gain d'abord : 5 → 7, puis −3) ou **6** (perte d'abord : plancher 4, puis +2). Variantes équivalentes :
-  **Melinda** ou **Wonald** (« Defeat: +2 Life ») contre **Oxen** ou **Jeyn** (« -3 Opp. Life Min 5 »).
-- **C3c, niveau 4 (effets persistants)** : faire **perdre** **Willow** (Roots 2★ P7 D2, « Defeat : Heal 1 Max. 10 »)
-  contre une carte **Freaks** (bonus « Poison 2, Min 3 ») qui gagne, de sorte que le joueur de Willow soit à
-  **exactement 10 vies après les dégâts du round** (le plafond du soin). Les deux effets se posent alors sur le même
-  joueur le même round ; lire ses vies **au round suivant** : le moteur donne **8** (soin d'abord, sans effet à 10,
-  puis poison) ou **9** (poison 10 → 8, puis soin → 9).
-- **Attendu si le moteur a tort** : ordonner les deux cartes par `game.turn` (premier joueur d'abord) dans
-  `apply_capacity_lvl_2`, `apply_capacity_lvl_3` et `apply_capacity_lvl_4` ; au niveau 2, étendre éventuellement la
-  règle 3.6 bis (plancher le plus haut d'abord) aux deux cartes à la fois.
-
-#### C4 — « Per Life Lost » au-delà de la vie de départ
-
-- **Moteur aujourd'hui** : le multiplicateur vaut `12 − vie` (`multipliers.MAX_LIFE`), donc **négatif** au-dessus de
-  12 vies : « +1 Power Per Life Lost » à 14 vies retire 2 de puissance. Ce 12 n'est pas une règle : c'est le hardcode
-  d'origine (`7ae5f73`, 2024-12-30, commentaire « change le hardcode 12 »), simplement renommé en 2026.
-- **Cartes** : **Razor** (Ulu Watu 4★ P5 D6), **Zell** (Berzerk 1★ P6 D2), **Padre Nido** (Paradox 3★ P6 D5),
-  **Miss Donna Luna** (Pussycats 2★ P3 D5), toutes « +1 Power Per Life Lost, Max. N » ; **P. Steevens Cr** (La Junta
-  1★, « +1 Damage Per Life Lost Max. 3 »). Pour dépasser 12 vies : bonus Jungo « +2 Life », ou **Dallas** (All Stars
-  3★, « Heal 1 Max. 14 »), ou un mode à plus de 12 vies.
-- **Manip** : monter au-dessus de 12 vies, puis jouer Razor et lire sa **puissance** (5 si le multiplicateur est borné
-  à 0, 3 à 14 vies s'il devient négatif). Vérifier aussi le cas « pillz » (`MAX_PILLZ`) avec un « Per Pillz Lost ».
-- **Attendu si le moteur a tort** : borner le multiplicateur à 0, et à terme lire la **vie de départ de la partie**
-  (le `Format` de la branche `feat/ia-tous-modes` la porte déjà) plutôt qu'une constante.
-
-Avec la collection actuelle (2026-09-19), jouables tout de suite : **D1, D2, D3, D6** ; partiels : **D7** (sans Perfect),
-**D8** (Oculus seul) ; bloqués faute de carte-clé : **D4** (aucun Combust), **D5** (pas de Fractal).
-
-### La collection du compte
-
-`UrbanPy/Backend_fastAPI/data/collection/collection_jerem.json` est la collection du compte Urban Rivals **« jere'm »**
-(celui qui joue les combats de `data/ur_battles/`), relevée le 2026-09-17 : 1 304 entrées pour 1 234 personnages
-distincts, chacun au niveau possédé. Elle a été lue **passivement dans le DOM** de la page `/collection/` (filtre
-« Seulement possédés », pagination côté client) — aucun appel à l'API du site, aucune rétro-ingénierie du client.
-
-Elle sert à composer des duels jouables : `scripts/collection_lookup.py` cherche les cartes possédées dont le pouvoir
-correspond à un motif, et signale celles dont le pouvoir n'est débloqué qu'à un niveau supérieur.
-
-```bash
-cd UrbanPy/Backend_fastAPI
-.venv/bin/python scripts/collection_lookup.py "Protection : Damage"
-.venv/bin/python scripts/collection_lookup.py "Stop Opp. Ability" --exclude GHEIST,Roots,Nightmare,Piranas
-.venv/bin/python scripts/collection_lookup.py . --clan Leader
-```
-
-Le relevé date du 2026-09-17 : le refaire après des achats ou des montées de niveau.
+Les duels D1-D8 ci-dessus couvrent les confirmations listées en `docs/REGLES.md` § 5.1. Les questions encore ouvertes
+(R1 ordre entre les deux cartes, R2 « Par Dégât » en défaite, R3 « Par Vie perdue » au-dessus de la vie de départ,
+R4 Protection contre « Cards », R5 Exchange contre Copie / Impose) y sont décrites avec les cartes à jouer : les
+préparer dans un même duel privé fait gagner une session entière.
 
 ## 3. Exporter
 
