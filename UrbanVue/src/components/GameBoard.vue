@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import { OPPONENT_LABELS, aiPick, errorMessage, processGameRound, savePlayForTest, type StartedGame } from "../api/game";
+import { computed, ref } from "vue";
+import { errorMessage, processGameRound, savePlayForTest, type StartedGame } from "../api/game";
 import { roundSummaries } from "../logic/history";
 import { RoundPicker, type Pick, type Side } from "../logic/round";
 import type { Game, GameState, Player } from "../models/game.interface";
@@ -12,11 +12,9 @@ const emit = defineEmits<{ newGame: [] }>();
 const game = ref<Game>(props.started.game);
 const states = ref<Game[]>([props.started.game]);
 const gameId = props.started.gameId;
-const opponent = props.started.opponent;
 const state = ref<GameState>("Game Not Finished");
 const error = ref<string | null>(null);
 const saved = ref(false);
-const thinking = ref(false);
 let picker = new RoundPicker(game.value);
 const current = ref<Side | null>(picker.current);
 
@@ -32,7 +30,6 @@ function toggleLog(round: number) {
 	else next.add(round);
 	openedLogs.value = next;
 }
-const enemyIsAi = opponent !== "human";
 
 const effectLabel = (kind: string, value: number, borne: number) =>
 	({
@@ -66,28 +63,9 @@ async function submitIfComplete(pick: Pick) {
 	current.value = finished.value ? null : picker.current;
 }
 
-/** L'ordinateur joue tant que c'est à lui (il peut jouer en premier ou en second). */
-async function letAiPlay() {
-	while (!finished.value && opponent !== "human" && current.value === "enemy") {
-		thinking.value = true;
-		try {
-			const pick = await aiPick(gameId, opponent);
-			await submitIfComplete({ index: pick.card_index, pillz: pick.pillz, fury: pick.fury });
-		} catch (err) {
-			error.value = errorMessage(err);
-			break;
-		} finally {
-			thinking.value = false;
-		}
-	}
-}
-
 async function handleCombat(pillz: number, fury: boolean, index: number) {
 	await submitIfComplete({ index, pillz, fury });
-	await letAiPlay();
 }
-
-onMounted(letAiPlay);
 
 async function save() {
 	try {
@@ -102,13 +80,9 @@ async function save() {
 <template>
 	<div class="flex min-h-screen flex-col items-center gap-4 p-2 sm:p-4">
 		<header class="flex w-full max-w-5xl flex-wrap items-center justify-between gap-2 text-sm text-gray-300">
-			<span>Partie #{{ gameId }} · round {{ Math.min(game.nb_turn, 4) }} / 4 · {{ OPPONENT_LABELS[opponent] }}</span>
+			<span>Partie #{{ gameId }} · round {{ Math.min(game.nb_turn, 4) }} / 4 · deux joueurs (même écran)</span>
 			<span v-if="!finished">
-				<template v-if="thinking">L'ordinateur réfléchit…</template>
-				<template v-else
-					>Au tour de :
-					<strong class="text-yellow-400">{{ current === "ally" ? "toi" : enemyIsAi ? "l'ordinateur" : "l'ennemi" }}</strong></template
-				>
+				Au tour de : <strong class="text-yellow-400">{{ current === "ally" ? "toi" : "l'ennemi" }}</strong>
 			</span>
 			<button class="rounded bg-gray-700 px-3 py-1 hover:bg-gray-600" @click="emit('newGame')">Nouvelle partie</button>
 		</header>
@@ -139,7 +113,7 @@ async function save() {
 						:key="'enemy-' + index"
 						:card="card"
 						:pillz="game.enemy.pillz"
-						:turn="!enemyIsAi && current === 'enemy'"
+						:turn="current === 'enemy'"
 						@combat="(pillz, fury) => handleCombat(pillz, fury, index)"
 					/>
 				</div>
@@ -157,7 +131,7 @@ async function save() {
 						:key="'ally-' + index"
 						:card="card"
 						:pillz="game.ally.pillz"
-						:turn="current === 'ally' && !thinking"
+						:turn="current === 'ally'"
 						@combat="(pillz, fury) => handleCombat(pillz, fury, index)"
 					/>
 				</div>

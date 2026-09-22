@@ -2,7 +2,7 @@ import os
 import random
 from src.core.use_cases.process_round import check_round_correct, process_round
 from src.core.domain.player import Player
-from src.schemas.game_schemas import GameResult, PlayerCards, ProcessRoundInput
+from src.schemas.game_schemas import GameResult, GameSetup, ProcessRoundInput
 from src.core.domain.card import Card
 from src.adapters.repositories.game_repository import get_new_game_id, get_new_test_id, load_game_from_json, save_game_to_json
 from src.core.domain.game import Game, NB_ROUNDS
@@ -63,26 +63,30 @@ def check_end(board: Game) -> GameResult:
     else:
         return GameResult.NONE
 
-def create_game(players_cards: PlayerCards):
+def create_game(setup: GameSetup):
     """
-    Crée une partie en initialisant les joueurs avec leurs cartes.
+    Crée une partie en initialisant les joueurs avec leurs cartes, dans la situation de départ demandée —
+    vies et pillz de chaque joueur et premier joueur du round 1, c'est-à-dire ce qui distingue un mode de jeu.
 
     Args:
-        players_cards (PlayerCards): Objet contenant les cartes de `player1` et `player2`.
+        setup (GameSetup): les cartes de `player1` et `player2`, `life`, `pillz`, `first`, `night`.
 
     Returns:
         (Game, int): la partie initialisée (round 1 en cours) et son identifiant.
     """
-    night = random.choice((False, True)) if players_cards.night is None else players_cards.night
-    game = Game(1, True, Player(name="ally", life=12, pillz=12), Player(name="enemy", life=12, pillz=12), [], night=night)
+    night = random.choice((False, True)) if setup.night is None else setup.night
+    ally_first = random.choice((True, False)) if setup.first == "random" else setup.first == "player1"
+    (ally_life, enemy_life), (ally_pillz, enemy_pillz) = setup.per_side(setup.life), setup.per_side(setup.pillz)
+    game = Game(1, ally_first, Player(name="ally", life=ally_life, pillz=ally_pillz),
+                Player(name="enemy", life=enemy_life, pillz=enemy_pillz), [], night=night)
 
     # Ajouter les cartes à player1
-    for card_input in players_cards.player1:
+    for card_input in setup.player1:
         card = Card(card_name=card_input.card_name, nb_stars=card_input.nb_stars, night=night)
         game.ally.cards.append(card)
 
     # Ajouter les cartes à player2
-    for card_input in players_cards.player2:
+    for card_input in setup.player2:
         card = Card(card_name=card_input.card_name, nb_stars=card_input.nb_stars, night=night)
         game.enemy.cards.append(card)
 

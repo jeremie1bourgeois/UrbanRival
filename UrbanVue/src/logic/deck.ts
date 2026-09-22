@@ -1,4 +1,4 @@
-import type { CatalogueCard, Deck, DeckCard } from "../models/game.interface";
+import type { CatalogueCard, Deck, DeckCard, Situation } from "../models/game.interface";
 
 export const DECK_SIZE = 4;
 
@@ -19,8 +19,25 @@ export function isDeckComplete(slots: DeckSlots): slots is DeckCard[] {
 	return slots.length === DECK_SIZE && slots.every((slot) => slot !== null);
 }
 
-export function toDeck(ally: DeckCard[], enemy: DeckCard[]): Deck {
-	return { player1: ally, player2: enemy };
+/** Partie classique : 12 vies, 12 pillz, l'allié pose en premier. */
+export const DEFAULT_SITUATION: Situation = { life: [12, 12], pillz: [12, 12], first: "player1" };
+
+/** Modes connus ; sur le site le premier joueur du round 1 est toujours tiré au sort. Coliseum et Survivor : valeurs à la main. */
+export const MODES: (Situation & { label: string })[] = [
+	{ label: "Classic", life: [12, 12], pillz: [12, 12], first: "random" },
+	{ label: "ELO", life: [14, 14], pillz: [12, 12], first: "random" },
+	{ label: "Duel contre le bot", life: [15, 15], pillz: [12, 12], first: "random" },
+];
+
+export function toDeck(ally: DeckCard[], enemy: DeckCard[], situation: Situation = DEFAULT_SITUATION): Deck {
+	return { player1: ally, player2: enemy, life: situation.life, pillz: situation.pillz, first: situation.first };
+}
+
+/** Message d'erreur si la situation n'est pas jouable (même règle que le backend : vies ≥ 1, pillz ≥ 0, entiers), sinon null. */
+export function situationError(situation: Situation): string | null {
+	if (!situation.life.every((value) => Number.isInteger(value) && value >= 1)) return "Les vies de départ doivent être des entiers ≥ 1.";
+	if (!situation.pillz.every((value) => Number.isInteger(value) && value >= 0)) return "Les pillz de départ doivent être des entiers ≥ 0.";
+	return null;
 }
 
 export interface ClanStatus {

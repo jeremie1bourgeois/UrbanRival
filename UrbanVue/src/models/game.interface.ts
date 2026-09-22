@@ -232,7 +232,16 @@ export interface DeckCard {
 	nb_stars: number;
 }
 
-export interface Deck {
+export type FirstPlayer = "player1" | "player2" | "random";
+
+/** Situation de départ — tout ce qui distingue un mode de jeu : vies et pillz de chaque joueur (Survivor : différents), premier joueur du round 1. */
+export interface Situation {
+	life: [number, number];
+	pillz: [number, number];
+	first: FirstPlayer;
+}
+
+export interface Deck extends Situation {
 	player1: DeckCard[];
 	player2: DeckCard[];
 }

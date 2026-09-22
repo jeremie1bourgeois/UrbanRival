@@ -86,6 +86,41 @@ def test_init_game_reports_the_night_draw_and_accepts_a_forced_value(client):
     assert forced["night"] is True
 
 
+def test_init_game_takes_the_starting_situation_of_any_game_mode(client):
+    """Vies et pillz de chaque joueur (en Survivor ils diffèrent), premier joueur imposé ; défauts : 12, 12, joueur 1."""
+    response = client.post("/init_game/", json={**REAL_DECK, "life": [16, 12], "pillz": [8, 12], "first": "player2"})
+
+    assert response.status_code == 200, response.json()
+    game = response.json()["game"]
+    assert (game["ally"]["life"], game["enemy"]["life"]) == (16, 12)
+    assert (game["ally"]["pillz"], game["enemy"]["pillz"]) == (8, 12)
+    assert game["turn"] is False                      # le joueur 2 pose en premier
+
+    same_for_both = client.post("/init_game/", json={**REAL_DECK, "life": 15}).json()["game"]
+    assert (same_for_both["ally"]["life"], same_for_both["enemy"]["life"]) == (15, 15)
+    assert (same_for_both["ally"]["pillz"], same_for_both["enemy"]["pillz"]) == (12, 12)
+    assert same_for_both["turn"] is True
+
+
+def test_init_game_defaults_to_the_classic_situation(client):
+    game = client.post("/init_game/", json=REAL_DECK).json()["game"]
+
+    assert (game["ally"]["life"], game["ally"]["pillz"], game["turn"]) == (12, 12, True)
+
+
+def test_init_game_can_draw_the_first_player(client):
+    drawn = {client.post("/init_game/", json={**REAL_DECK, "first": "random"}).json()["game"]["turn"] for _ in range(12)}
+
+    assert drawn == {True, False}
+
+
+def test_init_game_rejects_an_invalid_starting_situation(client):
+    assert client.post("/init_game/", json={**REAL_DECK, "first": "player3"}).status_code == 422
+    assert client.post("/init_game/", json={**REAL_DECK, "life": 0}).status_code == 422
+    assert client.post("/init_game/", json={**REAL_DECK, "pillz": -1}).status_code == 422
+    assert client.post("/init_game/", json={**REAL_DECK, "pillz": [12, 12, 12]}).status_code == 422
+
+
 def test_init_game_with_unknown_card_is_a_client_error(client):
     deck = {**REAL_DECK, "player1": [{"card_name": "Zorglub", "nb_stars": 1}] + REAL_DECK["player1"][1:]}
 

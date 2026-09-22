@@ -10,8 +10,8 @@ Objectif à terme : une IA capable de gagner un maximum de parties (plan détail
 | Cartes jouables | **2 497** (36 clans), données scrapées d'iclintz.com le 2026-09-15, illustrations incluses |
 | Pouvoirs (abilities / bonus) | **1 386 / 1 396 descriptions gérées (99,3 %)**, 2 487 cartes sur 2 497 entièrement gérées — `python scripts/capacity_coverage.py` liste le reste |
 | Moteur | 4 niveaux d'effets (méta, stats, fin de round, persistants), bonus de clan (Oculus infiltré compris), Leaders (Team, Tie-break, Counter-attack, Limitless), conditions Courage/Revenge/Confidence/Reprisal/Symmetry/Asymmetry/Stop/Killshot/Perfect/Bet/Versus/After/Unison/Disunion/Defeat/Backlash/Victory or Defeat, Tune Out, Impose, Cards, Consume/Combust/Mindwipe/Corrosion, Xantiax, Corrupt, Fatal Killshot ; journal des effets de chaque round |
-| Tests | 556 backend (pytest) + 24 front (vitest) ; **corpus combinatoire du moteur** : 113 501 rounds (chaque capacité, chaque interaction méta, chaque condition, effets persistants, Leaders, Oculus, égalités/KO, parties aléatoires) rejoués contre des digests versionnés ; balayage de robustesse sur toutes les descriptions gérées ; 51 combats réels Urban Rivals rejoués à l'identique (`data/ur_battles/`) |
-| Interface | composition de deck (recherche, filtre par clan, decks aléatoires, statut des bonus, decks mémorisés), partie de 4 rounds contre un second joueur, historique des rounds, fin de partie, effets persistants |
+| Tests | 560 backend (pytest) + 28 front (vitest) ; **corpus combinatoire du moteur** : 113 501 rounds (chaque capacité, chaque interaction méta, chaque condition, effets persistants, Leaders, Oculus, égalités/KO, parties aléatoires) rejoués contre des digests versionnés ; balayage de robustesse sur toutes les descriptions gérées ; 51 combats réels Urban Rivals rejoués à l'identique (`data/ur_battles/`) |
+| Interface | composition de deck (recherche, filtre par clan, decks aléatoires, statut des bonus, decks mémorisés), **choix du mode** (Classic, ELO, duel, personnalisé : vies et pillz par camp, premier joueur), partie de 4 rounds à deux sur le même écran, historique des rounds, fin de partie, effets persistants |
 
 Non gérés : 9 capacités uniques sans règle publiée (Beyond, Bypass, Hazard, Illusion, Overdose, Perfection, Rebirth,
 Remove Ability Conditions, une coquille de Bugamon), soit 9 cartes. Jour/nuit est tiré au sort à la création de la
@@ -21,7 +21,7 @@ partie : les cartes à `Day:` / `Night:` et le bonus GhosTown changent de texte.
 
 ```
 UrbanPy/Backend_fastAPI/       backend FastAPI
-  main.py                      endpoints : /cards, /init_game/, /init_game/template, /process_round/{id}, /save_for_test
+  main.py                      endpoints : /cards, /init_game/ (mains + situation de départ), /init_game/template, /process_round/{id}, /save_for_test
   src/core/domain/             Game, Player, Card, Capacity, PersistentEffect
   src/core/parsing/            capacity_parser.py : texte d'ability -> Capacity (vocabulaire du moteur)
   src/core/use_cases/          process_round.py + apply_capacity_lvl_1..4.py (le moteur) + multipliers.py
@@ -34,6 +34,7 @@ UrbanPy/Backend_fastAPI/       backend FastAPI
                                capture (ur_capture.js) et import (import_ur_battles.py) de combats réels
   data/jsonData_officiel.json  les cartes (seule source de vérité)
   data/template_game_v1.json   partie d'exemple à 8 cartes
+  data/collection/             collection du compte Urban Rivals « jere'm » (voir docs/ORACLE.md)
   data/engine_digests.json     digests du corpus combinatoire (le corpus lui-même, data/engine_corpus/, se régénère et n'est pas versionné)
   data/test/                   fixtures de rejeu (voir « Tests de régression par fixtures »)
   data/ur_battles/             combats réels capturés dans le client officiel, rejoués par tests/test_ur_battles.py
@@ -61,15 +62,15 @@ npm ci
 npm run dev
 ```
 
-Ouvrir http://localhost:5173 : le second joueur joue sur le même écran, composer deux
+Ouvrir http://localhost:5173 : les deux joueurs jouent sur le même écran, composer deux
 decks de 4 cartes (recherche, filtre par clan ou « aléatoire »), puis jouer. Le bouton « Sauvegarder le dernier round
 pour les tests » enregistre le round dans `data/test/test_N/` (voir ci-dessous).
 
 ## Tests
 
 ```bash
-cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 556 tests (~70 s) ; -m "not corpus" : 528 tests en 4 s
-cd UrbanVue && npm test && npm run lint && npm run build           # 24 tests, lint, type-check + build
+cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 560 tests (~70 s) ; -m "not corpus" : 532 tests en 4 s
+cd UrbanVue && npm test && npm run lint && npm run build           # 28 tests, lint, type-check + build
 ```
 
 Les tests du moteur sont écrits **de bout en bout** : un texte d'ability (« Growth: -1 Opp Power, Min 4 ») est parsé puis

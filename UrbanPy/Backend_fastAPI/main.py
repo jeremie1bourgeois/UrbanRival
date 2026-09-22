@@ -3,7 +3,7 @@ import traceback
 from typing import Any, Dict, List
 
 from fastapi.responses import JSONResponse
-from src.schemas.game_schemas import PlayerCards, ProcessRoundInput
+from src.schemas.game_schemas import GameSetup, ProcessRoundInput
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException, Body, Request
 from src.core.services.game_service import create_game, process_round_service, init_game_from_template, save_for_test_service
@@ -73,13 +73,14 @@ def process_game_round(game_id: str, round_data: ProcessRoundInput = Body(...)):
 
 
 @app.post("/init_game/", response_model=Dict[str, Any])
-def init_game(players_cards: PlayerCards = Body(...)) -> Dict[str, Any]:
+def init_game(setup: GameSetup = Body(...)) -> Dict[str, Any]:
     """
-    Initialise une partie avec les cartes fournies pour deux joueurs.
+    Initialise une partie avec les cartes fournies pour deux joueurs, dans la situation de départ demandée
+    (vies, pillz, premier joueur — voir GameSetup).
     """
     try:
         # Créer une partie avec les données validées
-        (game, new_id) = create_game(players_cards)
+        (game, new_id) = create_game(setup)
 
         # Retourner la partie initialisée
         return {"status": "success", "game": game.to_dict(), "game_id": new_id}
