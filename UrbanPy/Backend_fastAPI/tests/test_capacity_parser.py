@@ -377,7 +377,7 @@ def test_every_official_description_parses_without_raising():
     descriptions = all_capacity_descriptions()
     results = {text: parse_capacity(text) for text in descriptions}   # ne doit pas lever
 
-    assert len(descriptions) == 1396   # instantané iclintz du 2026-09-15, clans « After » et « Infiltrated » rendus en texte le 2026-09-16
+    assert len(descriptions) == 1395   # instantané iclintz du 2026-09-15, clans « After » et « Infiltrated » rendus en texte le 2026-09-16, bonus GhosTown de Gunslinger ramené au texte de jour le 2026-09-22
     assert all(r.reason for r in results.values() if not r.supported)
     supported = sum(1 for r in results.values() if r.supported)
     assert supported >= SUPPORTED_DESCRIPTIONS_FLOOR, f"couverture en baisse : {supported} < {SUPPORTED_DESCRIPTIONS_FLOOR}"

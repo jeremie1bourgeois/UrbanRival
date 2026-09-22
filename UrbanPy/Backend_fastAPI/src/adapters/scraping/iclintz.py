@@ -4,13 +4,18 @@ Le téléchargement est dans scripts/scrape_official_cards.py.
 """
 import re
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from bs4 import BeautifulSoup, Tag
 
 BASE_URL = "https://iclintz.com"
 CLANS_INDEX_URL = f"{BASE_URL}/"   # le menu de navigation de toute page liste les clans
 CLAN_URL = f"{BASE_URL}/characters/clan.php?ID={{clan_id}}"
+
+# Bonus jour/nuit (GhosTown) : iclintz n'affiche que le texte de l'heure de la visite, jamais les deux.
+# Textes relevés le 2026-09-15 (Gunslinger visité de nuit, les 58 autres GhosTown de jour).
+NIGHT_BONUS_OF_DAY_BONUS = {"Day: Power And Damage + 1": "Night: -1 Opp Pow. And Damage, Min 1"}
+DAY_BONUS_OF_NIGHT_BONUS = {night: day for day, night in NIGHT_BONUS_OF_DAY_BONUS.items()}
 
 
 @dataclass
@@ -31,6 +36,8 @@ class ScrapedCard:
     bonus: str
     clan_image: str
     levels: List[ScrapedLevel]
+    night_ability: str = ""   # texte « Night: … » du badge lune, un seul par carte (iclintz ne le donne pas par niveau)
+    night_bonus: str = ""
 
 
 def clan_ids(index_html: str) -> List[int]:
@@ -75,6 +82,21 @@ def _int(text: str) -> int:
     return int(match.group()) if match else 0
 
 
+def _night_ability(soup: BeautifulSoup) -> str:
+    """Le pouvoir de nuit est affiché hors des cadres de carte, dans un badge à icône de lune."""
+    moon = soup.find("i", {"class": "bi-moon-stars-fill"})
+    return re.sub(r"\s+", " ", moon.parent.get_text(" ", strip=True)).strip() if moon else ""
+
+
+def _day_and_night_bonus(bonus: str) -> Tuple[str, str]:
+    """Le bonus affiché est celui du jour ou de la nuit selon l'heure de la visite : on complète l'autre."""
+    if bonus in NIGHT_BONUS_OF_DAY_BONUS:
+        return bonus, NIGHT_BONUS_OF_DAY_BONUS[bonus]
+    if bonus in DAY_BONUS_OF_NIGHT_BONUS:
+        return DAY_BONUS_OF_NIGHT_BONUS[bonus], bonus
+    return bonus, ""
+
+
 def parse_card_page(html: str, card_id: int) -> ScrapedCard:
     soup = BeautifulSoup(html, "html.parser")
     title = soup.find("title").text.split("|", 1)[-1].strip()          # "Aamir - All Stars"
@@ -105,20 +127,27 @@ def parse_card_page(html: str, card_id: int) -> ScrapedCard:
             clan_image = clan_pict.get("src", "")
 
     levels.sort(key=lambda level: level.stars)
+    bonus, night_bonus = _day_and_night_bonus(bonus)
     return ScrapedCard(id=card_id, name=name.strip(), faction=faction.strip(), star_off=star_off,
-                       bonus=bonus, clan_image=clan_image, levels=levels)
+                       bonus=bonus, clan_image=clan_image, levels=levels,
+                       night_ability=_night_ability(soup), night_bonus=night_bonus)
 
 
 def to_official_json(cards: List[ScrapedCard]) -> Dict[str, dict]:
     """
     Même forme que l'historique jsonData_officiel.json (clé = nom, niveaux sous "1".."5"), plus id,
-    clan_image et image par niveau. En cas d'homonymes, la première carte rencontrée est conservée.
+    clan_image, image par niveau, night_ability et night_bonus quand la carte en a. En cas d'homonymes, la
+    première carte rencontrée est conservée.
     """
     data: Dict[str, dict] = {}
     for card in cards:
         if card.name in data:
             continue
         entry = {"id": card.id, "faction": card.faction, "starOff": card.star_off, "bonus": card.bonus, "clan_image": card.clan_image}
+        if card.night_ability:
+            entry["night_ability"] = card.night_ability
+        if card.night_bonus:
+            entry["night_bonus"] = card.night_bonus
         for level in card.levels:
             entry[str(level.stars)] = {"power": level.power, "damage": level.damage, "ability": level.ability, "image": level.image}
         data[card.name] = entry
