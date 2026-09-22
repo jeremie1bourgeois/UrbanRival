@@ -13,7 +13,7 @@ ce document décrit **où on en est et ce qui reste**, pour reprendre le travail
 | Moteur | 4 niveaux réécrits et testés (méta, stats, fin de round, persistants) ; bonus de clan (≥ 2 du clan, Oculus infiltré sur ses clans listés, Leaders), conditions Courage / Revenge / Confidence / Reprisal / Symmetry / Asymmetry / Stop / Killshot / Perfect / Bet / Versus / After / Unison / Disunion / Defeat / Backlash / Victory or Defeat / Team ; Tune Out, Impose, Cards, Consume / Combust / Mindwipe / Corrosion, Xantiax, Corrupt, Fatal Killshot, Sinister Symmetry, Leaders Tie-break / Counter-attack / Limitless / Per Round ; `scripts/engine_crash_sweep.py` : 0 exception |
 | API | `/cards`, `/init_game/`, `/init_game/template`, `/process_round/{id}`, `/save_for_test` |
 | Front | deck builder (recherche, filtre clan, aléatoire, statut des bonus, decks mémorisés), partie à deux, historique des rounds, fin de partie, effets persistants, illustrations |
-| Tests | 535 backend (pytest) + 24 front (vitest) ; CI GitHub Actions (backend + front) ; 3 fixtures de rejeu `data/test/` + 33 combats réels `data/ur_battles/` ; **corpus combinatoire** de 113 501 rounds (2026-09-22, `src/core/engine/scenarios.py`, digests versionnés `data/engine_digests.json`) : test différentiel prêt pour le port Rust, voir README « Corpus combinatoire » |
+| Tests | 556 backend (pytest) + 24 front (vitest) ; CI GitHub Actions (backend + front) ; 3 fixtures de rejeu `data/test/` + 51 combats réels `data/ur_battles/` ; **corpus combinatoire** de 113 501 rounds (2026-09-22, `src/core/engine/scenarios.py`, digests versionnés `data/engine_digests.json`) : test différentiel prêt pour le port Rust, voir README « Corpus combinatoire » |
 | Dépôt | nettoyé (IDE, binaires, doublons), fins de ligne LF (`.gitattributes`), README |
 
 ### Décisions de règles prises sans certitude (à confirmer contre les règles officielles)
@@ -40,6 +40,8 @@ Cancel Life Modif., Reanimate, Versus) ont été **corrigées** le même jour ; 
 | Copy : copie le **texte** adverse (bonus seulement s'il est actif), ses conditions sont **réévaluées pour le copieur** — combat 1349481 ; Copy vs Copy → rien | `apply_capacity_lvl_1.apply_copies`, `process_round.drop_unmet_conditions` |
 | Fury : +2 dégâts ajoutés **après** les modificateurs de dégâts (utilisateur ; glossaire 56 : « Annul Modif Dégâts n'annule pas la Fury ») | `process_round` |
 | Toxine / Régén / Dope / Repair / Consume / Combust (Mindwipe) agissent **dès le round joué** (glossaire 51, 52 ; Repair, Combust : utilisateur) ; Poison / Heal aux rounds suivants | `apply_capacity_lvl_4.IMMEDIATE_KINDS` |
+| **Repair X, Max Y verse X vies ET X pillz**, chacune plafonnée à Y — combat réel 1211702 | `apply_capacity_lvl_4._STATS_OF_KIND` |
+| Un Annul Modif. Vie / Pillz suspend un effet persistant **attribut par attribut** (un Annul Vie contre un Repair verse les pillz, pas la vie) — combat réel 1211922 | `apply_capacity_lvl_4._suspended` |
 | « Per Pillz Left » : pillz **avant la mise**, pillz gratuite exclue (glossaire 66) | `multipliers._nb_pillz_left` |
 | Jour/nuit tiré au sort en début de partie ; de nuit les cartes prennent `night_ability` / `night_bonus` (REGLES 3.13) | `game_service.create_game`, `Card(night=)` |
 
