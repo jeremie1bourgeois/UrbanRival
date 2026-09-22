@@ -78,6 +78,14 @@ def test_init_game_with_real_cards_then_play_a_round(client):
     assert played.json()["game"]["nb_turn"] == 2
 
 
+def test_init_game_reports_the_night_draw_and_accepts_a_forced_value(client):
+    drawn = client.post("/init_game/", json=REAL_DECK).json()["game"]["night"]
+    forced = client.post("/init_game/", json={**REAL_DECK, "night": True}).json()["game"]
+
+    assert drawn in (True, False)
+    assert forced["night"] is True
+
+
 def test_init_game_with_unknown_card_is_a_client_error(client):
     deck = {**REAL_DECK, "player1": [{"card_name": "Zorglub", "nb_stars": 1}] + REAL_DECK["player1"][1:]}
 

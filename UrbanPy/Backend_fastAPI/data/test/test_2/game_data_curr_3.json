@@ -1,6 +1,7 @@
 {
     "nb_turn": 3,
     "turn": false,
+    "night": false,
     "ally": {
         "name": "ally",
         "life": 6,
@@ -381,7 +382,45 @@
             "enemy": {
                 "card_index": 2,
                 "win": false
-            }
+            },
+            "log": [
+                {
+                    "side": "ally",
+                    "card": "Amelia",
+                    "source": "stop",
+                    "text": "Amelia : bonus \u00ab -2 Opp Power, Min 1 \u00bb stopp\u00e9 par Bhudd (pouvoir \u00ab Stop Opp. Bonus \u00bb)"
+                },
+                {
+                    "side": "ally",
+                    "card": "Amelia",
+                    "source": "modificateur",
+                    "text": "Amelia : pouvoir \u00ab Power +4 \u00bb \u2192 puissance d'Amelia 3 \u2192 7"
+                },
+                {
+                    "side": "enemy",
+                    "card": "Bhudd",
+                    "source": "modificateur",
+                    "text": "Bhudd : bonus \u00ab -2 Opp Power, Min 1 \u00bb \u2192 puissance d'Amelia 7 \u2192 5"
+                },
+                {
+                    "side": "ally",
+                    "card": "Amelia",
+                    "source": "attaque",
+                    "text": "Amelia : attaque = 5 \u00d7 3 pillz = 15"
+                },
+                {
+                    "side": "enemy",
+                    "card": "Bhudd",
+                    "source": "attaque",
+                    "text": "Bhudd : attaque = 4 \u00d7 3 pillz = 12"
+                },
+                {
+                    "side": null,
+                    "card": null,
+                    "source": "round",
+                    "text": "Amelia gagne (15 > 12) : l'ennemi perd 5 vies (12 \u2192 7)"
+                }
+            ]
         },
         {
             "ally": {
@@ -391,7 +430,51 @@
             "enemy": {
                 "card_index": 0,
                 "win": true
-            }
+            },
+            "log": [
+                {
+                    "side": "ally",
+                    "card": "Allison",
+                    "source": "modificateur",
+                    "text": "Allison : pouvoir \u00ab Courage: Damage +3 \u00bb \u2192 d\u00e9g\u00e2ts d'Allison 3 \u2192 6"
+                },
+                {
+                    "side": "enemy",
+                    "card": "Asporov",
+                    "source": "modificateur",
+                    "text": "Asporov : pouvoir \u00ab Support: Damage +1 \u00bb \u2192 d\u00e9g\u00e2ts d'Asporov 3 \u2192 6"
+                },
+                {
+                    "side": "ally",
+                    "card": "Allison",
+                    "source": "modificateur",
+                    "text": "Allison : bonus \u00ab -2 Opp Power, Min 1 \u00bb \u2192 puissance d'Asporov 7 \u2192 5"
+                },
+                {
+                    "side": "enemy",
+                    "card": "Asporov",
+                    "source": "modificateur",
+                    "text": "Asporov : bonus \u00ab -2 Opp Power, Min 1 \u00bb \u2192 puissance d'Allison 5 \u2192 3"
+                },
+                {
+                    "side": "ally",
+                    "card": "Allison",
+                    "source": "attaque",
+                    "text": "Allison : attaque = 3 \u00d7 2 pillz = 6"
+                },
+                {
+                    "side": "enemy",
+                    "card": "Asporov",
+                    "source": "attaque",
+                    "text": "Asporov : attaque = 5 \u00d7 2 pillz = 10"
+                },
+                {
+                    "side": null,
+                    "card": null,
+                    "source": "round",
+                    "text": "Asporov gagne (10 > 6) : l'alli\u00e9 perd 6 vies (12 \u2192 6)"
+                }
+            ]
         }
     ]
 }

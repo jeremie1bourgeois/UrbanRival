@@ -1,6 +1,7 @@
 {
     "nb_turn": 1,
     "turn": false,
+    "night": false,
     "ally": {
         "name": "ally",
         "life": 12,

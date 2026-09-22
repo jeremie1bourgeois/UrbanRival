@@ -1,6 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel, validator
-from typing import List, Dict, Union
+from typing import List, Dict, Optional, Union
 from pydantic import Field
 
 from src.core.domain.round import Round
@@ -20,6 +20,7 @@ class CardInput(BaseModel):
 class PlayerCards(BaseModel):
 	player1: List[CardInput] = Field(..., min_items=4, max_items=4)
 	player2: List[CardInput] = Field(..., min_items=4, max_items=4)
+	night: Optional[bool] = None   # None : jour ou nuit tiré au sort à la création de la partie
 
 	@validator("player1", "player2")
 	def validate_card_list_length(cls, cards):

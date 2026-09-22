@@ -6,9 +6,11 @@ from src.core.domain.player import Player
 NB_ROUNDS = 4  # nombre de rounds d'une partie
 
 class Game:
-    def __init__(self, nb_turn: int = 0, turn: bool = True, ally: Player = None, enemy: Player = None, history: List[Round] = None):
+    def __init__(self, nb_turn: int = 0, turn: bool = True, ally: Player = None, enemy: Player = None, history: List[Round] = None,
+                 night: bool = False):
         self.nb_turn: int = nb_turn  # numéro du round en cours (1 = premier round) ; vaut NB_ROUNDS + 1 quand la partie est finie
         self.turn: bool = turn
+        self.night: bool = night   # tiré au sort à la création : les cartes portent alors leurs textes « Night: »
         self.ally: Player = ally if ally is not None else Player()
         self.enemy: Player = enemy if enemy is not None else Player()
         self.history: List[Round] = history if history is not None else []
@@ -18,6 +20,7 @@ class Game:
         game = Game()
         game.nb_turn = data.get("nb_turn", 0)
         game.turn = data.get("turn", True)
+        game.night = data.get("night", False)
         game.ally = Player.from_dict_template(data["ally"])
         game.enemy = Player.from_dict_template(data["enemy"])
         game.history = [Round(**round_data) for round_data in data.get("history", [])]
@@ -27,10 +30,11 @@ class Game:
         return {
             "nb_turn": self.nb_turn,
             "turn": self.turn,
+            "night": self.night,
             "ally": self.ally.to_dict(),
             "enemy": self.enemy.to_dict(),
             "history": [round_instance.model_dump() for round_instance in self.history],
         }
     
     def __repr__(self):
-        return f"Game(nb_turn={self.nb_turn}, turn={self.turn}, ally={self.ally}, enemy={self.enemy}, history={self.history})"
+        return f"Game(nb_turn={self.nb_turn}, turn={self.turn}, night={self.night}, ally={self.ally}, enemy={self.enemy}, history={self.history})"

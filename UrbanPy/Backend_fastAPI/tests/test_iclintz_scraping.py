@@ -97,3 +97,38 @@ def test_oculus_ability_clans_are_rendered_as_an_infiltrated_prefix():
 
     assert card.faction == "Oculus" and card.bonus == "Infiltrated"
     assert card.levels[-1].ability == "Infiltrated La Junta, Piranas, Riots, Tolvack, Ulu Watu: +1 Pillz And Life"
+
+
+def test_night_ability_is_read_from_the_moon_badge():
+    card = parse_card_page(fixture("card_215_zodiack_night.html"), card_id=215)
+
+    assert card.name == "Zodiack" and card.levels[-1].ability == "Day: Power Impose"
+    assert card.night_ability == "Night: Copy: Opp. Power"
+    assert to_official_json([card])["Zodiack"]["night_ability"] == "Night: Copy: Opp. Power"
+
+
+def test_cards_without_night_ability_have_no_night_key(aamir):
+    assert aamir.night_ability == ""
+    assert "night_ability" not in to_official_json([aamir])["Aamir"]
+
+
+def test_ghostown_bonus_scraped_at_night_is_completed_with_the_day_text():
+    card = parse_card_page(fixture("card_2547_gunslinger_ghostown_night.html"), card_id=2547)
+
+    assert card.name == "Gunslinger" and card.faction == "GhosTown"
+    assert card.bonus == "Day: Power And Damage + 1"
+    assert card.night_bonus == "Night: -1 Opp Pow. And Damage, Min 1"
+    assert to_official_json([card])["Gunslinger"]["night_bonus"] == "Night: -1 Opp Pow. And Damage, Min 1"
+
+
+def test_ghostown_bonus_scraped_by_day_is_completed_with_the_night_text():
+    html = fixture("card_2547_gunslinger_ghostown_night.html").replace(
+        "Night: -1 Opp Pow. And Damage, Min 1", "Day: Power And Damage + 1")
+    card = parse_card_page(html, card_id=2547)
+
+    assert card.bonus == "Day: Power And Damage + 1"
+    assert card.night_bonus == "Night: -1 Opp Pow. And Damage, Min 1"
+
+
+def test_cards_without_night_bonus_have_no_night_bonus_key(aamir):
+    assert aamir.night_bonus == "" and "night_bonus" not in to_official_json([aamir])["Aamir"]

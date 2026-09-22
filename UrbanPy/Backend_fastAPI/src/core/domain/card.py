@@ -10,10 +10,11 @@ FIGHT_SLOTS = ("ability_fight", "bonus_fight", "leader_fight")
 
 class Card:
 
-    def __init__(self, card_name: str, nb_stars: int = 1):
+    def __init__(self, card_name: str, nb_stars: int = 1, night: bool = False):
         """
         Initialise une carte à partir de son nom et de son nombre d'étoiles (données officielles scrapées).
         Les abilities / bonus sont parsés en Capacity ; None si absents ou non gérés par le moteur.
+        `night` : la partie se joue de nuit, la carte prend ses textes « Night: » (night_ability / night_bonus).
         """
         name, card_data = get_official_card(card_name)
         star_data = card_data.get(str(nb_stars))
@@ -32,6 +33,12 @@ class Card:
 
         self.bonus_description: str = card_data.get("bonus", "").strip()
         self.ability_description: str = star_data.get("ability", "").strip()
+        if night:
+            self.bonus_description = card_data.get("night_bonus", "").strip() or self.bonus_description
+            # Le badge de nuit d'iclintz peut survivre à une carte devenue diurne (Pulp Ld) : on ne l'applique
+            # qu'aux niveaux dont le texte de jour est bien marqué « Day: ».
+            if self.ability_description.startswith("Day:"):
+                self.ability_description = card_data.get("night_ability", "").strip() or self.ability_description
         self.bonus: Capacity = parse_capacity(self.bonus_description).capacity
         self.ability: Capacity = parse_capacity(self.ability_description).capacity
 

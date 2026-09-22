@@ -1,6 +1,7 @@
 {
     "nb_turn": 2,
     "turn": true,
+    "night": false,
     "ally": {
         "name": "ally",
         "life": 12,
@@ -381,7 +382,45 @@
             "enemy": {
                 "card_index": 2,
                 "win": false
-            }
+            },
+            "log": [
+                {
+                    "side": "ally",
+                    "card": "Amelia",
+                    "source": "stop",
+                    "text": "Amelia : bonus \u00ab -2 Opp Power, Min 1 \u00bb stopp\u00e9 par Bhudd (pouvoir \u00ab Stop Opp. Bonus \u00bb)"
+                },
+                {
+                    "side": "ally",
+                    "card": "Amelia",
+                    "source": "modificateur",
+                    "text": "Amelia : pouvoir \u00ab Power +4 \u00bb \u2192 puissance d'Amelia 3 \u2192 7"
+                },
+                {
+                    "side": "enemy",
+                    "card": "Bhudd",
+                    "source": "modificateur",
+                    "text": "Bhudd : bonus \u00ab -2 Opp Power, Min 1 \u00bb \u2192 puissance d'Amelia 7 \u2192 5"
+                },
+                {
+                    "side": "ally",
+                    "card": "Amelia",
+                    "source": "attaque",
+                    "text": "Amelia : attaque = 5 \u00d7 3 pillz = 15"
+                },
+                {
+                    "side": "enemy",
+                    "card": "Bhudd",
+                    "source": "attaque",
+                    "text": "Bhudd : attaque = 4 \u00d7 3 pillz = 12"
+                },
+                {
+                    "side": null,
+                    "card": null,
+                    "source": "round",
+                    "text": "Amelia gagne (15 > 12) : l'ennemi perd 5 vies (12 \u2192 7)"
+                }
+            ]
         }
     ]
 }

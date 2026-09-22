@@ -78,3 +78,30 @@ def test_official_data_provides_card_and_clan_images():
 
     assert card.image.startswith("https://") and card.image.endswith(".png")
     assert card.clan_image == "https://s.acdn.ur-img.com/urimages/clan/ALLSTARS_42.png"
+
+
+def test_card_takes_its_night_ability_and_bonus_when_the_game_is_at_night():
+    hollow_spyke = Card("Hollow Spyke", 4, night=True)
+
+    assert hollow_spyke.ability_description == "Night: Power +4"
+    assert hollow_spyke.bonus_description == "Night: -1 Opp Pow. And Damage, Min 1"
+    assert hollow_spyke.ability.to_dict() == Capacity("ally", ["power"], 4, -1).to_dict()
+    assert hollow_spyke.bonus.to_dict() == Capacity("enemy", ["power", "damage"], -1, 1).to_dict()
+
+
+def test_card_keeps_its_day_texts_by_default():
+    hollow_spyke = Card("Hollow Spyke", 4)
+
+    assert hollow_spyke.ability_description == "Day: -4 Opp Power, Min 4"
+    assert hollow_spyke.bonus_description == "Day: Power And Damage + 1"
+
+
+def test_night_leaves_cards_without_night_texts_untouched():
+    assert Card("Aamir", 3, night=True).ability_description == "Growth: -1 Opp Power, Min 4"
+    assert Card("Aamir", 3, night=True).bonus_description == "-2 Opp Power, Min 1"
+    assert Card("Hollow Spyke", 3, night=True).ability_description == "Ability at Level 4"   # pouvoir verrouillé
+
+
+def test_stale_night_badge_is_ignored_when_the_day_text_is_not_marked_day():
+    # Pulp Ld : iclintz garde un badge de nuit alors que le pouvoir n'a plus de préfixe « Day: » depuis 2024
+    assert Card("Pulp Ld", 3, night=True).ability_description == Card("Pulp Ld", 3).ability_description
