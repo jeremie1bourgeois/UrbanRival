@@ -48,6 +48,6 @@ describe("deck slots", () => {
 			{ card_name: "Ambre", nb_stars: 2 },
 		];
 
-		expect(toDeck(ally, enemy)).toEqual({ player1: ally, player2: enemy });
+		expect(toDeck(ally, enemy)).toMatchObject({ player1: ally, player2: enemy });
 	});
 });

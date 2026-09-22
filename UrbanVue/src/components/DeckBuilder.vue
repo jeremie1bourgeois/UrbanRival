@@ -1,9 +1,20 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { OPPONENT_LABELS, errorMessage, getCatalogue, getInitGameTemplate, initGame, type Opponent, type StartedGame } from "../api/game";
-import { DECK_SIZE, clanBonusStatus, emptySlots, filterCatalogue, isDeckComplete, randomDeck, toDeck, type DeckSlots } from "../logic/deck";
+import {
+	DECK_SIZE,
+	MODES,
+	clanBonusStatus,
+	emptySlots,
+	filterCatalogue,
+	isDeckComplete,
+	randomDeck,
+	situationError,
+	toDeck,
+	type DeckSlots,
+} from "../logic/deck";
 import { loadSavedDecks, saveDecks } from "../logic/storage";
-import type { CatalogueCard, CatalogueLevel } from "../models/game.interface";
+import type { CatalogueCard, CatalogueLevel, FirstPlayer, Situation } from "../models/game.interface";
 import type { Side } from "../logic/round";
 
 const emit = defineEmits<{ start: [StartedGame] }>();
@@ -16,6 +27,9 @@ const clanFilter = ref("");
 const side = ref<Side>("ally");
 const opponent = ref<Opponent>("heuristic");
 const slots = ref<Record<Side, DeckSlots>>(loadSavedDecks() ?? { ally: emptySlots(), enemy: emptySlots() });
+// Situation de départ : ce qui distingue un mode de jeu (vies et pillz de chaque joueur, premier joueur du round 1).
+const situation = ref<Situation>({ life: [...MODES[0].life], pillz: [...MODES[0].pillz], first: MODES[0].first });
+const FIRST_LABELS: Record<FirstPlayer, string> = { random: "Tiré au sort", player1: "Allié (toi)", player2: "Ennemi" };
 
 const byName = computed(() => new Map(catalogue.value.map((card) => [card.name, card])));
 const clans = computed(() => [...new Set(catalogue.value.map((card) => card.faction))].sort());
@@ -24,7 +38,22 @@ const results = computed(() => {
 	return query.value.trim() ? filterCatalogue(pool, query.value) : clanFilter.value ? pool.slice(0, 40) : [];
 });
 const status = computed(() => ({ ally: clanBonusStatus(slots.value.ally, byName.value), enemy: clanBonusStatus(slots.value.enemy, byName.value) }));
-const ready = computed(() => isDeckComplete(slots.value.ally) && isDeckComplete(slots.value.enemy));
+const situationProblem = computed(() => situationError(situation.value));
+const ready = computed(() => isDeckComplete(slots.value.ally) && isDeckComplete(slots.value.enemy) && !situationProblem.value);
+/** Le mode dont les valeurs sont celles saisies, ou « Personnalisé » (Survivor, Coliseum…). */
+const mode = computed({
+	get: () =>
+		MODES.find(
+			(m) =>
+				m.life.every((v, i) => v === situation.value.life[i]) &&
+				m.pillz.every((v, i) => v === situation.value.pillz[i]) &&
+				m.first === situation.value.first,
+		)?.label ?? "",
+	set: (label: string) => {
+		const preset = MODES.find((m) => m.label === label);
+		if (preset) situation.value = { life: [...preset.life], pillz: [...preset.pillz], first: preset.first };
+	},
+});
 
 watch(slots, (value) => saveDecks(value), { deep: true });
 
@@ -66,7 +95,7 @@ async function start() {
 	if (!isDeckComplete(slots.value.ally) || !isDeckComplete(slots.value.enemy)) return;
 	error.value = null;
 	try {
-		emit("start", await initGame(toDeck(slots.value.ally, slots.value.enemy), opponent.value));
+		emit("start", await initGame(toDeck(slots.value.ally, slots.value.enemy, situation.value), opponent.value));
 	} catch (err) {
 		error.value = errorMessage(err);
 	}
@@ -96,6 +125,36 @@ async function startTemplate() {
 				<button class="rounded bg-gray-700 px-3 py-2 hover:bg-gray-600" @click="startTemplate">Partie d'exemple</button>
 			</div>
 		</header>
+
+		<section class="flex flex-wrap items-end gap-4 rounded-xl border border-gray-700 bg-gray-800/50 p-4 text-sm">
+			<label class="flex flex-col gap-1">
+				Mode
+				<select v-model="mode" class="rounded bg-gray-800 px-2 py-1">
+					<option v-for="preset in MODES" :key="preset.label" :value="preset.label">{{ preset.label }}</option>
+					<option value="">Personnalisé (Survivor, Coliseum…)</option>
+				</select>
+			</label>
+			<fieldset v-for="(label, key) in { life: 'Vies', pillz: 'Pillz' }" :key="key" class="flex items-end gap-2">
+				<legend class="mb-1">{{ label }} de départ</legend>
+				<label v-for="(who, index) in ['allié', 'ennemi']" :key="who" class="flex flex-col gap-1 text-xs text-gray-400">
+					{{ who }}
+					<input
+						v-model.number="situation[key][index]"
+						type="number"
+						:min="key === 'life' ? 1 : 0"
+						max="99"
+						class="w-16 rounded bg-gray-800 px-2 py-1 text-sm text-white"
+					/>
+				</label>
+			</fieldset>
+			<label class="flex flex-col gap-1">
+				Premier joueur
+				<select v-model="situation.first" class="rounded bg-gray-800 px-2 py-1">
+					<option v-for="(label, key) in FIRST_LABELS" :key="key" :value="key">{{ label }}</option>
+				</select>
+			</label>
+			<p v-if="situationProblem" class="text-red-300">{{ situationProblem }}</p>
+		</section>
 
 		<p v-if="error" class="flex items-center justify-between gap-3 rounded border border-red-500 bg-red-900/40 p-3 text-red-200">
 			<span>{{ error }}</span>
