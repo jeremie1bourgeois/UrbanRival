@@ -49,7 +49,8 @@ Un duel = deck A (vous) contre deck B (l'ami / le second compte), 8 cartes chacu
 tout tirage de 4 convienne. Les cartes sont choisies petites (2-3★) et fréquentes ; remplacer par une équivalente
 (même pouvoir) si elle manque. Les stats sont celles du niveau max.
 
-> **Colonne Deck A mise à jour le 2026-09-19** à partir de la collection réelle (1236/2497 cartes). Chaque carte
+> **Colonne Deck A mise à jour le 2026-09-19** à partir de la collection réelle (1 234 personnages sur 2 497, voir
+> « La collection du compte » ci-dessous). Chaque carte
 > listée est possédée à un niveau où son ability est active ; les substitutions et les duels non constituables faute
 > de carte-clé sont signalés dans la cellule. La colonne Deck B reste la composition théorique d'origine.
 
@@ -140,6 +141,25 @@ puis régénérer les digests (`python scripts/build_engine_corpus.py`).
 
 Avec la collection actuelle (2026-09-19), jouables tout de suite : **D1, D2, D3, D6** ; partiels : **D7** (sans Perfect),
 **D8** (Oculus seul) ; bloqués faute de carte-clé : **D4** (aucun Combust), **D5** (pas de Fractal).
+
+### La collection du compte
+
+`UrbanPy/Backend_fastAPI/data/collection/collection_jerem.json` est la collection du compte Urban Rivals **« jere'm »**
+(celui qui joue les combats de `data/ur_battles/`), relevée le 2026-09-17 : 1 304 entrées pour 1 234 personnages
+distincts, chacun au niveau possédé. Elle a été lue **passivement dans le DOM** de la page `/collection/` (filtre
+« Seulement possédés », pagination côté client) — aucun appel à l'API du site, aucune rétro-ingénierie du client.
+
+Elle sert à composer des duels jouables : `scripts/collection_lookup.py` cherche les cartes possédées dont le pouvoir
+correspond à un motif, et signale celles dont le pouvoir n'est débloqué qu'à un niveau supérieur.
+
+```bash
+cd UrbanPy/Backend_fastAPI
+.venv/bin/python scripts/collection_lookup.py "Protection : Damage"
+.venv/bin/python scripts/collection_lookup.py "Stop Opp. Ability" --exclude GHEIST,Roots,Nightmare,Piranas
+.venv/bin/python scripts/collection_lookup.py . --clan Leader
+```
+
+Le relevé date du 2026-09-17 : le refaire après des achats ou des montées de niveau.
 
 ## 3. Exporter
 
