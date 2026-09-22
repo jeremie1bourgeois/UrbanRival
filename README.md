@@ -13,7 +13,7 @@ Objectif à terme : une IA capable de gagner un maximum de parties (plan détail
 | Tests | 429 backend (pytest) + 22 front (vitest) ; balayage de robustesse sur toutes les descriptions gérées |
 | Interface | composition de deck (recherche, filtre par clan, decks aléatoires, statut des bonus, decks mémorisés), partie de 4 rounds contre un second joueur, historique des rounds, fin de partie, effets persistants |
 
-Non gérés pour l'instant (par nombre de descriptions) : Unison (62), After (37), Tune Out (bonus Cosmohnuts), Cards (15), Mindwipe (7), Disunion (7), Perfect (7), Combust (6), Impose (5) et quelques mécaniques à 1-3 cartes. `Day:` est considéré toujours valide, `Night:` jamais.
+Non gérés pour l'instant (par nombre de descriptions) : Unison (62), After (37), Tune Out (bonus Cosmohnuts), Cards (15), Mindwipe (7), Disunion (7), Perfect (7), Combust (6), Impose (5) et quelques mécaniques à 1-3 cartes. Jour/nuit est tiré au sort à la création de la partie (les cartes à `Day:` / `Night:` et le bonus GhosTown changent de texte).
 
 ## Structure
 

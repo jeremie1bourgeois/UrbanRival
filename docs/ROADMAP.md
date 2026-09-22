@@ -9,7 +9,7 @@ ce document décrit **où on en est et ce qui reste**, pour reprendre le travail
 |---|---|
 | Données | 2 497 cartes, 36 clans, illustrations (URLs CDN), scrapées d'iclintz.com le 2026-09-15 par `scripts/scrape_official_cards.py` (cache disque, reprise possible, `--from-cache` pour regénérer sans réseau) ; les icônes de clan de « Versus », « After » et des abilities d'Oculus sont rendues en texte |
 | Parseur de capacités | 1 386 / 1 396 descriptions gérées (99,3 %) ; `scripts/capacity_coverage.py` liste les 10 restantes (capacités uniques sans règle publiée) |
-| Cartes entièrement gérées | toutes sauf les porteuses des 10 descriptions restantes (Genesis, Robert Cobb, Bugamon, Memento, Kate, Glibon Cr, Hekate, Administrator, Nemo Cr, une carte Night) |
+| Cartes entièrement gérées | toutes sauf les porteuses des 9 descriptions restantes (Genesis, Robert Cobb, Bugamon, Memento, Kate, Glibon Cr, Hekate, Administrator, Nemo Cr) |
 | Moteur | 4 niveaux réécrits et testés (méta, stats, fin de round, persistants) ; bonus de clan (≥ 2 du clan, Oculus infiltré sur ses clans listés, Leaders), conditions Courage / Revenge / Confidence / Reprisal / Symmetry / Asymmetry / Stop / Killshot / Perfect / Bet / Versus / After / Unison / Disunion / Defeat / Backlash / Victory or Defeat / Team ; Tune Out, Impose, Cards, Consume / Combust / Mindwipe / Corrosion, Xantiax, Corrupt, Fatal Killshot, Sinister Symmetry, Leaders Tie-break / Counter-attack / Limitless / Per Round ; `scripts/engine_crash_sweep.py` : 0 exception |
 | API | `/cards`, `/init_game/`, `/init_game/template`, `/process_round/{id}`, `/save_for_test` |
 | Front | deck builder (recherche, filtre clan, aléatoire, statut des bonus, decks mémorisés), partie à deux, historique des rounds, fin de partie, effets persistants, illustrations |
@@ -41,7 +41,7 @@ Cancel Life Modif., Reanimate, Versus) ont été **corrigées** le même jour ; 
 | Fury : +2 dégâts ajoutés **après** les modificateurs de dégâts (utilisateur ; glossaire 56 : « Annul Modif Dégâts n'annule pas la Fury ») | `process_round` |
 | Toxine / Régén / Dope / Repair / Consume / Combust (Mindwipe) agissent **dès le round joué** (glossaire 51, 52 ; Repair, Combust : utilisateur) ; Poison / Heal aux rounds suivants | `apply_capacity_lvl_4.IMMEDIATE_KINDS` |
 | « Per Pillz Left » : pillz **avant la mise**, pillz gratuite exclue (glossaire 66) | `multipliers._nb_pillz_left` |
-| `Day:` toujours valide, `Night:` jamais — règle réelle : jour/nuit tiré au sort en début de partie, non modélisé (textes de nuit absents des données, REGLES 3.13) | `capacity_parser._IGNORED_PREFIXES` |
+| Jour/nuit tiré au sort en début de partie ; de nuit les cartes prennent `night_ability` / `night_bonus` (REGLES 3.13) | `game_service.create_game`, `Card(night=)` |
 
 ### Ce que le moteur ne modélise pas du tout
 - Le tirage de la main : les decks sont composés carte par carte (pas de collection, pas de tirage 8 → 4).
@@ -54,7 +54,7 @@ Cancel Life Modif., Reanimate, Versus) ont été **corrigées** le même jour ; 
 
 Tout ce qui a une règle publiée est codé (voir `docs/REGLES.md` § 4). Reste, sans règle trouvée ni sur le site ni sur le
 wiki : **Beyond** (Genesis, 5e round — hors périmètre), **Perfection** (Glibon Cr), `Growth: -1 Power And Damage, Min 4`
-(Bugamon, coquille probable) et `Night:` (ignoré volontairement).
+(Bugamon, coquille probable).
 
 **Exclus définitivement du moteur et de l'IA** (décision utilisateur, 2026-09-21) : **Hazard** (Administrator),
 **Illusion** (Kate), **Bypass** (Robert Cobb), **Overdose** (Hekate), **Remove Ability Conditions** (Memento),

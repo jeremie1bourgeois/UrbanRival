@@ -243,13 +243,22 @@ Aucune source textuelle trouvée ; l'utilisateur confirme par connaissance du je
 réducteurs de dégâts (une carte 2 dégâts + fury face à « −2 Opp Damage, Min 1 » inflige 1 + 2 = 3). C'est ce que fait
 le moteur (`process_round` : « Appliquer les fury » après `lvl_2`).
 
-### 3.13 `Day:` / `Night:` — ⚠️ RÈGLE CONNUE, NON MODÉLISÉE
+### 3.13 `Day:` / `Night:` — ✅ MODÉLISÉ (2026-09-22)
 
 Règle (utilisateur, 2026-09-21) : jour ou nuit est **tiré au sort au début de la partie** ; les cartes à `Day:` /
-`Night:` ont un pouvoir différent selon la valeur tirée. Moteur : `Day:` toujours valide, `Night:` jamais (partie
-toujours de jour). **Lacune de données** : `jsonData_officiel.json` ne contient que les 55 textes `Day:` d'un pouvoir,
-aucun texte `Night:` — modéliser le tirage n'aurait de sens qu'avec les pouvoirs de nuit. À reprendre avec le tirage de
-la main et du premier joueur (aléatoire seedé à la création de la partie).
+`Night:` ont un pouvoir différent selon la valeur tirée. Moteur : `create_game` tire `Game.night` (`random.choice`,
+forçable par `night` dans le corps de `/init_game/`) ; de nuit, `Card(…, night=True)` prend `night_bonus` s'il existe et
+`night_ability` quand le texte du niveau commence par `Day:` ; le parseur ignore les deux préfixes (la carte porte déjà
+le texte du moment). Les parties sauvées sans champ `night` sont de jour.
+
+**Données** : `jsonData_officiel.json` porte le texte `Day:` par niveau dans `ability` et le texte de nuit dans
+`night_ability` au niveau carte (badge lune d'iclintz, 32 cartes) — iclintz ne donne qu'un seul texte de nuit par
+carte, même quand le pouvoir de jour change selon le niveau (Judge Lynch, Donna Luna) : de nuit ce texte vaut pour tous
+les niveaux marqués `Day:`. Pulp Ld garde un `night_ability` alors que son pouvoir n'a plus de préfixe `Day:` depuis
+2024 (badge iclintz périmé) : ignoré. Le bonus GhosTown est lui aussi jour/nuit : iclintz n'affiche que le texte de
+l'heure de la visite, le scraper complète l'autre (table dans `iclintz.py`) → `bonus` = « Day: Power And Damage + 1 »,
+`night_bonus` = « Night: -1 Opp Pow. And Damage, Min 1 » sur les 59 GhosTown.
+À reprendre avec le tirage de la main et du premier joueur (aléatoire seedé à la création de la partie).
 
 ### Synthèse
 
@@ -265,7 +274,7 @@ la main et du premier joueur (aléatoire seedé à la création de la partie).
 | 3.7 | Team | ✅ confirmé (Cancel Leader, immunité SoA, Leader inclus, doublons de Leader) | — |
 | 3.12 | Fury après les réducteurs | ✅ confirmé (utilisateur) | — |
 | 3.2 | Protection cyclique | ✅ confirmé (utilisateur) : les Stops gagnent | — |
-| 3.13 | Day/Night | règle connue (tirage en début de partie), non modélisée : textes de nuit absents des données | données |
+| 3.13 | Day/Night | ✅ tirage en début de partie, textes de nuit par carte | — |
 
 ## 4. Mécaniques non gérées : définitions retrouvées
 
@@ -355,7 +364,7 @@ Verdicts sur les points encore ouverts ou déjà codés :
 | 68 Killshot, 173 Versus (main adverse), 174 Symétrie, 175 Infiltration (carte seule, clans spécifiques) | ✅ conformes aux corrections du matin | | ✅ |
 | 50 Poison / Soin | le second remplace le premier ; Poison et Soin coexistent | ✅ | ✅ |
 | 61 Courage / Riposte, 62 Confiance / Revanche | ✅ | | ✅ |
-| 70 Jour / Nuit | cycle de 4 h dans le jeu | non modélisé (Day toujours vrai) | choix utilisateur |
+| 70 Jour / Nuit | cycle de 4 h dans le jeu | tiré au sort en début de partie (3.13) | ✅ |
 
 Limitless : exclu du moteur et de l'IA (utilisateur, 2026-09-21). (Cycles de Stops/Protections, Leader et son Team, Tune Out et fury, Repair,
 Mindwipe : tranchés par l'utilisateur, voir § 5.)

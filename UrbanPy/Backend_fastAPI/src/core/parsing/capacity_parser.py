@@ -29,7 +29,7 @@ _WORD_SYNONYMS = {
     "mod": "modif",
     "prot": "protection", "protec": "protection", "protect": "protection",
     "canc": "cancel", "rec": "recover", "recov": "recover",
-    "conf": "confidence", "vict": "victory", "def": "defeat",
+    "conf": "confidence", "confid": "confidence", "vict": "victory", "def": "defeat",
     "rev": "revenge", "repris": "reprisal", "asy": "asymmetry", "asym": "asymmetry", "asymm": "asymmetry",
     "brwl": "brawl",
 }
@@ -77,8 +77,8 @@ _CONDITION_PREFIXES = {
     "disunion": "disunion",   # au moins une carte d'un autre clan dans la main
 }
 _MULTIPLIER_PREFIXES = ("support", "growth", "degrowth", "equalizer", "brawl")
-_IGNORED_PREFIXES = ("day",)   # cycle jour/nuit non modélisé : Day toujours valide, donc Night jamais
-_UNSUPPORTED_PREFIXES = ("versus", "after", "infiltrated", "night")   # sans clan : données anciennes
+_IGNORED_PREFIXES = ("day", "night")   # la carte porte déjà le texte du moment tiré en début de partie (Card, night=)
+_UNSUPPORTED_PREFIXES = ("versus", "after", "infiltrated")   # sans clan : données anciennes
 _R_BET = re.compile(r"^bet ([<>]) (\d+) pillz$")   # « Bet > 4 pillz » : pillz misées ce round
 _CORE_STARTERS = ("copy", "protection", "reanimate")   # mots qui ouvrent un cœur contenant ':'
 
@@ -104,7 +104,7 @@ _PER_MULTIPLIERS = {
 _R_STAT_PLUS = re.compile(r"^(?:(opp) )?(power and damage|power|damage|attack) \+(\d+)(?: max (\d+))?$")
 _R_PLUS = re.compile(rf"^\+(\d+) (?:(opp|players) )?({_STAT})(?: per (.+?))?(?: max (\d+))?$")
 _R_MINUS_OPP = re.compile(rf"^-(\d+) opp ({_STAT})(?: per (.+?))? min (\d+)$")
-_R_MINUS_SELF = re.compile(r"^-(\d+) (?:(players) )?(life|pillz) min (\d+)$")
+_R_MINUS_SELF = re.compile(r"^-(\d+) (?:(players) )?(life and pillz|pillz and life|life|pillz) min (\d+)$")
 
 _R_STOP = re.compile(r"^stop (?:opp )?(ability|bonus)$")
 _R_COPY = re.compile(r"^copy (?:opp )?(ability|bonus|power and damage|power|damage)(?: opp)?$")
@@ -263,7 +263,7 @@ def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacit
     if match:
         value, players, stat, borne = match.groups()
         how, error = _resolve_how(prefix_hows, None)
-        return error or _capacity("both" if players else "ally", [stat], -int(value), how, int(borne), conditions)
+        return error or _capacity("both" if players else "ally", _types(stat), -int(value), how, int(borne), conditions)
 
     return _unsupported("unknown core")
 

@@ -1,4 +1,5 @@
 import os
+import random
 from src.core.use_cases.process_round import check_round_correct, process_round
 from src.core.domain.player import Player
 from src.schemas.game_schemas import GameResult, PlayerCards, ProcessRoundInput
@@ -72,16 +73,17 @@ def create_game(players_cards: PlayerCards):
     Returns:
         (Game, int): la partie initialisée (round 1 en cours) et son identifiant.
     """
-    game = Game(1, True, Player(name="ally", life=12, pillz=12), Player(name="enemy", life=12, pillz=12), [])
+    night = random.choice((False, True)) if players_cards.night is None else players_cards.night
+    game = Game(1, True, Player(name="ally", life=12, pillz=12), Player(name="enemy", life=12, pillz=12), [], night=night)
 
     # Ajouter les cartes à player1
     for card_input in players_cards.player1:
-        card = Card(card_name=card_input.card_name, nb_stars=card_input.nb_stars)
+        card = Card(card_name=card_input.card_name, nb_stars=card_input.nb_stars, night=night)
         game.ally.cards.append(card)
 
     # Ajouter les cartes à player2
     for card_input in players_cards.player2:
-        card = Card(card_name=card_input.card_name, nb_stars=card_input.nb_stars)
+        card = Card(card_name=card_input.card_name, nb_stars=card_input.nb_stars, night=night)
         game.enemy.cards.append(card)
 
     new_id = get_new_game_id()

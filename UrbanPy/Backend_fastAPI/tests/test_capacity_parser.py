@@ -109,6 +109,16 @@ def test_minus_self_life_backlash():
     assert parsed("Backlash: - 2 Life Min 0") == cap("ally", ["life"], -2, borne=0, conditions=["backlash"])
 
 
+def test_minus_self_life_and_pillz_is_a_composite():
+    # Crook Cr de nuit
+    assert parsed("Night: Vict. Or Def.: -1 Life & Pillz, Min 0") == cap("ally", ["pillz", "life"], -1, borne=0, conditions=["victory_defeat"])
+
+
+def test_confid_abbreviation_means_confidence():
+    # Schwarz de nuit
+    assert parsed("Night: Confid.: -2 Opp Pow. & Damage, Min 3") == cap("enemy", ["power", "damage"], -2, borne=3, conditions=["confidence"])
+
+
 def test_minus_players_pillz_targets_both():
     assert parsed("-1 Players Pillz. Min 2") == cap("both", ["pillz"], -1, borne=2)
 
@@ -138,10 +148,12 @@ def test_two_conditions_combine():
     assert parsed("Conf.: Vict. Or Def.: -3 Opp. Life, Min 2") == cap("enemy", ["life"], -3, borne=2, conditions=["confidence", "victory_defeat"])
 
 
-def test_day_prefix_is_ignored_for_now():
-    # Simplification assumée : le cycle jour/nuit n'est pas modélisé, « Day: » est toujours valide.
+def test_day_and_night_prefixes_are_ignored():
+    # Jour ou nuit est tiré en début de partie et la carte porte déjà le texte du moment tiré : le préfixe est inerte.
     assert parsed("Day: Power +2") == cap("ally", ["power"], 2)
     assert parsed("Day: Courage: Attack +3") == cap("ally", ["attack"], 3, conditions=["courage"])
+    assert parsed("Night: Power +2") == cap("ally", ["power"], 2)
+    assert parsed("Night: Reprisal: -2 Opp Damage, Min 0") == cap("enemy", ["damage"], -2, borne=0, conditions=["reprisal"])
 
 
 @pytest.mark.parametrize("text, expected", [
@@ -431,12 +443,6 @@ def test_team_prefix_is_a_leader_condition():
 ])
 def test_abbreviations_repair_and_bet(text, expected):
     assert parsed(text) == expected
-
-
-def test_night_prefix_is_inert_since_day_is_always_valid():
-    result = parse_capacity("Night: Power +2")
-
-    assert (result.supported, result.reason) == (False, "unsupported prefix: night")
 
 
 @pytest.mark.parametrize("text, keyword", [
