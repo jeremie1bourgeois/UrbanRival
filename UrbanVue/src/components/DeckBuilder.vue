@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
-import { OPPONENT_LABELS, errorMessage, getCatalogue, getInitGameTemplate, initGame, type Opponent, type StartedGame } from "../api/game";
+import { errorMessage, getCatalogue, getInitGameTemplate, initGame, type StartedGame } from "../api/game";
 import {
 	DECK_SIZE,
 	MODES,
@@ -25,7 +25,6 @@ const error = ref<string | null>(null);
 const query = ref("");
 const clanFilter = ref("");
 const side = ref<Side>("ally");
-const opponent = ref<Opponent>("heuristic");
 const slots = ref<Record<Side, DeckSlots>>(loadSavedDecks() ?? { ally: emptySlots(), enemy: emptySlots() });
 // Situation de départ : ce qui distingue un mode de jeu (vies et pillz de chaque joueur, premier joueur du round 1).
 const situation = ref<Situation>({ life: [...MODES[0].life], pillz: [...MODES[0].pillz], first: MODES[0].first });
@@ -95,7 +94,7 @@ async function start() {
 	if (!isDeckComplete(slots.value.ally) || !isDeckComplete(slots.value.enemy)) return;
 	error.value = null;
 	try {
-		emit("start", await initGame(toDeck(slots.value.ally, slots.value.enemy, situation.value), opponent.value));
+		emit("start", await initGame(toDeck(slots.value.ally, slots.value.enemy, situation.value)));
 	} catch (err) {
 		error.value = errorMessage(err);
 	}
@@ -104,7 +103,7 @@ async function start() {
 async function startTemplate() {
 	error.value = null;
 	try {
-		emit("start", await getInitGameTemplate(opponent.value));
+		emit("start", await getInitGameTemplate());
 	} catch (err) {
 		error.value = errorMessage(err);
 	}
@@ -116,12 +115,7 @@ async function startTemplate() {
 		<header class="flex flex-wrap items-center justify-between gap-3">
 			<h1 class="text-2xl font-bold text-yellow-400">Composer les decks</h1>
 			<div class="flex flex-wrap items-center gap-3 text-sm">
-				<label class="flex items-center gap-2">
-					Adversaire
-					<select v-model="opponent" class="rounded bg-gray-800 px-2 py-1">
-						<option v-for="(label, key) in OPPONENT_LABELS" :key="key" :value="key">{{ label }}</option>
-					</select>
-				</label>
+				<span class="text-gray-400">Deux joueurs sur le même écran</span>
 				<button class="rounded bg-gray-700 px-3 py-2 hover:bg-gray-600" @click="startTemplate">Partie d'exemple</button>
 			</div>
 		</header>
@@ -171,7 +165,7 @@ async function startTemplate() {
 				:class="side === which ? 'border-yellow-400 bg-gray-800' : 'border-gray-700 bg-gray-800/50'"
 			>
 				<div class="mb-3 flex flex-wrap items-center justify-between gap-2">
-					<h2 class="font-bold">{{ which === "ally" ? "Allié (toi)" : opponent === "human" ? "Ennemi" : "Ennemi (ordinateur)" }}</h2>
+					<h2 class="font-bold">{{ which === "ally" ? "Allié (toi)" : "Ennemi" }}</h2>
 					<div class="flex gap-1 text-xs">
 						<button class="rounded px-2 py-1" :class="side === which ? 'bg-yellow-500 text-black' : 'bg-gray-700'" @click="side = which">
 							{{ side === which ? "sélection en cours" : "remplir" }}

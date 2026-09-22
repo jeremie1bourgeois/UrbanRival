@@ -12,7 +12,7 @@ ce document décrit **où on en est et ce qui reste**, pour reprendre le travail
 | Cartes entièrement gérées | toutes sauf les porteuses des 9 descriptions restantes (Genesis, Robert Cobb, Bugamon, Memento, Kate, Glibon Cr, Hekate, Administrator, Nemo Cr) |
 | Moteur | 4 niveaux réécrits et testés (méta, stats, fin de round, persistants) ; bonus de clan (≥ 2 du clan, Oculus infiltré sur ses clans listés, Leaders), conditions Courage / Revenge / Confidence / Reprisal / Symmetry / Asymmetry / Stop / Killshot / Perfect / Bet / Versus / After / Unison / Disunion / Defeat / Backlash / Victory or Defeat / Team ; Tune Out, Impose, Cards, Consume / Combust / Mindwipe / Corrosion, Xantiax, Corrupt, Fatal Killshot, Sinister Symmetry, Leaders Tie-break / Counter-attack / Limitless / Per Round ; `scripts/engine_crash_sweep.py` : 0 exception |
 | API | `/cards`, `/init_game/` (mains + situation de départ : vies, pillz, premier joueur), `/init_game/template`, `/process_round/{id}`, `/save_for_test` |
-| Front | deck builder (recherche, filtre clan, aléatoire, statut des bonus, decks mémorisés), partie à deux, historique des rounds, fin de partie, effets persistants, illustrations |
+| Front | deck builder (recherche, filtre clan, aléatoire, statut des bonus, decks mémorisés, choix du mode et de la situation de départ), partie à deux sur le même écran, historique des rounds, fin de partie, effets persistants, illustrations |
 | Tests | 560 backend (pytest) + 28 front (vitest) ; CI GitHub Actions (backend + front) ; 3 fixtures de rejeu `data/test/` + 51 combats réels `data/ur_battles/` ; **corpus combinatoire** de 113 501 rounds (2026-09-22, `src/core/engine/scenarios.py`, digests versionnés `data/engine_digests.json`) : test différentiel prêt pour le port Rust, voir README « Corpus combinatoire » |
 | Dépôt | nettoyé (IDE, binaires, doublons), fins de ligne LF (`.gitattributes`), README |
 
@@ -90,9 +90,8 @@ compte les exemplaires comme Support ; Cancel Opp. Life Modif. saute le tic imm�
 - ~~Historique : afficher les effets appliqués~~ → fait (D2).
 - Montrer au second joueur la carte jouée par le premier (règle UR : la carte est visible, pas les pillz) — aujourd'hui rien n'est révélé avant la résolution.
 - ~~Tirer un premier joueur aléatoire / laisser choisir~~ → fait (2026-09-22, panneau « Mode » du deck builder).
-- **Le sélecteur d'adversaire (« Ordinateur — aléatoire / heuristique ») appelle `POST /ai_pick/`, supprimé du backend
-  avec le code d'IA le 2026-09-18 (`2b5cfba`) : une partie contre l'ordinateur échoue en 404.** À retirer du front, ou
-  à rétablir quand l'IA reviendra.
+- ~~Le sélecteur d'adversaire appelle `POST /ai_pick/`, supprimé du backend~~ → retiré du front le 2026-09-22 : la
+  partie se joue à deux sur le même écran. À rétablir (sélecteur, appel, pilotage automatique) quand l'IA reviendra.
 
 ### D. Backend — préparer l'IA (recommandé en premier)
 | # | Tâche | Détail |

@@ -11,7 +11,7 @@ Objectif à terme : une IA capable de gagner un maximum de parties (plan détail
 | Pouvoirs (abilities / bonus) | **1 386 / 1 396 descriptions gérées (99,3 %)**, 2 487 cartes sur 2 497 entièrement gérées — `python scripts/capacity_coverage.py` liste le reste |
 | Moteur | 4 niveaux d'effets (méta, stats, fin de round, persistants), bonus de clan (Oculus infiltré compris), Leaders (Team, Tie-break, Counter-attack, Limitless), conditions Courage/Revenge/Confidence/Reprisal/Symmetry/Asymmetry/Stop/Killshot/Perfect/Bet/Versus/After/Unison/Disunion/Defeat/Backlash/Victory or Defeat, Tune Out, Impose, Cards, Consume/Combust/Mindwipe/Corrosion, Xantiax, Corrupt, Fatal Killshot ; journal des effets de chaque round |
 | Tests | 560 backend (pytest) + 28 front (vitest) ; **corpus combinatoire du moteur** : 113 501 rounds (chaque capacité, chaque interaction méta, chaque condition, effets persistants, Leaders, Oculus, égalités/KO, parties aléatoires) rejoués contre des digests versionnés ; balayage de robustesse sur toutes les descriptions gérées ; 51 combats réels Urban Rivals rejoués à l'identique (`data/ur_battles/`) |
-| Interface | composition de deck (recherche, filtre par clan, decks aléatoires, statut des bonus, decks mémorisés), **choix du mode** (Classic, ELO, duel, personnalisé : vies et pillz par camp, premier joueur), partie de 4 rounds contre un second joueur, historique des rounds, fin de partie, effets persistants |
+| Interface | composition de deck (recherche, filtre par clan, decks aléatoires, statut des bonus, decks mémorisés), **choix du mode** (Classic, ELO, duel, personnalisé : vies et pillz par camp, premier joueur), partie de 4 rounds à deux sur le même écran, historique des rounds, fin de partie, effets persistants |
 
 Non gérés : 9 capacités uniques sans règle publiée (Beyond, Bypass, Hazard, Illusion, Overdose, Perfection, Rebirth,
 Remove Ability Conditions, une coquille de Bugamon), soit 9 cartes. Jour/nuit est tiré au sort à la création de la
@@ -62,7 +62,7 @@ npm ci
 npm run dev
 ```
 
-Ouvrir http://localhost:5173 : le second joueur joue sur le même écran, composer deux
+Ouvrir http://localhost:5173 : les deux joueurs jouent sur le même écran, composer deux
 decks de 4 cartes (recherche, filtre par clan ou « aléatoire »), puis jouer. Le bouton « Sauvegarder le dernier round
 pour les tests » enregistre le round dans `data/test/test_N/` (voir ci-dessous).
 

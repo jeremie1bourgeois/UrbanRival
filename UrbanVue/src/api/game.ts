@@ -6,24 +6,9 @@ const apiClient = axios.create({
 	headers: { "Content-Type": "application/json" },
 });
 
-export type Opponent = "human" | "random" | "heuristic";
-
-export const OPPONENT_LABELS: Record<Opponent, string> = {
-	human: "Deux joueurs (même écran)",
-	random: "Ordinateur — aléatoire",
-	heuristic: "Ordinateur — heuristique",
-};
-
 export interface StartedGame {
 	game: Game;
 	gameId: string;
-	opponent: Opponent;
-}
-
-export interface AiPick {
-	card_index: number;
-	pillz: number;
-	fury: boolean;
 }
 
 export async function getCatalogue(): Promise<CatalogueCard[]> {
@@ -31,20 +16,14 @@ export async function getCatalogue(): Promise<CatalogueCard[]> {
 	return response.data;
 }
 
-export async function getInitGameTemplate(opponent: Opponent = "human"): Promise<StartedGame> {
+export async function getInitGameTemplate(): Promise<StartedGame> {
 	const response = await apiClient.get("/init_game/template");
-	return { game: new Game(response.data.game), gameId: String(response.data.game_id), opponent };
+	return { game: new Game(response.data.game), gameId: String(response.data.game_id) };
 }
 
-export async function initGame(deck: Deck, opponent: Opponent = "human"): Promise<StartedGame> {
+export async function initGame(deck: Deck): Promise<StartedGame> {
 	const response = await apiClient.post("/init_game/", deck);
-	return { game: new Game(response.data.game), gameId: String(response.data.game_id), opponent };
-}
-
-/** Choix de l'ordinateur pour le camp ennemi, sans jouer le round. */
-export async function aiPick(gameId: string, strategy: Exclude<Opponent, "human">): Promise<AiPick> {
-	const response = await apiClient.post<AiPick>(`/ai_pick/${gameId}`, { strategy, side: "enemy" });
-	return response.data;
+	return { game: new Game(response.data.game), gameId: String(response.data.game_id) };
 }
 
 export async function processGameRound(gameId: string, roundData: RoundData): Promise<{ game: Game; state: GameState }> {
