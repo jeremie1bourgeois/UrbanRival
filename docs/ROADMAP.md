@@ -11,9 +11,9 @@ ce document décrit **où on en est et ce qui reste**, pour reprendre le travail
 | Parseur de capacités | 1 386 / 1 396 descriptions gérées (99,3 %) ; `scripts/capacity_coverage.py` liste les 10 restantes (capacités uniques sans règle publiée) |
 | Cartes entièrement gérées | toutes sauf les porteuses des 9 descriptions restantes (Genesis, Robert Cobb, Bugamon, Memento, Kate, Glibon Cr, Hekate, Administrator, Nemo Cr) |
 | Moteur | 4 niveaux réécrits et testés (méta, stats, fin de round, persistants) ; bonus de clan (≥ 2 du clan, Oculus infiltré sur ses clans listés, Leaders), conditions Courage / Revenge / Confidence / Reprisal / Symmetry / Asymmetry / Stop / Killshot / Perfect / Bet / Versus / After / Unison / Disunion / Defeat / Backlash / Victory or Defeat / Team ; Tune Out, Impose, Cards, Consume / Combust / Mindwipe / Corrosion, Xantiax, Corrupt, Fatal Killshot, Sinister Symmetry, Leaders Tie-break / Counter-attack / Limitless / Per Round ; `scripts/engine_crash_sweep.py` : 0 exception |
-| API | `/cards`, `/init_game/`, `/init_game/template`, `/process_round/{id}`, `/save_for_test` |
+| API | `/cards`, `/init_game/` (mains + situation de départ : vies, pillz, premier joueur), `/init_game/template`, `/process_round/{id}`, `/save_for_test` |
 | Front | deck builder (recherche, filtre clan, aléatoire, statut des bonus, decks mémorisés), partie à deux, historique des rounds, fin de partie, effets persistants, illustrations |
-| Tests | 556 backend (pytest) + 24 front (vitest) ; CI GitHub Actions (backend + front) ; 3 fixtures de rejeu `data/test/` + 51 combats réels `data/ur_battles/` ; **corpus combinatoire** de 113 501 rounds (2026-09-22, `src/core/engine/scenarios.py`, digests versionnés `data/engine_digests.json`) : test différentiel prêt pour le port Rust, voir README « Corpus combinatoire » |
+| Tests | 560 backend (pytest) + 28 front (vitest) ; CI GitHub Actions (backend + front) ; 3 fixtures de rejeu `data/test/` + 51 combats réels `data/ur_battles/` ; **corpus combinatoire** de 113 501 rounds (2026-09-22, `src/core/engine/scenarios.py`, digests versionnés `data/engine_digests.json`) : test différentiel prêt pour le port Rust, voir README « Corpus combinatoire » |
 | Dépôt | nettoyé (IDE, binaires, doublons), fins de ligne LF (`.gitattributes`), README |
 
 ### Décisions de règles prises sans certitude (à confirmer contre les règles officielles)
@@ -46,8 +46,10 @@ Cancel Life Modif., Reanimate, Versus) ont été **corrigées** le même jour ; 
 | Jour/nuit tiré au sort en début de partie ; de nuit les cartes prennent `night_ability` / `night_bonus` (REGLES 3.13) | `game_service.create_game`, `Card(night=)` |
 
 ### Ce que le moteur ne modélise pas du tout
-- Le tirage de la main : les decks sont composés carte par carte (pas de collection, pas de tirage 8 → 4).
-- Le premier joueur d'une partie est toujours l'allié (`turn = True` dans `create_game`) ; dans le jeu il est tiré au sort (utilisateur, 2026-09-21), comme jour/nuit.
+- Le tirage de la main : les decks sont composés carte par carte (pas de tirage 8 → 4). La collection du compte
+  « jere'm » est relevée (`data/collection/`) mais sert seulement à composer des duels d'oracle.
+- Les scores de tournoi / Deathmatch et les modificateurs Coliseum : un mode se réduit à sa situation de départ
+  (vies, pillz, premier joueur), réglable depuis le 2026-09-22 dans `/init_game/` et le deck builder.
 - Les pouvoirs ci-dessous (§ 2.A).
 
 ## 2. Travail restant
@@ -87,7 +89,10 @@ compte les exemplaires comme Support ; Cancel Opp. Life Modif. saute le tic imm�
 - Tests de composants (aucun : seuls la logique pure et le modèle sont testés) ; éventuellement des tests de bout en bout (Playwright).
 - ~~Historique : afficher les effets appliqués~~ → fait (D2).
 - Montrer au second joueur la carte jouée par le premier (règle UR : la carte est visible, pas les pillz) — aujourd'hui rien n'est révélé avant la résolution.
-- Tirer un premier joueur aléatoire / laisser choisir.
+- ~~Tirer un premier joueur aléatoire / laisser choisir~~ → fait (2026-09-22, panneau « Mode » du deck builder).
+- **Le sélecteur d'adversaire (« Ordinateur — aléatoire / heuristique ») appelle `POST /ai_pick/`, supprimé du backend
+  avec le code d'IA le 2026-09-18 (`2b5cfba`) : une partie contre l'ordinateur échoue en 404.** À retirer du front, ou
+  à rétablir quand l'IA reviendra.
 
 ### D. Backend — préparer l'IA (recommandé en premier)
 | # | Tâche | Détail |
