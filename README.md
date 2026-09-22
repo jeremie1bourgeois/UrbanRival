@@ -8,12 +8,14 @@ Objectif à terme : une IA capable de gagner un maximum de parties (plan détail
 | | |
 |---|---|
 | Cartes jouables | **2 497** (36 clans), données scrapées d'iclintz.com le 2026-09-15, illustrations incluses |
-| Pouvoirs (abilities / bonus) | **1 132 / 1 310 descriptions gérées (86 %)**, 2 340 cartes sur 2 497 entièrement gérées — `python scripts/capacity_coverage.py` liste le reste |
-| Moteur | 4 niveaux d'effets (méta, stats, fin de round, persistants), bonus de clan, Leaders, conditions Courage/Revenge/Confidence/Reprisal/Symmetry/Asymmetry/Stop/Killshot/Bet/Versus/Defeat/Backlash/Victory or Defeat |
-| Tests | 429 backend (pytest) + 22 front (vitest) ; balayage de robustesse sur toutes les descriptions gérées |
+| Pouvoirs (abilities / bonus) | **1 386 / 1 396 descriptions gérées (99,3 %)**, 2 487 cartes sur 2 497 entièrement gérées — `python scripts/capacity_coverage.py` liste le reste |
+| Moteur | 4 niveaux d'effets (méta, stats, fin de round, persistants), bonus de clan (Oculus infiltré compris), Leaders (Team, Tie-break, Counter-attack, Limitless), conditions Courage/Revenge/Confidence/Reprisal/Symmetry/Asymmetry/Stop/Killshot/Perfect/Bet/Versus/After/Unison/Disunion/Defeat/Backlash/Victory or Defeat, Tune Out, Impose, Cards, Consume/Combust/Mindwipe/Corrosion, Xantiax, Corrupt, Fatal Killshot ; journal des effets de chaque round |
+| Tests | 509 backend (pytest) + 24 front (vitest) ; balayage de robustesse sur toutes les descriptions gérées ; 33 combats réels Urban Rivals rejoués à l'identique (`data/ur_battles/`) |
 | Interface | composition de deck (recherche, filtre par clan, decks aléatoires, statut des bonus, decks mémorisés), partie de 4 rounds contre un second joueur, historique des rounds, fin de partie, effets persistants |
 
-Non gérés pour l'instant (par nombre de descriptions) : Unison (62), After (37), Tune Out (bonus Cosmohnuts), Cards (15), Mindwipe (7), Disunion (7), Perfect (7), Combust (6), Impose (5) et quelques mécaniques à 1-3 cartes. Jour/nuit est tiré au sort à la création de la partie (les cartes à `Day:` / `Night:` et le bonus GhosTown changent de texte).
+Non gérés : 9 capacités uniques sans règle publiée (Beyond, Bypass, Hazard, Illusion, Overdose, Perfection, Rebirth,
+Remove Ability Conditions, une coquille de Bugamon), soit 9 cartes. Jour/nuit est tiré au sort à la création de la
+partie : les cartes à `Day:` / `Night:` et le bonus GhosTown changent de texte.
 
 ## Structure
 
@@ -24,12 +26,16 @@ UrbanPy/Backend_fastAPI/       backend FastAPI
   src/core/parsing/            capacity_parser.py : texte d'ability -> Capacity (vocabulaire du moteur)
   src/core/use_cases/          process_round.py + apply_capacity_lvl_1..4.py (le moteur) + multipliers.py
   src/core/services/           game_service.py : parties persistées en JSON (data/game/, ignoré par git)
+  src/core/engine/             contrat du moteur pur (état compact, cartes compilées), API de référence step / legal_actions / terminal,
+                               mains aléatoires réalistes, corpus de non-régression pour un moteur compilé
   src/adapters/repositories/   accès aux données officielles, sauvegarde des parties
   src/adapters/scraping/       extracteur HTML iclintz (pur, testé)
-  scripts/                     scraper, rapport de couverture, balayage de robustesse, fixtures d'exemple
+  scripts/                     scraper, rapport de couverture, balayage de robustesse, fixtures d'exemple, corpus du moteur,
+                               capture (ur_capture.js) et import (import_ur_battles.py) de combats réels
   data/jsonData_officiel.json  les cartes (seule source de vérité)
   data/template_game_v1.json   partie d'exemple à 8 cartes
   data/test/                   fixtures de rejeu (voir « Tests de régression par fixtures »)
+  data/ur_battles/             combats réels capturés dans le client officiel, rejoués par tests/test_ur_battles.py
   tests/
 UrbanVue/                      front Vue 3 + TypeScript + Tailwind (Vite)
 UrbanPy/script/                pipeline historique d'extraction des patterns de capacités (all_capacities_v*.json)
@@ -61,7 +67,7 @@ pour les tests » enregistre le round dans `data/test/test_N/` (voir ci-dessous)
 ## Tests
 
 ```bash
-cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 429 tests
+cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 453 tests
 cd UrbanVue && npm test && npm run lint && npm run build           # 22 tests, lint, type-check + build
 ```
 
@@ -75,6 +81,13 @@ rejoue le coup et exige l'état exact. Pour en ajouter : jouer un round dans l'i
 cliquer « Sauvegarder … pour les tests », commiter le dossier créé. `scripts/regenerate_example_fixtures.py` régénère les
 trois fixtures d'exemple quand le format de partie change.
 
+### Combats réels (oracle)
+
+`data/ur_battles/*.json` sont des combats joués dans le client officiel d'Urban Rivals et capturés avec
+`scripts/ur_capture.js`. `tests/test_ur_battles.py` rejoue chaque round avec les mêmes choix et exige les valeurs
+officielles (puissance, dégâts, attaque, vainqueur, vies, pillz) : c'est l'oracle qui tranche les règles incertaines.
+Procédure de capture et d'import : [docs/ORACLE.md](docs/ORACLE.md).
+
 ## Scripts utiles
 
 ```bash
@@ -87,22 +100,24 @@ cd UrbanPy/Backend_fastAPI
 ## Règles du moteur
 
 Un round : conditions de début de round → niveau 1 (Stop / Protection / Copy / Cancel / Exchange, résolus simultanément)
-→ niveau 2 (Power / Damage / Attack) → attaques (puissance × pillz, fury +2 dégâts pour 3 pillz) → Killshot → combat
+→ niveau 2 (Power / Damage / Attack) → attaques (puissance × pillz, fury +2 dégâts pour 3 pillz ; sous Tune Out,
+puissance 1 et attaque = pillz misées) → Killshot → combat
 (égalité : moins d'étoiles gagne, puis le joueur qui joue en premier) → KO et Reanimate → niveau 3 (Life / Pillz de fin
 de round) → niveau 4 (Poison / Toxin / Heal / Regen / Dope / Repair, qui agissent à la fin des rounds suivants).
 
 Le bonus de clan n'est actif qu'avec au moins deux cartes du clan en main ; l'ability « Team: » d'un Leader s'applique à
 chaque carte jouée s'il est le seul Leader en main.
 
-Deux règles ont été tranchées sans certitude et sont isolées dans le code avec un test : « Stop Opp. Ability » contre
-« Stop Opp. Bonus » (les deux s'appliquent) et « Cancel Opp. Life Modif. » (ne touche pas au poison).
+Les décisions de règles prises sans source, leur vérification contre le glossaire officiel et les points encore
+ouverts sont consignés dans [docs/REGLES.md](docs/REGLES.md) ; les combats réels (`docs/ORACLE.md`) les tranchent.
 
 ## Feuille de route
 
 État des lieux détaillé, décisions de règles et travail restant : [docs/ROADMAP.md](docs/ROADMAP.md).
 
-1. Mécaniques restantes : Unison, After, Tune Out, Cards… (règles à documenter d'abord — elles se codent comme Killshot ou Bet)
-2. Backend : journal des effets appliqués à chaque round (explicabilité, débogage des règles), API moteur pure
-   `step(state, action)` + `legal_actions(state)`, persistance en mémoire/SQLite, mise à jour FastAPI/Pydantic
+1. Règles : trancher les points encore ouverts de `docs/REGLES.md` § 5 (cycles de Stops, Leader et son Team,
+   Mindwipe / Combust, Limitless…) par des combats réels capturés selon `docs/ORACLE.md`
+2. Backend : moteur compilé rapide derrière le contrat `src/core/engine/` (~1 ms par round aujourd'hui, ~10 µs visés
+   pour le solveur), persistance en mémoire/SQLite, mise à jour FastAPI/Pydantic
 3. IA : équilibre de Nash par round, solveur exact de référence, fonction de valeur apprise sur ses résultats,
    arène d'évaluation, intégration dans l'interface — étapes détaillées dans [docs/IA.md](docs/IA.md)

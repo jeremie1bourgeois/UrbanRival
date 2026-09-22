@@ -223,6 +223,14 @@ def test_exchange_versus_copy_of_the_same_stat_only_the_exchange_acts(template_g
     assert (amelia.power_fight, asporov.power_fight) == (7 - 2, 3 - 2)
 
 
+def test_cancel_opp_damage_modif_annuls_an_opponent_damage_exchange(template_game):
+    # Combat réel 1294992 : Pandora « Cancel Opp. Power And Damage Modif. » annule le « Damage Exchange » de Harrow Ld,
+    # les deux cartes gardent leurs dégâts imprimés (sans le Cancel : 3 et 5).
+    amelia, asporov = play(template_game, ally_ability="Damage Exchange", enemy_ability="Cancel Opp. Damage Modif.")
+
+    assert (amelia.damage_fight, asporov.damage_fight) == (5, 3)
+
+
 @pytest.mark.parametrize("text", ["Asymmetry: Copy: Opp. Power", "Confidence: Power Exchange", "Power And Damage Exchange"])
 def test_value_copies_and_exchanges_do_not_crash(template_game, text):
     template_game.turn = True
@@ -342,6 +350,7 @@ def test_stop_conditioned_end_of_round_effect(template_game):
 def test_tune_out_makes_the_most_pillz_win_whatever_the_attack(template_game):
     amelia, asporov = play(template_game, ally_bonus="Tune Out", ally_pillz=2, enemy_pillz=1)   # sans Tune Out : 3 x 2 = 6 > 5 x 1... mais Asporov P7 : 7
 
+    assert (amelia.power_fight, asporov.power_fight) == (1, 1)   # le client officiel affiche puissance 1 (combat 1248952)
     assert (amelia.attack, asporov.attack) == (2, 1)
     assert amelia.win is True
 

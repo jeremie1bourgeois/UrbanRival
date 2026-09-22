@@ -173,12 +173,16 @@ Sofilia comptent chacun (contrairement à l'activation du bonus, qui compte les 
 sur Support (exemplaires comptés) : confirmé par l'utilisateur (2026-09-21), test `test_brawl_counts_every_copy…`.
 Moteur : `multipliers._support`, `_brawl`.
 
-### 3.6 bis Ordre bonus / pouvoir sur une même carte — ✅ TRANCHÉ (attaque)
+### 3.6 bis Ordre des réductions sur une même carte — ✅ TRANCHÉ (2026-09-22) : plancher le plus haut d'abord
 
-Combat réel 1347131, round 2 : Donna Black (bonus « -12 Opp Attack, Min 8 », pouvoir « Revenge: -10 Opp Attack, Min 3 »)
-contre Liona à 14 d'attaque → 3. Seul l'ordre **bonus puis pouvoir** le donne (14 → 8 → 3) ; pouvoir puis bonus donnerait
-4 (14 → 4, puis le Min 8 ne fait rien). Le moteur applique désormais le bonus avant le pouvoir pour tous les
-modificateurs de niveau 2 (puissance, dégâts, attaque) ; seule l'attaque est vérifiée en combat réel.
+Deux combats réels se contredisent sur « bonus d'abord » / « pouvoir d'abord » et une seule règle reproduit les deux :
+la réduction au **Min le plus haut s'applique d'abord** (à Min égal : bonus, pouvoir, Leader).
+- 1347131, round 2 : Donna Black (bonus « -12 Opp Attack, Min 8 », pouvoir « Revenge: -10 Opp Attack, Min 3 ») contre
+  Liona à 14 d'attaque → 8 → **3** (pouvoir d'abord donnerait 4).
+- 1294992, round 4 : Aamir (pouvoir « Growth: -1 Opp Power, Min 4 » = −4, bonus « -2 Opp Power, Min 1 ») contre
+  Honikai à 6 de puissance → 4 → **2** (bonus d'abord donnerait 4).
+Moteur : `apply_capacity_lvl_2._slots_highest_floor_first`, pour tous les modificateurs de niveau 2. Les 33 combats
+réels de `data/ur_battles/` sont conformes.
 
 ### 3.7 Team (Leader) — ✅ CONFIRMÉ
 
@@ -287,7 +291,7 @@ ROADMAP § 2.A.
 
 | Mécanique | Définition | Type d'implémentation |
 |---|---|---|
-| **Tune Out** (bonus Cosmohnuts) | « When a Tune Out card is played, the Attack calculation is ignored and the winner of the round is the player who bet the most Pillz. In case of a tie in Pillz, the two cards are decided in the same way as for a tie in Attack. » | Nouveau mode de résolution dans `resolve_combat` ; la fury **ne compte pas** (utilisateur, 2026-09-21 ; `test_tune_out_ignores_the_fury_pillz`) |
+| **Tune Out** (bonus Cosmohnuts) | « When a Tune Out card is played, the Attack calculation is ignored and the winner of the round is the player who bet the most Pillz. In case of a tie in Pillz, the two cards are decided in the same way as for a tie in Attack. » | Nouveau mode de résolution dans `resolve_combat` : puissance des deux cartes ramenée à 1, attaque = pillz misées, la fury **ne compte pas** (combat réel 1248952, 2026-09-19 ; utilisateur, 2026-09-21 ; `test_tune_out_ignores_the_fury_pillz`) |
 | **Unison: X** | « only activates if the hand of the player contains EXCLUSIVELY cards of the same clan as the card which has the Unison effect » | Condition de début de round (main mono-clan) |
 | **Disunion: X** | « only activates if the hand of the player at least contains ONE card from a different clan » | Condition, négation d'Unison |
 | **After (Clan X[, Clan Y]): X** (bonus Tolvack + abilities) | « This effect only activates if you played a "Clan X" character in the previous round. Oculus characters, even when infiltrated "Clan X", do not count. » Ne s'active jamais au round 1. | Condition sur `history[-1]` (clan de la carte jouée par le même joueur au round précédent) |
@@ -330,8 +334,10 @@ Précisions utiles glanées au passage :
 ## 5. Ce que les textes ne tranchent pas — à régler par rejeu de combats réels
 
 Par ordre d'impact :
-1. Exchange contre Cancel Opp. X Modif. : échange annulé en entier ou seulement pour la carte qui annule (§ 6, entrée 60).
-2. Recover : plancher de 1 pillz (3.5), jamais observé en combat réel.
+1. Recover : plancher de 1 pillz (3.5), jamais observé en combat réel.
+2. Exchange contre Copie/Impose, Copie/Impose contre Cancel (§ 7).
+
+Tranché par combat réel (1294992, 2026-09-20, § 7) : Cancel Opp. X Modif. annule le X Exchange en entier.
 
 Confirmés par l'utilisateur le 2026-09-21 : Cancel Opp. Life Modif. saute aussi le tic immédiat d'une Toxine posée ce
 round (3.3, testé) ; Perfect = victoire avec `attack − power_fight < attaque adverse` (§ 4) ; Brawl compte les
@@ -359,15 +365,30 @@ Verdicts sur les points encore ouverts ou déjà codés :
 | 58 Stop | « la condition Stop ne s'active pas contre des cartes Annul » | « stop » consommé à la phase des Stops uniquement | ✅ |
 | 55 Protection | Protection: Bonus/Pouvoir protège des Stops « mais pas d'une carte Annul » ; « peut également annuler les effets négatifs d'un Leader » | Protection: X retire les modifs adverses ciblant ma carte, y compris `leader_fight` adverse | ✅ |
 | 59 Copie, 172 Impose | valeurs **de base** ; Copie Bonus « s'il est actif » | ✅ | ✅ |
-| 60 Echange | échange des valeurs de base « même si la carte en face a une Protection appropriée » ; annulé par un Annul approprié ; Echange face à Copie/Echange du même type → seul l'Echange agit | Exchange est méta (non touché par Protection) ; Exchange vs Copy : seul l'Echange agit (les deux lisent les valeurs imprimées, testé dans les deux sens) ; Cancel : **à vérifier** (utilisateur) | ➖ Cancel à vérifier |
+| 60 Echange | échange des valeurs de base « même si la carte en face a une Protection appropriée » ; annulé par un Annul approprié ; Echange face à Copie/Echange du même type → seul l'Echange agit | Exchange est méta (non touché par Protection) ✅ ; Exchange vs Copy : seul l'Echange agit (les deux lisent les valeurs imprimées, testé dans les deux sens) ✅ ; **Cancel Opp. Dmg/Pow Modif. annule l'Exchange ✅** (combat 1294992, corrigé le 2026-09-20, § 7) | ✅ |
 | 63 Support / Brawl, 64 Croissance, 65 Equalizer, 67 Par Puissance/Dégâts adv. (valeurs de base) | ✅ conformes | | ✅ |
 | 68 Killshot, 173 Versus (main adverse), 174 Symétrie, 175 Infiltration (carte seule, clans spécifiques) | ✅ conformes aux corrections du matin | | ✅ |
 | 50 Poison / Soin | le second remplace le premier ; Poison et Soin coexistent | ✅ | ✅ |
 | 61 Courage / Riposte, 62 Confiance / Revanche | ✅ | | ✅ |
 | 70 Jour / Nuit | cycle de 4 h dans le jeu | tiré au sort en début de partie (3.13) | ✅ |
 
-Limitless : exclu du moteur et de l'IA (utilisateur, 2026-09-21). (Cycles de Stops/Protections, Leader et son Team, Tune Out et fury, Repair,
-Mindwipe : tranchés par l'utilisateur, voir § 5.)
+Limitless : exclu du moteur et de l'IA (utilisateur, 2026-09-21). Cycles de Stops/Protections, Leader et son Team, Tune Out et fury, Repair,
+Mindwipe : tranchés par l'utilisateur, voir § 5. Égalité d'attaque, Exchange vs Cancel : tranchés par les combats réels, voir § 7.
+
+## 7. Combats réels capturés en duel privé (2026-09-19 → 2026-09-20)
+
+Duels privés capturés via `scripts/ur_capture.js` puis rejoués par le moteur (`tests/test_ur_battles.py`). Chaque point
+ci-dessous est confirmé par au moins un combat où le moteur reproduit exactement les valeurs du serveur.
+
+| Règle | Verdict serveur | Moteur | Combat |
+|---|---|---|---|
+| **Égalité d'attaque** | la carte avec le **moins d'étoiles** gagne ; à étoiles égales, le **premier joueur** gagne (Tie-break/Solomon prime) | ✅ conforme (`process_round.py`) | 1294088 (Glorg 4★ vs Davina 3★ → Davina) |
+| **All-Stop vs Protection: Bonus** | l'All-Stop l'emporte : le SoA retire d'abord la Protection, puis le SoB annule le bonus | ✅ conforme | 1294088 (Glorg vs Davina) |
+| **Le Leader profite-t-il de son Team ?** | **oui**, l'aura « Team: X » s'applique aussi au Leader lui-même | ✅ conforme (test `test_leader_team.py`) | confirmé par l'oracle utilisateur + tests |
+| **Exchange vs Cancel Opp. Modif.** | le Cancel **annule** l'Exchange : les deux cartes gardent leurs valeurs imprimées | ❌ → **corrigé le 2026-09-20** (`apply_capacity_lvl_1.py`, `_opp_cancels_stat`) | 1294992 (Harrow Ld *Damage Exchange* vs Pandora *Cancel Opp. Power And Damage Modif.*) |
+
+Portée du correctif Exchange/Cancel : limité à l'**Exchange** (seul cas prouvé). Exchange vs **Copie**/**Impose** et
+Copie/Impose vs Cancel restent non gérés, faute de combat réel les couvrant.
 
 **Historique de combats** : `player/history.php` ne donne que le score final de chaque combat (ex. « 12-3 »), sans détail
 de rounds ni rapport. Le jeu lui-même est un client Unity WebGL (`/game/play/`) ; les données de round transitent

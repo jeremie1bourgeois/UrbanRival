@@ -93,6 +93,13 @@ Chaque étape reprend la précédente en changeant **une seule chose** :
 Sans elle, on avance à l'aveugle : on ne saurait pas si une modification est un progrès ou du bruit.
 
 ### 3.1 API moteur pure
+**Fait le 2026-09-18** (`src/core/engine/`) : `contract.py` fixe l'état compact `State` (dataclass figée, donc
+hashable : c'est `key(state)` ; `ally_first` = premier joueur) et le deck compilé (`CompiledCard` / `CompiledCapacity` :
+indices dans un vocabulaire figé, masques de bits — le format qu'un moteur compilé lira) ; `reference.py` expose
+`legal_actions`, `step`, `terminal` sur `process_round` ; `tests/test_engine_contract.py` prouve la complétude de
+l'état en rejouant 300 parties depuis la forme compacte ; `corpus.py` + `scripts/build_engine_corpus.py` produisent
+le corpus différentiel que le moteur compilé devra reproduire. Reste de l'étape 0 : arène, étalons.
+
 Le moteur (`process_round`) est déjà une fonction ; il manque une façade stable pour l'IA :
 
 - `legal_actions(state, side) → [(card_index, pillz_fight, fury)]` — cartes non jouées × mises 0..pillz × fury si
@@ -450,6 +457,7 @@ ce que la recherche corrige ; pourquoi on n'a pas besoin de résoudre des partie
 |---|---|---|
 | 2026-09-17 | Moteur Python : deepcopy d'une partie / deepcopy + `process_round` | 0,7 ms / 1,4 ms (~700 rounds/s) |
 | 2026-09-18 | Solveur exact prototype : `step`/s en résolution | ~1 000 |
+| 2026-09-18 | `reference.step` (état compact → partie → `process_round` → état), Python 3.10 | ~250 µs ; `legal_actions` ~30 µs |
 | 2026-09-18 | Résolution exacte depuis le round 4 / round 3 | 0,2-0,5 s / 45-75 s (voir § 5.3) |
 | 2026-09-18 | Résolution exacte depuis le round 2 (extrapolée après 3 lignes sur 69) | ~4 h |
 | 2026-09-18 | Jouet 2 rounds (§ 5.2) : états distincts / valeur du match-up | 23 / 0,667 |

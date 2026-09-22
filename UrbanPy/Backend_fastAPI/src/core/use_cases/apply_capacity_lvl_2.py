@@ -20,16 +20,23 @@ _ATTR_MAP = {
 ALL_STATS = tuple(_ATTR_MAP)
 
 
-# Sur une même carte, le bonus s'applique avant le pouvoir : combat réel 1347131, Donna Black (bonus « -12 Opp Attack,
-# Min 8 », pouvoir « -10 Opp Attack, Min 3 ») ramène 14 à 8 puis 3, et non 14 à 4 puis 4. Vérifié sur l'attaque seulement.
+# Sur une même carte, la réduction au plancher le plus haut s'applique d'abord (REGLES 3.6 bis) : combat 1347131, Donna
+# Black (bonus « -12 Opp Attack, Min 8 », pouvoir « -10 Opp Attack, Min 3 ») ramène 14 à 8 puis 3 ; combat 1294992,
+# Aamir (pouvoir « Growth: -1 Opp Power, Min 4 » au round 4, bonus « -2 Opp Power, Min 1 ») ramène 6 à 4 puis 2.
+# À plancher égal : bonus, pouvoir, Leader.
 _MODIFIER_SLOTS = ("bonus_fight", "ability_fight", "leader_fight")
+
+
+def _slots_highest_floor_first(card: Card) -> list:
+    slots = [slot for slot in _MODIFIER_SLOTS if getattr(card, slot) is not None]
+    return sorted(slots, key=lambda slot: -getattr(card, slot).borne)
 
 
 def apply_capacity_lvl_2(game: Game, card1: Card, card2: Card, stats=ALL_STATS) -> None:
     """Applique les modificateurs des stats `stats` : cible ally, puis both, puis enemy, pour chaque emplacement."""
     for apply in (apply_target_ally_effects, apply_target_both_effects, apply_target_enemy_effects):
         for card, opp_card, own, opp in ((card1, card2, game.ally, game.enemy), (card2, card1, game.enemy, game.ally)):
-            for slot in _MODIFIER_SLOTS:
+            for slot in _slots_highest_floor_first(card):
                 capacity = getattr(card, slot)
                 if capacity is not None:
                     setattr(card, slot, apply(game, own, opp, capacity, card, opp_card, stats))

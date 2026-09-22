@@ -146,15 +146,16 @@ def test_growth_scales_with_the_round_number(template_game):
 
     _, asporov = play(template_game, AGUSTINO, ASPOROV)
 
-    assert asporov.power_fight == max(4, 7 - 2 - 1 * 2)  # bonus -2 puis growth x round 2, min 4
+    assert asporov.power_fight == 7 - 1 * 2 - 2  # growth x round 2 (Min 4, plancher le plus haut, d'abord) puis bonus -2
 
 
-def test_growth_respects_its_minimum_after_the_bonus(template_game):
+def test_growth_minimum_applies_before_the_lower_bonus_minimum(template_game):
+    # Plancher le plus haut d'abord (REGLES 3.6 bis, combat 1294992) : growth -4 -> 3 borné à 4, puis bonus -2 -> 2
     template_game.nb_turn = 4
 
     _, asporov = play(template_game, AGUSTINO, ASPOROV)
 
-    assert asporov.power_fight == 4  # bonus -2 -> 5, puis growth -4 -> 1, borné à 4 (le bonus s'applique avant le pouvoir)
+    assert asporov.power_fight == 2
 
 
 # --- Conditions de déclenchement --------------------------------------------------------------

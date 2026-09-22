@@ -30,7 +30,7 @@ Cancel Life Modif., Reanimate, Versus) ont été **corrigées** le même jour ; 
 | « Cancel Opp. Life Modif. » **suspend pour le round** les effets persistants adverses (poison/toxin/heal/regen ; Pillz : dope/consume), qui reprennent au round suivant — glossaire officiel 56 | `Card.cancelled_modifs`, `apply_capacity_lvl_4._suspended` |
 | Reanimate = « Defeat: +X Life » qui marche aussi depuis 0 (règle officielle) ; les effets de fin de round sont sautés sur KO | `apply_capacity_lvl_3.apply_reanimate` + boucle de niveau 3, `process_round` |
 | Recover X out of Y : ⌊pillz posées × X / Y⌋, **minimum 1** (glossaire 53), fury et **pillz gratuite comprises** — combat réel 1347075 (2026-09-21) | `apply_capacity_lvl_3.recovered_pillz`, `data/ur_battles/1347075.json` |
-| Sur une même carte, le **bonus s'applique avant le pouvoir** (modificateurs de niveau 2) — combat réel 1347131 (2026-09-21), vérifié sur l'attaque | `apply_capacity_lvl_2._MODIFIER_SLOTS`, `data/ur_battles/1347131.json` |
+| Sur une même carte, la réduction au **plancher le plus haut s'applique d'abord** (modificateurs de niveau 2) — combats réels 1347131 et 1294992, seule règle conforme aux deux (REGLES 3.6 bis) | `apply_capacity_lvl_2._slots_highest_floor_first`, `data/ur_battles/1347131.json`, `1294992.json` |
 | Infiltrated (Oculus) — règle officielle : un seul autre clan → celui-là ; deux → celui de la **carte seule** ; trois ou deux Oculus → rien. Chaque Leader est son propre clan : un Leader seul est la carte seule (l'Oculus le rejoint et le Cancel Leader l'annule), deux Leaders + une carte = trois clans (rien) — combats réels 1346878, 1347500, 1347671, 1347602 (2026-09-21) ; la liste des clans imprimée sur la carte ne restreint que le bonus adopté et l'ability | `clan.infiltrated_clan`, `multipliers._support`, `data/ur_battles/1346878.json`, `1347671.json` |
 | Team (Leader) : s'applique à chaque carte jouée, Leader compris, seulement si Leader unique (deux exemplaires du même Leader s'annulent) — confirmé par l'utilisateur (2026-09-21) | `process_round.leader_team_capacity`, `tests/test_leader_team.py` |
 | Versus (clans) : s'active si la **main** adverse contient une carte du clan, pas seulement la carte en face — règle officielle | `process_round.check_capacity_condition` |
@@ -63,8 +63,9 @@ vérifier ni à traiter par l'IA ; le premier joueur du combat 1349159 contredis
 (Fractal — même statut : code conservé, règle plus à vérifier). Leurs définitions sont conservées dans `docs/REGLES.md` § 4 pour mémoire ; ne pas les
 compter parmi les pouvoirs restant à gérer.
 
-Choix de modélisation à confirmer en combat réel : Exchange face à Cancel Opp. X Modif. (échange annulé en entier ?).
-Confirmé par l'utilisateur (2026-09-21) : Tune Out compare les pillz **sans la fury** ; Mindwipe = Combust ; Repair,
+Tranché par combat réel (1294992, 2026-09-20) : un Cancel Opp. X Modif. adverse annule le X Exchange, les deux cartes
+gardent leurs valeurs imprimées (REGLES § 7).
+Confirmé par l'utilisateur (2026-09-21) : Tune Out ramène la puissance des deux cartes à 1 et compare les pillz **sans la fury** (combat 1248952) ; Mindwipe = Combust ; Repair,
 Combust et Mindwipe agissent dès le round joué (si la carte gagne) ; Perfect = écart d'attaque < puissance ; Brawl
 compte les exemplaires comme Support ; Cancel Opp. Life Modif. saute le tic immédiat d'une Toxine.
 
@@ -73,8 +74,8 @@ compte les exemplaires comme Support ; Cancel Opp. Life Modif. saute le tic imm�
 2. **Oracle = combats réels** (fait le 2026-09-16, premier combat reproduit à l'identique) : jouer un combat dans le
    client web d'Urban Rivals avec `scripts/ur_capture.js` chargé, importer `urRecords()` avec `scripts/import_ur_battles.py` (procédure complète : `docs/ORACLE.md`),
    `tests/test_ur_battles.py` rejoue chaque round et exige les valeurs officielles (puissance, dégâts, attaque,
-   vainqueur, vies, pillz). Viser les points non tranchés (Exchange contre Annul,
-   plancher de Recover) et les clans à bonus méta. Le modèle `abilityData` du
+   vainqueur, vies, pillz). Viser les points non tranchés (plancher de Recover, Exchange contre Copie/Impose)
+   et les clans à bonus méta. Le modèle `abilityData` du
    client (`docs/ur-abilitydata-modele.md`) s'accumule passivement avec les combats (pas de scraping API : piste abandonnée).
 3. Le journal des effets (D2, fait) rend ces vérifications immédiates : comparer le journal au déroulé réel.
 
