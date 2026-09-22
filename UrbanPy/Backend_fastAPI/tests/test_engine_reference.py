@@ -40,9 +40,9 @@ def _accepted_by_engine(deck, state, side: str) -> set:
             for fury in (False, True):
                 own = Action(card, pillz, fury)
                 ally, enemy = (own, other) if side == "ally" else (other, own)
-                round_data = ProcessRoundInput(player1_card_index=ally.card, player1_pillz=ally.pillz, player1_fury=ally.fury,
-                                               player2_card_index=enemy.card, player2_pillz=enemy.pillz, player2_fury=enemy.fury)
-                try:
+                try:   # le schéma refuse déjà une mise < 1 ou un index hors main (ValidationError est un ValueError)
+                    round_data = ProcessRoundInput(player1_card_index=ally.card, player1_pillz=ally.pillz, player1_fury=ally.fury,
+                                                   player2_card_index=enemy.card, player2_pillz=enemy.pillz, player2_fury=enemy.fury)
                     check_round_correct(game_from_state(deck, state), round_data)
                     accepted.add(own)
                 except ValueError:
@@ -64,8 +64,7 @@ def test_legal_actions_are_exactly_what_the_engine_accepts(seed):
         for side in ("ally", "enemy"):
             legal = legal_actions(state, side)
             assert len(legal) == len(set(legal))
-            # check_round_correct accepte aussi pillz_fight = 0 (mise « -1 ») ; le contrat exige au moins la pillz gratuite
-            assert set(legal) == {action for action in _accepted_by_engine(deck, state, side) if action.pillz >= 1}
+            assert set(legal) == _accepted_by_engine(deck, state, side)
 
 
 def test_step_is_deterministic_and_leaves_the_state_untouched():

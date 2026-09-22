@@ -4,42 +4,42 @@
     "solo": {
       "entries": 53734,
       "decks": 6528,
-      "sha256": "7a04e4c59d1cc73bcb51f7ea16e90d38d45e03d40de097eb83a9ae26b8ea935b"
+      "sha256": "f52514971ef4081359cf0b7682fdb805b8e09463a61b31899f4254266c86a630"
     },
     "interactions": {
       "entries": 39912,
       "decks": 14477,
-      "sha256": "225430d1d0f72eda1359e0602e4666ba3882ca57e15fc655e5d510ae36127c60"
+      "sha256": "f5ab83d7e1eb477b1083c2083b6110a7a7e91a1e771cc510eab20a16c2229dff"
     },
     "planchers": {
       "entries": 4159,
       "decks": 4159,
-      "sha256": "7c045b2a049f4d83b980c144a2b2a534be90ac92afefb3e983325e00d2c05869"
+      "sha256": "bc2f4d912e0ec1454eb5b073b1c7fbda59ccf34f4e70670c900183f0b7311b94"
     },
     "persistants": {
       "entries": 2628,
       "decks": 934,
-      "sha256": "154ae3350dafd2f5228f2b2b626e780f21489c9318131a8d1e0d6465f05571c7"
+      "sha256": "2cfb4c9bcc099f13f46b8dd88d619ac95b0ac5210851916d5472cdd64b756723"
     },
     "leaders": {
       "entries": 3639,
       "decks": 1008,
-      "sha256": "d2874ace87c3de37b9285e0b9f75473f8d4863f5fd52d5f3c7afad59d193f1ca"
+      "sha256": "6ca377d4c4badf698752f500e592d4d86dc7bfd29dc195bbae2c14c73bee1ba4"
     },
     "oculus": {
       "entries": 3683,
       "decks": 1905,
-      "sha256": "b4dbe3db6ec22c3c9a4cf86a9331f60ebc7d900e6ebd3645ea3f080414939a06"
+      "sha256": "d3fe430c81ea2f95bdf32875f6b699fd50450ca349043e6a817f6686d8c5b568"
     },
     "combat": {
       "entries": 166,
       "decks": 42,
-      "sha256": "a4091f396af9a5d2616ec04ac0e0c645c24af4502001fb61344ef3f36d06e85c"
+      "sha256": "66f793626fd22d9e1f6d40e35186cd71653406f190e7cba249b2800e1e1ac5d4"
     },
     "aleatoire": {
       "entries": 5580,
       "decks": 300,
-      "sha256": "583266b449e94e23f357dfba56a91e7a45c1cfc71933b8d89dee2568bda79619"
+      "sha256": "488df4df6c65e76a0a7e3faa81145260ffb06d437683db219de552b98c6d7b71"
     }
   }
 }

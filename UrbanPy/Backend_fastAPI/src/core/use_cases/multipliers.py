@@ -5,10 +5,6 @@ de la capacité et player2/card2 son adversaire, et renvoie le facteur appliqué
 """
 from src.core.use_cases.clan import clan_for_bonus
 
-MAX_LIFE = 12   # vie de départ ; à paramétrer avec la partie si elle devient variable
-MAX_PILLZ = 12
-
-
 def _one(game, player1, player2, card1, card2) -> int:
     return 1
 
@@ -48,11 +44,12 @@ def _nb_damage_inflicted(game, player1, player2, card1, card2) -> int:
 
 
 def _nb_life_lost(game, player1, player2, card1, card2) -> int:
-    return MAX_LIFE - player1.life
+    """Vies perdues depuis le début de la partie ; jamais négatif si un soin a dépassé la vie de départ (REGLES 3.14)."""
+    return max(0, player1.start_life - player1.life)
 
 
 def _nb_pillz_lost(game, player1, player2, card1, card2) -> int:
-    return MAX_PILLZ - player1.pillz
+    return max(0, player1.start_pillz - player1.pillz)
 
 
 def _nb_pillz_left(game, player1, player2, card1, card2) -> int:

@@ -6,6 +6,8 @@
         "name": "ally",
         "life": 6,
         "pillz": 5,
+        "start_life": 12,
+        "start_pillz": 12,
         "cards": [
             {
                 "name": "Agustino",
@@ -192,6 +194,8 @@
         "name": "enemy",
         "life": 4,
         "pillz": 8,
+        "start_life": 12,
+        "start_pillz": 12,
         "cards": [
             {
                 "name": "Asporov",
@@ -490,13 +494,13 @@
                     "side": "ally",
                     "card": "Agustino",
                     "source": "modificateur",
-                    "text": "Agustino : bonus \u00ab -2 Opp Power, Min 1 \u00bb \u2192 puissance de B Mappe Mt 3 \u2192 1"
+                    "text": "Agustino : pouvoir \u00ab Growth: -1 Opp Power, Min 4 \u00bb \u2192 puissance de B Mappe Mt 3 \u2192 3"
                 },
                 {
                     "side": "ally",
                     "card": "Agustino",
                     "source": "modificateur",
-                    "text": "Agustino : pouvoir \u00ab Growth: -1 Opp Power, Min 4 \u00bb \u2192 puissance de B Mappe Mt 1 \u2192 1"
+                    "text": "Agustino : bonus \u00ab -2 Opp Power, Min 1 \u00bb \u2192 puissance de B Mappe Mt 3 \u2192 1"
                 },
                 {
                     "side": "enemy",

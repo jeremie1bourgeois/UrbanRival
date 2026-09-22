@@ -360,10 +360,17 @@ def init_fight_data(card: Card, nb_pillz: int, fury: bool):
 
 
 def check_round_correct(game: Game, round_data: ProcessRoundInput):
-    if round_data.player1_card_index >= 4:
-        raise ValueError("Player 1: invalid card index.")
-    if round_data.player2_card_index >= 4:
-        raise ValueError("Player 2: invalid card index.")
+    """
+    Garde-fou du moteur, indépendant de la validation du schéma : une carte est dans la main (un index négatif se
+    lirait à l'envers en Python) et la mise vaut au moins la pillz gratuite (une mise nulle ou négative rendrait des
+    pillz au joueur) sans dépasser son stock.
+    """
+    for label, index, pillz in (("Player 1", round_data.player1_card_index, round_data.player1_pillz),
+                                ("Player 2", round_data.player2_card_index, round_data.player2_pillz)):
+        if not 0 <= index < len(game.ally.cards):
+            raise ValueError(f"{label}: invalid card index.")
+        if pillz < 1:
+            raise ValueError(f"{label}: a bet includes the free pillz, so it is at least 1.")
     if round_data.player1_pillz + 3 * round_data.player1_fury > game.ally.pillz + 1:
         raise ValueError("Player 1: too many pillz.")
     if round_data.player2_pillz + 3 * round_data.player2_fury > game.enemy.pillz + 1:

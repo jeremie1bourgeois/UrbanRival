@@ -76,19 +76,16 @@ class GameResult(Enum):
     DRAW = "Draw"
     NONE = "Game Not Finished"
 
-class ProcessRoundInput(BaseModel):
-    player1_card_index: int
-    player1_pillz: int
-    player1_fury: bool = False
-    
-    player2_card_index: int
-    player2_pillz: int
-    player2_fury: bool = False
+# Une main compte 4 cartes ; `pillz` est la mise totale, pillz gratuite comprise, donc au moins 1 (voir
+# check_round_correct pour le plafond, qui dépend du stock du joueur).
+HAND_SIZE = 4
 
-    @classmethod
-    def validate_pillz_and_indices(cls, values):
-        if values["player1_pillz"] < 0 or values["player2_pillz"] < 0:
-            raise ValueError("Pillz values must be non-negative.")
-        if values["player1_card_index"] < 0 or values["player2_card_index"] < 0:
-            raise ValueError("Card indices must be non-negative.")
-        return values
+
+class ProcessRoundInput(BaseModel):
+    player1_card_index: int = Field(..., ge=0, lt=HAND_SIZE)
+    player1_pillz: int = Field(..., ge=1)
+    player1_fury: bool = False
+
+    player2_card_index: int = Field(..., ge=0, lt=HAND_SIZE)
+    player2_pillz: int = Field(..., ge=1)
+    player2_fury: bool = False
