@@ -4,8 +4,9 @@ class PersistentEffect:
     """
     Effet actif sur un joueur à la fin de chaque round suivant son activation :
     poison / toxine (vie -value, pas en dessous de borne), heal / regen (vie +value, pas au-dessus de borne),
-    dope / repair (pillz +value, pas au-dessus de borne), consume (pillz -value, pas en dessous de borne),
-    combust (vie et pillz -value, chacune pas en dessous de borne). Un effet remplace l'effet de même sorte déjà actif.
+    dope (pillz +value, pas au-dessus de borne), repair (vie et pillz +value, chacune pas au-dessus de borne),
+    consume (pillz -value, pas en dessous de borne), combust (vie et pillz -value, chacune pas en dessous de borne).
+    Un effet remplace l'effet de même sorte déjà actif.
     """
     KINDS = ("poison", "toxine", "heal", "regen", "dope", "repair", "consume", "combust")
 
