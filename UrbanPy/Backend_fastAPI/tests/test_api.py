@@ -40,6 +40,21 @@ def test_full_game_lasts_four_rounds_then_refuses_a_fifth(client):
     assert _play(client, game_id, 0, 0).status_code == 400
 
 
+def test_process_round_rejects_bets_and_card_indices_outside_the_rules(client):
+    """Une mise vaut au moins la pillz gratuite et une carte est en main : sinon le joueur gagnerait des pillz
+    (mise négative) ou jouerait une carte par un index négatif, que Python lit à l'envers."""
+    game_id = client.get("/init_game/template").json()["game_id"]
+    base = {"player1_card_index": 0, "player1_pillz": 1, "player1_fury": False,
+            "player2_card_index": 0, "player2_pillz": 1, "player2_fury": False}
+
+    for invalide in ({"player1_pillz": 0}, {"player1_pillz": -5}, {"player2_pillz": -1},
+                     {"player1_card_index": -1}, {"player2_card_index": 4}):
+        response = client.post(f"/process_round/{game_id}", json={**base, **invalide})
+        assert response.status_code in (400, 422), f"{invalide} accepté : {response.json()}"
+
+    assert client.post(f"/process_round/{game_id}", json=base).status_code == 200
+
+
 def test_save_for_test_stores_two_consecutive_states(client, tmp_path):
     game_id = client.get("/init_game/template").json()["game_id"]
     _play(client, game_id, 0, 0)

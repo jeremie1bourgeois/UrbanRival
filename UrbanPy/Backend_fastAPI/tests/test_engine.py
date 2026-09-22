@@ -237,9 +237,22 @@ def test_refuses_a_card_already_played(template_game):
         play(template_game, AMELIA, ASPOROV)
 
 
-def test_refuses_an_out_of_range_card_index(template_game):
-    with pytest.raises(ValueError, match="invalid card index"):
-        play(template_game, 4, BHUDD)
+def test_schema_refuses_an_out_of_range_card_index_or_a_bet_below_the_free_pillz(template_game):
+    for invalide in ({"player1_card_index": 4}, {"player1_card_index": -1}, {"player1_pillz": 0}, {"player2_pillz": -3}):
+        with pytest.raises(ValueError):
+            ProcessRoundInput(**{"player1_card_index": 0, "player1_pillz": 1, "player2_card_index": 0, "player2_pillz": 1, **invalide})
+
+
+def test_engine_refuses_them_too_when_the_schema_is_bypassed(template_game):
+    """Garde-fou du moteur : il ne dépend pas de la validation du schéma (un appelant interne peut la contourner)."""
+    for invalide, message in (({"player1_card_index": 4}, "invalid card index"),
+                              ({"player1_card_index": -1}, "invalid card index"),
+                              ({"player1_pillz": 0}, "at least 1")):
+        round_data = ProcessRoundInput.model_construct(
+            **{"player1_card_index": 0, "player1_pillz": 1, "player1_fury": False,
+               "player2_card_index": BHUDD, "player2_pillz": 1, "player2_fury": False, **invalide})
+        with pytest.raises(ValueError, match=message):
+            check_round_correct(template_game, round_data)
 
 
 # --- Partie complète --------------------------------------------------------------------------
