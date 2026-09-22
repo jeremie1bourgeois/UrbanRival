@@ -1,41 +1,101 @@
 """
-Corpus de non-régression du moteur : des parties jouées au hasard par le moteur de référence, enregistrées sous la
-forme du contrat (deck compilé, état, actions, état suivant). Tout moteur qui implémente le contrat — le port
-compilé — doit reproduire chaque entrée exactement : c'est le test différentiel, à relancer à chaque changement de
-règle. Chaque état enregistre le coup joué et quelques paires d'actions supplémentaires non jouées, pour couvrir plus
-que la trajectoire. Le corpus se régénère à l'identique à graine égale : il n'est pas versionné.
+Corpus de non-régression du moteur : chaque famille de scénarios (scenarios.py) jouée par le moteur de référence et
+enregistrée sous la forme du contrat — deck compilé, état, actions, état suivant, issue du round. Tout moteur qui
+implémente le contrat — le port compilé — doit reproduire chaque entrée : c'est le test différentiel, à relancer à
+chaque changement de règle.
+Les fichiers se régénèrent à l'identique (générateurs déterministes) et ne sont pas versionnés ; seuls leurs digests
+le sont (data/engine_digests.json) : tests/test_engine_golden.py les recalcule, tout changement de règle s'y
+voit et se régénère consciemment (scripts/build_engine_corpus.py).
+Format, par famille : <famille>.decks.json (liste de decks, dataclasses.asdict) et <famille>.jsonl (une entrée par
+ligne : id, deck = indice dans la liste, state, ally_action, enemy_action, next_state, outcome) ; vocabulary.json une
+fois. Les entrées sont écrites en JSON canonique (clés triées, sans espace) : c'est sur ces lignes que porte le digest.
 """
-import random
+import hashlib
+import json
+import os
 from dataclasses import asdict
+from typing import Dict, Iterator, List, Optional
 
-from src.core.domain.game import Game
-from src.core.domain.player import Player
-from src.core.engine.contract import (CLANS, CONDITIONS, EFFECT_KINDS, HOWS, TARGETS, TYPES, deck_from_game,
-                                      state_from_game)
-from src.core.engine.hands import random_hand
-from src.core.engine.reference import legal_actions, step, terminal
+from src.core.engine.contract import CLANS, CONDITIONS, EFFECT_KINDS, HOWS, TARGETS, TYPES, Deck
+from src.core.engine.reference import play
+from src.core.engine.scenarios import FAMILIES
 
 VOCABULARY = {"hows": HOWS, "types": TYPES, "conditions": CONDITIONS, "targets": TARGETS, "clans": CLANS,
               "effect_kinds": EFFECT_KINDS}
 
 
-def build_corpus(games: int, extra_pairs: int, seed: int) -> dict:
-    rng = random.Random(seed)
-    return {"seed": seed, "vocabulary": VOCABULARY, "games": [_random_game(rng, extra_pairs) for _ in range(games)]}
+def canonical(record) -> str:
+    return json.dumps(record, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
 
-def _random_game(rng: random.Random, extra_pairs: int) -> dict:
-    game = Game(1, rng.random() < 0.5, Player("ally", 12, 12), Player("enemy", 12, 12), [])
-    game.ally.cards, game.enemy.cards = random_hand(rng), random_hand(rng)
-    deck, state = deck_from_game(game), state_from_game(game)
-    states = []
-    while terminal(state) is None:
-        pairs = [(rng.choice(legal_actions(state, "ally")), rng.choice(legal_actions(state, "enemy")))
-                 for _ in range(1 + extra_pairs)]
-        next_states = [step(deck, state, ally_action, enemy_action) for ally_action, enemy_action in pairs]
-        states.append({"state": asdict(state),
-                       "plays": [{"ally_action": list(ally_action), "enemy_action": list(enemy_action),
-                                  "next_state": asdict(next_state)}
-                                 for (ally_action, enemy_action), next_state in zip(pairs, next_states)]})
-        state = next_states[0]                              # la trajectoire suit le premier coup
-    return {"deck": asdict(deck), "states": states}
+def family_entries(name: str, decks: List[Deck]) -> Iterator[dict]:
+    """Joue chaque scénario de la famille ; les decks distincts sont ajoutés à `decks`, référencés par indice."""
+    index: Dict[Deck, int] = {}
+    ids = set()
+    for scenario in FAMILIES[name]():
+        if scenario.label in ids:
+            raise ValueError(f"identifiant en double dans la famille {name} : {scenario.label}")
+        ids.add(scenario.label)
+        deck_id = index.get(scenario.deck)
+        if deck_id is None:
+            deck_id = index[scenario.deck] = len(decks)
+            decks.append(scenario.deck)
+        next_state, outcome = play(scenario.deck, scenario.state, scenario.ally_action, scenario.enemy_action)
+        yield {"id": scenario.label, "deck": deck_id, "state": asdict(scenario.state),
+               "ally_action": list(scenario.ally_action), "enemy_action": list(scenario.enemy_action),
+               "next_state": asdict(next_state),
+               "outcome": {"ally": list(outcome.ally), "enemy": list(outcome.enemy)}}
+
+
+def family_summary(name: str, directory: Optional[str] = None) -> dict:
+    """Effectifs et digest sha256 de la famille (entrées puis decks) ; écrit ses deux fichiers si `directory` est donné."""
+    digest = hashlib.sha256()
+    decks: List[Deck] = []
+    entries = 0
+    out = open(os.path.join(directory, f"{name}.jsonl"), "w", encoding="utf-8") if directory else None
+    try:
+        for entry in family_entries(name, decks):
+            line = canonical(entry)
+            digest.update(line.encode("utf-8") + b"\n")
+            entries += 1
+            if out:
+                out.write(line + "\n")
+    finally:
+        if out:
+            out.close()
+    for deck in decks:
+        digest.update(canonical(asdict(deck)).encode("utf-8") + b"\n")
+    if directory:
+        with open(os.path.join(directory, f"{name}.decks.json"), "w", encoding="utf-8") as file:
+            json.dump([asdict(deck) for deck in decks], file, ensure_ascii=False)
+    return {"entries": entries, "decks": len(decks), "sha256": digest.hexdigest()}
+
+
+def vocabulary_digest() -> str:
+    return hashlib.sha256(canonical(VOCABULARY).encode("utf-8")).hexdigest()
+
+
+def read_digests(path: str) -> dict:
+    if not os.path.exists(path):
+        return {"vocabulary": None, "families": {}}
+    with open(path, "r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+def write_corpus(directory: str, digests_path: str, families=None) -> dict:
+    """
+    Écrit vocabulary.json et les fichiers de chaque famille demandée dans `directory`, puis met à jour le fichier des
+    digests (les familles non demandées gardent le leur) ; renvoie les digests.
+    """
+    os.makedirs(directory, exist_ok=True)
+    with open(os.path.join(directory, "vocabulary.json"), "w", encoding="utf-8") as file:
+        json.dump(VOCABULARY, file, ensure_ascii=False)
+    digests = read_digests(digests_path)
+    digests["vocabulary"] = vocabulary_digest()
+    for name in (families or FAMILIES):
+        digests["families"][name] = family_summary(name, directory)
+    digests["families"] = {name: digests["families"][name] for name in FAMILIES if name in digests["families"]}
+    with open(digests_path, "w", encoding="utf-8") as file:
+        json.dump(digests, file, indent=2, ensure_ascii=False)
+        file.write("\n")
+    return digests
