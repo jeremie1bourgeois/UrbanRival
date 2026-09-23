@@ -3,6 +3,7 @@ Clan d'une carte en main : son propre clan, ou celui qu'un Oculus « Infiltrated
 (bonus, Leader unique) et multipliers (Support, Brawl).
 """
 from collections import Counter
+from typing import List, Optional, Union
 
 from src.core.domain.card import Card
 from src.core.domain.player import Player
@@ -15,14 +16,14 @@ def is_infiltrated(card: Card) -> bool:
     return card.faction == OCULUS and card.bonus is not None and "infiltrated" in card.bonus.types
 
 
-def _clan_for_infiltration(card: Card):
+def _clan_for_infiltration(card: Card) -> Union[str, tuple]:
     """Chaque Leader est son propre clan : Freaks ×1 + Administrator + Ashigaru = trois clans, l'Oculus ne rejoint
     personne (combat 1347671, Support ×1) ; un Leader seul face à deux cartes d'un clan est la carte seule, l'Oculus
     le rejoint et le Cancel Leader l'annule (1346878 Morphun, 1347500 Ashigaru)."""
     return (LEADER, card.name) if card.faction == LEADER else card.faction
 
 
-def infiltrated_clan(player: Player):
+def infiltrated_clan(player: Player) -> Optional[str]:
     """
     Clan adopté par l'Oculus « Infiltrated » de la main (règle officielle du bonus) : un seul autre clan -> celui-là ;
     deux autres clans -> celui de la carte seule ; trois autres clans ou plus d'un Oculus -> None.
@@ -41,7 +42,7 @@ def infiltrated_clan(player: Player):
     return LEADER if isinstance(clan, tuple) else clan
 
 
-def infiltrable_clans(card: Card):
+def infiltrable_clans(card: Card) -> Optional[List[str]]:
     """Clans listés sur la carte Oculus (icônes de l'ability, condition « infiltrated:Clan|Clan ») ; None si inconnus."""
     if card.ability is None:
         return None
@@ -51,6 +52,6 @@ def infiltrable_clans(card: Card):
     return None
 
 
-def clan_for_bonus(player: Player, card: Card):
+def clan_for_bonus(player: Player, card: Card) -> Optional[str]:
     """Clan dont la carte porte le bonus : son propre clan, ou le clan adopté pour un Oculus infiltré."""
     return infiltrated_clan(player) if is_infiltrated(card) else card.faction

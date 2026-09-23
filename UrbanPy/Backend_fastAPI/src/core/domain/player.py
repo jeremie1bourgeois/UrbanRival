@@ -1,9 +1,10 @@
-# src/core/domain/player.py
 from typing import List
 from src.core.domain.card import Card
 from src.core.domain.effect import PersistentEffect
 
 class Player:
+    """Un camp de la partie : ses cartes en main, sa vie et ses pillz, ses effets persistants actifs."""
+
     def __init__(self, name: str = "", life: int = -1, pillz: int = -1,
                  cards: List[Card] = None, effect_list: List[PersistentEffect] = None,
                  start_life: int = None, start_pillz: int = None):
@@ -29,7 +30,7 @@ class Player:
         player.effect_list = [PersistentEffect.from_dict(effect) for effect in data.get("effect_list", [])]
         return player
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return {
             "name": self.name,
             "life": self.life,
@@ -40,5 +41,5 @@ class Player:
             "effect_list": [effect.to_dict() for effect in self.effect_list],
         }
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Player(name={self.name}, life={self.life}/{self.start_life}, pillz={self.pillz}/{self.start_pillz}, cards={self.cards}, effect_list={self.effect_list})"

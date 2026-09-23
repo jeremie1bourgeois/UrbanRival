@@ -4,6 +4,8 @@ Appelé en deux passes par process_round : power et damage avant le calcul de l'
 attack après — sinon un « -X Opp Attack, Min Y » s'appliquerait à une attaque encore nulle.
 Une capacité est consommée (None) quand tous ses types de niveau 2 ont été appliqués.
 """
+from typing import Optional
+
 from src.core.domain.player import Player
 from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card
@@ -55,7 +57,7 @@ def _apply_to(card: Card, attrs: list, bonus: int, borne: int, increase: bool) -
 
 
 def _apply_targeted(target: str, cards: list, game: Game, player1: Player, player2: Player, capacity: Capacity,
-                    card1: Card, card2: Card, stats) -> Capacity:
+                    card1: Card, card2: Card, stats) -> Optional[Capacity]:
     """Applique la capacité aux cartes données si sa cible est `target` ; consommée quand ses types niveau 2 sont épuisés."""
     if capacity.target != target:
         return capacity
@@ -74,13 +76,16 @@ def _apply_targeted(target: str, cards: list, game: Game, player1: Player, playe
     return capacity if capacity.types else None
 
 
-def apply_target_ally_effects(game, player1, player2, capacity, card1, card2, stats=ALL_STATS) -> Capacity:
+def apply_target_ally_effects(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card,
+                              card2: Card, stats=ALL_STATS) -> Optional[Capacity]:
     return _apply_targeted("ally", [card1], game, player1, player2, capacity, card1, card2, stats)
 
 
-def apply_target_enemy_effects(game, player1, player2, capacity, card1, card2, stats=ALL_STATS) -> Capacity:
+def apply_target_enemy_effects(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card,
+                               card2: Card, stats=ALL_STATS) -> Optional[Capacity]:
     return _apply_targeted("enemy", [card2], game, player1, player2, capacity, card1, card2, stats)
 
 
-def apply_target_both_effects(game, player1, player2, capacity, card1, card2, stats=ALL_STATS) -> Capacity:
+def apply_target_both_effects(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card,
+                              card2: Card, stats=ALL_STATS) -> Optional[Capacity]:
     return _apply_targeted("both", [card1, card2], game, player1, player2, capacity, card1, card2, stats)

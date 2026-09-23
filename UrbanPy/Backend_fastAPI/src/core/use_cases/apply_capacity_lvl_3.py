@@ -1,3 +1,11 @@
+"""
+Niveau 3 : effets de fin de round sur la vie / les pillz des joueurs, une fois les deux joueurs encore en vie
+(les KO éventuels sont traités avant, par apply_reanimate). Chaque capacité restante est filtrée par sa condition
+de fin de round (Defeat, Backlash, Victory or Defeat, ou victoire implicite sans condition), puis appliquée une
+seule fois : Reanimate est un cas particulier, traité avant le filtre (« Defeat: +X Life » implicite).
+"""
+from typing import Optional
+
 from src.core.domain.player import Player
 from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card, FIGHT_SLOTS
@@ -83,7 +91,7 @@ def _side(game: Game, player: Player) -> str:
     return "l'allié" if player is game.ally else "l'ennemi"
 
 
-def check_capacity_condition_lvl_3(capacity: Capacity, has_won: bool) -> Capacity:
+def check_capacity_condition_lvl_3(capacity: Capacity, has_won: bool) -> Optional[Capacity]:
     """Filtre une capacité selon l'issue du round : sans condition = seulement en cas de victoire."""
     if capacity.effect_conditions == []:
         return capacity if has_won else None
@@ -117,7 +125,7 @@ def _apply_to(player: Player, attrs: list, bonus: int, borne: int) -> None:
             setattr(player, attr, current_value + bonus)
 
 
-def _apply_targeted(target: str, players: list, game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card) -> Capacity:
+def _apply_targeted(target: str, players: list, game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card) -> Optional[Capacity]:
     """Applique la capacité aux joueurs donnés si sa cible est `target` ; renvoie None une fois consommée."""
     if capacity.target != target:
         return capacity
@@ -133,13 +141,13 @@ def _apply_targeted(target: str, players: list, game: Game, player1: Player, pla
     return None
 
 
-def apply_target_ally_effects(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card) -> Capacity:
+def apply_target_ally_effects(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card) -> Optional[Capacity]:
     return _apply_targeted("ally", [player1], game, player1, player2, capacity, card1, card2)
 
 
-def apply_target_enemy_effects(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card) -> Capacity:
+def apply_target_enemy_effects(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card) -> Optional[Capacity]:
     return _apply_targeted("enemy", [player2], game, player1, player2, capacity, card1, card2)
 
 
-def apply_target_both_effects(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card) -> Capacity:
+def apply_target_both_effects(game: Game, player1: Player, player2: Player, capacity: Capacity, card1: Card, card2: Card) -> Optional[Capacity]:
     return _apply_targeted("both", [player1, player2], game, player1, player2, capacity, card1, card2)
