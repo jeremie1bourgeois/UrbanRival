@@ -121,7 +121,7 @@ situation que le moteur sait jouer ; aucune constante « 12 » dans le code de l
 ils comptent **pour un seul** dans le « ≥ 2 cartes du clan » qui active le bonus (règle confirmée par l'utilisateur,
 cohérente avec le wiki : « This doesn't apply to the same Characters »). Le moteur compte les **noms distincts** par
 clan (`is_clan_bonus_active`, test « deux exemplaires seuls de leur clan → bonus inactif »). Le pouvoir `Support`, lui,
-compte **chaque exemplaire** (combat réel 1347602, `docs/REGLES.md` § 3.6). L'Oculus, lui aussi, compte les
+compte **chaque exemplaire** (combat réel 1347602, `docs/REGLES.md`). L'Oculus, lui aussi, compte les
 exemplaires pour trouver la carte seule (combat 1349230). Unison est une condition « main mono-clan », les doublons n'y changent rien (combat 1349464). Deux exemplaires du même Leader s'annulent (confirmé par l'utilisateur le 2026-09-21).
 
 ### 3.2 Générateur de mains
@@ -427,7 +427,7 @@ ce que la recherche corrige ; pourquoi on n'a pas besoin de résoudre des partie
 
 | Date | Décision | Pourquoi |
 |---|---|---|
-| 2026-09-18 | **Pas d'apprentissage par renforcement par essais-erreurs** (PPO / DQN / Gymnasium, comme l'envisageait `ROADMAP.md` § E) : la voie est Nash exact + fonction de valeur apprise sur des cibles exactes. Aucune expérience « pour montrer que ça ne marche pas ». | Le jeu est résoluble exactement par round ; un signal exact (V) vaut mieux qu'un bit par partie ; la référence Nash rend chaque progrès mesurable. |
+| 2026-09-18 | **Pas d'apprentissage par renforcement par essais-erreurs** (PPO / DQN / Gymnasium, comme l'envisageait une version antérieure de `ROADMAP.md`) : la voie est Nash exact + fonction de valeur apprise sur des cibles exactes. Aucune expérience « pour montrer que ça ne marche pas ». | Le jeu est résoluble exactement par round ; un signal exact (V) vaut mieux qu'un bit par partie ; la référence Nash rend chaque progrès mesurable. |
 | 2026-09-18 | **Aucun mode de jeu ciblé** : l'IA doit faire face à toute situation que le moteur sait jouer. | Conséquence : l'état est paramétrique (vies, pillz de départ sont des valeurs, pas des constantes) ; les modes à règles différentes relèvent du moteur, pas de l'IA. |
 | 2026-09-18 | **Mains données** (4 cartes par joueur, comme le moteur) ; le tirage 4 parmi 8 sera traité plus tard (étape 4, espérance sur les tirages). | Séparer le jeu de la main du choix de la main. |
 | 2026-09-18 | **La vitesse du moteur n'est pas un sujet bloquant** : elle sera optimisée (cibles § 5.4) ; GPU disponibles pour l'étape 3. | Les étapes 0-1 tournent avec le moteur actuel ; les mesures § 5.3 fixent les objectifs de l'optimisation. |
