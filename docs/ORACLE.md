@@ -62,7 +62,8 @@ Ordre de rentabilité (théorique) : D4 (3 questions ouvertes en un duel), D1, D
 
 ### Les duels et le registre des règles
 
-Les duels D1-D8 ci-dessus couvrent les confirmations listées en `docs/REGLES.md` § 5.1. Les questions encore ouvertes
+Les duels D1-D8 ci-dessus couvrent les confirmations « pas encore prouvé par combat réel » listées dans
+`docs/REGLES.md` § 3 (sous-sections concernées, et la table en fin de § 3). Les questions encore ouvertes
 (R1 ordre entre les deux cartes, R2 « Par Dégât » en défaite, R3 « Par Vie perdue » au-dessus de la vie de départ,
 R4 Protection contre « Cards », R5 Exchange contre Copie / Impose) y sont décrites avec les cartes à jouer : les
 préparer dans un même duel privé fait gagner une session entière.
