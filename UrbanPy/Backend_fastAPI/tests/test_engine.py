@@ -158,6 +158,19 @@ def test_growth_minimum_applies_before_the_lower_bonus_minimum(template_game):
     assert asporov.power_fight == 2
 
 
+def test_the_highest_floor_applies_first_whichever_card_carries_it(template_game):
+    # Combat réel 1414453 : Merrick Cr « -2 Cards Damage, Min 1 » contre Rajesh « -2 Cards Damage, Min 4 » ; le
+    # serveur laisse Rajesh à 2, donc le plancher le plus haut passe d'abord même quand c'est la carte adverse
+    # qui le porte (« allié d'abord » donnerait 3 et 1).
+    template_game.ally.cards[AMELIA].ability = parse_capacity("-2 Cards Damage, Min 1").capacity
+    template_game.enemy.cards[ASPOROV].ability = parse_capacity("-2 Cards Damage, Min 4").capacity
+
+    amelia, asporov = play(template_game, AMELIA, ASPOROV)
+
+    # Amelia D5 : 5 -> 4 (Min 4), puis 4 -> 2 ; Asporov D3 : déjà sous le Min 4, puis 3 -> 1
+    assert (amelia.damage_fight, asporov.damage_fight) == (2, 1)
+
+
 # --- Conditions de déclenchement --------------------------------------------------------------
 
 def test_courage_triggers_when_the_player_plays_first(template_game):

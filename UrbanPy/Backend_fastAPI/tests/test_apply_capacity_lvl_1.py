@@ -231,6 +231,14 @@ def test_cancel_opp_damage_modif_annuls_an_opponent_damage_exchange(template_gam
     assert (amelia.damage_fight, asporov.damage_fight) == (5, 3)
 
 
+def test_cancel_opp_damage_modif_annuls_an_opponent_damage_impose(template_game):
+    # Combat réel 1412809 : Pandora « Cancel Opp. Power And Damage Modif. » annule le « Reprisal: Damage Impose »
+    # d'Honikai, Pandora garde ses dégâts imprimés (sans le Cancel : 5, la valeur imprimée de l'imposeur).
+    _, asporov = play(template_game, ally_ability="Damage Impose", enemy_ability="Cancel Opp. Damage Modif.")
+
+    assert asporov.damage_fight == 3
+
+
 @pytest.mark.parametrize("text", ["Asymmetry: Copy: Opp. Power", "Confidence: Power Exchange", "Power And Damage Exchange"])
 def test_value_copies_and_exchanges_do_not_crash(template_game, text):
     template_game.turn = True
@@ -290,6 +298,12 @@ def test_protection_cards_power_shields_both_cards_from_power_reductions(templat
     amelia, asporov = play(template_game, ally_ability="Protection: Cards Power And Damage", enemy_ability="-3 Opp Damage, Min 1")
 
     assert (amelia.power_fight, amelia.damage_fight, asporov.power_fight) == (3, 5, 7)   # les deux bonus -2 opp power et le -3 damage sont neutralisés
+
+
+def test_protection_damage_shields_me_from_a_cards_but_not_its_owner(template_game):
+    amelia, asporov = play(template_game, ally_ability="Protection: Damage", enemy_ability="-2 Cards Damage, Min 1")
+
+    assert (amelia.damage_fight, asporov.damage_fight) == (5, 1)   # combat réel 1412809 : protégée, mais le porteur se réduit lui-même
 
 
 # --- Protection: Power / Damage / Attack ------------------------------------------------------

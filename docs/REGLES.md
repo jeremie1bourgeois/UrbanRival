@@ -36,15 +36,16 @@ Hiérarchie de confiance : règle officielle (support ou glossaire) > combat ré
 | Les Stop (SoA/SoB) se résolvent **en chaîne** : un Stop lui-même stoppé ne stoppe rien. En cycle (SoA contre SoA, ou double Protection contre SoA+SoB), **les Stops gagnent** | `apply_capacity_lvl_1._stopped_slots` | support art. 91 (chaîne) ; utilisateur (cycles, 2026-09-21) |
 | La condition Stop ne s'active pas contre un Annul | `apply_capacity_lvl_1` | glossaire 58 |
 | Protection : Bonus/Pouvoir protège des Stop mais pas d'un Annul ni d'une Protection adverse adaptée ; protège aussi des effets négatifs d'un Leader | `apply_capacity_lvl_1._apply_stat_protections` | glossaire 55 |
+| Protection de stat : bloque aussi un « -X Cards <stat> » adverse, qui **continue de s'appliquer à son propre porteur** | `apply_capacity_lvl_1._strip_types` | combats réels 1412809, 1414093 |
 | Annul Modif. Vie/Pillz suspend l'effet persistant adverse **pour le round où il est joué** (poison/toxine/heal/regen ; dope/consume côté pillz) ; il reprend au round suivant, **attribut par attribut** (un Annul Vie contre un Repair laisse passer les pillz). Annul Modif. Dégâts n'annule pas la Fury | `Card.cancelled_modifs`, `apply_capacity_lvl_4._suspended` | glossaire 56 ; combat réel 1211922 |
 | Copie : lit les valeurs **imprimées** ; Copie Bonus seulement si le bonus adverse est actif ; Copie contre Copie → rien ; le texte copié garde ses conditions, **réévaluées pour le copieur** (pas « tel que joué ») ; les abilities de Leader et Genesis ne peuvent être copiées | `apply_capacity_lvl_1.apply_copies`, `drop_unmet_conditions` | glossaire 59 ; wiki *Oblivion* ; combat réel 1349481 |
-| Impose : lit les valeurs **imprimées**, inverse de Copie | `_apply_value_copies_and_exchanges` | glossaire 172 |
+| Impose : lit les valeurs **imprimées**, inverse de Copie ; annulé par un Annul adapté porté par la carte visée | `_apply_value_copies_and_exchanges`, `_opp_cancels_stat` | glossaire 172 ; combats réels 1412809, 1414093 |
 | Echange : échange les valeurs **imprimées** même contre une Protection adaptée ; annulé par un Annul adapté (les deux cartes gardent alors leurs valeurs imprimées) ; face à une Copie ou un Echange du même type, seul l'Echange agit | `apply_capacity_lvl_1._opp_cancels_stat` | glossaire 60 ; combat réel 1294992 |
 
 ### Niveau 2 — Puissance, Dégâts, Attaque
 | Règle | Moteur | Source |
 |---|---|---|
-| Sur une même carte, la réduction au **Min le plus haut s'applique d'abord** (à Min égal : bonus, pouvoir, Leader) | `apply_capacity_lvl_2._slots_highest_floor_first` | combats réels 1347131, 1294992 |
+| La réduction au **Min le plus haut s'applique d'abord**, quelle que soit la carte qui la porte (à Min égal : carte alliée puis ennemie, et bonus, pouvoir, Leader) | `apply_capacity_lvl_2._modifiers_highest_floor_first` | combats réels 1347131, 1294992, 1414453 |
 | Bet > N / < N compare `pillz_fight` directement (pillz gratuite comprise, fury exclue) | `process_round._bet_condition_met` | texte de carte (Zenith et autres) |
 | Killshot : attaque ≥ 2 × attaque adverse, évaluée après les modificateurs | `process_round.apply_killshot_condition` | glossaire 68 |
 | Versus (clan) s'active si le clan est présent n'importe où dans la **main** adverse, pas seulement en face | `check_capacity_condition` | glossaire 173 |
@@ -102,27 +103,29 @@ le fait tranché rejoint « Règles confirmées » ci-dessus, sans y rester dupl
 
 | # | Question | Ce que fait le moteur aujourd'hui | Comment trancher |
 |---|---|---|---|
-| **R1** | Ordre de résolution entre les deux cartes | la carte **alliée** d'abord, aux niveaux 2, 3 et 4 | duel, 3 manips |
+| **R1** | Ordre de résolution entre les deux cartes | la carte **alliée** d'abord, aux niveaux 3 et 4 | 2 manips (R1a tranchée, R1c à moitié) |
 | **R2** | « Par Dégât » quand la carte perd | multiplicateur **0** | duel |
 | **R3** | « Par Vie perdue » au-dessus de la vie de départ | borné à **0** (pas de malus) | duel avec un soin |
-| **R4** | Protection de stat contre un « Cards » | la Protection **ne bloque pas** | duel |
-| **R5** | Exchange contre Copie / Impose, Copie / Impose contre Cancel | non géré (aucune interaction) | duel |
+| **R5** | Exchange contre Copie / Impose, Copie contre Cancel | non géré (aucune interaction) | duel |
 | **R6** | Perfection (Glibon Cr) | pouvoir non parsé, carte injouable | aucune règle publiée |
 
 ### R1 — Ordre de résolution entre les deux cartes
 
-Le moteur résout toujours la carte **alliée** avant la carte ennemie. Tant qu'aucun plancher, plafond ou liste
-n'intervient, l'ordre est sans effet ; dès qu'il y en a un, le résultat dépend du camp qui s'appelle « allié » — ce
-qui n'existe pas dans le vrai jeu. 25 scénarios asymétriques sont épinglés dans `tests/test_engine_properties.py`
-(`KNOWN_ASYMMETRIES`) : une décision ici les fera disparaître.
+Le moteur résout la carte **alliée** avant la carte ennemie aux niveaux 3 et 4. Tant qu'aucun plancher, plafond ou
+liste n'intervient, l'ordre est sans effet ; dès qu'il y en a un, le résultat dépend du camp qui s'appelle
+« allié » — ce qui n'existe pas dans le vrai jeu. Le **niveau 2 est sorti de la question** (voir R1a ci-dessous) :
+les scénarios épinglés dans `tests/test_engine_properties.py` (`KNOWN_ASYMMETRIES`) sont passés de 25 à **5**.
 
-Trois manipulations, chacune à **rejouer en inversant le premier joueur** : si le résultat suit l'ordre de jeu, la
+Deux manipulations, chacune à **rejouer en inversant le premier joueur** : si le résultat suit l'ordre de jeu, la
 règle est « le premier joueur d'abord ».
 
-- **R1a, niveau 2 (stats)** — **Rajesh** (Uppers 2★ P5 D6, « -2 Cards Damage, Min 4 ») contre **Pandemos Cr**
-  (Paradox 5★ P9 D8, « -4 Cards Damage, Min 0 »), 1 pillz chacun. Rajesh résolu en premier : 6→4 et 8→6, puis −4 →
-  **Rajesh 0, Pandemos 2**. Pandemos en premier : 8→4 et 6→2, puis le « Min 4 » ne mord plus → **Rajesh 2,
-  Pandemos 4**. Du simple au double.
+- **R1a, niveau 2 (stats) — tranchée** par le combat réel 1414453 : **Rajesh** (Uppers 2★ D6, « -2 Cards Damage,
+  Min 4 ») contre **Merrick Cr** (Freaks 3★ D3, « -2 Cards Damage, Min 1 »). Le serveur laisse Rajesh à **2**, donc
+  le « Min 4 » s'applique avant le « Min 1 » bien qu'il soit porté par la carte d'en face. « Allié d'abord » comme
+  « premier joueur d'abord » donnaient 4 — les deux se confondaient ici, vous jouiez en premier avec Merrick Cr.
+  C'est l'option (c) ci-dessous ; la règle est passée en § « Règles confirmées ». Une lecture par cumul des deux
+  réductions sous le plancher le plus bas donne le même résultat sur ce combat, il faudrait une grosse réduction
+  mordant son propre plancher pour les départager.
 - **R1b, niveau 3 (vie / pillz)** — faire **perdre** **Kusuri** (Fang Pi Clang 2★ P7 D2, « Defeat: +2 Life ») face à
   **Phyllis** (Nightmare 2★ P7 D1, « -3 Opp. Life Min 4 »), le joueur de Kusuri **à 6 vies**. Le gain résolu en
   premier donne 5 → 7 → **4** ; la perte en premier donne 5 → 4 (plancher) → **6**. Variantes : **Melinda** ou
@@ -131,9 +134,14 @@ règle est « le premier joueur d'abord ».
   contre une carte **Freaks** (bonus « Poison 2, Min 3 ») qui gagne, de sorte que le joueur de Willow soit à
   **exactement 10 vies après les dégâts du round** (le plafond du soin). Au round suivant : **8** (soin d'abord,
   sans effet à 10, puis poison) ou **9** (poison 10 → 8, puis soin).
+  **À moitié fait** : le combat réel 1413898 produit ce scénario (Willow perd contre Schaap, Freaks) et donne **8**,
+  ce qui écarte « la carte adverse d'abord ». Mais le porteur du soin jouait **en premier**, donc « allié d'abord »
+  et « premier joueur d'abord » se confondent. Reste à refaire avec le porteur du soin **en second** : **8** dirait
+  « allié d'abord », **9** dirait « premier joueur d'abord ».
 
-Options si le moteur a tort : (a) garder « allié d'abord » ; (b) « le premier joueur d'abord » — symétrique et
-cohérent avec l'ordre de jeu ; (c) au niveau 2, étendre la règle du plancher le plus haut aux deux cartes à la fois.
+Options pour les niveaux 3 et 4, si le moteur a tort : (a) garder « allié d'abord » ; (b) « le premier joueur
+d'abord » — symétrique et cohérent avec l'ordre de jeu. L'option (c), étendre la règle du plancher le plus haut aux
+deux cartes, est **appliquée au niveau 2** depuis 1414453.
 
 ### R2 — « Par Dégât » quand la carte perd
 
@@ -161,30 +169,15 @@ Manipulation : monter au-dessus de la vie de départ avec un soin (bonus Jungo �
 inchangée si le plancher à 0 est juste, réduite si le jeu compte un écart négatif. Même question côté pillz avec un
 « Per Pillz Lost » après un Dope ou un Recover.
 
-### R4 — Protection de stat contre un « Cards »
+### R5 — Exchange contre Copie / Impose, et Copie contre Cancel
 
-`apply_capacity_lvl_1._apply_stat_protections` ne retire que les modificateurs adverses qui ciblent explicitement
-l'adversaire (`target == "enemy"`). Un « -X Cards <stat> », qui vise **les deux** cartes, traverse donc la
-Protection. L'utilisateur penche pour l'inverse (2026-09-22), sans source écrite.
-
-Manipulation : **Vivian** (Berzerk 3★ P7 D4, « Protection : Damage ») face à **Giovanni** (Montana 3★,
-« -2 Cards Damage, Min 1 »), 1 pillz chacun ; lire les **dégâts de Vivian** — le moteur donne **2**, la Protection
-donnerait **4**. Idem **Fixit** (Bangers 5★ P7 D6, « Protection: Power And Damage ») face à Giovanni : moteur **4**,
-attendu **6**. Attention, **Eyrton Cr** n'a sa Protection qu'à 2★ (à 5★ c'est un Cancel). Refaire une fois sur la
-puissance avec **Delija Cr** (Roots 1★, « -2 Cards Power, Min 2 ») contre un « Protection: Power ».
-
-Si le moteur a tort : `_strip_types(..., only_targeting_opponent=True)` doit aussi retirer les capacités
-`target == "both"` quand la carte protégée est visée.
-
-### R5 — Exchange contre Copie / Impose, et Copie / Impose contre Cancel
-
-Un seul cas est tranché (combat 1294992, § « Règles confirmées ») : un Cancel Opp. X Modif. annule un X Exchange en
-entier. Les autres croisements de ces trois pouvoirs, qui réécrivent tous les valeurs imprimées, ne sont couverts
-par aucun combat et le moteur les traite dans l'ordre où il les rencontre.
+Deux cas sont tranchés (§ « Règles confirmées ») : un Cancel Opp. X Modif. annule un X Exchange en entier (combat
+1294992) et un X Impose (combat 1412809). Les autres croisements de ces trois pouvoirs, qui réécrivent tous les
+valeurs imprimées, ne sont couverts par aucun combat et le moteur les traite dans l'ordre où il les rencontre.
 
 Manipulation : un **Damage Exchange** (Blast, Homy, Serleena, Incubus Cr, Duchess, Waldegrin Cr) contre
 **Copy: Opp. Damage** (Angelina, Bettisia, Darril, Dash), puis contre **Damage Impose** (Zwoosh, Zombiyaki) ; puis
-Copie contre Cancel et Impose contre Cancel (Shaker, Lenora).
+Copie contre Cancel (Shaker, Lenora).
 
 ### R6 — Perfection, seul pouvoir sans règle publiée
 

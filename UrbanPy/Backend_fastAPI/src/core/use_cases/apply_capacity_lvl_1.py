@@ -175,7 +175,7 @@ def _apply_value_copies_and_exchanges(card1: Card, card2: Card) -> None:
             for stat in ("power", "damage"):
                 if stat not in capacity.types:
                     continue
-                if capacity.how == "exchange" and _opp_cancels_stat(opp, stat):   # combat réel 1294992 : le Cancel adverse annule l'Exchange
+                if capacity.how in ("exchange", "impose") and _opp_cancels_stat(opp, stat):   # le Cancel adverse annule l'Exchange (combat réel 1294992) comme l'Impose (1412809)
                     note(own, "annule", f"{own.name} : {label(capacity)} sur {STAT_LABELS.get(stat, stat)} annulé par le Cancel {_of(opp)}")
                     continue
                 own_before, opp_before = getattr(own, f"{stat}_fight"), getattr(opp, f"{stat}_fight")
@@ -194,12 +194,19 @@ def _apply_value_copies_and_exchanges(card1: Card, card2: Card) -> None:
 # --- Phase 4 : Cancel Opp. X Modif. et Protection: X ------------------------------------------
 
 def _strip_types(card: Card, types: Set[str], only_targeting_opponent: bool) -> None:
-    """Retire `types` des capacités d'effet de `card` ; une capacité sans type restant disparaît."""
+    """Retire `types` des capacités d'effet de `card` ; une capacité sans type restant disparaît.
+
+    `only_targeting_opponent` (Protection) : un « Cards », qui frappe les deux cartes, ne disparaît pas — il se
+    replie sur son porteur, qui continue de se réduire lui-même (combat réel 1412809). Aucune description « Cards »
+    ne porte deux stats, le repli vaut donc pour toute la capacité.
+    """
     for slot in FIGHT_SLOTS:
         capacity = getattr(card, slot)
         if capacity is None or capacity.how in META_HOWS:
             continue
         if only_targeting_opponent and capacity.target != "enemy":
+            if capacity.target == "both" and set(capacity.types) & types:
+                capacity.target = "ally"
             continue
         capacity.types = [type_ for type_ in capacity.types if type_ not in types]
         if not capacity.types:

@@ -22,26 +22,31 @@ _ATTR_MAP = {
 ALL_STATS = tuple(_ATTR_MAP)
 
 
-# Sur une même carte, la réduction au plancher le plus haut s'applique d'abord (REGLES 3.6 bis) : combat 1347131, Donna
-# Black (bonus « -12 Opp Attack, Min 8 », pouvoir « -10 Opp Attack, Min 3 ») ramène 14 à 8 puis 3 ; combat 1294992,
-# Aamir (pouvoir « Growth: -1 Opp Power, Min 4 » au round 4, bonus « -2 Opp Power, Min 1 ») ramène 6 à 4 puis 2.
-# À plancher égal : bonus, pouvoir, Leader.
+# La réduction au plancher le plus haut s'applique d'abord, quelle que soit la carte qui la porte (REGLES 3.6 bis) :
+# combat 1347131, Donna Black (bonus « -12 Opp Attack, Min 8 », pouvoir « -10 Opp Attack, Min 3 ») ramène 14 à 8 puis
+# 3 ; combat 1294992, Aamir (pouvoir « Growth: -1 Opp Power, Min 4 » au round 4, bonus « -2 Opp Power, Min 1 »)
+# ramène 6 à 4 puis 2 ; combat 1414453, le « -2 Cards Damage, Min 4 » de Rajesh passe avant le « Min 1 » de Merrick
+# Cr, porté par l'autre carte, et laisse Rajesh à 2.
+# À plancher égal : carte alliée puis ennemie, et bonus, pouvoir, Leader.
 _MODIFIER_SLOTS = ("bonus_fight", "ability_fight", "leader_fight")
 
 
-def _slots_highest_floor_first(card: Card) -> list:
-    slots = [slot for slot in _MODIFIER_SLOTS if getattr(card, slot) is not None]
-    return sorted(slots, key=lambda slot: -getattr(card, slot).borne)
+def _modifiers_highest_floor_first(camps: tuple) -> list:
+    """(camp, emplacement) des deux cartes, plancher le plus haut d'abord ; le tri stable garde l'ordre d'origine
+    à plancher égal."""
+    modifiers = [(camp, slot) for camp in camps for slot in _MODIFIER_SLOTS if getattr(camp[0], slot) is not None]
+    return sorted(modifiers, key=lambda entry: -getattr(entry[0][0], entry[1]).borne)
 
 
 def apply_capacity_lvl_2(game: Game, card1: Card, card2: Card, stats=ALL_STATS) -> None:
     """Applique les modificateurs des stats `stats` : cible ally, puis both, puis enemy, pour chaque emplacement."""
+    camps = ((card1, card2, game.ally, game.enemy), (card2, card1, game.enemy, game.ally))
     for apply in (apply_target_ally_effects, apply_target_both_effects, apply_target_enemy_effects):
-        for card, opp_card, own, opp in ((card1, card2, game.ally, game.enemy), (card2, card1, game.enemy, game.ally)):
-            for slot in _slots_highest_floor_first(card):
-                capacity = getattr(card, slot)
-                if capacity is not None:
-                    setattr(card, slot, apply(game, own, opp, capacity, card, opp_card, stats))
+        for camp, slot in _modifiers_highest_floor_first(camps):
+            card, opp_card, own, opp = camp
+            capacity = getattr(card, slot)
+            if capacity is not None:
+                setattr(card, slot, apply(game, own, opp, capacity, card, opp_card, stats))
 
 
 def _apply_to(card: Card, attrs: list, bonus: int, borne: int, increase: bool) -> None:
