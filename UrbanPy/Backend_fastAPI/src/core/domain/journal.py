@@ -4,7 +4,7 @@ Power, Min 1 » → puissance d'Asporov 7 → 5 »). process_round ouvre un Jour
 niveaux appellent `note(...)` sans connaître le journal ; hors enregistrement, `note` ne fait rien.
 """
 from contextlib import contextmanager
-from typing import List, Optional
+from typing import Iterator, List, Optional
 
 from src.core.domain.capacity import Capacity
 from src.core.domain.card import Card
@@ -36,7 +36,7 @@ _current: Optional[Journal] = None
 
 
 @contextmanager
-def recording(journal: Journal):
+def recording(journal: Journal) -> Iterator[Journal]:
     global _current
     previous, _current = _current, journal
     try:

@@ -1,5 +1,3 @@
-# src/core/domain/effect.py
-
 class PersistentEffect:
     """
     Effet actif sur un joueur à la fin de chaque round suivant son activation :

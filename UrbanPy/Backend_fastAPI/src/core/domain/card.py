@@ -1,4 +1,3 @@
-# src/core/domain/card.py
 from src.adapters.repositories.card_repository import get_official_card
 from src.core.domain.capacity import Capacity
 from src.core.parsing.capacity_parser import parse_capacity
@@ -59,7 +58,6 @@ class Card:
 
     @staticmethod
     def from_dict_template(data: dict) -> "Card":
-
         card = Card.__new__(Card)
         card.name = data.get("name")
         card.faction = data.get("faction")
@@ -90,9 +88,6 @@ class Card:
         return card
 
     def to_dict(self) -> dict:
-        """
-        Convertit la carte en dictionnaire JSON-serializable.
-        """
         return {
             "name": self.name,
             "faction": self.faction,
@@ -118,6 +113,5 @@ class Card:
             "win": self.win,
         }
 
-    # print les données de fight + attack
     def __repr__(self) -> str:
         return f"Card(name={self.name}, power_fight={self.power_fight}, damage_fight={self.damage_fight}, attack={self.attack}, played={self.played}, win={self.win})"
