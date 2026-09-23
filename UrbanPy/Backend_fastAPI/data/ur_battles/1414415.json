@@ -1,0 +1,99 @@
+{
+ "_comment": "Combat réel Urban Rivals capturé via battles.status (voir scripts/ur_capture.js).",
+ "battle_id": 1414415,
+ "rule_id": 1,
+ "p0": {
+  "name": "jere'm",
+  "base_life": 12,
+  "base_pillz": 12,
+  "cards": [
+   {
+    "id": 1775,
+    "level": 2
+   },
+   {
+    "id": 876,
+    "level": 2
+   },
+   {
+    "id": 1806,
+    "level": 2
+   },
+   {
+    "id": 2047,
+    "level": 5
+   }
+  ]
+ },
+ "p1": {
+  "name": "Damien Bourgeois99297",
+  "base_life": 12,
+  "base_pillz": 12,
+  "cards": [
+   {
+    "id": 932,
+    "level": 3
+   },
+   {
+    "id": 455,
+    "level": 5
+   },
+   {
+    "id": 2315,
+    "level": 2
+   },
+   {
+    "id": 716,
+    "level": 5
+   }
+  ]
+ },
+ "rounds": [
+  {
+   "round": 1,
+   "first": "p1",
+   "before": {
+    "life": [
+     12,
+     12
+    ],
+    "pillz": [
+     12,
+     12
+    ]
+   },
+   "p0": {
+    "index": 1,
+    "pillz": 3,
+    "fury": false,
+    "power": 7,
+    "damage": 2,
+    "attack": 21,
+    "won": true
+   },
+   "p1": {
+    "index": 2,
+    "pillz": 1,
+    "fury": false,
+    "power": 8,
+    "damage": 2,
+    "attack": 8,
+    "won": false
+   },
+   "post_round": [
+    [],
+    []
+   ],
+   "after": {
+    "life": [
+     12,
+     10
+    ],
+    "pillz": [
+     10,
+     12
+    ]
+   }
+  }
+ ]
+}
