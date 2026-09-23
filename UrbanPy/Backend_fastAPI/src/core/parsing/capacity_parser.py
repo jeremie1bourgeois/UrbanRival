@@ -1,7 +1,6 @@
 """
 Parseur des descriptions textuelles d'abilities / bonus (ex. "Growth: -1 Opp Power, Min 4")
 vers des objets Capacity au vocabulaire exact du moteur. Fonction pure, ne lève jamais.
-Voir docs/superpowers/specs/2026-09-15-capacity-parser-design.md.
 """
 import re
 from dataclasses import dataclass
