@@ -1,5 +1,6 @@
 import logging
-import traceback
+import os
+import sys
 from typing import Any, Dict, List
 
 from fastapi.responses import JSONResponse
@@ -8,23 +9,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException, Body, Request
 from src.core.services.game_service import create_game, process_round_service, init_game_from_template, save_for_test_service
 from src.adapters.repositories.card_repository import official_card_catalogue
-from src.utils.config import BASE_DIR
-
-# logging.basicConfig(level=logging.DEBUG)
-import sys
+from src.utils.config import cors_origins
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=os.environ.get("UR_LOG_LEVEL", "INFO").upper(),
     format="%(asctime)s - %(levelname)s - %(message)s",
     handlers=[logging.StreamHandler(sys.stdout)],  # Assure l'affichage dans le terminal
 )
 
-app = FastAPI(debug=True)
+app = FastAPI()
 
-# Configuration du middleware CORS
+# Origines autorisées : le front local par défaut, `UR_CORS_ORIGINS` pour un autre déploiement.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Frontend URL (changer si nécessaire)
+    allow_origins=cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -33,11 +31,9 @@ app.add_middleware(
 @app.middleware("http")
 async def log_exceptions_middleware(request: Request, call_next):
     try:
-        print("DEBUG: Middleware appelé pour", request.url)
         return await call_next(request)
     except Exception as exc:
-        logging.error(f"Erreur capturée pour {request.url}: {exc}")
-        traceback.print_exc()  # Affiche la trace complète
+        logging.exception("Erreur capturée pour %s : %s", request.url, exc)
         return JSONResponse(
             status_code=500,
             content={"detail": "Erreur interne. Consultez les logs pour plus d'informations."},
@@ -47,8 +43,7 @@ async def log_exceptions_middleware(request: Request, call_next):
 # Gestionnaire global des erreurs
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    logging.error(f"Erreur globale pour {request.url}: {exc}")
-    traceback.print_exc()
+    logging.exception("Erreur globale pour %s : %s", request.url, exc)
     return JSONResponse(
         status_code=500,
         content={"detail": "Erreur inattendue. Consultez les logs pour plus d'informations."},
@@ -125,7 +120,6 @@ def save_for_test(game_id: int) -> Dict[str, Any]:
         
         return {"status": "success"}
     except ValueError as e:
-        print("DEBUG: Erreur dans save_for_test_service:", e)
         raise HTTPException(status_code=400, detail=str(e))
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail=f"Game ID '{game_id}' not found.")

@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 
 import src.core.services.game_service as game_service
 from main import app
+from src.utils.config import FRONT_DEV_ORIGIN, cors_origins
 from tests.conftest import TEMPLATE_PATH
 
 
@@ -152,6 +153,23 @@ def test_init_game_with_unknown_card_is_a_client_error(client):
     response = client.post("/init_game/", json=deck)
 
     assert (response.status_code, response.json()["detail"]) == (400, "No card found with name: Zorglub")
+
+
+def test_cors_origins_come_from_the_environment(monkeypatch):
+    """Le front local est le défaut ; un déploiement déclare ses origines dans UR_CORS_ORIGINS."""
+    monkeypatch.delenv("UR_CORS_ORIGINS", raising=False)
+    assert cors_origins() == [FRONT_DEV_ORIGIN]
+
+    monkeypatch.setenv("UR_CORS_ORIGINS", "https://urbanrival.example, http://127.0.0.1:4173")
+    assert cors_origins() == ["https://urbanrival.example", "http://127.0.0.1:4173"]
+
+
+def test_api_answers_cors_to_the_configured_front_only(client):
+    autorisee = client.get("/cards", headers={"Origin": FRONT_DEV_ORIGIN})
+    etrangere = client.get("/cards", headers={"Origin": "https://ailleurs.example"})
+
+    assert autorisee.headers.get("access-control-allow-origin") == FRONT_DEV_ORIGIN
+    assert "access-control-allow-origin" not in etrangere.headers
 
 
 def test_cards_catalogue_lists_every_official_card_with_its_levels(client):

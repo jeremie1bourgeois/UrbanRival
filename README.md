@@ -53,6 +53,10 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
+Deux variables d'environnement facultatives : `UR_CORS_ORIGINS` (origines autorisées à appeler l'API, séparées
+par des virgules — par défaut `http://localhost:5173`, le front en développement) et `UR_LOG_LEVEL` (`DEBUG`,
+`INFO` par défaut, …).
+
 Front (Node 22) :
 
 ```bash
