@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { Card, hasUnsupportedPower } from "../models/game.interface";
+import { cardImageUrl } from "../api/backend";
 
 const props = defineProps({
 	card: {
@@ -16,10 +17,10 @@ const props = defineProps({
 
 const imageBroken = ref(false);
 
-// Images servies par le CDN d'Urban Rivals (données scrapées) ; repli sur les anciens fichiers locaux
+// Images servies par le cache du backend ; repli sur les anciens fichiers locaux
 const imageSrc = computed(() => {
 	if (imageBroken.value) return "";
-	if (props.card.image) return props.card.image;
+	if (props.card.image) return cardImageUrl(props.card.image);
 	if (!props.card.name) return "src/assets/default-card.jpg";
 	return "src/assets/imageCard/" + `${props.card.name.replace(/\s+/g, "_")}_${props.card.stars}.jpg`;
 });
@@ -27,11 +28,11 @@ const imageSrc = computed(() => {
 if (props.card.image) {
 	const probe = new Image();
 	probe.onerror = () => (imageBroken.value = true);
-	probe.src = props.card.image;
+	probe.src = cardImageUrl(props.card.image);
 }
 
 const clanSrc = computed(() => {
-	if (props.card.clan_image) return props.card.clan_image;
+	if (props.card.clan_image) return cardImageUrl(props.card.clan_image);
 	if (!props.card.faction) return "src/assets/default-clan.jpg";
 	return "src/assets/Clan/" + props.card.faction.replace(/\s+/g, "").toUpperCase() + ".jpg";
 });

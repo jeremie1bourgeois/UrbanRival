@@ -1,8 +1,9 @@
 import axios from "axios";
+import { API_BASE_URL } from "./backend";
 import { Game, type CatalogueCard, type Deck, type GameState, type RoundData } from "../models/game.interface";
 
 const apiClient = axios.create({
-	baseURL: "http://127.0.0.1:8000",
+	baseURL: API_BASE_URL,
 	headers: { "Content-Type": "application/json" },
 });
 
@@ -40,7 +41,7 @@ export function errorMessage(error: unknown): string {
 	if (axios.isAxiosError(error)) {
 		const detail = error.response?.data?.detail;
 		if (typeof detail === "string") return detail;
-		if (error.response === undefined) return "Backend injoignable (http://127.0.0.1:8000).";
+		if (error.response === undefined) return `Backend injoignable (${API_BASE_URL}).`;
 	}
 	return error instanceof Error ? error.message : String(error);
 }

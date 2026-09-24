@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { errorMessage, getCatalogue, getInitGameTemplate, initGame, type StartedGame } from "../api/game";
+import { cardImageUrl } from "../api/backend";
 import {
 	DECK_SIZE,
 	MODES,
@@ -220,7 +221,7 @@ async function startTemplate() {
 			</div>
 			<ul v-if="results.length" class="divide-y divide-gray-700 rounded-xl bg-gray-800">
 				<li v-for="card in results" :key="card.name" class="flex flex-wrap items-center gap-3 px-4 py-2">
-					<img v-if="card.clan_image" :src="card.clan_image" :alt="card.faction" class="h-6 w-6" loading="lazy" />
+					<img v-if="card.clan_image" :src="cardImageUrl(card.clan_image)" :alt="card.faction" class="h-6 w-6" loading="lazy" />
 					<div class="w-48">
 						<div class="font-semibold">{{ card.name }}</div>
 						<div class="text-xs text-gray-400">
@@ -237,7 +238,7 @@ async function startTemplate() {
 					>
 						<img
 							v-if="level.image"
-							:src="level.image"
+							:src="cardImageUrl(level.image)"
 							:alt="`${card.name} ${level.stars}★`"
 							class="mx-auto h-16 rounded"
 							loading="lazy"
