@@ -158,14 +158,15 @@ def test_init_game_with_unknown_card_is_a_client_error(client):
 
 def test_une_erreur_inattendue_devient_un_500_sobre(client, caplog):
     """Une exception qui échappe aux routes est journalisée côté serveur et rendue en 500 : le client
-    ne voit ni la trace ni le message d'origine."""
+    ne voit ni la trace ni le message d'origine, mais il doit pouvoir lire la réponse — sans en-tête
+    CORS le navigateur la masque et le front annonce « Backend injoignable » à la place du détail."""
     @app.get("/panne_de_test")
     def panne():
         raise RuntimeError("rouage cassé")
 
     try:
         with caplog.at_level(logging.ERROR):
-            reponse = client.get("/panne_de_test")
+            reponse = client.get("/panne_de_test", headers={"Origin": FRONT_DEV_ORIGIN})
     finally:
         app.router.routes.pop()
 
@@ -173,6 +174,7 @@ def test_une_erreur_inattendue_devient_un_500_sobre(client, caplog):
     assert reponse.json() == {"detail": "Erreur interne. Consultez les logs pour plus d'informations."}
     assert "rouage cassé" not in reponse.text
     assert "rouage cassé" in caplog.text, "la trace doit rester dans les logs du serveur"
+    assert reponse.headers.get("access-control-allow-origin") == FRONT_DEV_ORIGIN
 
 
 def test_cors_origins_come_from_the_environment(monkeypatch):

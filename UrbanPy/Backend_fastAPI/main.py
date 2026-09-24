@@ -20,15 +20,9 @@ logging.basicConfig(
 
 app = FastAPI()
 
-# Origines autorisées : le front local par défaut, `UR_CORS_ORIGINS` pour un autre déploiement.
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=cors_origins(),
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
+# Déclaré avant CORSMiddleware, donc monté à l'intérieur de lui : la pile s'assemble dans l'ordre
+# inverse des déclarations, et le 500 fabriqué ici doit repasser par CORS pour en porter les en-têtes,
+# faute de quoi le navigateur masque la réponse au front, qui annonce « Backend injoignable ».
 @app.middleware("http")
 async def log_exceptions_middleware(request: Request, call_next):
     try:
@@ -39,6 +33,16 @@ async def log_exceptions_middleware(request: Request, call_next):
             status_code=500,
             content={"detail": "Erreur interne. Consultez les logs pour plus d'informations."},
         )
+
+
+# Origines autorisées : le front local par défaut, `UR_CORS_ORIGINS` pour un autre déploiement.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins(),
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.post("/process_round/{game_id}", response_model=Dict[str, Any])
