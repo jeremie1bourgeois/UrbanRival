@@ -1,2 +1,5 @@
-fastapi==0.100.0
-uvicorn==0.22.0
+# Versions épinglées : le projet se travaille depuis plusieurs postes, tous doivent résoudre les mêmes paquets.
+fastapi==0.141.1
+uvicorn==0.53.0
+# fastapi tolère toute la 2.x ; on fige la version testée, les schémas dépendent de son comportement de validation.
+pydantic==2.13.5

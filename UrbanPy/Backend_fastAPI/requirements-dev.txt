@@ -1,7 +1,9 @@
 -r requirements.txt
-pytest
-httpx<0.28
+
+# Versions épinglées ici aussi : le projet se travaille depuis plusieurs postes.
+pytest==9.1.1
+httpx2==2.13.1  # client du TestClient de Starlette ; `httpx` 0.x est déprécié de son côté
 
 # scraper (scripts/scrape_official_cards.py) et son extracteur testé
-requests
-beautifulsoup4
+requests==2.34.2
+beautifulsoup4==4.15.0

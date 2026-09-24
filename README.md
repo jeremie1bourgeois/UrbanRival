@@ -34,6 +34,7 @@ UrbanPy/Backend_fastAPI/       backend FastAPI
   data/jsonData_officiel.json   les cartes (seule source de vérité)
   data/collection/               collection du compte Urban Rivals « jere'm », relevée passivement (voir docs/ORACLE.md)
   data/engine_digests.json      digests du corpus combinatoire (le corpus lui-même, data/engine_corpus/, se régénère et n'est pas versionné)
+  data/card_images/             images rapatriées du CDN à la demande et servies par /card_image/ (ignoré par git)
   data/test/                    fixtures de rejeu (voir « Tests » ci-dessous)
   data/ur_battles/               combats réels capturés dans le client officiel, rejoués par tests/test_ur_battles.py
   tests/
@@ -53,6 +54,10 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
+Deux variables d'environnement facultatives : `UR_CORS_ORIGINS` (origines autorisées à appeler l'API, séparées
+par des virgules — par défaut `http://localhost:5173`, le front en développement) et `UR_LOG_LEVEL` (`DEBUG`,
+`INFO` par défaut, …).
+
 Front (Node 22) :
 
 ```bash
@@ -68,8 +73,8 @@ enregistre le round dans `data/test/test_N/` (voir ci-dessous).
 ## Tests
 
 ```bash
-cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 584 tests (~75 s) ; -m "not corpus" : 556 tests en ~4 s
-cd UrbanVue && npm test && npm run lint && npm run build           # 28 tests, lint, type-check + build
+cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 590 tests (~70 s) ; -m "not corpus" : 562 tests en ~4 s
+cd UrbanVue && npm test && npm run lint && npm run build           # 30 tests, lint, type-check + build
 cd UrbanRust && ./bootstrap.sh                                     # 5 tests ; installe rustup si la machine ne l'a pas
 ```
 

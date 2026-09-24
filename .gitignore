@@ -9,6 +9,8 @@ venv/
 UrbanPy/Backend_fastAPI/data/game
 UrbanPy/Backend_fastAPI/data/.scrape_cache
 UrbanPy/Backend_fastAPI/data/engine_corpus
+# Images de cartes rapatriées du CDN à la demande (~120 Ko pièce, 7 935 au total)
+UrbanPy/Backend_fastAPI/data/card_images
 
 # Rust
 UrbanRust/target/
