@@ -30,7 +30,7 @@ Ce document liste **ce qui reste à faire**. L'état actuel (cartes, moteur, tes
 
 | Tâche | Détail |
 |---|---|
-| **Port compilé (Rust)** | Le contrat pur (`src/core/engine/contract.py`, API `step` / `legal_actions` / `terminal`) et le corpus combinatoire (113 501 rounds, `scripts/build_engine_corpus.py`, digests dans `data/engine_digests.json`) sont l'oracle de comparaison. Pour vérifier un autre moteur : générer le corpus, puis pour chaque ligne de `<famille>.jsonl` — `deck` (indice dans `<famille>.decks.json`), `state`, `ally_action`, `enemy_action` — calculer l'état suivant et exiger `next_state` et `outcome` identiques. Vocabulaire des indices : `vocabulary.json` ; format des états : `contract.py`. |
+| **Port compilé (Rust)** | Commencé dans `UrbanRust/` : vocabulaire et état compact transcrits, empreinte du vocabulaire vérifiée contre celle de Python. Restent le lecteur de corpus, puis la résolution d'un round — cette dernière **après R1-R4**. Le contrat pur (`src/core/engine/contract.py`, API `step` / `legal_actions` / `terminal`) et le corpus combinatoire (113 501 rounds, `scripts/build_engine_corpus.py`, digests dans `data/engine_digests.json`) sont l'oracle de comparaison. Pour vérifier un autre moteur : générer le corpus, puis pour chaque ligne de `<famille>.jsonl` — `deck` (indice dans `<famille>.decks.json`), `state`, `ally_action`, `enemy_action` — calculer l'état suivant et exiger `next_state` et `outcome` identiques. Vocabulaire des indices : `vocabulary.json` ; format des états : `contract.py`. |
 | **Persistance** | Fichiers JSON par round (`data/game/`) → stockage mémoire + SQLite optionnel ; `get_new_game_id` est relatif au dossier courant (le serveur doit être lancé depuis `UrbanPy/Backend_fastAPI`). |
 | **Dette technique** | `requirements.txt` fige `fastapi==0.100.0` (2023) et des validateurs Pydantic v1 (`@validator`, dépréciés → `field_validator`) ; CORS à rendre configurable ; `print` de debug et `debug=True` dans `main.py` ; le front dépend du CDN d'Urban Rivals pour les images (option : script de téléchargement local). |
 
@@ -45,9 +45,10 @@ Ce document liste **ce qui reste à faire**. L'état actuel (cartes, moteur, tes
 
 ## IA
 
-Plan, décisions et mesures détaillés : [`IA.md`](IA.md). Travail en cours sur la branche `feat/ia-tous-modes`
-(étapes 1 à 3 bis du plan : Nash à un round, solveur exact, mesures de coût) — à fusionner sur accord explicite.
-Suite : étape 4 (exploitation, modèle d'adversaire, évaluation de decks, intégration dans l'interface).
+Plan, décisions et mesures détaillés : [`IA.md`](IA.md), seule référence. Une première implémentation des étapes 1
+à 3 bis (Nash à un round, solveur exact, mesures de coût) a été abandonnée le 2026-09-23 plutôt que fusionnée : elle
+était bâtie sur le moteur Python, dont la lenteur est justement ce qui la plafonnait (20 min pour résoudre une seule
+paire de mains à 12 pillz). L'IA se reprend depuis `IA.md` une fois le moteur compilé disponible.
 
 ## Divers
 

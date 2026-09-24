@@ -38,6 +38,8 @@ UrbanPy/Backend_fastAPI/       backend FastAPI
   data/ur_battles/               combats réels capturés dans le client officiel, rejoués par tests/test_ur_battles.py
   tests/
 UrbanVue/                      front Vue 3 + TypeScript + Tailwind (Vite)
+UrbanRust/                     port compilé du moteur, en construction : vocabulaire et état compact transcrits du contrat Python,
+                                 comparés à lui par les digests du corpus ; la résolution d'un round reste à écrire (voir ROADMAP)
 UrbanPy/script/                 pipeline historique d'extraction des patterns de capacités (all_capacities_v*.json), plus utilisé
 ```
 
@@ -68,7 +70,12 @@ enregistre le round dans `data/test/test_N/` (voir ci-dessous).
 ```bash
 cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 584 tests (~75 s) ; -m "not corpus" : 556 tests en ~4 s
 cd UrbanVue && npm test && npm run lint && npm run build           # 28 tests, lint, type-check + build
+cd UrbanRust && ./bootstrap.sh                                     # 5 tests ; installe rustup si la machine ne l'a pas
 ```
+
+Sur une machine neuve, `UrbanRust/bootstrap.sh` (ou `bootstrap.ps1` sous Windows) installe rustup s'il manque et joue
+les tests ; `rust-toolchain.toml` épingle la version du compilateur, donc le même code se compile à l'identique
+partout. Ensuite, `cargo test` suffit.
 
 Les tests du moteur sont écrits **de bout en bout** : un texte d'ability (« Growth: -1 Opp Power, Min 4 ») est parsé
 puis joué dans un round, et le résultat attendu est calculé à la main d'après les règles. Trois familles s'y

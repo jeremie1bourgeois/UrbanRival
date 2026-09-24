@@ -1,0 +1,5 @@
+# Le Python du projet tourne à ~120 colonnes ; les listes du vocabulaire et les petits littéraux restent denses,
+# pour qu'on les relise en face de contract.py plutôt qu'à raison d'une chaîne par ligne.
+max_width = 120
+short_array_element_width_threshold = 24
+struct_lit_width = 60

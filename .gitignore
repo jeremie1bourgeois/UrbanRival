@@ -10,6 +10,9 @@ UrbanPy/Backend_fastAPI/data/game
 UrbanPy/Backend_fastAPI/data/.scrape_cache
 UrbanPy/Backend_fastAPI/data/engine_corpus
 
+# Rust
+UrbanRust/target/
+
 # IDE / outils locaux
 .vs/
 *.suo
