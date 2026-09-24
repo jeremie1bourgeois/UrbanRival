@@ -43,13 +43,6 @@ Ce document liste **ce qui reste à faire**. L'état actuel (cartes, moteur, tes
 - Réintégrer un sélecteur d'adversaire IA (retiré du front avec `POST /ai_pick/` le temps que la partie se joue à
   deux sur le même écran) quand l'IA sera prête à jouer.
 
-## IA
-
-Plan, décisions et mesures détaillés : [`IA.md`](IA.md), seule référence. Une première implémentation des étapes 1
-à 3 bis (Nash à un round, solveur exact, mesures de coût) a été abandonnée le 2026-09-23 plutôt que fusionnée : elle
-était bâtie sur le moteur Python, dont la lenteur est justement ce qui la plafonnait (20 min pour résoudre une seule
-paire de mains à 12 pillz). L'IA se reprend depuis `IA.md` une fois le moteur compilé disponible.
-
 ## Divers
 
 - Branches distantes déjà fusionnées dans `main` : à supprimer (`git branch -r --merged main`).
