@@ -1,5 +1,5 @@
 from enum import Enum
-from pydantic import BaseModel, ValidationInfo, field_validator, validator
+from pydantic import BaseModel, ValidationInfo, field_validator
 from typing import List, Dict, Literal, Optional, Tuple, Union
 from pydantic import Field
 
@@ -10,7 +10,8 @@ class CardInput(BaseModel):
     card_name: str
     nb_stars: int = 1  # Par défaut : 1 étoile
 
-    @validator("nb_stars")
+    @field_validator("nb_stars")
+    @classmethod
     def validate_nb_stars(cls, nb_stars):
         if not (1 <= nb_stars <= 5):
             raise ValueError("Number of stars must be between 1 and 5.")
@@ -18,11 +19,12 @@ class CardInput(BaseModel):
 
 
 class PlayerCards(BaseModel):
-	player1: List[CardInput] = Field(..., min_items=4, max_items=4)
-	player2: List[CardInput] = Field(..., min_items=4, max_items=4)
+	player1: List[CardInput] = Field(..., min_length=4, max_length=4)
+	player2: List[CardInput] = Field(..., min_length=4, max_length=4)
 	night: Optional[bool] = None   # None : jour ou nuit tiré au sort à la création de la partie
 
-	@validator("player1", "player2")
+	@field_validator("player1", "player2")
+	@classmethod
 	def validate_card_list_length(cls, cards):
 		if len(cards) != 4:
 			raise ValueError("Each player must have exactly 4 cards.")

@@ -136,6 +136,16 @@ def test_init_game_rejects_an_invalid_starting_situation(client):
     assert client.post("/init_game/", json={**REAL_DECK, "pillz": [12, 12, 12]}).status_code == 422
 
 
+def test_init_game_rejects_an_invalid_hand(client):
+    """Une main compte exactement 4 cartes et un niveau va de 1 à 5 (contraintes de `PlayerCards`/`CardInput`)."""
+    assert client.post("/init_game/", json={**REAL_DECK, "player1": REAL_DECK["player1"][:3]}).status_code == 422
+    assert client.post("/init_game/", json={**REAL_DECK,
+                                            "player2": REAL_DECK["player2"] + [{"card_name": "Aamir"}]}).status_code == 422
+
+    niveau_hors_bornes = [{"card_name": "Aamir", "nb_stars": 7}] + REAL_DECK["player1"][1:]
+    assert client.post("/init_game/", json={**REAL_DECK, "player1": niveau_hors_bornes}).status_code == 422
+
+
 def test_init_game_with_unknown_card_is_a_client_error(client):
     deck = {**REAL_DECK, "player1": [{"card_name": "Zorglub", "nb_stars": 1}] + REAL_DECK["player1"][1:]}
 
