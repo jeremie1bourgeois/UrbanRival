@@ -35,6 +35,18 @@ def all_capacity_descriptions() -> Set[str]:
     return descriptions
 
 
+def all_image_urls() -> Set[str]:
+    """Toutes les URLs d'images citées par le catalogue : illustrations par niveau et écussons de clan."""
+    urls = set()
+    for data in _official_cards().values():
+        urls.add(data.get("clan_image", ""))
+        for level, star_data in data.items():
+            if level.isdigit():
+                urls.add(star_data.get("image", ""))
+    urls.discard("")
+    return urls
+
+
 @lru_cache(maxsize=1)
 def official_card_catalogue() -> list:
     """

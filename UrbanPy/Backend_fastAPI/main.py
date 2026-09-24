@@ -3,11 +3,12 @@ import os
 import sys
 from typing import Any, Dict, List
 
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from src.schemas.game_schemas import GameSetup, ProcessRoundInput
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException, Body, Request
 from src.core.services.game_service import create_game, process_round_service, init_game_from_template, save_for_test_service
+from src.adapters.repositories.card_image_cache import cached_image_path
 from src.adapters.repositories.card_repository import official_card_catalogue
 from src.utils.config import cors_origins
 
@@ -106,6 +107,20 @@ def cards_catalogue() -> List[Dict[str, Any]]:
     pour composer un deck côté front.
     """
     return official_card_catalogue()
+
+
+@app.get("/card_image/{filename}")
+def card_image(filename: str) -> FileResponse:
+    """
+    Sert une illustration du catalogue depuis le cache local, en la rapatriant du CDN d'Urban Rivals
+    à la première demande. Le front passe donc par le backend et ne dépend plus du CDN.
+    """
+    try:
+        return FileResponse(cached_image_path(filename), media_type="image/png")
+    except ValueError:
+        raise HTTPException(status_code=404, detail=f"Unknown card image: {filename}")
+    except OSError as e:
+        raise HTTPException(status_code=502, detail=f"Image unavailable on the CDN: {e}")
 
 
 @app.get("/save_for_test")
