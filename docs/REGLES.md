@@ -57,6 +57,7 @@ Hiérarchie de confiance : règle officielle (support ou glossaire) > combat ré
 ### Combat, KO, fin de round
 | Règle | Moteur | Source |
 |---|---|---|
+| Un effet de vie / pillz **sans préfixe** (`Defeat`, `Backlash`, `Victory Or Defeat`) n'agit que si la carte **gagne** le round, qu'il soigne son camp ou frappe l'adversaire. Sa condition d'activation (Bet, Equalizer, Courage…) est consommée en amont par `check_capacity_condition` et ne dispense pas de gagner | `apply_capacity_lvl_3.check_capacity_condition_lvl_3` | combats réels 1402251 (Akem, « Bet < 6 Pillz: +3 Life » non versé), 1414369 et 1414453 (Owen, « -4 Opp. Life Min 2 » non infligé) |
 | Reanimate = « Defeat: +X Life » qui fonctionne aussi depuis 0 vie (soigne sur **toute** défaite, pas seulement un KO) | `apply_capacity_lvl_3` | wiki *Reanimate* |
 | Recover X sur Y : ⌊pillz posées × X / Y⌋, **minimum 1**, pillz gratuite et fury comprises | `apply_capacity_lvl_3.recovered_pillz` | glossaire 53 ; combat réel 1347075 |
 | Repair X, Max Y verse **X vies ET X pillz**, chacune plafonnée à Y | `apply_capacity_lvl_4._STATS_OF_KIND` | combat réel 1211702 |
@@ -106,7 +107,7 @@ le fait tranché rejoint « Règles confirmées » ci-dessus, sans y rester dupl
 | **R1** | Ordre de résolution entre les deux cartes | la carte **alliée** d'abord, aux niveaux 3 et 4 | 2 manips (R1a tranchée, R1c à moitié) |
 | **R2** | « Par Dégât » quand la carte perd | multiplicateur **0** | duel |
 | **R3** | « Par Vie perdue » au-dessus de la vie de départ | borné à **0** (pas de malus) | duel avec un soin |
-| **R5** | Exchange contre Copie / Impose, Copie contre Cancel | non géré (aucune interaction) | duel |
+| **R5** | Exchange contre Copie / Impose, Copie contre Cancel | appliqués dans l'ordre rencontré, sans interaction ; conforme aux combats du 23/09 | duel avec un 3ᵉ modificateur intercalé |
 | **R6** | Perfection (Glibon Cr) | pouvoir non parsé, carte injouable | aucune règle publiée |
 
 ### R1 — Ordre de résolution entre les deux cartes
@@ -172,12 +173,24 @@ inchangée si le plancher à 0 est juste, réduite si le jeu compte un écart n�
 ### R5 — Exchange contre Copie / Impose, et Copie contre Cancel
 
 Deux cas sont tranchés (§ « Règles confirmées ») : un Cancel Opp. X Modif. annule un X Exchange en entier (combat
-1294992) et un X Impose (combat 1412809). Les autres croisements de ces trois pouvoirs, qui réécrivent tous les
-valeurs imprimées, ne sont couverts par aucun combat et le moteur les traite dans l'ordre où il les rencontre.
+1294992) et un X Impose (combat 1412809). Le moteur traite les autres croisements dans l'ordre où il les rencontre.
 
-Manipulation : un **Damage Exchange** (Blast, Homy, Serleena, Incubus Cr, Duchess, Waldegrin Cr) contre
-**Copy: Opp. Damage** (Angelina, Bettisia, Darril, Dash), puis contre **Damage Impose** (Zwoosh, Zombiyaki) ; puis
-Copie contre Cancel (Shaker, Lenora).
+Les combats du 23 septembre **contraignent** Exchange contre Copie et Exchange contre Impose sans les départager.
+Ce qu'ils excluent : la Copie ne lit pas le résultat de l'Échange (1412809 r1, 1412980 r1, 1414277 r4 — Blast D2 contre
+Flood Ed « Copy: Power And Damage Opp. », l'Échange porte Blast à 3 et Flood Ed finit à **2**, la valeur imprimée
+de Blast, non à 3) ; et l'Impose ne rend pas au lanceur sa valeur imprimée, l'Échange tient sur lui (1402174 r2,
+Honikai à 6 = 3 reçus + 3 de bonus ; 1412902 r4, Honikai à 5 = 3 reçus + 2 de fury — dans les deux cas 2+X aurait
+donné un de moins).
+
+Ce qu'ils ne départagent pas, et pourquoi c'est structurel : dans un échange à deux, la valeur reçue par une carte
+**est** la valeur imprimée de l'adversaire — exactement ce qu'une Copie ou un Impose lui donnerait. « Les deux
+pouvoirs agissent, chacun sur les imprimées » et « seul l'Échange agit » produisent donc le même nombre. Les sept
+occurrences de « Reprisal: Damage Impose » de ces 17 combats — trois face à un Échange, trois face à un Cancel —
+sont toutes sans effet observable.
+
+Manipulation : il faut un **troisième modificateur intercalé** entre l'Échange et la Copie / l'Impose, sinon les
+deux lectures resteront confondues quel que soit le nombre de duels. Reste entier, lui : **Copie contre Cancel**
+(Shaker, Lenora), qu'aucun combat ne couvre.
 
 ### R6 — Perfection, seul pouvoir sans règle publiée
 
