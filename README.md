@@ -73,7 +73,7 @@ enregistre le round dans `data/test/test_N/` (voir ci-dessous).
 ## Tests
 
 ```bash
-cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 590 tests (~70 s) ; -m "not corpus" : 562 tests en ~4 s
+cd UrbanPy/Backend_fastAPI && .venv/bin/python -m pytest          # 591 tests (~70 s) ; -m "not corpus" : 563 tests en ~4 s
 cd UrbanVue && npm test && npm run lint && npm run build           # 30 tests, lint, type-check + build
 cd UrbanRust && ./bootstrap.sh                                     # 5 tests ; installe rustup si la machine ne l'a pas
 ```

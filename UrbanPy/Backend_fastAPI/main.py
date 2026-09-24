@@ -41,15 +41,6 @@ async def log_exceptions_middleware(request: Request, call_next):
         )
 
 
-# Gestionnaire global des erreurs
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    logging.exception("Erreur globale pour %s : %s", request.url, exc)
-    return JSONResponse(
-        status_code=500,
-        content={"detail": "Erreur inattendue. Consultez les logs pour plus d'informations."},
-    )
-
 @app.post("/process_round/{game_id}", response_model=Dict[str, Any])
 def process_game_round(game_id: str, round_data: ProcessRoundInput = Body(...)):
     """

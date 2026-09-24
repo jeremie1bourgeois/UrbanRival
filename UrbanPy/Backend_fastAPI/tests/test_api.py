@@ -1,5 +1,6 @@
 import glob
 import json
+import logging
 import os
 import shutil
 
@@ -153,6 +154,25 @@ def test_init_game_with_unknown_card_is_a_client_error(client):
     response = client.post("/init_game/", json=deck)
 
     assert (response.status_code, response.json()["detail"]) == (400, "No card found with name: Zorglub")
+
+
+def test_une_erreur_inattendue_devient_un_500_sobre(client, caplog):
+    """Une exception qui échappe aux routes est journalisée côté serveur et rendue en 500 : le client
+    ne voit ni la trace ni le message d'origine."""
+    @app.get("/panne_de_test")
+    def panne():
+        raise RuntimeError("rouage cassé")
+
+    try:
+        with caplog.at_level(logging.ERROR):
+            reponse = client.get("/panne_de_test")
+    finally:
+        app.router.routes.pop()
+
+    assert reponse.status_code == 500
+    assert reponse.json() == {"detail": "Erreur interne. Consultez les logs pour plus d'informations."}
+    assert "rouage cassé" not in reponse.text
+    assert "rouage cassé" in caplog.text, "la trace doit rester dans les logs du serveur"
 
 
 def test_cors_origins_come_from_the_environment(monkeypatch):

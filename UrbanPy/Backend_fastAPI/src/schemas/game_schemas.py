@@ -23,13 +23,6 @@ class PlayerCards(BaseModel):
 	player2: List[CardInput] = Field(..., min_length=4, max_length=4)
 	night: Optional[bool] = None   # None : jour ou nuit tiré au sort à la création de la partie
 
-	@field_validator("player1", "player2")
-	@classmethod
-	def validate_card_list_length(cls, cards):
-		if len(cards) != 4:
-			raise ValueError("Each player must have exactly 4 cards.")
-		return cards
-
 
 class GameSetup(PlayerCards):
 	"""
