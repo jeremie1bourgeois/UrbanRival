@@ -115,4 +115,6 @@ grandit avec le dépôt et la CI le rejoue à chaque changement du moteur. C'est
   cartes, pas sur les vies finales.
 - Les modes à règles spéciales (`battleRuleId` autre que le classique, vies ≠ 12/14, bonus modifiés) doivent être
   identifiés avant d'être ajoutés : le moteur ne modélise que le gameplay classique.
-- `Day:` / `Night:` dépendent de l'heure du jeu ; un combat de nuit avec des GhosTown produira des écarts attendus.
+- `Day:` / `Night:` dépendent de l'heure du jeu. Le serveur n'envoie pas de drapeau : la capture déduit `night` du
+  texte des pouvoirs en jeu (« Night: » / « Nuit: »), et le rejeu en tient compte. Un combat sans carte jour/nuit est
+  noté de jour, ce qui ne change rien ; un fichier sans champ `night` (capturé avant le 2026-09-29) est rejoué de jour.

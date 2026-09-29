@@ -25,15 +25,17 @@ def _battles():
     return sorted(glob.glob(os.path.join(BATTLES_DIR, "*.json")))
 
 
-def _card(card_id: int, level: int) -> Card:
+def _card(card_id: int, level: int, night: bool) -> Card:
     name = next(name for name, data in _official_cards().items() if data["id"] == card_id)
-    return Card(name, level)
+    return Card(name, level, night=night)
 
 
 def _game(record: dict) -> Game:
+    # `night` absent = combat enregistré avant que la capture le relève : de jour
+    night = record.get("night", False)
     players = [Player(name=record[side]["name"], life=record[side]["base_life"], pillz=record[side]["base_pillz"],
-                      cards=[_card(c["id"], c["level"]) for c in record[side]["cards"]]) for side in ("p0", "p1")]
-    return Game(1, True, players[0], players[1], [])
+                      cards=[_card(c["id"], c["level"], night) for c in record[side]["cards"]]) for side in ("p0", "p1")]
+    return Game(1, True, players[0], players[1], [], night=night)
 
 
 @pytest.mark.parametrize("path", _battles(), ids=os.path.basename)
