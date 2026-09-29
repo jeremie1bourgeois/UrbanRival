@@ -1,0 +1,185 @@
+{
+ "_comment": "Combat réel Urban Rivals capturé via battles.status (voir scripts/ur_capture.js).",
+ "battle_id": 1600898,
+ "rule_id": 1,
+ "p0": {
+  "name": "Dehqo",
+  "base_life": 12,
+  "base_pillz": 12,
+  "cards": [
+   {
+    "id": 2434,
+    "level": 2
+   },
+   {
+    "id": 2628,
+    "level": 3
+   },
+   {
+    "id": 187,
+    "level": 3
+   },
+   {
+    "id": 1235,
+    "level": 5
+   }
+  ]
+ },
+ "p1": {
+  "name": "jere'm",
+  "base_life": 12,
+  "base_pillz": 12,
+  "cards": [
+   {
+    "id": 1822,
+    "level": 3
+   },
+   {
+    "id": 1620,
+    "level": 2
+   },
+   {
+    "id": 2148,
+    "level": 3
+   },
+   {
+    "id": 1972,
+    "level": 1
+   }
+  ]
+ },
+ "rounds": [
+  {
+   "round": 1,
+   "first": "p0",
+   "before": {
+    "life": [
+     12,
+     12
+    ],
+    "pillz": [
+     12,
+     12
+    ]
+   },
+   "p0": {
+    "index": 2,
+    "pillz": 1,
+    "fury": false,
+    "power": 7,
+    "damage": 2,
+    "attack": 7,
+    "won": false
+   },
+   "p1": {
+    "index": 0,
+    "pillz": 2,
+    "fury": false,
+    "power": 6,
+    "damage": 1,
+    "attack": 12,
+    "won": true
+   },
+   "post_round": [
+    [],
+    []
+   ],
+   "after": {
+    "life": [
+     11,
+     12
+    ],
+    "pillz": [
+     12,
+     11
+    ]
+   }
+  },
+  {
+   "round": 2,
+   "first": "p1",
+   "before": {
+    "life": [
+     11,
+     12
+    ],
+    "pillz": [
+     12,
+     11
+    ]
+   },
+   "p0": {
+    "index": 0,
+    "pillz": 6,
+    "fury": false,
+    "power": 9,
+    "damage": 6,
+    "attack": 54,
+    "won": true
+   },
+   "p1": {
+    "index": 3,
+    "pillz": 1,
+    "fury": false,
+    "power": 7,
+    "damage": 1,
+    "attack": 7,
+    "won": false
+   },
+   "post_round": [
+    [],
+    []
+   ],
+   "after": {
+    "life": [
+     11,
+     6
+    ],
+    "pillz": [
+     7,
+     11
+    ]
+   }
+  },
+  {
+   "round": 3,
+   "first": "p0",
+   "before": {
+    "life": [
+     11,
+     6
+    ],
+    "pillz": [
+     7,
+     11
+    ]
+   },
+   "p0": {
+    "index": 3,
+    "pillz": 8,
+    "fury": false,
+    "power": 11,
+    "damage": 7,
+    "attack": 88,
+    "won": true
+   },
+   "p1": {
+    "index": 1,
+    "pillz": 12,
+    "fury": false,
+    "power": 7,
+    "damage": 2,
+    "attack": 84,
+    "won": false
+   },
+   "post_round": [
+    [],
+    []
+   ],
+   "after": {
+    "life": null,
+    "pillz": null
+   }
+  }
+ ]
+}
