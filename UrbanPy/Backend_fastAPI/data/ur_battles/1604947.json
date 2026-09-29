@@ -1,0 +1,279 @@
+{
+ "_comment": "Combat réel Urban Rivals capturé via battles.status (voir scripts/ur_capture.js).",
+ "battle_id": 1604947,
+ "rule_id": 1,
+ "night": false,
+ "p0": {
+  "name": "jere'm",
+  "base_life": 12,
+  "base_pillz": 12,
+  "cards": [
+   {
+    "id": 2148,
+    "level": 3
+   },
+   {
+    "id": 2301,
+    "level": 1
+   },
+   {
+    "id": 1972,
+    "level": 1
+   },
+   {
+    "id": 1322,
+    "level": 1
+   }
+  ]
+ },
+ "p1": {
+  "name": "dhoeffher",
+  "base_life": 12,
+  "base_pillz": 12,
+  "cards": [
+   {
+    "id": 2245,
+    "level": 5
+   },
+   {
+    "id": 2251,
+    "level": 5
+   },
+   {
+    "id": 1846,
+    "level": 5
+   },
+   {
+    "id": 1920,
+    "level": 5
+   }
+  ]
+ },
+ "rounds": [
+  {
+   "round": 1,
+   "first": "p1",
+   "before": {
+    "life": [
+     12,
+     12
+    ],
+    "pillz": [
+     12,
+     12
+    ]
+   },
+   "p0": {
+    "index": 0,
+    "pillz": 1,
+    "fury": false,
+    "power": 8,
+    "damage": 3,
+    "attack": 8,
+    "won": false
+   },
+   "p1": {
+    "index": 0,
+    "pillz": 3,
+    "fury": false,
+    "power": 8,
+    "damage": 5,
+    "attack": 24,
+    "won": true
+   },
+   "post_round": [
+    [
+     {
+      "playerId": 32895372,
+      "attributeAffected": "life",
+      "attributeAction": "increase",
+      "isPermanent": false,
+      "quantity": 1
+     }
+    ],
+    [
+     {
+      "playerId": 118265,
+      "attributeAffected": "life",
+      "attributeAction": "increase",
+      "isPermanent": false,
+      "quantity": 1
+     }
+    ]
+   ],
+   "after": {
+    "life": [
+     8,
+     13
+    ],
+    "pillz": [
+     12,
+     10
+    ]
+   }
+  },
+  {
+   "round": 2,
+   "first": "p0",
+   "before": {
+    "life": [
+     8,
+     13
+    ],
+    "pillz": [
+     12,
+     10
+    ]
+   },
+   "p0": {
+    "index": 1,
+    "pillz": 6,
+    "fury": false,
+    "power": 6,
+    "damage": 2,
+    "attack": 36,
+    "won": true
+   },
+   "p1": {
+    "index": 2,
+    "pillz": 5,
+    "fury": false,
+    "power": 6,
+    "damage": 7,
+    "attack": 15,
+    "won": false
+   },
+   "post_round": [
+    [
+     {
+      "playerId": 32895372,
+      "attributeAffected": "pillz",
+      "attributeAction": "decrease",
+      "isPermanent": false,
+      "quantity": 2
+     }
+    ],
+    [
+     {
+      "playerId": 118265,
+      "attributeAffected": "pillz",
+      "attributeAction": "increase",
+      "isPermanent": false,
+      "quantity": 1
+     },
+     {
+      "playerId": 118265,
+      "attributeAffected": "pillz",
+      "attributeAction": "decrease",
+      "isPermanent": false,
+      "quantity": 2
+     }
+    ]
+   ],
+   "after": {
+    "life": [
+     8,
+     11
+    ],
+    "pillz": [
+     5,
+     5
+    ]
+   }
+  },
+  {
+   "round": 3,
+   "first": "p1",
+   "before": {
+    "life": [
+     8,
+     11
+    ],
+    "pillz": [
+     5,
+     5
+    ]
+   },
+   "p0": {
+    "index": 2,
+    "pillz": 1,
+    "fury": false,
+    "power": 7,
+    "damage": 1,
+    "attack": 7,
+    "won": false
+   },
+   "p1": {
+    "index": 3,
+    "pillz": 6,
+    "fury": false,
+    "power": 9,
+    "damage": 5,
+    "attack": 39,
+    "won": true
+   },
+   "post_round": [
+    [],
+    []
+   ],
+   "after": {
+    "life": [
+     3,
+     11
+    ],
+    "pillz": [
+     5,
+     0
+    ]
+   }
+  },
+  {
+   "round": 4,
+   "first": "p0",
+   "before": {
+    "life": [
+     3,
+     11
+    ],
+    "pillz": [
+     5,
+     0
+    ]
+   },
+   "p0": {
+    "index": 3,
+    "pillz": 3,
+    "fury": true,
+    "power": 6,
+    "damage": 4,
+    "attack": 18,
+    "won": true
+   },
+   "p1": {
+    "index": 1,
+    "pillz": 1,
+    "fury": false,
+    "power": 8,
+    "damage": 8,
+    "attack": 8,
+    "won": false
+   },
+   "post_round": [
+    [
+     {
+      "playerId": 32895372,
+      "attributeAffected": "life",
+      "attributeAction": "decrease",
+      "isPermanent": true,
+      "quantity": 2
+     }
+    ],
+    []
+   ],
+   "after": {
+    "life": null,
+    "pillz": null
+   }
+  }
+ ]
+}
