@@ -81,7 +81,13 @@ function urRecordOf(sts) {
       after: next ? { life: [next.player0.life, next.player1.life], pillz: [next.player0.pillz, next.player1.pillz] } : { life: null, pillz: null } });
   }
   return { _comment: "Combat réel Urban Rivals capturé via battles.status (voir scripts/ur_capture.js).", battle_id: first.id, rule_id: first.battleRuleId,
-    p0: pl(first.player0), p1: pl(first.player1), rounds };
+    night: urIsNight(first), p0: pl(first.player0), p1: pl(first.player1), rounds };
+}
+
+// Le serveur n'envoie aucun drapeau jour/nuit : seul le texte des pouvoirs « Day: / Night: » change (« Nuit: » en
+// français). Sans carte de ce genre en jeu, le moment ne change rien et le combat est noté de jour.
+function urIsNight(b) {
+  return [b.player0, b.player1].some((p) => p.characters.some((x) => [x.ability, x.bonus].some((a) => a && /^\s*(night|nuit)\s*:/i.test(a.description))));
 }
 
 // Tous les combats capturés depuis le chargement du script (ou urRestore()), un enregistrement par combat.
