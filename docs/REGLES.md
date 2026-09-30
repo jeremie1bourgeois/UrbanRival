@@ -61,7 +61,7 @@ Hiérarchie de confiance : règle officielle (support ou glossaire) > combat ré
 | Reanimate = « Defeat: +X Life » qui fonctionne aussi depuis 0 vie (soigne sur **toute** défaite, pas seulement un KO) | `apply_capacity_lvl_3` | wiki *Reanimate* |
 | Recover X sur Y : ⌊pillz posées × X / Y⌋, **minimum 1**, pillz gratuite et fury comprises | `apply_capacity_lvl_3.recovered_pillz` | glossaire 53 ; combat réel 1347075 |
 | Repair X, Max Y verse **X vies ET X pillz**, chacune plafonnée à Y | `apply_capacity_lvl_4._STATS_OF_KIND` | combat réel 1211702 |
-| Poison/Toxine/Heal/Regen/Dope/Consume : au sein d'une même sorte, le second remplace le premier (Poison et Heal, sortes opposées, coexistent) ; Toxine, Régén, Dope, Consume, Repair, Mindwipe agissent **dès le round joué** ; Poison, Heal et Combust, aux rounds suivants. Mindwipe est un Combust immédiat : même sorte d'effet, marqué `how` « immediate » au parsage | `apply_capacity_lvl_4.IMMEDIATE_KINDS` | glossaire 50, 51, 52 ; utilisateur ; combats réels 1638346 (Combust), 1211702, 1214027, 1214141 (Mindwipe) |
+| Poison/Toxine/Heal/Regen/Dope/Consume : au sein d'une même sorte, le second remplace le premier (Poison et Heal, sortes opposées, coexistent) ; Toxine, Régén, Dope, Consume, Repair, Mindwipe agissent **dès le round joué** ; Poison, Heal et Combust, aux rounds suivants. Une Toxine remplace le Poison du joueur visé, qui n'agit pas au round de la Toxine (combat réel 1647870). Mindwipe est un Combust immédiat : même sorte d'effet, marqué `how` « immediate » au parsage | `apply_capacity_lvl_4.IMMEDIATE_KINDS` | glossaire 50, 51, 52 ; utilisateur ; combats réels 1638346 (Combust), 1211702, 1214027, 1214141 (Mindwipe) |
 
 ### Bonus de clan, Leader, Oculus
 | Règle | Moteur | Source |
