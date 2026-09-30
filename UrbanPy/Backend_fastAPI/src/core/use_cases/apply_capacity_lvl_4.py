@@ -4,8 +4,9 @@ Niveau 4 : effets persistants (poison / toxine / heal / regen / dope / repair / 
   1. les effets déjà actifs agissent (« à la fin de chaque round suivant » leur activation) ;
   2. les capacités persistantes restantes (leur condition de fin de round a été validée au niveau 3) sont
      enregistrées sur le joueur affecté : cible ally -> propriétaire, enemy -> adversaire ; le multiplicateur
-     est résolu à l'activation ; un effet remplace l'effet de même sorte (poison et toxine se cumulent,
-     heal et regen aussi, dope et repair aussi) ;
+     est résolu à l'activation ; un effet remplace l'effet de même sorte (heal et regen se cumulent — non
+     prouvé, REGLES R7 —, dope et repair aussi) ; une toxine remplace aussi le poison du joueur visé, et ce poison
+     n'agit pas au round de la toxine (combat réel 1647870) ;
   3. toxine, regen, dope et consume « agissent immédiatement à la fin du round dans lequel ils ont été joués »
      (glossaire officiel 51, 52 ; repair : utilisateur) : les effets de ces sortes enregistrés ce round agissent
      aussitôt. Combust attend le round suivant (combat réel 1638346), sauf posé par un Mindwipe (how « immediate »),
@@ -42,6 +43,7 @@ def _suspended(effect: PersistentEffect, player_card: Card, opp_card: Card) -> t
 
 def apply_capacity_lvl_4(game: Game, card1: Card, card2: Card) -> None:
     sides = ((card1, card2, game.ally, game.enemy), (card2, card1, game.enemy, game.ally))
+    _drop_poisons_replaced_by_a_toxin(sides)
     for card, opp_card, own, opp in sides:
         side = _side(game, own)
         for effect in own.effect_list:
@@ -72,6 +74,17 @@ def apply_capacity_lvl_4(game: Game, card1: Card, card2: Card) -> None:
                 if immediate and suspended != _STATS_OF_KIND[kind]:
                     _tick(player, effect, _side(game, player), suspended)
             setattr(card, slot, None)
+
+
+def _drop_poisons_replaced_by_a_toxin(sides) -> None:
+    """Une toxine posée ce round remplace le poison du joueur visé avant que ce poison agisse (combat réel 1647870)."""
+    for card, _, own, opp in sides:
+        for slot in FIGHT_SLOTS:
+            capacity = getattr(card, slot)
+            if capacity is None or "toxine" not in capacity.types:
+                continue
+            for player in {"enemy": [opp], "ally": [own], "both": [own, opp]}[capacity.target]:
+                player.effect_list = [effect for effect in player.effect_list if effect.kind != "poison"]
 
 
 def register_persistent_effect(player: Player, effect: PersistentEffect) -> None:

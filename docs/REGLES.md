@@ -2,7 +2,7 @@
 
 Confronte chaque décision de règle du moteur aux sources disponibles, et consigne ce qui reste incertain. Les
 sections « Règles confirmées » et « Pouvoirs exclus » décrivent l'état **actuel** du moteur — les corrections
-passées sont dans l'historique git, pas ici. **Le § 3 (registre R1-R6) est le seul endroit où sont écrites les
+passées sont dans l'historique git, pas ici. **Le § 3 (registre R1-R7) est le seul endroit où sont écrites les
 questions de règles ouvertes** ; `docs/ROADMAP.md` y renvoie, `docs/ORACLE.md` décrit seulement la logistique de
 capture des combats qui les tranchent.
 
@@ -61,7 +61,7 @@ Hiérarchie de confiance : règle officielle (support ou glossaire) > combat ré
 | Reanimate = « Defeat: +X Life » qui fonctionne aussi depuis 0 vie (soigne sur **toute** défaite, pas seulement un KO) | `apply_capacity_lvl_3` | wiki *Reanimate* |
 | Recover X sur Y : ⌊pillz posées × X / Y⌋, **minimum 1**, pillz gratuite et fury comprises | `apply_capacity_lvl_3.recovered_pillz` | glossaire 53 ; combat réel 1347075 |
 | Repair X, Max Y verse **X vies ET X pillz**, chacune plafonnée à Y | `apply_capacity_lvl_4._STATS_OF_KIND` | combat réel 1211702 |
-| Poison/Toxine/Heal/Regen/Dope/Consume : au sein d'une même sorte, le second remplace le premier (Poison et Heal, sortes opposées, coexistent) ; Toxine, Régén, Dope, Consume, Repair, Mindwipe agissent **dès le round joué** ; Poison, Heal et Combust, aux rounds suivants. Mindwipe est un Combust immédiat : même sorte d'effet, marqué `how` « immediate » au parsage | `apply_capacity_lvl_4.IMMEDIATE_KINDS` | glossaire 50, 51, 52 ; utilisateur ; combats réels 1638346 (Combust), 1211702, 1214027, 1214141 (Mindwipe) |
+| Poison/Toxine/Heal/Regen/Dope/Consume : au sein d'une même sorte, le second remplace le premier (Poison et Heal, sortes opposées, coexistent) ; Toxine, Régén, Dope, Consume, Repair, Mindwipe agissent **dès le round joué** ; Poison, Heal et Combust, aux rounds suivants. Une Toxine remplace le Poison du joueur visé, qui n'agit pas au round de la Toxine (combat réel 1647870) ; Heal + Regen : R7. Mindwipe est un Combust immédiat : même sorte d'effet, marqué `how` « immediate » au parsage | `apply_capacity_lvl_4.IMMEDIATE_KINDS` | glossaire 50, 51, 52 ; utilisateur ; combats réels 1638346 (Combust), 1211702, 1214027, 1214141 (Mindwipe) |
 
 ### Bonus de clan, Leader, Oculus
 | Règle | Moteur | Source |
@@ -109,6 +109,7 @@ le fait tranché rejoint « Règles confirmées » ci-dessus, sans y rester dupl
 | **R3** | « Par Vie perdue » au-dessus de la vie de départ | borné à **0** (pas de malus) | duel avec un soin |
 | **R5** | Exchange contre Copie / Impose, Copie contre Cancel | appliqués dans l'ordre rencontré, sans interaction ; conforme aux combats du 23/09 | duel avec un 3ᵉ modificateur intercalé |
 | **R6** | Perfection (Glibon Cr) | pouvoir non parsé, carte injouable | aucune règle publiée |
+| **R7** | Heal + Regen sur le même joueur | les deux **se cumulent** | une partie, cartes possédées |
 
 ### R1 — Ordre de résolution entre les deux cartes
 
@@ -197,6 +198,25 @@ deux lectures resteront confondues quel que soit le nombre de duels. Reste entie
 **Perfection** (Glibon Cr) n'a de règle ni sur le site ni sur le wiki ; la carte qui le porte est injouable. S'y
 ajoute une coquille probable du scraping, `Growth: -1 Power And Damage, Min 4` (Bugamon) — pas une question de
 règle, mais de parsing.
+
+### R7 — Heal et Regen se cumulent-ils ?
+
+Le moteur garde un Heal et une Regen actifs ensemble sur le même joueur et les fait agir tous les deux
+(`apply_capacity_lvl_4.register_persistent_effect`, test `test_regen_stacks_with_heal_and_a_new_heal_replaces_the_old_one`).
+Aucun combat ne l'a montré. Le cas symétrique côté pertes a été tranché dans l'autre sens : une Toxine **remplace** le
+Poison du joueur visé, et ce Poison n'agit pas au round de la Toxine (combat réel 1647870). Par analogie, une Regen
+remplacerait un Heal — probable, mais à prouver. Le glossaire (51) dit seulement qu'une Toxine et une Régén peuvent
+être actives ensemble, ce qui ne tranche rien ici.
+
+Manipulation, avec des cartes possédées et des plafonds hauts pour qu'aucun Max ne morde : gagner un round avec
+**Lianah Ld** (Ulu Watu 3★, « Heal 1 Max. 20 ») ou **Pere Barali** (Oblivion 3★, « Heal 1 Max. 18 »), puis jouer
+au round suivant **Missandei** (Pussycats 5★, « Victory Or Defeat: Regen 1, Max. 20 », active qu'elle gagne ou perde),
+sans que ce soit le dernier round. Lire dans `post_round` les gains de vie permanents de ce round et du suivant :
+**deux gains de 1** par round = cumul (le moteur a raison) ; **un seul** = la Regen remplace le Heal. Variante :
+**Drak** (Frozn 5★, « Regen 1, Max. 16 »), qui doit gagner.
+
+Si le serveur dit « remplacement » : étendre `_drop_poisons_replaced_by_a_toxin` à la paire heal / regen, retoucher
+le test ci-dessus, régénérer les digests.
 
 Les sept pouvoirs exclus par décision (Beyond, Hazard, Illusion, Bypass, Overdose, Remove Ability Conditions,
 Rebirth) sont documentés ci-dessus : ce ne sont pas des questions ouvertes.

@@ -196,17 +196,17 @@ def test_a_new_poison_replaces_the_previous_one_after_it_ticked(game):
     assert (game.enemy.life, effects(game.enemy)) == (3, [("poison", 3, 0)])
 
 
-def test_toxin_stacks_with_poison(game):
+def test_toxin_replaces_poison_before_it_ticks(game):
     game.enemy.life = 16
     play(game, 1, ally_ability="Poison 1, Min 0", ally_pillz=6)   # ennemi 11
-    play(game, 2, ally_ability="Toxin 2, Min 0")                   # Allison gagne : 11 - 3 = 8, poison -> 7, toxine immédiate -> 5
+    play(game, 2, ally_ability="Toxin 2, Min 0")                   # Allison gagne : 11 - 3 = 8, le poison n'agit pas, toxine -> 6 (combat réel 1647870)
 
-    play(game, 3, enemy_pillz=5)                                   # B Mappe gagne : 5 - 1 - 2 -> 2
+    play(game, 3, enemy_pillz=5)                                   # B Mappe gagne : toxine seule, 6 -> 4
 
-    assert (game.enemy.life, effects(game.enemy)) == (2, [("poison", 1, 0), ("toxine", 2, 0)])
+    assert (game.enemy.life, effects(game.enemy)) == (4, [("toxine", 2, 0)])
 
 
-def test_regen_stacks_with_heal_and_a_new_heal_replaces_the_old_one(game):
+def test_regen_stacks_with_heal_and_a_new_heal_replaces_the_old_one(game):   # cumul heal + regen non prouvé : R7
     game.ally.life = 4
     play(game, 1, ally_ability="Heal 1 Max. 12", ally_pillz=6)
     play(game, 2, ally_ability="Regen 2, Max. 12")                 # heal -> 5
