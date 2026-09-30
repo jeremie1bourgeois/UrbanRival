@@ -1,0 +1,154 @@
+{
+ "_comment": "Combat réel Urban Rivals capturé via battles.status (voir scripts/ur_capture.js).",
+ "battle_id": 1638625,
+ "rule_id": 2,
+ "night": false,
+ "p0": {
+  "name": "jere'm",
+  "base_life": 15,
+  "base_pillz": 12,
+  "cards": [
+   {
+    "id": 1676,
+    "level": 2
+   },
+   {
+    "id": 984,
+    "level": 3
+   },
+   {
+    "id": 790,
+    "level": 3
+   },
+   {
+    "id": 1115,
+    "level": 2
+   }
+  ]
+ },
+ "p1": {
+  "name": "Smash Jabber",
+  "base_life": 15,
+  "base_pillz": 12,
+  "cards": [
+   {
+    "id": 1884,
+    "level": 5
+   },
+   {
+    "id": 823,
+    "level": 4
+   },
+   {
+    "id": 1461,
+    "level": 3
+   },
+   {
+    "id": 139,
+    "level": 3
+   }
+  ]
+ },
+ "rounds": [
+  {
+   "round": 1,
+   "first": "p1",
+   "before": {
+    "life": [
+     15,
+     15
+    ],
+    "pillz": [
+     12,
+     12
+    ]
+   },
+   "p0": {
+    "index": 2,
+    "pillz": 5,
+    "fury": false,
+    "power": 6,
+    "damage": 4,
+    "attack": 30,
+    "won": true
+   },
+   "p1": {
+    "index": 1,
+    "pillz": 1,
+    "fury": false,
+    "power": 7,
+    "damage": 5,
+    "attack": 15,
+    "won": false
+   },
+   "post_round": [
+    [],
+    []
+   ],
+   "after": {
+    "life": [
+     15,
+     11
+    ],
+    "pillz": [
+     8,
+     12
+    ]
+   }
+  },
+  {
+   "round": 2,
+   "first": "p0",
+   "before": {
+    "life": [
+     15,
+     11
+    ],
+    "pillz": [
+     8,
+     12
+    ]
+   },
+   "p0": {
+    "index": 1,
+    "pillz": 1,
+    "fury": false,
+    "power": 6,
+    "damage": 4,
+    "attack": 6,
+    "won": false
+   },
+   "p1": {
+    "index": 0,
+    "pillz": 3,
+    "fury": false,
+    "power": 7,
+    "damage": 6,
+    "attack": 41,
+    "won": true
+   },
+   "post_round": [
+    [
+     {
+      "playerId": 32895372,
+      "attributeAffected": "life",
+      "attributeAction": "increase",
+      "isPermanent": false,
+      "quantity": 2
+     }
+    ],
+    []
+   ],
+   "after": {
+    "life": [
+     11,
+     11
+    ],
+    "pillz": [
+     8,
+     10
+    ]
+   }
+  }
+ ]
+}
