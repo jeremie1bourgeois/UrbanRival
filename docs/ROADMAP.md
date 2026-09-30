@@ -16,8 +16,8 @@ Ce document liste **ce qui reste à faire**. L'état actuel (cartes, moteur, tes
 ## Moteur et règles
 
 - Les six points du registre `REGLES.md` § « Registre des règles non tranchées » (R1 ordre entre camps, R2 per
-  damage en défaite, R3 per life/pillz lost au-dessus du départ, R4 Protection contre « Cards », R5 Exchange contre
-  Copie/Impose, R6 Perfection sans règle publiée).
+  damage en défaite, R3 per pillz lost au-dessus du départ, R5 Exchange contre Copie/Impose, R6 Perfection sans
+  règle publiée, R7 cumul Heal + Regen).
 - **Ce que le moteur ne modélise pas du tout**, hors round : le tirage de la main (deck de 8 → 4 cartes au hasard),
   les contraintes de composition (plafond d'étoiles, cartes interdites par mode), les scores de tournoi / ELO /
   Deathmatch, la progression Survivor, les modificateurs Coliseum et les chronomètres. Un mode se réduit dans le

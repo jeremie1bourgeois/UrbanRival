@@ -275,6 +275,16 @@ def test_per_pillz_lost_counts_from_the_starting_pillz_of_the_game(template_game
     assert bhudd.power_fight == 4             # aucune pillz perdue : la puissance adverse ne bouge pas
 
 
+def test_per_pillz_lost_is_read_before_the_bet(template_game):
+    """Combat réel 1649648 (Korapacce) : les pillz perdues se comptent avant la mise du round, comme Per Pillz Left."""
+    template_game.ally.start_pillz, template_game.ally.pillz = 12, 7
+    template_game.ally.cards[AMELIA].ability = parse_capacity("+2 Attack Per Pillz Lost").capacity
+
+    amelia, _ = play(template_game, AMELIA, BHUDD, ally_pillz=5)
+
+    assert amelia.attack == (3 - 2) * 5 + 2 * (12 - 7)   # puissance 1 (bonus adverse -2) × 5 pillz, +2 × 5 pillz perdues
+
+
 def test_schema_refuses_an_out_of_range_card_index_or_a_bet_below_the_free_pillz(template_game):
     for invalide in ({"player1_card_index": 4}, {"player1_card_index": -1}, {"player1_pillz": 0}, {"player2_pillz": -3}):
         with pytest.raises(ValueError):

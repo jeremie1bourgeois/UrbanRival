@@ -1,0 +1,256 @@
+{
+ "_comment": "Combat réel Urban Rivals capturé via battles.status (voir scripts/ur_capture.js).",
+ "battle_id": 1650032,
+ "rule_id": 2,
+ "night": false,
+ "p0": {
+  "name": "jere'm",
+  "base_life": 15,
+  "base_pillz": 12,
+  "cards": [
+   {
+    "id": 2588,
+    "level": 1
+   },
+   {
+    "id": 2616,
+    "level": 1
+   },
+   {
+    "id": 1311,
+    "level": 1
+   },
+   {
+    "id": 1281,
+    "level": 2
+   }
+  ]
+ },
+ "p1": {
+  "name": "Smash Jabber",
+  "base_life": 15,
+  "base_pillz": 12,
+  "cards": [
+   {
+    "id": 1799,
+    "level": 4
+   },
+   {
+    "id": 2010,
+    "level": 5
+   },
+   {
+    "id": 602,
+    "level": 5
+   },
+   {
+    "id": 2216,
+    "level": 3
+   }
+  ]
+ },
+ "rounds": [
+  {
+   "round": 1,
+   "first": "p1",
+   "before": {
+    "life": [
+     15,
+     15
+    ],
+    "pillz": [
+     12,
+     12
+    ]
+   },
+   "p0": {
+    "index": 2,
+    "pillz": 4,
+    "fury": false,
+    "power": 6,
+    "damage": 1,
+    "attack": 24,
+    "won": false
+   },
+   "p1": {
+    "index": 2,
+    "pillz": 6,
+    "fury": false,
+    "power": 8,
+    "damage": 6,
+    "attack": 48,
+    "won": true
+   },
+   "post_round": [
+    [],
+    [
+     {
+      "playerId": 64101,
+      "attributeAffected": "life",
+      "attributeAction": "increase",
+      "isPermanent": false,
+      "quantity": 2
+     }
+    ]
+   ],
+   "after": {
+    "life": [
+     9,
+     17
+    ],
+    "pillz": [
+     9,
+     7
+    ]
+   }
+  },
+  {
+   "round": 2,
+   "first": "p0",
+   "before": {
+    "life": [
+     9,
+     17
+    ],
+    "pillz": [
+     9,
+     7
+    ]
+   },
+   "p0": {
+    "index": 3,
+    "pillz": 3,
+    "fury": false,
+    "power": 7,
+    "damage": 1,
+    "attack": 21,
+    "won": false
+   },
+   "p1": {
+    "index": 1,
+    "pillz": 6,
+    "fury": false,
+    "power": 9,
+    "damage": 8,
+    "attack": 54,
+    "won": true
+   },
+   "post_round": [
+    [],
+    [
+     {
+      "playerId": 64101,
+      "attributeAffected": "life",
+      "attributeAction": "increase",
+      "isPermanent": false,
+      "quantity": 2
+     }
+    ]
+   ],
+   "after": {
+    "life": [
+     1,
+     19
+    ],
+    "pillz": [
+     7,
+     2
+    ]
+   }
+  },
+  {
+   "round": 3,
+   "first": "p1",
+   "before": {
+    "life": [
+     1,
+     19
+    ],
+    "pillz": [
+     7,
+     2
+    ]
+   },
+   "p0": {
+    "index": 0,
+    "pillz": 2,
+    "fury": true,
+    "power": 9,
+    "damage": 4,
+    "attack": 14,
+    "won": true
+   },
+   "p1": {
+    "index": 0,
+    "pillz": 1,
+    "fury": false,
+    "power": 7,
+    "damage": 5,
+    "attack": 7,
+    "won": false
+   },
+   "post_round": [
+    [],
+    []
+   ],
+   "after": {
+    "life": [
+     1,
+     15
+    ],
+    "pillz": [
+     3,
+     2
+    ]
+   }
+  },
+  {
+   "round": 4,
+   "first": "p0",
+   "before": {
+    "life": [
+     1,
+     15
+    ],
+    "pillz": [
+     3,
+     2
+    ]
+   },
+   "p0": {
+    "index": 1,
+    "pillz": 1,
+    "fury": true,
+    "power": 5,
+    "damage": 5,
+    "attack": 23,
+    "won": false
+   },
+   "p1": {
+    "index": 3,
+    "pillz": 3,
+    "fury": false,
+    "power": 8,
+    "damage": 4,
+    "attack": 33,
+    "won": true
+   },
+   "post_round": [
+    [],
+    [
+     {
+      "playerId": 64101,
+      "attributeAffected": "life",
+      "attributeAction": "increase",
+      "isPermanent": false,
+      "quantity": 2
+     }
+    ]
+   ],
+   "after": {
+    "life": null,
+    "pillz": null
+   }
+  }
+ ]
+}

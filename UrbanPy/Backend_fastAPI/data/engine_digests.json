@@ -4,12 +4,12 @@
     "solo": {
       "entries": 53734,
       "decks": 6528,
-      "sha256": "9e0e961cb6ece350eee00a3bd476eab1433f96897dda219d8a949a6950f2accd"
+      "sha256": "f5d05d907c5f705b6c71fd54619729146d80140dd7d8f5b69e2d893c66975873"
     },
     "interactions": {
       "entries": 39936,
       "decks": 14489,
-      "sha256": "46451abdc5b983554fc8d3aa1d1bbc4ee0359c36161a7000e97831b53041f96f"
+      "sha256": "582f765bd763a75f68507433c8594856efbeda99bcacbdff67daa2cd56eb3aec"
     },
     "planchers": {
       "entries": 4159,
@@ -24,12 +24,12 @@
     "leaders": {
       "entries": 3639,
       "decks": 1008,
-      "sha256": "72d32711c51bd4d631a6796dbf5c17dbf40d08f72f65b8f288230f8200d4d4cd"
+      "sha256": "250901ae7bdeeaca3573d55495f8ba7430765efe842aefb9763081823bd69274"
     },
     "oculus": {
       "entries": 3683,
       "decks": 1905,
-      "sha256": "cc9b6f6f7d2eeb88403160e9c2eb1294104e926be99b1b18d60a9592697bc511"
+      "sha256": "ea400c0e448509021f5aa011b068d2f218bb4c0ff413b41f942e8f701af9cab3"
     },
     "combat": {
       "entries": 166,
@@ -39,7 +39,7 @@
     "aleatoire": {
       "entries": 5595,
       "decks": 300,
-      "sha256": "dbb02d6123cc236aa952f279dd9a19d7833efeea3f2bdb0bdc561274242a8548"
+      "sha256": "5f2737b1b5acaf9aa7b24788211ca01bd679a283fb8c9842b488d1631fe1f730"
     }
   }
 }

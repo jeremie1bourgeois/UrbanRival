@@ -47,12 +47,13 @@ def _nb_damage_inflicted(game: Game, player1: Player, player2: Player, card1: Ca
 
 
 def _nb_life_lost(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> int:
-    """Vies perdues depuis le début de la partie ; jamais négatif si un soin a dépassé la vie de départ (REGLES 3.14)."""
+    """Vies perdues depuis le début de la partie ; jamais négatif si un soin a dépassé la vie de départ (combat réel 1649965)."""
     return max(0, player1.start_life - player1.life)
 
 
 def _nb_pillz_lost(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> int:
-    return max(0, player1.start_pillz - player1.pillz)
+    """Pillz perdues depuis le début de la partie, lues avant la mise du round (combats réels 1649648, 1650032)."""
+    return max(0, player1.start_pillz - _nb_pillz_left(game, player1, player2, card1, card2))
 
 
 def _nb_pillz_left(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> int:

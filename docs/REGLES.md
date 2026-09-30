@@ -52,6 +52,8 @@ Hiérarchie de confiance : règle officielle (support ou glossaire) > combat ré
 | Symétrie / Asymétrie : active si la carte adverse est / n'est pas en face | — | glossaire 174 |
 | Support × cartes de ma main du même clan ; Brawl × cartes de la main adverse du clan affronté, **exemplaires comptés** ; Growth × numéro du round, Degrowth × rounds restants ; Equalizer × étoiles de la carte affrontée ; Per Opp. Power/Damage × valeur **imprimée** adverse | `multipliers` | glossaire 63, 64, 65, 67 |
 | Per Pillz/Vie restante : lu **avant** la mise (pillz gratuite exclue) | `multipliers._nb_pillz_left`, `_nb_life_left` | glossaire 66 |
+| Per Pillz perdue : écart entre les pillz de départ de la partie et celles d'avant la mise du round | `multipliers._nb_pillz_lost` | combats réels 1649648, 1650032 (Korapacce) |
+| Per Vie perdue : écart avec la vie de départ de la partie, **borné à 0** au-dessus (un soin qui dépasse ne donne pas de malus) | `multipliers._nb_life_lost` | combat réel 1649965 (Zell à 16 vies sur 15, puissance inchangée) |
 | per damage (Vie/Pillz) : dégâts réellement infligés après modificateurs, **0 si la carte perd** | `multipliers._nb_damage_inflicted` | glossaire 49 ; wiki *Terminology* |
 
 ### Combat, KO, fin de round
@@ -106,7 +108,7 @@ le fait tranché rejoint « Règles confirmées » ci-dessus, sans y rester dupl
 |---|---|---|---|
 | **R1** | Ordre de résolution entre les deux cartes | la carte **alliée** d'abord, aux niveaux 3 et 4 | 2 manips (R1a tranchée, R1c à moitié) |
 | **R2** | « Par Dégât » quand la carte perd | multiplicateur **0** | duel |
-| **R3** | « Par Vie perdue » au-dessus de la vie de départ | borné à **0** (pas de malus) | duel avec un soin |
+| **R3** | « Par Pillz perdue » au-dessus des pillz de départ | borné à **0** (pas de malus) | une partie, cartes possédées |
 | **R5** | Exchange contre Copie / Impose, Copie contre Cancel | appliqués dans l'ordre rencontré, sans interaction ; conforme aux combats du 23/09 | duel avec un 3ᵉ modificateur intercalé |
 | **R6** | Perfection (Glibon Cr) | pouvoir non parsé, carte injouable | aucune règle publiée |
 | **R7** | Heal + Regen sur le même joueur | les deux **se cumulent** | une partie, cartes possédées |
@@ -159,17 +161,17 @@ Cr ou Senestra en victoire (témoin) **puis** en défaite ; refaire une défaite
 Lecture probable : les dégâts après modificateurs, gagnante ou non. Si le moteur a tort : `_nb_damage_inflicted`
 renvoie `card1.damage_fight` sans regarder `card1.win`.
 
-### R3 — « Par Vie / Pillz perdue » au-dessus de la situation de départ
+### R3 — « Par Pillz perdue » au-dessus des pillz de départ
 
-Le multiplicateur vaut l'écart avec la **situation de départ de la partie** (`Player.start_life` / `start_pillz`).
-Reste une hypothèse : au-dessus de la vie de départ (un soin qui dépasse), le moteur **borne à 0**, faute de quoi le
-pouvoir se retournerait en malus.
+Le multiplicateur vaut l'écart avec les pillz de départ de la partie (`Player.start_pillz`), lues avant la mise.
+Au-dessus (un Recover, un Dope ou un « +X Pillz » qui dépasse), le moteur **borne à 0**, faute de quoi le pouvoir
+se retournerait en malus. Le côté vie est tranché dans ce sens par le combat 1649965 (§ « Règles confirmées ») ;
+le côté pillz reste à voir.
 
-Manipulation : monter au-dessus de la vie de départ avec un soin (bonus Jungo « +2 Life », ou **Dallas**, All Stars
-3★ « Heal 1 Max. 14 »), puis jouer **Razor** (Ulu Watu 4★ P5), **Zell** (Berzerk 1★ P6), **Padre Nido** (Paradox
-3★ P6) ou **Miss Donna Luna** (Pussycats 2★ P3), toutes « +1 Power Per Life Lost », et lire la **puissance** :
-inchangée si le plancher à 0 est juste, réduite si le jeu compte un écart négatif. Même question côté pillz avec un
-« Per Pillz Lost » après un Dope ou un Recover.
+Manipulation, avec des cartes possédées : faire **gagner Grace** (Riots, « +1 Pillz Per Damage ») avec 1 pillz
+(la gratuite), ce qui porte les pillz au-dessus de 12, puis jouer **Korapacce** (Komboka, « +2 Attack Per Pillz
+Lost ») au round suivant et lire son **attaque** : puissance × pillz si le plancher à 0 est juste, moins si le jeu
+compte un écart négatif. Si le serveur dit « malus » : retirer le `max(0, …)` de `multipliers._nb_pillz_lost`.
 
 ### R5 — Exchange contre Copie / Impose, et Copie contre Cancel
 
