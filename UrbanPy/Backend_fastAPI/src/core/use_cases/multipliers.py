@@ -47,7 +47,7 @@ def _nb_damage_inflicted(game: Game, player1: Player, player2: Player, card1: Ca
 
 
 def _nb_life_lost(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> int:
-    """Vies perdues depuis le début de la partie ; jamais négatif si un soin a dépassé la vie de départ (REGLES 3.14)."""
+    """Vies perdues depuis le début de la partie ; jamais négatif si un soin a dépassé la vie de départ (combat réel 1649965)."""
     return max(0, player1.start_life - player1.life)
 
 
