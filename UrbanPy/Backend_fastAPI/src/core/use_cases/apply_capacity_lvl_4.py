@@ -7,8 +7,9 @@ Niveau 4 : effets persistants (poison / toxine / heal / regen / dope / repair / 
      est résolu à l'activation ; un effet remplace l'effet de même sorte (poison et toxine se cumulent,
      heal et regen aussi, dope et repair aussi) ;
   3. toxine, regen, dope et consume « agissent immédiatement à la fin du round dans lequel ils ont été joués »
-     (glossaire officiel 51, 52 ; repair et combust : utilisateur) : les effets de ces sortes enregistrés ce round
-     agissent aussitôt.
+     (glossaire officiel 51, 52 ; repair : utilisateur) : les effets de ces sortes enregistrés ce round agissent
+     aussitôt. Combust attend le round suivant (combat réel 1638346), sauf posé par un Mindwipe (how « immediate »),
+     qui agit dès son round (1211702, 1214027, 1214141).
 Repair et combust portent sur la vie ET les pillz ; un Annul Modif. Vie / Pillz suspend un effet attribut par
 attribut, donc seule la moitié annulée saute (combats réels 1211702 et 1211922).
 Un poison peut amener un joueur à 0 vie : la fin de partie est constatée par check_end.
@@ -20,7 +21,7 @@ from src.core.domain.player import Player
 from src.core.domain.journal import label, note
 from src.core.use_cases.multipliers import multiplier
 
-IMMEDIATE_KINDS = ("toxine", "regen", "dope", "repair", "consume", "combust")
+IMMEDIATE_KINDS = ("toxine", "regen", "dope", "repair", "consume")
 _LOSS_KINDS = ("poison", "toxine", "consume", "combust")           # les autres sortes font gagner
 _CAUSED_BY_OPPONENT = ("poison", "toxine", "consume", "combust")   # posés sur un joueur par son adversaire
 
@@ -67,7 +68,8 @@ def apply_capacity_lvl_4(game: Game, card1: Card, card2: Card) -> None:
                 bound = "" if capacity.borne in (None, -1) else (f" (min {capacity.borne})" if kind in _LOSS_KINDS else f" (max {capacity.borne})")
                 note(card, "persistant", f"{card.name} : {label(capacity)} → {kind} {value}{bound} sur {_side(game, player)}")
                 suspended = tuple(stat for stat in _STATS_OF_KIND[kind] if stat in card.cancelled_modifs)
-                if kind in IMMEDIATE_KINDS and suspended != _STATS_OF_KIND[kind]:
+                immediate = kind in IMMEDIATE_KINDS or capacity.how == "immediate"
+                if immediate and suspended != _STATS_OF_KIND[kind]:
                     _tick(player, effect, _side(game, player), suspended)
             setattr(card, slot, None)
 

@@ -119,7 +119,8 @@ _R_REANIMATE = re.compile(r"^reanimate \+(\d+) life$")
 _R_RECOVER = re.compile(r"^recover (\d+) (?:(players) )?pillz out of (\d+)$")   # X pillz récupérées sur Y misées (fin de round)
 _R_INFILTRATED = re.compile(r"^infiltrated$")                        # bonus Oculus : adopte le bonus du clan majoritaire de la main
 
-# Mindwipe : « lose X Life Points and Pillz, minimum Y, at the end of each of the following rounds » = Combust (textes officiels)
+# Mindwipe : « lose X Life Points and Pillz, minimum Y, at the end of each of the following rounds » = Combust (textes officiels),
+# mais qui agit dès son round (combats réels 1211702, 1214027, 1214141) quand Combust attend le suivant (1638346)
 _PERSISTENT_TYPES = {"poison": "poison", "toxin": "toxine", "heal": "heal", "regen": "regen", "dope": "dope", "repair": "repair",
                      "consume": "consume", "combust": "combust", "mindwipe": "combust"}
 _PERSISTENT_TARGETS = {"poison": "enemy", "toxin": "enemy", "heal": "ally", "regen": "ally", "dope": "ally", "repair": "ally",
@@ -216,6 +217,7 @@ def _parse_core(core: str, conditions: list, prefix_hows: list) -> ParsedCapacit
     if match:
         players, effect, value, borne = match.groups()
         target = "both" if players else _PERSISTENT_TARGETS[effect]
+        how = "immediate" if effect == "mindwipe" else how
         return error or _capacity(target, [_PERSISTENT_TYPES[effect]], int(value), how, int(borne), conditions)
 
     match = _R_CORRUPT.match(core)

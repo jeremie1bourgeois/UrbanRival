@@ -25,10 +25,10 @@ KNOWN_ASYMMETRIES = frozenset({
     # niveau 3 : vie / pillz du même joueur touchées par les deux cartes, avec plancher (allié d'abord)
     "aleatoire/partie-83/round-2/coup-1",
     "aleatoire/partie-106/round-1/coup-2",
-    "aleatoire/partie-188/round-3/coup-3",
+    "aleatoire/partie-189/round-3/coup-3",
     # niveau 4 : les effets persistants sont enregistrés dans l'ordre allié puis ennemi
-    "aleatoire/partie-199/round-2/coup-2",
-    "aleatoire/partie-199/round-4/coup-3",
+    "aleatoire/partie-200/round-2/coup-2",
+    "aleatoire/partie-200/round-4/coup-3",
 })
 
 
