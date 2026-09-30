@@ -5,10 +5,10 @@
 //! `tests/vocabulaire.rs` recalcule l'empreinte sha256 du vocabulaire et la compare à celle que Python a écrite dans
 //! `data/engine_digests.json` : toute divergence de transcription, même une coquille, y apparaît.
 
-pub const HOWS: [&str; 23] = [
+pub const HOWS: [&str; 24] = [
     "", "Protection", "brawl", "cancel", "copy", "counter_attack", "degrowth", "equalizer", "exchange", "growth",
     "impose", "limitless", "nb_dam_opp", "nb_damage", "nb_life_left", "nb_life_lost", "nb_pillz_left", "nb_pillz_lost",
-    "nb_pow_opp", "stop", "support", "tie_break", "tune_out",
+    "nb_pow_opp", "stop", "support", "tie_break", "tune_out", "immediate",
 ];
 
 pub const TYPES: [&str; 23] = [

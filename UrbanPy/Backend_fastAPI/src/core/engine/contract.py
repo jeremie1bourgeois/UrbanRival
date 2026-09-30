@@ -23,7 +23,7 @@ from src.core.domain.round import Round
 
 HOWS = ("", "Protection", "brawl", "cancel", "copy", "counter_attack", "degrowth", "equalizer", "exchange", "growth",
         "impose", "limitless", "nb_dam_opp", "nb_damage", "nb_life_left", "nb_life_lost", "nb_pillz_left",
-        "nb_pillz_lost", "nb_pow_opp", "stop", "support", "tie_break", "tune_out")
+        "nb_pillz_lost", "nb_pow_opp", "stop", "support", "tie_break", "tune_out", "immediate")
 TYPES = ("ability", "attack", "bonus", "combust", "consume", "counter_attack", "damage", "dope", "heal", "infiltrated",
          "ko", "life", "limitless", "pillz", "poison", "power", "reanimate", "recover", "regen", "repair", "tie_break",
          "toxine", "tune_out")

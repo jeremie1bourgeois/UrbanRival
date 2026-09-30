@@ -250,7 +250,7 @@ def test_repair_adds_pillz_and_stacks_with_dope(game):
     assert (game.ally.pillz, sorted(effects(game.ally))) == (12, [("dope", 1, 12), ("repair", 2, 12)])
 
 
-# --- Consume / Combust : pillz (et vie) perdues dès le round joué puis à chaque round suivant ----------------------
+# --- Consume / Mindwipe dès le round joué, Combust au round suivant, puis à chaque round ----------------------
 
 def test_consume_is_registered_on_the_opponent_when_the_card_wins(game):
     play(game, 1, ally_ability="Consume 1, Min 3", ally_pillz=6)
@@ -267,24 +267,32 @@ def test_consume_removes_opponent_pillz_at_the_end_of_each_following_round_down_
     assert game.enemy.pillz == 5
 
 
-def test_combust_ticks_on_its_own_round(game):
-    play(game, 1, ally_ability="Combust 1, Min 0", ally_pillz=6)   # ennemi 12 - 5 = 7 vies, 12 pillz, combust immédiat (utilisateur, 2026-09-21)
+def test_combust_waits_for_the_next_round(game):
+    play(game, 1, ally_ability="Combust 1, Min 0", ally_pillz=6)   # ennemi 12 - 5 = 7 vies ; combust noté 0 ce round (combat réel 1638346)
 
-    assert (game.enemy.life, game.enemy.pillz) == (6, 11)
+    assert (game.enemy.life, game.enemy.pillz) == (7, 12)
+    assert effects(game.enemy) == [("combust", 1, 0)]
 
 
 def test_combust_removes_life_and_pillz_each_following_round(game):
-    play(game, 1, ally_ability="Combust 1, Min 0", ally_pillz=6)   # ennemi 6 vies, 11 pillz
+    play(game, 1, ally_ability="Combust 1, Min 0", ally_pillz=6)   # ennemi 7 vies, 12 pillz
 
-    play(game, 2, enemy_pillz=2)                                    # Bhudd gagne (allié -2) ; ennemi 6 -> 5 vies, 10 -> 9 pillz
-    assert (game.enemy.life, game.enemy.pillz) == (5, 9)
+    play(game, 2, enemy_pillz=2)                                    # Bhudd gagne (allié -2) ; ennemi 7 -> 6 vies, 11 -> 10 pillz
+    assert (game.enemy.life, game.enemy.pillz) == (6, 10)
 
 
-def test_players_combust_hits_both_players(game):
-    play(game, 1, ally_ability="Players Combust 1, Min 0", ally_pillz=6)   # tic immédiat : allié 11 vies, 6 pillz ; ennemi 6 vies, 11 pillz
+def test_players_combust_hits_both_players_from_the_next_round(game):
+    play(game, 1, ally_ability="Players Combust 1, Min 0", ally_pillz=6)   # pas de tic : allié 12 vies, 7 pillz ; ennemi 7 vies, 12 pillz
 
-    play(game, 2, enemy_pillz=2)                                           # allié -2 (Bhudd) puis combust : 8 vies, 5 pillz ; ennemi 5 vies, 9 pillz
-    assert (game.ally.life, game.ally.pillz, game.enemy.life, game.enemy.pillz) == (8, 5, 5, 9)
+    play(game, 2, enemy_pillz=2)                                           # allié -2 (Bhudd) puis combust : 9 vies, 6 pillz ; ennemi 6 vies, 10 pillz
+    assert (game.ally.life, game.ally.pillz, game.enemy.life, game.enemy.pillz) == (9, 6, 6, 10)
+
+
+def test_mindwipe_ticks_on_its_own_round(game):
+    play(game, 1, ally_ability="Mindwipe 1, Min 0", ally_pillz=6)   # ennemi 7 vies, 12 pillz, puis tic aussitôt (combat réel 1211702)
+
+    assert (game.enemy.life, game.enemy.pillz) == (6, 11)
+    assert effects(game.enemy) == [("combust", 1, 0)]
 
 
 def test_corrosion_is_a_poison_worth_the_round_number(game):

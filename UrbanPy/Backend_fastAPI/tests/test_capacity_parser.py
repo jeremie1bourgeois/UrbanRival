@@ -338,8 +338,8 @@ def test_persistent_effects(text, target, types):
     ("Combust 1, Min 2", cap("enemy", ["combust"], 1, borne=2)),
     ("Players Combust 1, Min 0", cap("both", ["combust"], 1, borne=0)),
     ("Victory Or Defeat: Combust 1, Min 3", cap("enemy", ["combust"], 1, borne=3, conditions=["victory_defeat"])),
-    ("Mindwipe 1, Min 3", cap("enemy", ["combust"], 1, borne=3)),            # même effet que Combust d'après les textes officiels
-    ("Confidence: Mindwipe 2, Min 0", cap("enemy", ["combust"], 2, borne=0, conditions=["confidence"])),
+    ("Mindwipe 1, Min 3", cap("enemy", ["combust"], 1, "immediate", borne=3)),   # un Combust qui agit dès son round (combats réels)
+    ("Confidence: Mindwipe 2, Min 0", cap("enemy", ["combust"], 2, "immediate", borne=0, conditions=["confidence"])),
     ("Victory Or Defeat: Corrosion 1, Min 0", cap("enemy", ["poison"], 1, how="growth", borne=0, conditions=["victory_defeat"])),   # poison x numéro du round
 ])
 def test_new_persistent_effects(text, expected):

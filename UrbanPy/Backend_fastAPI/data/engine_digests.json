@@ -1,15 +1,15 @@
 {
-  "vocabulary": "fe1961813160c850770a229934ef7a00bb9ce60fdb6f07c5375a2bb5b8e1e262",
+  "vocabulary": "1a7206c691516570f12ffe26dbaf4c548f76dd311d8f804489e1ebe158701c74",
   "families": {
     "solo": {
       "entries": 53734,
       "decks": 6528,
-      "sha256": "f52514971ef4081359cf0b7682fdb805b8e09463a61b31899f4254266c86a630"
+      "sha256": "9e0e961cb6ece350eee00a3bd476eab1433f96897dda219d8a949a6950f2accd"
     },
     "interactions": {
-      "entries": 39912,
-      "decks": 14477,
-      "sha256": "087f9caae84a76d3425c4aa798e6d28ddf44d057ff6804200c0d0e64a299259e"
+      "entries": 39936,
+      "decks": 14489,
+      "sha256": "46451abdc5b983554fc8d3aa1d1bbc4ee0359c36161a7000e97831b53041f96f"
     },
     "planchers": {
       "entries": 4159,
@@ -19,17 +19,17 @@
     "persistants": {
       "entries": 2628,
       "decks": 934,
-      "sha256": "2cfb4c9bcc099f13f46b8dd88d619ac95b0ac5210851916d5472cdd64b756723"
+      "sha256": "bcee34091f9279dc9b929c73b075d583ce2d1de7c2c56342269e51282faf0f8a"
     },
     "leaders": {
       "entries": 3639,
       "decks": 1008,
-      "sha256": "6ca377d4c4badf698752f500e592d4d86dc7bfd29dc195bbae2c14c73bee1ba4"
+      "sha256": "72d32711c51bd4d631a6796dbf5c17dbf40d08f72f65b8f288230f8200d4d4cd"
     },
     "oculus": {
       "entries": 3683,
       "decks": 1905,
-      "sha256": "d3fe430c81ea2f95bdf32875f6b699fd50450ca349043e6a817f6686d8c5b568"
+      "sha256": "cc9b6f6f7d2eeb88403160e9c2eb1294104e926be99b1b18d60a9592697bc511"
     },
     "combat": {
       "entries": 166,
@@ -37,9 +37,9 @@
       "sha256": "66f793626fd22d9e1f6d40e35186cd71653406f190e7cba249b2800e1e1ac5d4"
     },
     "aleatoire": {
-      "entries": 5580,
+      "entries": 5595,
       "decks": 300,
-      "sha256": "488df4df6c65e76a0a7e3faa81145260ffb06d437683db219de552b98c6d7b71"
+      "sha256": "dbb02d6123cc236aa952f279dd9a19d7833efeea3f2bdb0bdc561274242a8548"
     }
   }
 }

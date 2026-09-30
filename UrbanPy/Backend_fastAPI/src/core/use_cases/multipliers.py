@@ -66,6 +66,7 @@ def _nb_life_left(game: Game, player1: Player, player2: Player, card1: Card, car
 
 MULTIPLIERS = {
     "": _one,
+    "immediate": _one,   # marque de Mindwipe (tic dès son round, niveau 4), sans multiplicateur
     "growth": _growth,
     "degrowth": _degrowth,
     "support": _support,
