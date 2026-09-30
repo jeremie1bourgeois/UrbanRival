@@ -52,6 +52,7 @@ Hiérarchie de confiance : règle officielle (support ou glossaire) > combat ré
 | Symétrie / Asymétrie : active si la carte adverse est / n'est pas en face | — | glossaire 174 |
 | Support × cartes de ma main du même clan ; Brawl × cartes de la main adverse du clan affronté, **exemplaires comptés** ; Growth × numéro du round, Degrowth × rounds restants ; Equalizer × étoiles de la carte affrontée ; Per Opp. Power/Damage × valeur **imprimée** adverse | `multipliers` | glossaire 63, 64, 65, 67 |
 | Per Pillz/Vie restante : lu **avant** la mise (pillz gratuite exclue) | `multipliers._nb_pillz_left`, `_nb_life_left` | glossaire 66 |
+| Per Pillz perdue : écart entre les pillz de départ de la partie et celles d'avant la mise du round | `multipliers._nb_pillz_lost` | combats réels 1649648, 1650032 (Korapacce) |
 | per damage (Vie/Pillz) : dégâts réellement infligés après modificateurs, **0 si la carte perd** | `multipliers._nb_damage_inflicted` | glossaire 49 ; wiki *Terminology* |
 
 ### Combat, KO, fin de round

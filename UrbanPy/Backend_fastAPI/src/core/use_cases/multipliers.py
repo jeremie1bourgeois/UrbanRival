@@ -52,7 +52,8 @@ def _nb_life_lost(game: Game, player1: Player, player2: Player, card1: Card, car
 
 
 def _nb_pillz_lost(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> int:
-    return max(0, player1.start_pillz - player1.pillz)
+    """Pillz perdues depuis le début de la partie, lues avant la mise du round (combats réels 1649648, 1650032)."""
+    return max(0, player1.start_pillz - _nb_pillz_left(game, player1, player2, card1, card2))
 
 
 def _nb_pillz_left(game: Game, player1: Player, player2: Player, card1: Card, card2: Card) -> int:
