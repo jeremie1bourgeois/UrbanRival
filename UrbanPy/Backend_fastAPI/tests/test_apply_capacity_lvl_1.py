@@ -239,6 +239,14 @@ def test_cancel_opp_damage_modif_annuls_an_opponent_damage_impose(template_game)
     assert asporov.damage_fight == 3
 
 
+def test_cancel_opp_damage_modif_annuls_an_opponent_damage_copy_but_not_its_power_copy(template_game):
+    # Combat réel 1734264 r3 : Flood Ed « Copy: Power And Damage Opp. » contre Mr Big Duke (Leader « Team: Cancel Opp.
+    # Damage Modif. ») -> puissance copiée (9), dégâts imprimés (3, sans le Cancel : 7).
+    amelia, _ = play(template_game, ally_ability="Copy: Power And Damage Opp.", enemy_ability="Cancel Opp. Damage Modif.")
+
+    assert (amelia.power_fight, amelia.damage_fight) == (7 - 2, 5)
+
+
 @pytest.mark.parametrize("text", ["Asymmetry: Copy: Opp. Power", "Confidence: Power Exchange", "Power And Damage Exchange"])
 def test_value_copies_and_exchanges_do_not_crash(template_game, text):
     template_game.turn = True
