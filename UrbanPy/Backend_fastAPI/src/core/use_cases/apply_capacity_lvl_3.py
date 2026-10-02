@@ -24,11 +24,22 @@ def apply_capacity_lvl_3(game: Game, card1: Card, card2: Card) -> None:
     """
     Effets de fin de round sur la vie / les pillz des joueurs (les deux joueurs sont encore en vie).
     Chaque capacité restante est filtrée par sa condition de fin de round puis appliquée une seule fois.
+    Les gains passent avant les pertes, quelle que soit la carte qui les porte : un plancher mord après le gain
+    adverse (combats réels 1734030, 1734587).
     """
+    for losses in (False, True):
+        _apply_capacities_lvl_3(game, card1, card2, losses)
+
+
+def _is_loss(capacity: Capacity) -> bool:
+    return capacity.value < 0 or "ko" in capacity.types
+
+
+def _apply_capacities_lvl_3(game: Game, card1: Card, card2: Card, losses: bool) -> None:
     for card, opp_card, own, opp in ((card1, card2, game.ally, game.enemy), (card2, card1, game.enemy, game.ally)):
         for slot in FIGHT_SLOTS:
             capacity = getattr(card, slot)
-            if capacity is None:
+            if capacity is None or _is_loss(capacity) != losses:
                 continue
             if "reanimate" in capacity.types:      # Reanimate = « Defeat: +X Life » (le cas KO est traité par apply_reanimate)
                 if not card.win:
