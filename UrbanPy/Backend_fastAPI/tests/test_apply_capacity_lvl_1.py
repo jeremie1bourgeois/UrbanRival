@@ -420,3 +420,11 @@ def test_per_pillz_left_ignores_the_fury_cost_too(template_game):
                                                    player2_card_index=ASPOROV, player2_pillz=1))
 
     assert amelia.attack == 1 * 2 + 12
+
+
+def test_per_pillz_lost_is_zero_above_the_starting_pillz(template_game):
+    # Combat réel 1734264 r2 : Korapacce, « +2 Attack Per Pillz Lost », 13 pillz sur 12 avant de miser 3 -> aucun bonus
+    template_game.ally.pillz = 13
+    amelia, _ = play(template_game, ally_ability="+2 Attack Per Pillz Lost", ally_pillz=6)   # 13 sur 12 avant la mise de 5
+
+    assert amelia.attack == 1 * 6                                  # sans plancher : -2 ; lu après la mise : +8
