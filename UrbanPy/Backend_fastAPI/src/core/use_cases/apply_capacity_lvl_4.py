@@ -4,13 +4,14 @@ Niveau 4 : effets persistants (poison / toxine / heal / regen / dope / repair / 
   1. les effets déjà actifs agissent (« à la fin de chaque round suivant » leur activation) ;
   2. les capacités persistantes restantes (leur condition de fin de round a été validée au niveau 3) sont
      enregistrées sur le joueur affecté : cible ally -> propriétaire, enemy -> adversaire ; le multiplicateur
-     est résolu à l'activation ; un effet remplace l'effet de même sorte (heal et regen se cumulent — non
-     prouvé, REGLES R7 —, dope et repair aussi) ; une toxine remplace aussi le poison du joueur visé, et ce poison
-     n'agit pas au round de la toxine (combat réel 1647870) ;
+     est résolu à l'activation ; un effet remplace l'effet de même sorte (dope et repair se cumulent) ; une
+     toxine remplace aussi le poison du joueur visé, une regen son heal, et l'effet remplacé n'agit pas au round
+     du remplaçant (combats réels 1647870, 1734431) ;
   3. toxine, regen, dope et consume « agissent immédiatement à la fin du round dans lequel ils ont été joués »
      (glossaire officiel 51, 52 ; repair : utilisateur) : les effets de ces sortes enregistrés ce round agissent
      aussitôt. Combust attend le round suivant (combat réel 1638346), sauf posé par un Mindwipe (how « immediate »),
      qui agit dès son round (1211702, 1214027, 1214141).
+À l'étape 1, les gains agissent avant les pertes (combat réel 1735837 : Heal puis Poison).
 Repair et combust portent sur la vie ET les pillz ; un Annul Modif. Vie / Pillz suspend un effet attribut par
 attribut, donc seule la moitié annulée saute (combats réels 1211702 et 1211922).
 Un poison peut amener un joueur à 0 vie : la fin de partie est constatée par check_end.
@@ -25,6 +26,7 @@ from src.core.use_cases.multipliers import multiplier
 IMMEDIATE_KINDS = ("toxine", "regen", "dope", "repair", "consume")
 _LOSS_KINDS = ("poison", "toxine", "consume", "combust")           # les autres sortes font gagner
 _CAUSED_BY_OPPONENT = ("poison", "toxine", "consume", "combust")   # posés sur un joueur par son adversaire
+_REPLACED_BEFORE_ACTING = {"toxine": "poison", "regen": "heal"}    # combats réels 1647870, 1734431
 
 # Attributs touchés par chaque sorte : repair verse la vie et les pillz, combust prend les deux (combat réel 1211702)
 _STATS_OF_KIND = {"poison": ("life",), "toxine": ("life",), "heal": ("life",), "regen": ("life",),
@@ -43,10 +45,10 @@ def _suspended(effect: PersistentEffect, player_card: Card, opp_card: Card) -> t
 
 def apply_capacity_lvl_4(game: Game, card1: Card, card2: Card) -> None:
     sides = ((card1, card2, game.ally, game.enemy), (card2, card1, game.enemy, game.ally))
-    _drop_poisons_replaced_by_a_toxin(sides)
+    _drop_effects_replaced_before_acting(sides)
     for card, opp_card, own, opp in sides:
         side = _side(game, own)
-        for effect in own.effect_list:
+        for effect in sorted(own.effect_list, key=lambda effect: effect.kind in _LOSS_KINDS):   # gains d'abord (combat réel 1735837)
             suspended = _suspended(effect, card, opp_card)
             if suspended == _STATS_OF_KIND[effect.kind]:
                 note(None, "persistant", f"{effect.kind} {effect.value} sur {side} suspendu ce round (Annul)")
@@ -76,15 +78,18 @@ def apply_capacity_lvl_4(game: Game, card1: Card, card2: Card) -> None:
             setattr(card, slot, None)
 
 
-def _drop_poisons_replaced_by_a_toxin(sides) -> None:
-    """Une toxine posée ce round remplace le poison du joueur visé avant que ce poison agisse (combat réel 1647870)."""
+def _drop_effects_replaced_before_acting(sides) -> None:
+    """Une toxine posée ce round remplace le poison du joueur visé, une regen son heal, avant que l'effet remplacé
+    agisse (combats réels 1647870, 1734431)."""
     for card, _, own, opp in sides:
         for slot in FIGHT_SLOTS:
             capacity = getattr(card, slot)
-            if capacity is None or "toxine" not in capacity.types:
+            replaced = None if capacity is None else next((_REPLACED_BEFORE_ACTING[type_] for type_ in capacity.types
+                                                           if type_ in _REPLACED_BEFORE_ACTING), None)
+            if replaced is None:
                 continue
             for player in {"enemy": [opp], "ally": [own], "both": [own, opp]}[capacity.target]:
-                player.effect_list = [effect for effect in player.effect_list if effect.kind != "poison"]
+                player.effect_list = [effect for effect in player.effect_list if effect.kind != replaced]
 
 
 def register_persistent_effect(player: Player, effect: PersistentEffect) -> None:
