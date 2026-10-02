@@ -225,10 +225,11 @@ def test_life_per_damage_counts_the_damage_inflicted(template_game):
     assert template_game.ally.life == 12 + 5
 
 
-def test_life_per_damage_is_zero_on_defeat(template_game):
-    play(template_game, ally_wins=False, ally_ability="Victory Or Defeat: +1 Life Per Damage")
+def test_life_per_damage_on_defeat_counts_the_card_own_damage(template_game):
+    # Combats réels 1736136 r1 et 1735837 r4 : Zalindra perd, subit 1 dégât et rend ses propres 4 dégâts
+    play(template_game, ally_wins=False, ally_ability="Victory Or Defeat: +1 Life Per Damage")   # Amelia D5, Asporov D3
 
-    assert template_game.ally.life == 12 - 3
+    assert template_game.ally.life == 12 - 3 + 5
 
 
 # --- Recover X Pillz Out Of Y ----------------------------------------------------------------
