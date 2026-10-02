@@ -34,7 +34,7 @@ une dizaine de combats, soit 40 rounds vérifiés.
 choisit les deux decks et les deux mains, donc le scénario exact à tester.
 
 > Les questions de règles ouvertes ne sont pas listées ici : elles sont toutes dans **`docs/REGLES.md` § « Registre
-> des règles non tranchées »** (R1-R6), avec pour chacune ce que fait le moteur, les cartes à jouer et la valeur à
+> des règles non tranchées »** (R1-R7), avec pour chacune ce que fait le moteur, les cartes à jouer et la valeur à
 > lire. Ce document ne décrit que la logistique : comment capturer, quels decks composer, comment importer.
 
 ### Duels encore utiles
@@ -95,7 +95,7 @@ grandit avec le dépôt et la CI le rejoue à chaque changement du moteur. C'est
 3. Corriger en TDD : d'abord un test unitaire ciblé (rouge), puis le moteur, puis `pytest` complet — le combat réel
    repasse au vert avec tous les autres.
 4. Consigner la règle apprise dans `docs/REGLES.md` § « Règles confirmées » et, si elle figurait dans le registre
-   R1-R6, retirer l'entrée.
+   R1-R7, retirer l'entrée.
 
 ## 6. Monter en volume
 
@@ -117,4 +117,4 @@ grandit avec le dépôt et la CI le rejoue à chaque changement du moteur. C'est
   identifiés avant d'être ajoutés : le moteur ne modélise que le gameplay classique.
 - `Day:` / `Night:` dépendent de l'heure du jeu. Le serveur n'envoie pas de drapeau : la capture déduit `night` du
   texte des pouvoirs en jeu (« Night: » / « Nuit: »), et le rejeu en tient compte. Un combat sans carte jour/nuit est
-  noté de jour, ce qui ne change rien ; un fichier sans champ `night` (capturé avant le 2026-09-29) est rejoué de jour.
+  noté de jour, ce qui ne change rien ; un fichier sans champ `night` (capturé avant le 2026-09-29, ou avec une copie plus ancienne du script) est rejoué de jour.

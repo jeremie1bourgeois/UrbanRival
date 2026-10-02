@@ -1,11 +1,10 @@
 """
 Invariants du moteur sur les scénarios du corpus combinatoire : ce qu'un port doit respecter aussi, indépendamment
 des valeurs enregistrées. La propriété miroir (camps échangés et premier joueur inversé -> état miroir) n'est pas
-vraie partout : le moteur traite la carte alliée avant la carte ennemie, et quand les deux camps touchent la vie ou
-les pillz du même joueur (niveau 3) ou enregistrent des effets persistants (ordre de la liste, niveau 4), l'ordre
-compte. Le niveau 2 n'en fait plus partie : depuis le combat réel 1414453 le plancher le plus haut s'applique
-d'abord quelle que soit la carte qui le porte, et les « Cards » sont redevenus symétriques. Les scénarios restants
-sont épinglés ci-dessous :
+vraie partout : quand les deux camps enregistrent des effets persistants (niveau 4), l'ordre de la liste suit la
+carte alliée puis la carte ennemie. Le niveau 2 n'en fait plus partie depuis le combat réel 1414453 (le plancher le
+plus haut s'applique d'abord quelle que soit la carte qui le porte), le niveau 3 depuis les combats réels 1734030 et
+1734587 (les gains avant les pertes). Les scénarios restants sont épinglés ci-dessous :
 toute nouvelle asymétrie fait échouer le test, toute règle d'ordre décidée les fera disparaître (REGLES § 5).
 """
 from itertools import islice
@@ -22,10 +21,6 @@ FULLY_MIRRORED = ("planchers", "persistants", "leaders", "oculus", "combat", "al
 SAMPLE_EVERY = 10    # solo et interactions : un scénario sur dix (aucune asymétrie trouvée sur l'ensemble)
 
 KNOWN_ASYMMETRIES = frozenset({
-    # niveau 3 : vie / pillz du même joueur touchées par les deux cartes, avec plancher (allié d'abord)
-    "aleatoire/partie-83/round-2/coup-1",
-    "aleatoire/partie-106/round-1/coup-2",
-    "aleatoire/partie-189/round-3/coup-3",
     # niveau 4 : les effets persistants sont enregistrés dans l'ordre allié puis ennemi
     "aleatoire/partie-200/round-2/coup-2",
     "aleatoire/partie-200/round-4/coup-3",

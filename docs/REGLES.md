@@ -39,6 +39,7 @@ Hiérarchie de confiance : règle officielle (support ou glossaire) > combat ré
 | Protection de stat : bloque aussi un « -X Cards <stat> » adverse, qui **continue de s'appliquer à son propre porteur** | `apply_capacity_lvl_1._strip_types` | combats réels 1412809, 1414093 |
 | Annul Modif. Vie/Pillz suspend l'effet persistant adverse **pour le round où il est joué** (poison/toxine/heal/regen ; dope/consume côté pillz) ; il reprend au round suivant, **attribut par attribut** (un Annul Vie contre un Repair laisse passer les pillz). Annul Modif. Dégâts n'annule pas la Fury | `Card.cancelled_modifs`, `apply_capacity_lvl_4._suspended` | glossaire 56 ; combat réel 1211922 |
 | Copie : lit les valeurs **imprimées** ; Copie Bonus seulement si le bonus adverse est actif ; Copie contre Copie → rien ; le texte copié garde ses conditions, **réévaluées pour le copieur** (pas « tel que joué ») ; les abilities de Leader et Genesis ne peuvent être copiées | `apply_capacity_lvl_1.apply_copies`, `drop_unmet_conditions` | glossaire 59 ; wiki *Oblivion* ; combat réel 1349481 |
+| Copie de puissance / dégâts : annulée stat par stat par un Annul adapté porté par la carte visée (« Copy: Power And Damage Opp. » contre « Cancel Opp. Damage Modif. » : puissance copiée, dégâts imprimés) | `apply_capacity_lvl_1._opp_cancels_stat` | combat réel 1734264 |
 | Impose : lit les valeurs **imprimées**, inverse de Copie ; annulé par un Annul adapté porté par la carte visée | `_apply_value_copies_and_exchanges`, `_opp_cancels_stat` | glossaire 172 ; combats réels 1412809, 1414093 |
 | Echange : échange les valeurs **imprimées** même contre une Protection adaptée ; annulé par un Annul adapté (les deux cartes gardent alors leurs valeurs imprimées) ; face à une Copie ou un Echange du même type, seul l'Echange agit | `apply_capacity_lvl_1._opp_cancels_stat` | glossaire 60 ; combat réel 1294992 |
 
@@ -52,18 +53,19 @@ Hiérarchie de confiance : règle officielle (support ou glossaire) > combat ré
 | Symétrie / Asymétrie : active si la carte adverse est / n'est pas en face | — | glossaire 174 |
 | Support × cartes de ma main du même clan ; Brawl × cartes de la main adverse du clan affronté, **exemplaires comptés** ; Growth × numéro du round, Degrowth × rounds restants ; Equalizer × étoiles de la carte affrontée ; Per Opp. Power/Damage × valeur **imprimée** adverse | `multipliers` | glossaire 63, 64, 65, 67 |
 | Per Pillz/Vie restante : lu **avant** la mise (pillz gratuite exclue) | `multipliers._nb_pillz_left`, `_nb_life_left` | glossaire 66 |
-| Per Pillz perdue : écart entre les pillz de départ de la partie et celles d'avant la mise du round | `multipliers._nb_pillz_lost` | combats réels 1649648, 1650032 (Korapacce) |
+| Per Pillz perdue : écart entre les pillz de départ de la partie et celles d'avant la mise du round, **borné à 0** au-dessus (13 pillz pour 12 au départ : ni bonus ni malus) | `multipliers._nb_pillz_lost` | combats réels 1649648, 1650032 (Korapacce), 1734264 (Korapacce au-dessus du départ) |
 | Per Vie perdue : écart avec la vie de départ de la partie, **borné à 0** au-dessus (un soin qui dépasse ne donne pas de malus) | `multipliers._nb_life_lost` | combat réel 1649965 (Zell à 16 vies sur 15, puissance inchangée) |
-| per damage (Vie/Pillz) : dégâts réellement infligés après modificateurs, **0 si la carte perd** | `multipliers._nb_damage_inflicted` | glossaire 49 ; wiki *Terminology* |
+| per damage (Vie/Pillz) : dégâts de la carte, **qu'elle gagne ou perde** — en défaite, ses propres dégâts, pas ceux qu'elle subit | `multipliers._nb_damage_inflicted` | glossaire 49 ; combats réels 1736136, 1735837 |
 
 ### Combat, KO, fin de round
 | Règle | Moteur | Source |
 |---|---|---|
 | Un effet de vie / pillz **sans préfixe** (`Defeat`, `Backlash`, `Victory Or Defeat`) n'agit que si la carte **gagne** le round, qu'il soigne son camp ou frappe l'adversaire. Sa condition d'activation (Bet, Equalizer, Courage…) est consommée en amont par `check_capacity_condition` et ne dispense pas de gagner | `apply_capacity_lvl_3.check_capacity_condition_lvl_3` | combats réels 1402251 (Akem, « Bet < 6 Pillz: +3 Life » non versé), 1414369 et 1414453 (Owen, « -4 Opp. Life Min 2 » non infligé) |
+| Vie / pillz en fin de round : les **gains avant les pertes**, quels que soient la carte qui les porte et le premier joueur — un plancher (« -4 Opp. Life Min 2 ») mord après le « Defeat: +2 Life » adverse | `apply_capacity_lvl_3` | combats réels 1734030, 1734587, 1734860 |
 | Reanimate = « Defeat: +X Life » qui fonctionne aussi depuis 0 vie (soigne sur **toute** défaite, pas seulement un KO) | `apply_capacity_lvl_3` | wiki *Reanimate* |
 | Recover X sur Y : ⌊pillz posées × X / Y⌋, **minimum 1**, pillz gratuite et fury comprises | `apply_capacity_lvl_3.recovered_pillz` | glossaire 53 ; combat réel 1347075 |
 | Repair X, Max Y verse **X vies ET X pillz**, chacune plafonnée à Y | `apply_capacity_lvl_4._STATS_OF_KIND` | combat réel 1211702 |
-| Poison/Toxine/Heal/Regen/Dope/Consume : au sein d'une même sorte, le second remplace le premier (Poison et Heal, sortes opposées, coexistent) ; Toxine, Régén, Dope, Consume, Repair, Mindwipe agissent **dès le round joué** ; Poison, Heal et Combust, aux rounds suivants. Une Toxine remplace le Poison du joueur visé, qui n'agit pas au round de la Toxine (combat réel 1647870) ; Heal + Regen : R7. Mindwipe est un Combust immédiat : même sorte d'effet, marqué `how` « immediate » au parsage | `apply_capacity_lvl_4.IMMEDIATE_KINDS` | glossaire 50, 51, 52 ; utilisateur ; combats réels 1638346 (Combust), 1211702, 1214027, 1214141 (Mindwipe) |
+| Poison/Toxine/Heal/Regen/Dope/Consume : au sein d'une même sorte, le second remplace le premier (Poison et Heal, sortes opposées, coexistent) ; Toxine, Régén, Dope, Consume, Repair, Mindwipe agissent **dès le round joué** ; Poison, Heal et Combust, aux rounds suivants. Une Toxine remplace le Poison du joueur visé, qui n'agit pas au round de la Toxine (combat réel 1647870) ; une Regen remplace de même le Heal du joueur (combat réel 1734431). Mindwipe est un Combust immédiat : même sorte d'effet, marqué `how` « immediate » au parsage. Les **gains agissent avant les pertes** (combat réel 1735837 : Heal puis Poison) | `apply_capacity_lvl_4.IMMEDIATE_KINDS`, `_REPLACED_BEFORE_ACTING` | glossaire 50, 51, 52 ; utilisateur ; combats réels 1638346 (Combust), 1211702, 1214027, 1214141 (Mindwipe), 1647870, 1734431, 1735837 |
 
 ### Bonus de clan, Leader, Oculus
 | Règle | Moteur | Source |
@@ -106,77 +108,50 @@ le fait tranché rejoint « Règles confirmées » ci-dessus, sans y rester dupl
 
 | # | Question | Ce que fait le moteur aujourd'hui | Comment trancher |
 |---|---|---|---|
-| **R1** | Ordre de résolution entre les deux cartes | la carte **alliée** d'abord, aux niveaux 3 et 4 | 2 manips (R1a tranchée, R1c à moitié) |
-| **R2** | « Par Dégât » quand la carte perd | multiplicateur **0** | duel |
-| **R3** | « Par Pillz perdue » au-dessus des pillz de départ | borné à **0** (pas de malus) | une partie, cartes possédées |
-| **R5** | Exchange contre Copie / Impose, Copie contre Cancel | appliqués dans l'ordre rencontré, sans interaction ; conforme aux combats du 23/09 | duel avec un 3ᵉ modificateur intercalé |
+| **R1** | Fin de round : « les gains avant les pertes », ou « la carte perdante d'abord » au niveau 3 ? | les gains d'abord, aux niveaux 3 et 4 | 1 duel |
+| **R2** | « Par Dégât » : dégâts imprimés ou après modificateurs ? | après modificateurs | duel face à un réducteur |
+| **R5** | Exchange contre Copie / Impose | appliqués dans l'ordre rencontré, sans interaction ; conforme aux combats du 23/09 | duel avec un 3ᵉ modificateur intercalé |
 | **R6** | Perfection (Glibon Cr) | pouvoir non parsé, carte injouable | aucune règle publiée |
-| **R7** | Heal + Regen sur le même joueur | les deux **se cumulent** | une partie, cartes possédées |
 
-### R1 — Ordre de résolution entre les deux cartes
+### R1 — Gains avant pertes, ou carte perdante d'abord ?
 
-Le moteur résout la carte **alliée** avant la carte ennemie aux niveaux 3 et 4. Tant qu'aucun plancher, plafond ou
-liste n'intervient, l'ordre est sans effet ; dès qu'il y en a un, le résultat dépend du camp qui s'appelle
-« allié » — ce qui n'existe pas dans le vrai jeu. Le **niveau 2 est sorti de la question** (voir R1a ci-dessous) :
-les scénarios épinglés dans `tests/test_engine_properties.py` (`KNOWN_ASYMMETRIES`) sont passés de 25 à **5**.
+L'ordre ne dépend **ni du camp ni du premier joueur** : c'est tranché à tous les niveaux.
 
-Deux manipulations, chacune à **rejouer en inversant le premier joueur** : si le résultat suit l'ordre de jeu, la
-règle est « le premier joueur d'abord ».
+- **Niveau 2** — combat réel 1414453 : le plancher le plus haut s'applique d'abord, quelle que soit la carte qui le
+  porte (§ « Règles confirmées »). Une lecture par cumul des deux réductions sous le plancher le plus bas donne le
+  même résultat sur ce combat ; il faudrait une grosse réduction mordant son propre plancher pour les départager.
+- **Niveau 3** — combats réels 1734030 r2, 1734587 r2 et 1734860 r3 : le « Defeat: +2 Life » de la carte perdante
+  (Kusuri, Eugene) passe avant le « -X Opp. Life Min Y » du gagnant (Owen, Zeke), que son porteur ait joué en
+  premier ou en second, qu'il soit le joueur 0 ou 1 du serveur.
+- **Niveau 4** — combats réels 1413898 et 1735837 r3 : le Heal agit avant le Poison, le porteur du soin jouant en
+  premier puis en second.
 
-- **R1a, niveau 2 (stats) — tranchée** par le combat réel 1414453 : **Rajesh** (Uppers 2★ D6, « -2 Cards Damage,
-  Min 4 ») contre **Merrick Cr** (Freaks 3★ D3, « -2 Cards Damage, Min 1 »). Le serveur laisse Rajesh à **2**, donc
-  le « Min 4 » s'applique avant le « Min 1 » bien qu'il soit porté par la carte d'en face. « Allié d'abord » comme
-  « premier joueur d'abord » donnaient 4 — les deux se confondaient ici, vous jouiez en premier avec Merrick Cr.
-  C'est l'option (c) ci-dessous ; la règle est passée en § « Règles confirmées ». Une lecture par cumul des deux
-  réductions sous le plancher le plus bas donne le même résultat sur ce combat, il faudrait une grosse réduction
-  mordant son propre plancher pour les départager.
-- **R1b, niveau 3 (vie / pillz)** — faire **perdre** **Kusuri** (Fang Pi Clang 2★ P7 D2, « Defeat: +2 Life ») face à
-  **Phyllis** (Nightmare 2★ P7 D1, « -3 Opp. Life Min 4 »), le joueur de Kusuri **à 6 vies**. Le gain résolu en
-  premier donne 5 → 7 → **4** ; la perte en premier donne 5 → 4 (plancher) → **6**. Variantes : **Melinda** ou
-  **Wonald** (« Defeat: +2 Life ») contre **Oxen** ou **Jeyn** (« -3 Opp. Life Min 5 »).
-- **R1c, niveau 4 (effets persistants)** — faire **perdre** **Willow** (Roots 2★ P7 D2, « Defeat : Heal 1 Max. 10 »)
-  contre une carte **Freaks** (bonus « Poison 2, Min 3 ») qui gagne, de sorte que le joueur de Willow soit à
-  **exactement 10 vies après les dégâts du round** (le plafond du soin). Au round suivant : **8** (soin d'abord,
-  sans effet à 10, puis poison) ou **9** (poison 10 → 8, puis soin).
-  **À moitié fait** : le combat réel 1413898 produit ce scénario (Willow perd contre Schaap, Freaks) et donne **8**,
-  ce qui écarte « la carte adverse d'abord ». Mais le porteur du soin jouait **en premier**, donc « allié d'abord »
-  et « premier joueur d'abord » se confondent. Reste à refaire avec le porteur du soin **en second** : **8** dirait
-  « allié d'abord », **9** dirait « premier joueur d'abord ».
+Le moteur applique donc « les gains avant les pertes » aux niveaux 3 et 4, et `KNOWN_ASYMMETRIES` est passé de 5 à
+**2** scénarios (l'ordre d'enregistrement des effets persistants). Reste une lecture concurrente au **niveau 3** :
+dans les trois combats, le gain venait de la carte **perdante** (« Defeat: »), donc « la carte perdante d'abord »
+donne les mêmes nombres.
 
-Options pour les niveaux 3 et 4, si le moteur a tort : (a) garder « allié d'abord » ; (b) « le premier joueur
-d'abord » — symétrique et cohérent avec l'ordre de jeu. L'option (c), étendre la règle du plancher le plus haut aux
-deux cartes, est **appliquée au niveau 2** depuis 1414453.
+Manipulation : un gain porté par le **gagnant** contre une perte portée par le **perdant**. Faire gagner **Grace**
+(Riots, « +1 Pillz Per Damage », D2) contre **Antoinette** (Freaks 2★ niveau 2, « Defeat: -2 Opp. Pillz, Min 3 »),
+le joueur de Grace à **3 pillz** après sa mise : les gains d'abord donnent 3 → 5 → **3** ; la perdante d'abord,
+3 → 3 (plancher) → **5**.
 
-### R2 — « Par Dégât » quand la carte perd
+### R2 — « Par Dégât » : dégâts imprimés ou après modificateurs ?
 
-`multipliers._nb_damage_inflicted` vaut 0 quand la carte perd le round (la victoire est confirmée par une source, la
-défaite non). Conséquence : le volet « défaite » de trois cartes réelles ne peut jamais rien faire — **Zalindra**
-(Zenith 3★ P9 D4, « Defeat: +1 Life Per Damage »), **Griffonmor Cr** (Skeelz 4★ P8 D4) et **Senestra** (Nightmare
-3★ P8 D2), ces deux dernières en « Victory Or Defeat: +1 Life Per Damage ».
+**La défaite est tranchée** par les combats réels 1736136 r1 et 1735837 r4 : **Zalindra** (Zenith 3★ P9 D4,
+« Defeat: +1 Life Per Damage ») perd et rend ses **propres** 4 dégâts — y compris quand elle n'en subit qu'un
+(1735837). Le moteur lit les dégâts **après modificateurs** (`card1.damage_fight`), gagnante ou non ; dans ces deux
+combats, les dégâts de Zalindra n'étaient pas modifiés.
 
-Manipulation : faire **perdre** Zalindra (1 pillz contre une grosse mise) et lire les vies gagnées ; puis Griffonmor
-Cr ou Senestra en victoire (témoin) **puis** en défaite ; refaire une défaite face à un réducteur de dégâts
-(Pussycats « -2 Opp Damage, Min 1 ») pour savoir si ce sont les dégâts imprimés ou après modificateurs.
+Manipulation : faire perdre Zalindra (ou **Griffonmor Cr**, Skeelz 4★ D4, et **Senestra**, Nightmare 3★ D2, toutes
+deux « Victory Or Defeat: +1 Life Per Damage ») face à un réducteur de dégâts (Pussycats « -2 Opp Damage, Min 1 ») :
+4 vies rendues pour les dégâts imprimés, 2 après modificateurs.
 
-Lecture probable : les dégâts après modificateurs, gagnante ou non. Si le moteur a tort : `_nb_damage_inflicted`
-renvoie `card1.damage_fight` sans regarder `card1.win`.
+### R5 — Exchange contre Copie / Impose
 
-### R3 — « Par Pillz perdue » au-dessus des pillz de départ
-
-Le multiplicateur vaut l'écart avec les pillz de départ de la partie (`Player.start_pillz`), lues avant la mise.
-Au-dessus (un Recover, un Dope ou un « +X Pillz » qui dépasse), le moteur **borne à 0**, faute de quoi le pouvoir
-se retournerait en malus. Le côté vie est tranché dans ce sens par le combat 1649965 (§ « Règles confirmées ») ;
-le côté pillz reste à voir.
-
-Manipulation, avec des cartes possédées : faire **gagner Grace** (Riots, « +1 Pillz Per Damage ») avec 1 pillz
-(la gratuite), ce qui porte les pillz au-dessus de 12, puis jouer **Korapacce** (Komboka, « +2 Attack Per Pillz
-Lost ») au round suivant et lire son **attaque** : puissance × pillz si le plancher à 0 est juste, moins si le jeu
-compte un écart négatif. Si le serveur dit « malus » : retirer le `max(0, …)` de `multipliers._nb_pillz_lost`.
-
-### R5 — Exchange contre Copie / Impose, et Copie contre Cancel
-
-Deux cas sont tranchés (§ « Règles confirmées ») : un Cancel Opp. X Modif. annule un X Exchange en entier (combat
-1294992) et un X Impose (combat 1412809). Le moteur traite les autres croisements dans l'ordre où il les rencontre.
+Trois cas sont tranchés (§ « Règles confirmées ») : un Cancel Opp. X Modif. annule un X Exchange en entier (combat
+1294992), un X Impose (combat 1412809) et une Copie de X (combat 1734264). Le moteur traite les autres croisements
+dans l'ordre où il les rencontre.
 
 Les combats du 23 septembre **contraignent** Exchange contre Copie et Exchange contre Impose sans les départager.
 Ce qu'ils excluent : la Copie ne lit pas le résultat de l'Échange (1412809 r1, 1412980 r1, 1414277 r4 — Blast D2 contre
@@ -192,33 +167,13 @@ occurrences de « Reprisal: Damage Impose » de ces 17 combats — trois face à
 sont toutes sans effet observable.
 
 Manipulation : il faut un **troisième modificateur intercalé** entre l'Échange et la Copie / l'Impose, sinon les
-deux lectures resteront confondues quel que soit le nombre de duels. Reste entier, lui : **Copie contre Cancel**
-(Shaker, Lenora), qu'aucun combat ne couvre.
+deux lectures resteront confondues quel que soit le nombre de duels.
 
 ### R6 — Perfection, seul pouvoir sans règle publiée
 
 **Perfection** (Glibon Cr) n'a de règle ni sur le site ni sur le wiki ; la carte qui le porte est injouable. S'y
 ajoute une coquille probable du scraping, `Growth: -1 Power And Damage, Min 4` (Bugamon) — pas une question de
 règle, mais de parsing.
-
-### R7 — Heal et Regen se cumulent-ils ?
-
-Le moteur garde un Heal et une Regen actifs ensemble sur le même joueur et les fait agir tous les deux
-(`apply_capacity_lvl_4.register_persistent_effect`, test `test_regen_stacks_with_heal_and_a_new_heal_replaces_the_old_one`).
-Aucun combat ne l'a montré. Le cas symétrique côté pertes a été tranché dans l'autre sens : une Toxine **remplace** le
-Poison du joueur visé, et ce Poison n'agit pas au round de la Toxine (combat réel 1647870). Par analogie, une Regen
-remplacerait un Heal — probable, mais à prouver. Le glossaire (51) dit seulement qu'une Toxine et une Régén peuvent
-être actives ensemble, ce qui ne tranche rien ici.
-
-Manipulation, avec des cartes possédées et des plafonds hauts pour qu'aucun Max ne morde : gagner un round avec
-**Lianah Ld** (Ulu Watu 3★, « Heal 1 Max. 20 ») ou **Pere Barali** (Oblivion 3★, « Heal 1 Max. 18 »), puis jouer
-au round suivant **Missandei** (Pussycats 5★, « Victory Or Defeat: Regen 1, Max. 20 », active qu'elle gagne ou perde),
-sans que ce soit le dernier round. Lire dans `post_round` les gains de vie permanents de ce round et du suivant :
-**deux gains de 1** par round = cumul (le moteur a raison) ; **un seul** = la Regen remplace le Heal. Variante :
-**Drak** (Frozn 5★, « Regen 1, Max. 16 »), qui doit gagner.
-
-Si le serveur dit « remplacement » : étendre `_drop_poisons_replaced_by_a_toxin` à la paire heal / regen, retoucher
-le test ci-dessus, régénérer les digests.
 
 Les sept pouvoirs exclus par décision (Beyond, Hazard, Illusion, Bypass, Overdose, Remove Ability Conditions,
 Rebirth) sont documentés ci-dessus : ce ne sont pas des questions ouvertes.

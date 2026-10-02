@@ -179,6 +179,15 @@ def test_consume_ticks_on_its_own_round(game):
     assert game.enemy.pillz == 10
 
 
+def test_a_persistent_gain_ticks_before_a_floored_persistent_loss(game):
+    # Combat réel 1735837 r3 (R1c) : Heal 1 et Poison 2 Min 3 sur le même joueur, à 4 vies -> 4 + 1 = 5, puis 5 - 2 = 3
+    play(game, 1, ally_ability="Poison 2, Min 3", enemy_ability="Defeat: Heal 1 Max. 10", ally_pillz=6)   # ennemi 7, poison puis heal posés
+
+    play(game, 2)                                                  # Allison gagne : ennemi 4, heal -> 5, poison -> 3
+
+    assert game.enemy.life == 3                                    # le poison d'abord : 4 -> 3 (plancher) -> 4
+
+
 def test_poison_and_heal_still_wait_for_the_next_round(game):
     game.ally.life = 4
     play(game, 1, ally_ability="Poison 2, Min 0", ally_pillz=6)   # ennemi 7, pas de tic
@@ -206,16 +215,12 @@ def test_toxin_replaces_poison_before_it_ticks(game):
     assert (game.enemy.life, effects(game.enemy)) == (4, [("toxine", 2, 0)])
 
 
-def test_regen_stacks_with_heal_and_a_new_heal_replaces_the_old_one(game):   # cumul heal + regen non prouvé : R7
+def test_regen_replaces_heal_before_it_ticks(game):
     game.ally.life = 4
-    play(game, 1, ally_ability="Heal 1 Max. 12", ally_pillz=6)
-    play(game, 2, ally_ability="Regen 2, Max. 12")                 # heal -> 5
-    play(game, 3, ally_ability="Heal 3 Max. 12")                   # heal 1 + regen 2 -> 8, puis heal 3 remplace heal 1
+    play(game, 1, ally_ability="Heal 1 Max. 12", ally_pillz=6)     # allié 4, heal posé
+    play(game, 2, ally_ability="Regen 2, Max. 12")                 # Allison gagne : le heal n'agit pas, regen -> 6 (combat réel 1734431)
 
-    play(game, 4, ally_pillz=2)                                    # regen 2 + heal 3 -> 13 -> plafonné 12
-
-    assert game.ally.life == 12
-    assert sorted(effects(game.ally)) == [("heal", 3, 12), ("regen", 2, 12)]
+    assert (game.ally.life, effects(game.ally)) == (6, [("regen", 2, 12)])
 
 
 # --- Sérialisation ----------------------------------------------------------------------------

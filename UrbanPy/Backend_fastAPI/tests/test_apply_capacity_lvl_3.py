@@ -112,6 +112,16 @@ def test_backlash_does_nothing_on_defeat(template_game):
     assert template_game.ally.life == 12 - 3
 
 
+def test_a_gain_applies_before_a_floored_loss_whichever_card_carries_it(template_game):
+    # Combats réels 1734030 r2 et 1734587 r2 : Owen / Zeke gagnent avec « -X Opp. Life Min Y » contre Kusuri / Eugene
+    # « Defeat: +2 Life » ; le serveur verse le +2 d'abord, le plancher mord ensuite
+    template_game.enemy.life = 8
+
+    play(template_game, ally_wins=True, ally_ability="-4 Opp. Life Min 2", enemy_ability="Defeat: +2 Life")
+
+    assert template_game.enemy.life == 2      # 8 - 5 = 3, +2 -> 5, -4 plancher 2 -> 2 (la perte d'abord : 3 -> 2 -> 4)
+
+
 @pytest.mark.parametrize("ally_wins, expected_enemy_life", [(True, 12 - 5 - 2), (False, 12 - 2)])
 def test_victory_or_defeat_applies_either_way(template_game, ally_wins, expected_enemy_life):
     play(template_game, ally_wins=ally_wins, ally_ability="Victory Or Defeat: -2 Opp. Life, Min 0")
@@ -225,10 +235,11 @@ def test_life_per_damage_counts_the_damage_inflicted(template_game):
     assert template_game.ally.life == 12 + 5
 
 
-def test_life_per_damage_is_zero_on_defeat(template_game):
-    play(template_game, ally_wins=False, ally_ability="Victory Or Defeat: +1 Life Per Damage")
+def test_life_per_damage_on_defeat_counts_the_card_own_damage(template_game):
+    # Combats réels 1736136 r1 et 1735837 r4 : Zalindra perd, subit 1 dégât et rend ses propres 4 dégâts
+    play(template_game, ally_wins=False, ally_ability="Victory Or Defeat: +1 Life Per Damage")   # Amelia D5, Asporov D3
 
-    assert template_game.ally.life == 12 - 3
+    assert template_game.ally.life == 12 - 3 + 5
 
 
 # --- Recover X Pillz Out Of Y ----------------------------------------------------------------

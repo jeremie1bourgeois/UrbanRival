@@ -11,7 +11,7 @@ Réimplémentation du jeu de cartes **Urban Rivals** : un moteur de règles en P
 | Cartes jouables | **2 497** (36 clans), données scrapées d'iclintz.com le 2026-09-15, illustrations incluses |
 | Pouvoirs (abilities / bonus) | **1 386 / 1 395 descriptions gérées (99,4 %)** — `python scripts/capacity_coverage.py` liste le reste ; les 9 non gérées sont documentées dans [docs/REGLES.md](docs/REGLES.md#pouvoirs-exclus-du-moteur-et-de-lia) |
 | Moteur | 4 niveaux d'effets (méta, stats, fin de round, persistants), bonus de clan (Oculus infiltré compris), Leaders (Team, Tie-break, Counter-attack, Limitless), une vingtaine de conditions numériques et de position, jour/nuit, journal des effets de chaque round — décisions de règles : [docs/REGLES.md](docs/REGLES.md) |
-| Tests | 584 backend (pytest, dont 113 501 rounds de corpus combinatoire) + 28 front (vitest) ; 68 combats réels Urban Rivals rejoués à l'identique — détail : § Tests ci-dessous |
+| Tests | 584 backend (pytest, dont 113 501 rounds de corpus combinatoire) + 28 front (vitest) ; 104 combats réels Urban Rivals rejoués à l'identique — détail : § Tests ci-dessous |
 | Interface | composition de deck (recherche, filtre par clan, decks aléatoires, decks mémorisés), choix du mode (Classic, ELO, duel, vies/pillz/premier joueur personnalisés), partie de 4 rounds à deux sur le même écran, historique, fin de partie, effets persistants |
 
 Feuille de route (ce qui reste à faire) : [docs/ROADMAP.md](docs/ROADMAP.md).
@@ -95,7 +95,7 @@ ajoutent :
   round, rejoué et comparé à l'exact. Pour en ajouter : jouer un round dans l'interface, cliquer « Sauvegarder …
   pour les tests », commiter le dossier créé. `scripts/regenerate_example_fixtures.py` régénère les fixtures
   d'exemple quand le format de partie change.
-- **Combats réels** (`data/ur_battles/*.json`, `tests/test_ur_battles.py`) : 68 combats joués dans le client
+- **Combats réels** (`data/ur_battles/*.json`, `tests/test_ur_battles.py`) : 104 combats joués dans le client
   officiel et rejoués à l'identique (puissance, dégâts, attaque, vainqueur, vies, pillz) — l'oracle qui tranche les
   règles incertaines. Procédure de capture : [docs/ORACLE.md](docs/ORACLE.md).
 

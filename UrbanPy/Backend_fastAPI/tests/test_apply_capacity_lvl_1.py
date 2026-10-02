@@ -239,6 +239,14 @@ def test_cancel_opp_damage_modif_annuls_an_opponent_damage_impose(template_game)
     assert asporov.damage_fight == 3
 
 
+def test_cancel_opp_damage_modif_annuls_an_opponent_damage_copy_but_not_its_power_copy(template_game):
+    # Combat réel 1734264 r3 : Flood Ed « Copy: Power And Damage Opp. » contre Mr Big Duke (Leader « Team: Cancel Opp.
+    # Damage Modif. ») -> puissance copiée (9), dégâts imprimés (3, sans le Cancel : 7).
+    amelia, _ = play(template_game, ally_ability="Copy: Power And Damage Opp.", enemy_ability="Cancel Opp. Damage Modif.")
+
+    assert (amelia.power_fight, amelia.damage_fight) == (7 - 2, 5)
+
+
 @pytest.mark.parametrize("text", ["Asymmetry: Copy: Opp. Power", "Confidence: Power Exchange", "Power And Damage Exchange"])
 def test_value_copies_and_exchanges_do_not_crash(template_game, text):
     template_game.turn = True
@@ -412,3 +420,11 @@ def test_per_pillz_left_ignores_the_fury_cost_too(template_game):
                                                    player2_card_index=ASPOROV, player2_pillz=1))
 
     assert amelia.attack == 1 * 2 + 12
+
+
+def test_per_pillz_lost_is_zero_above_the_starting_pillz(template_game):
+    # Combat réel 1734264 r2 : Korapacce, « +2 Attack Per Pillz Lost », 13 pillz sur 12 avant de miser 3 -> aucun bonus
+    template_game.ally.pillz = 13
+    amelia, _ = play(template_game, ally_ability="+2 Attack Per Pillz Lost", ally_pillz=6)   # 13 sur 12 avant la mise de 5
+
+    assert amelia.attack == 1 * 6                                  # sans plancher : -2 ; lu après la mise : +8

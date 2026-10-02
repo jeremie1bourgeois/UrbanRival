@@ -175,7 +175,7 @@ def _apply_value_copies_and_exchanges(card1: Card, card2: Card) -> None:
             for stat in ("power", "damage"):
                 if stat not in capacity.types:
                     continue
-                if capacity.how in ("exchange", "impose") and _opp_cancels_stat(opp, stat):   # le Cancel adverse annule l'Exchange (combat réel 1294992) comme l'Impose (1412809)
+                if _opp_cancels_stat(opp, stat):   # le Cancel adverse annule l'Exchange (combat réel 1294992), l'Impose (1412809) et la Copie (1734264)
                     note(own, "annule", f"{own.name} : {label(capacity)} sur {STAT_LABELS.get(stat, stat)} annulé par le Cancel {_of(opp)}")
                     continue
                 own_before, opp_before = getattr(own, f"{stat}_fight"), getattr(opp, f"{stat}_fight")
