@@ -55,7 +55,7 @@ Hiérarchie de confiance : règle officielle (support ou glossaire) > combat ré
 | Per Pillz/Vie restante : lu **avant** la mise (pillz gratuite exclue) | `multipliers._nb_pillz_left`, `_nb_life_left` | glossaire 66 |
 | Per Pillz perdue : écart entre les pillz de départ de la partie et celles d'avant la mise du round, **borné à 0** au-dessus (13 pillz pour 12 au départ : ni bonus ni malus) | `multipliers._nb_pillz_lost` | combats réels 1649648, 1650032 (Korapacce), 1734264 (Korapacce au-dessus du départ) |
 | Per Vie perdue : écart avec la vie de départ de la partie, **borné à 0** au-dessus (un soin qui dépasse ne donne pas de malus) | `multipliers._nb_life_lost` | combat réel 1649965 (Zell à 16 vies sur 15, puissance inchangée) |
-| per damage (Vie/Pillz) : dégâts de la carte, **qu'elle gagne ou perde** — en défaite, ses propres dégâts, pas ceux qu'elle subit | `multipliers._nb_damage_inflicted` | glossaire 49 ; combats réels 1736136, 1735837 |
+| per damage (Vie/Pillz) : dégâts de la carte **après modificateurs** (bonus, pouvoirs), **qu'elle gagne ou perde** — en défaite, ses propres dégâts, pas ceux qu'elle subit | `multipliers._nb_damage_inflicted` | glossaire 49 ; combats réels 1736136, 1735837, 1950994 (Spade D1 + bonus La Junta « Damage +2 » : +3 pillz), 1951079 (bonus stoppé : +1) |
 
 ### Combat, KO, fin de round
 | Règle | Moteur | Source |
@@ -109,7 +109,6 @@ le fait tranché rejoint « Règles confirmées » ci-dessus, sans y rester dupl
 | # | Question | Ce que fait le moteur aujourd'hui | Comment trancher |
 |---|---|---|---|
 | **R1** | Fin de round : « les gains avant les pertes », ou « la carte perdante d'abord » au niveau 3 ? | les gains d'abord, aux niveaux 3 et 4 | 1 duel |
-| **R2** | « Par Dégât » : dégâts imprimés ou après modificateurs ? | après modificateurs | duel face à un réducteur |
 | **R5** | Exchange contre Copie / Impose | appliqués dans l'ordre rencontré, sans interaction ; conforme aux combats du 23/09 | duel avec un 3ᵉ modificateur intercalé |
 | **R6** | Perfection (Glibon Cr) | pouvoir non parsé, carte injouable | aucune règle publiée |
 
@@ -135,17 +134,6 @@ Manipulation : un gain porté par le **gagnant** contre une perte portée par le
 (Riots, « +1 Pillz Per Damage », D2) contre **Antoinette** (Freaks 2★ niveau 2, « Defeat: -2 Opp. Pillz, Min 3 »),
 le joueur de Grace à **3 pillz** après sa mise : les gains d'abord donnent 3 → 5 → **3** ; la perdante d'abord,
 3 → 3 (plancher) → **5**.
-
-### R2 — « Par Dégât » : dégâts imprimés ou après modificateurs ?
-
-**La défaite est tranchée** par les combats réels 1736136 r1 et 1735837 r4 : **Zalindra** (Zenith 3★ P9 D4,
-« Defeat: +1 Life Per Damage ») perd et rend ses **propres** 4 dégâts — y compris quand elle n'en subit qu'un
-(1735837). Le moteur lit les dégâts **après modificateurs** (`card1.damage_fight`), gagnante ou non ; dans ces deux
-combats, les dégâts de Zalindra n'étaient pas modifiés.
-
-Manipulation : faire perdre Zalindra (ou **Griffonmor Cr**, Skeelz 4★ D4, et **Senestra**, Nightmare 3★ D2, toutes
-deux « Victory Or Defeat: +1 Life Per Damage ») face à un réducteur de dégâts (Pussycats « -2 Opp Damage, Min 1 ») :
-4 vies rendues pour les dégâts imprimés, 2 après modificateurs.
 
 ### R5 — Exchange contre Copie / Impose
 

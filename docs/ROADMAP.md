@@ -7,7 +7,7 @@ Ce document liste **ce qui reste à faire**. L'état actuel (cartes, moteur, tes
 
 ## Ordre recommandé
 
-1. **Règles** : trancher les quatre points du registre `REGLES.md` § « Registre des règles non tranchées » (R1, R2, R5, R6) par
+1. **Règles** : trancher les trois points du registre `REGLES.md` § « Registre des règles non tranchées » (R1, R5, R6) par
    des combats réels capturés selon [`ORACLE.md`](ORACLE.md).
 2. **Backend** : moteur compilé rapide derrière le contrat `src/core/engine/` (~1 ms par round aujourd'hui, ~10 µs
    visés), persistance en mémoire/SQLite.
@@ -15,22 +15,21 @@ Ce document liste **ce qui reste à faire**. L'état actuel (cartes, moteur, tes
 
 ## Moteur et règles
 
-- Les quatre points du registre `REGLES.md` § « Registre des règles non tranchées » (R1 gains avant pertes ou
-  carte perdante d'abord en fin de round, R2 per damage sur dégâts imprimés ou après modificateurs, R5 Exchange
-  contre Copie/Impose, R6 Perfection sans règle publiée).
+- Les trois points du registre `REGLES.md` § « Registre des règles non tranchées » (R1 gains avant pertes ou
+  carte perdante d'abord en fin de round, R5 Exchange contre Copie/Impose, R6 Perfection sans règle publiée).
 - **Ce que le moteur ne modélise pas du tout**, hors round : le tirage de la main (deck de 8 → 4 cartes au hasard),
   les contraintes de composition (plafond d'étoiles, cartes interdites par mode), les scores de tournoi / ELO /
   Deathmatch, la progression Survivor, les modificateurs Coliseum et les chronomètres. Un mode se réduit dans le
   moteur à sa **situation de départ** (vies et pillz par camp, premier joueur), réglable depuis `/init_game/` et le
   deck builder.
-- Avant de figer un port du moteur (Rust ou autre), trancher R1 et R2 en priorité : un ordre de résolution et la
-  valeur d'un multiplicateur, qui changeraient le corpus de non-régression.
+- Avant de figer un port du moteur (Rust ou autre), trancher R1 en priorité : un ordre de résolution, qui changerait
+  le corpus de non-régression.
 
 ## Backend
 
 | Tâche | Détail |
 |---|---|
-| **Port compilé (Rust)** | Commencé dans `UrbanRust/` : vocabulaire et état compact transcrits, empreinte du vocabulaire vérifiée contre celle de Python. Restent le lecteur de corpus, puis la résolution d'un round — cette dernière **après R1 et R2**. Le contrat pur (`src/core/engine/contract.py`, API `step` / `legal_actions` / `terminal`) et le corpus combinatoire (113 501 rounds, `scripts/build_engine_corpus.py`, digests dans `data/engine_digests.json`) sont l'oracle de comparaison. Pour vérifier un autre moteur : générer le corpus, puis pour chaque ligne de `<famille>.jsonl` — `deck` (indice dans `<famille>.decks.json`), `state`, `ally_action`, `enemy_action` — calculer l'état suivant et exiger `next_state` et `outcome` identiques. Vocabulaire des indices : `vocabulary.json` ; format des états : `contract.py`. |
+| **Port compilé (Rust)** | Commencé dans `UrbanRust/` : vocabulaire et état compact transcrits, empreinte du vocabulaire vérifiée contre celle de Python. Restent le lecteur de corpus, puis la résolution d'un round — cette dernière **après R1**. Le contrat pur (`src/core/engine/contract.py`, API `step` / `legal_actions` / `terminal`) et le corpus combinatoire (113 501 rounds, `scripts/build_engine_corpus.py`, digests dans `data/engine_digests.json`) sont l'oracle de comparaison. Pour vérifier un autre moteur : générer le corpus, puis pour chaque ligne de `<famille>.jsonl` — `deck` (indice dans `<famille>.decks.json`), `state`, `ally_action`, `enemy_action` — calculer l'état suivant et exiger `next_state` et `outcome` identiques. Vocabulaire des indices : `vocabulary.json` ; format des états : `contract.py`. |
 | **Persistance** | Fichiers JSON par round (`data/game/`) → stockage mémoire + SQLite optionnel ; `get_new_game_id` est relatif au dossier courant (le serveur doit être lancé depuis `UrbanPy/Backend_fastAPI`). |
 | **Dette technique** | Résorbée le 2026-09-24 : FastAPI 0.100 → 0.141 avec toutes les versions épinglées (dev comprises), validateurs en style Pydantic v2, CORS et niveau de log lus dans `UR_CORS_ORIGINS` / `UR_LOG_LEVEL`, plus de `debug=True` ni de `print` dans `main.py`, et les images passent par le cache local du backend (`/card_image/`, `data/card_images/` non versionné) au lieu du CDN d'Urban Rivals. Les deux résidus signalés — validateur de longueur de main devenu du code mort, gestionnaire d'erreur global jamais atteint — ont été retirés dans la foulée, un test fixant désormais la réponse aux erreurs inattendues. Le middleware d'erreur est enfin déclaré avant `CORSMiddleware`, donc monté à l'intérieur de lui : une réponse 500 porte ses en-têtes CORS et le front peut en lire le détail au lieu d'annoncer « Backend injoignable ». |
 

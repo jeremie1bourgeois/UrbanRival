@@ -242,6 +242,15 @@ def test_life_per_damage_on_defeat_counts_the_card_own_damage(template_game):
     assert template_game.ally.life == 12 - 3 + 5
 
 
+def test_pillz_per_damage_counts_the_damage_after_modifiers(template_game):
+    # Combat réel 1950994 r2 : Spade (D1) gagne avec le bonus La Junta « Damage +2 » et reçoit 3 pillz, pas 1.
+    # Sans le -2 Opp Power de son bonus, Amelia (1 x 8) bat encore Asporov (7 x 1)
+    template_game.ally.cards[AMELIA].bonus = ability("Damage +2")
+    play(template_game, ally_ability="+1 Pillz Per Damage", ally_pillz=8)   # Amelia D5 + 2
+
+    assert template_game.ally.pillz == 12 - 7 + 7
+
+
 # --- Recover X Pillz Out Of Y ----------------------------------------------------------------
 
 def test_defeat_recover_returns_part_of_the_pillz_placed(template_game):
