@@ -39,6 +39,7 @@ cd UrbanVue && npm test && npm run lint && npm run build
 
 ## Commits
 
-Un commit = un changement cohérent et relisible seul. Message en français,
+Travailler directement sur `main`, sans branche ni fusion. Committer régulièrement : un commit par étape
+cohérente, tests verts, relisible seul. Message en français,
 `type(scope): description` (ex. `feat(moteur): …`, `fix(front): …`, `docs(oracle): …`).
-Ne committer que sur demande.
+Ne pousser que sur demande.

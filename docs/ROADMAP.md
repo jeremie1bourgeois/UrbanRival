@@ -2,7 +2,7 @@
 
 Ce document liste **ce qui reste à faire**. L'état actuel (cartes, moteur, tests, interface) est dans le
 [README](../README.md#état-du-projet) ; les décisions de règles et le registre des questions ouvertes sont dans
-[`REGLES.md`](REGLES.md) ; le plan IA détaillé dans [`IA.md`](IA.md). Façon de travailler (branches, commits, TDD) :
+[`REGLES.md`](REGLES.md) ; le plan IA détaillé dans [`IA.md`](IA.md). Façon de travailler (commits, TDD) :
 `CLAUDE.md`.
 
 ## Ordre recommandé
