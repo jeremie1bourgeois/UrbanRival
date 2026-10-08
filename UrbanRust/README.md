@@ -53,5 +53,5 @@ gagner, et quel test garantit qu'elle ne change pas les résultats. Le code port
 
 ## Écarts connus et points ouverts
 
-- Les lectures encore ouvertes des règles R1 et R2 ([docs/REGLES.md](../docs/REGLES.md), registre) peuvent changer
-  le moteur Python : on régénère alors le corpus, et le moteur Rust suit.
+- Les règles encore ouvertes (R1 surtout, un ordre de résolution ; [docs/REGLES.md](../docs/REGLES.md),
+  registre) peuvent changer le moteur Python : on régénère alors le corpus, et le moteur Rust suit.

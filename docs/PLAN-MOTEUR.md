@@ -106,8 +106,8 @@ référence verts et mêmes valeurs → journal. Une optimisation qui ne fait ri
 
 ## Points d'attention
 
-- Les lectures encore ouvertes de R1 et R2 ([REGLES.md](REGLES.md), registre) peuvent changer le moteur Python ; on
-  régénère alors le corpus et le moteur Rust suit.
+- Les règles encore ouvertes (R1 surtout, un ordre de résolution ; [REGLES.md](REGLES.md), registre) peuvent
+  changer le moteur Python ; on régénère alors le corpus et le moteur Rust suit.
 - Un jeu peut avoir plusieurs équilibres : les tests comparent les **valeurs**, pas les stratégies.
 - Deux coups « aussi bons » l'un que l'autre ne le sont qu'à une tolérance près (les valeurs sont des flottants) :
   sans cette tolérance, des équilibres valables seraient écartés.
