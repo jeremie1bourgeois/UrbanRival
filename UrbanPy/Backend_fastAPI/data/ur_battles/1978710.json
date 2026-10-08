@@ -1,0 +1,287 @@
+{
+ "_comment": "Combat réel Urban Rivals capturé via battles.status (voir scripts/ur_capture.js).",
+ "battle_id": 1978710,
+ "rule_id": 2,
+ "night": true,
+ "p0": {
+  "name": "jere'm",
+  "base_life": 15,
+  "base_pillz": 12,
+  "cards": [
+   {
+    "id": 1247,
+    "level": 5
+   },
+   {
+    "id": 1769,
+    "level": 2
+   },
+   {
+    "id": 1732,
+    "level": 4
+   },
+   {
+    "id": 1638,
+    "level": 2
+   }
+  ]
+ },
+ "p1": {
+  "name": "Smash Jabber",
+  "base_life": 15,
+  "base_pillz": 12,
+  "cards": [
+   {
+    "id": 455,
+    "level": 5
+   },
+   {
+    "id": 495,
+    "level": 3
+   },
+   {
+    "id": 1626,
+    "level": 5
+   },
+   {
+    "id": 1499,
+    "level": 5
+   }
+  ]
+ },
+ "rounds": [
+  {
+   "round": 1,
+   "first": "p1",
+   "before": {
+    "life": [
+     15,
+     15
+    ],
+    "pillz": [
+     12,
+     12
+    ]
+   },
+   "p0": {
+    "index": 0,
+    "pillz": 6,
+    "fury": false,
+    "power": 8,
+    "damage": 5,
+    "attack": 48,
+    "won": false
+   },
+   "p1": {
+    "index": 1,
+    "pillz": 7,
+    "fury": false,
+    "power": 8,
+    "damage": 3,
+    "attack": 56,
+    "won": true
+   },
+   "post_round": [
+    [
+     {
+      "playerId": 32895372,
+      "attributeAffected": "life",
+      "attributeAction": "decrease",
+      "isPermanent": true,
+      "quantity": 0
+     }
+    ],
+    []
+   ],
+   "after": {
+    "life": [
+     12,
+     15
+    ],
+    "pillz": [
+     7,
+     6
+    ]
+   }
+  },
+  {
+   "round": 2,
+   "first": "p0",
+   "before": {
+    "life": [
+     12,
+     15
+    ],
+    "pillz": [
+     7,
+     6
+    ]
+   },
+   "p0": {
+    "index": 2,
+    "pillz": 4,
+    "fury": false,
+    "power": 4,
+    "damage": 5,
+    "attack": 16,
+    "won": false
+   },
+   "p1": {
+    "index": 2,
+    "pillz": 7,
+    "fury": false,
+    "power": 3,
+    "damage": 6,
+    "attack": 21,
+    "won": true
+   },
+   "post_round": [
+    [
+     {
+      "playerId": 32895372,
+      "attributeAffected": "life",
+      "attributeAction": "decrease",
+      "isPermanent": true,
+      "quantity": 2
+     }
+    ],
+    [
+     {
+      "playerId": 64101,
+      "attributeAffected": "pillz",
+      "attributeAction": "increase",
+      "isPermanent": false,
+      "quantity": 1
+     }
+    ]
+   ],
+   "after": {
+    "life": [
+     4,
+     15
+    ],
+    "pillz": [
+     4,
+     1
+    ]
+   }
+  },
+  {
+   "round": 3,
+   "first": "p1",
+   "before": {
+    "life": [
+     4,
+     15
+    ],
+    "pillz": [
+     4,
+     1
+    ]
+   },
+   "p0": {
+    "index": 3,
+    "pillz": 3,
+    "fury": false,
+    "power": 8,
+    "damage": 2,
+    "attack": 24,
+    "won": true
+   },
+   "p1": {
+    "index": 3,
+    "pillz": 2,
+    "fury": false,
+    "power": 7,
+    "damage": 6,
+    "attack": 14,
+    "won": false
+   },
+   "post_round": [
+    [
+     {
+      "playerId": 32895372,
+      "attributeAffected": "life",
+      "attributeAction": "decrease",
+      "isPermanent": true,
+      "quantity": 1
+     }
+    ],
+    [
+     {
+      "playerId": 64101,
+      "attributeAffected": "pillz",
+      "attributeAction": "increase",
+      "isPermanent": false,
+      "quantity": 1
+     }
+    ]
+   ],
+   "after": {
+    "life": [
+     3,
+     13
+    ],
+    "pillz": [
+     2,
+     1
+    ]
+   }
+  },
+  {
+   "round": 4,
+   "first": "p0",
+   "before": {
+    "life": [
+     3,
+     13
+    ],
+    "pillz": [
+     2,
+     1
+    ]
+   },
+   "p0": {
+    "index": 1,
+    "pillz": 3,
+    "fury": false,
+    "power": 7,
+    "damage": 1,
+    "attack": 21,
+    "won": true
+   },
+   "p1": {
+    "index": 0,
+    "pillz": 2,
+    "fury": false,
+    "power": 5,
+    "damage": 6,
+    "attack": 10,
+    "won": false
+   },
+   "post_round": [
+    [
+     {
+      "playerId": 32895372,
+      "attributeAffected": "life",
+      "attributeAction": "increase",
+      "isPermanent": false,
+      "quantity": 5
+     },
+     {
+      "playerId": 32895372,
+      "attributeAffected": "life",
+      "attributeAction": "decrease",
+      "isPermanent": true,
+      "quantity": 2
+     }
+    ],
+    []
+   ],
+   "after": {
+    "life": null,
+    "pillz": null
+   }
+  }
+ ]
+}
