@@ -124,5 +124,7 @@ réels ([docs/ORACLE.md](docs/ORACLE.md)) les tranchent.
 - [docs/REGLES.md](docs/REGLES.md) — décisions de règles, sources, registre des questions ouvertes
 - [docs/REGLES-glossaire-officiel.md](docs/REGLES-glossaire-officiel.md) — texte intégral du glossaire officiel
 - [docs/IA.md](docs/IA.md) — plan de construction de l'IA
+- [docs/MOTEUR-RUST.md](docs/MOTEUR-RUST.md) — moteur Rust et solveur Nash : objectifs et lignes directrices
+- [docs/PLAN-MOTEUR.md](docs/PLAN-MOTEUR.md) — plan d'exécution du moteur Rust
 - [docs/ORACLE.md](docs/ORACLE.md) — capturer des combats réels comme tests
 - [docs/ur-abilitydata-modele.md](docs/ur-abilitydata-modele.md) — modèle de règles observé côté client officiel

@@ -20,6 +20,16 @@ Règles du jeu : `docs/REGLES.md` et `docs/REGLES-glossaire-officiel.md`. Feuill
 - Quand deux lectures d'une demande mènent à un travail différent, poser la question avant
   de coder. Sinon, décider et le dire.
 
+## Moteur Rust (`UrbanRust/`)
+
+- Cap : `docs/MOTEUR-RUST.md`. Plan actuel, modifiable à tout moment : `docs/PLAN-MOTEUR.md`.
+  État du travail : `UrbanRust/README.md`, à lire avant de toucher au code.
+- Sur le moteur et le solveur Nash, ces documents priment sur `docs/IA.md`, plus ancien (horizon exact, GPU pour les
+  matrices, perte de la sortie stratégie).
+- À la fin de chaque étape : statut dans le plan, mesure dans son journal, état dans `UrbanRust/README.md`
+  (ce qui est fait, organisation du code, chaque optimisation avec sa raison, son gain et le test qui la garantit).
+- Vérification : `cd UrbanRust && cargo test`.
+
 ## Code
 
 - Backend : Python 3.12, FastAPI, pytest. Front : Vue 3, TypeScript, Tailwind, vitest.
