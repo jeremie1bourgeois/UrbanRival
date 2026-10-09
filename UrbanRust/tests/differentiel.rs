@@ -14,7 +14,7 @@ use corpus::Entry;
 use ur_engine::round::play;
 
 /// Rounds de la famille `solo` identiques au moteur Python (53 734 au total).
-const SOLO_IDENTIQUES: usize = 26_648;
+const SOLO_IDENTIQUES: usize = 44_004;
 
 #[test]
 fn solo() {
