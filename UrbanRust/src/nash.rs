@@ -25,9 +25,7 @@ pub struct Solution<'a> {
 pub struct Solver {
     rows: Vec<f64>,
     cols: Vec<f64>,
-    tableau: Vec<f64>,
-    objective: Vec<f64>,
-    basis: Vec<usize>,
+    tableau: Tableau,
 }
 
 impl Solver {
@@ -53,50 +51,78 @@ impl Solver {
                 self.cols[col] = 1.0;
                 (matrix[row * cols + col], true)
             }
-            None => (self.simplex(matrix, rows, cols), false),
+            None => {
+                self.tableau.load(matrix, rows, cols);
+                self.tableau.optimize(|_| true);
+                self.tableau.row_strategy(&mut self.rows);
+                self.tableau.col_strategy(&mut self.cols);
+                (self.tableau.value(), false)
+            }
         };
-        let (best_row_reply, worst_col_reply) = replies(matrix, cols, &self.rows, &self.cols);
-        let gap = best_row_reply - worst_col_reply;
-        assert!(
-            gap <= TOLERANCE && worst_col_reply - TOLERANCE <= value && value <= best_row_reply + TOLERANCE,
-            "solution hors d'équilibre ({rows} × {cols}) : valeur {value}, entre {worst_col_reply} et {best_row_reply}"
-        );
+        let gap = verify(matrix, cols, &self.rows, &self.cols, value);
         Solution { value, rows: &self.rows, cols: &self.cols, pure, gap }
     }
+}
 
-    /// Le jeu décalé (toutes les valeurs ≥ 1, donc une valeur > 0) se résout par un seul programme linéaire, celui
-    /// des colonnes : maximiser Σ y sous M y ≤ 1, y ≥ 0. Alors valeur = 1 / Σ y, colonnes = y × valeur ; les lignes
-    /// sont les variables duales, lues sur les coûts réduits des variables d'écart. Rend la valeur du jeu d'origine.
-    fn simplex(&mut self, matrix: &[f64], rows: usize, cols: usize) -> f64 {
-        let shift = 1.0 - matrix.iter().copied().fold(f64::INFINITY, f64::min);
-        let width = cols + rows + 1; // y, puis les écarts, puis le second membre
-        let rhs = width - 1;
-        self.tableau.clear();
-        self.tableau.resize(rows * width, 0.0);
+/// Le programme linéaire des colonnes d'un jeu décalé (toutes les valeurs ≥ 1, donc une valeur > 0) : maximiser Σ y
+/// sous M y ≤ 1, y ≥ 0, en tableau du simplexe. Alors valeur = 1 / Σ y et colonnes = y × valeur ; les lignes sont
+/// les variables duales, lues sur les coûts réduits des variables d'écart. Les variables, dans l'ordre des colonnes du
+/// tableau : y (une par colonne du jeu), puis un écart par ligne ; la dernière colonne est le second membre.
+#[derive(Default)]
+struct Tableau {
+    rows: usize,
+    cols: usize,
+    shift: f64,
+    cells: Vec<f64>,     // rows × width, ligne par ligne
+    objective: Vec<f64>, // coûts réduits des variables, puis la valeur de l'objectif
+    basis: Vec<usize>,   // la variable de base de chaque ligne
+}
+
+impl Tableau {
+    fn width(&self) -> usize {
+        self.cols + self.rows + 1
+    }
+
+    fn rhs(&self) -> usize {
+        self.cols + self.rows
+    }
+
+    /// Le jeu `matrix` (`rows × cols`, ligne par ligne) décalé, à l'objectif Σ y, la base étant celle des écarts.
+    fn load(&mut self, matrix: &[f64], rows: usize, cols: usize) {
+        self.rows = rows;
+        self.cols = cols;
+        self.shift = 1.0 - matrix.iter().copied().fold(f64::INFINITY, f64::min);
+        let (width, rhs) = (self.width(), self.rhs());
+        self.cells.clear();
+        self.cells.resize(rows * width, 0.0);
         for row in 0..rows {
             for col in 0..cols {
-                self.tableau[row * width + col] = matrix[row * cols + col] + shift;
+                self.cells[row * width + col] = matrix[row * cols + col] + self.shift;
             }
-            self.tableau[row * width + cols + row] = 1.0;
-            self.tableau[row * width + rhs] = 1.0;
+            self.cells[row * width + cols + row] = 1.0;
+            self.cells[row * width + rhs] = 1.0;
         }
         self.objective.clear();
         self.objective.resize(width, 0.0);
         self.objective[..cols].fill(-1.0);
         self.basis.clear();
         self.basis.extend(cols..cols + rows);
+    }
 
-        // Règle de Bland : entre la première variable de coût réduit négatif ; sort la ligne du plus petit rapport, à
-        // égalité celle dont la variable de base a le plus petit indice. Le simplexe ne peut alors pas cycler, même
-        // sur les matrices à nombreuses égalités.
-        while let Some(entering) = (0..rhs).find(|&col| self.objective[col] < -PIVOT_EPSILON) {
+    /// Le simplexe jusqu'à l'optimum de l'objectif courant, en ne faisant entrer que les variables `allowed`. Règle de
+    /// Bland : entre la première variable de coût réduit négatif ; sort la ligne du plus petit rapport, à égalité
+    /// celle dont la variable de base a le plus petit indice. Le simplexe ne peut alors pas cycler, même sur les
+    /// matrices à nombreuses égalités.
+    fn optimize(&mut self, allowed: impl Fn(usize) -> bool) {
+        let (width, rhs) = (self.width(), self.rhs());
+        while let Some(entering) = (0..rhs).find(|&col| self.objective[col] < -PIVOT_EPSILON && allowed(col)) {
             let mut leaving: Option<(usize, f64)> = None;
-            for row in 0..rows {
-                let coefficient = self.tableau[row * width + entering];
+            for row in 0..self.rows {
+                let coefficient = self.cells[row * width + entering];
                 if coefficient <= PIVOT_EPSILON {
                     continue;
                 }
-                let ratio = self.tableau[row * width + rhs] / coefficient;
+                let ratio = self.cells[row * width + rhs] / coefficient;
                 let better = match leaving {
                     None => true,
                     Some((best, best_ratio)) => {
@@ -109,40 +135,69 @@ impl Solver {
                 }
             }
             let (leaving, _) = leaving.expect("simplexe non borné : impossible sur un jeu décalé à valeurs positives");
-            self.pivot(leaving, entering, rows, width);
+            self.pivot(leaving, entering);
         }
-
-        for row in 0..rows {
-            if self.basis[row] < cols {
-                self.cols[self.basis[row]] = self.tableau[row * width + rhs].max(0.0);
-            }
-            self.rows[row] = self.objective[cols + row].max(0.0);
-        }
-        normalize(&mut self.cols);
-        normalize(&mut self.rows);
-        1.0 / self.objective[rhs] - shift
     }
 
-    fn pivot(&mut self, pivot_row: usize, pivot_col: usize, rows: usize, width: usize) {
-        let pivot = self.tableau[pivot_row * width + pivot_col];
-        for col in 0..width {
-            self.tableau[pivot_row * width + col] /= pivot;
+    /// La valeur du jeu d'origine, à l'optimum de l'objectif Σ y.
+    fn value(&self) -> f64 {
+        1.0 / self.objective[self.rhs()] - self.shift
+    }
+
+    /// La stratégie des colonnes : y, normalisé.
+    fn col_strategy(&self, strategy: &mut [f64]) {
+        let (width, rhs) = (self.width(), self.rhs());
+        strategy.fill(0.0);
+        for row in 0..self.rows {
+            if self.basis[row] < self.cols {
+                strategy[self.basis[row]] = self.cells[row * width + rhs].max(0.0);
+            }
         }
-        for row in (0..rows).filter(|&row| row != pivot_row) {
-            let factor = self.tableau[row * width + pivot_col];
+        normalize(strategy);
+    }
+
+    /// La stratégie des lignes : les coûts réduits des écarts (les variables duales), normalisés.
+    fn row_strategy(&self, strategy: &mut [f64]) {
+        for (row, probability) in strategy.iter_mut().enumerate() {
+            *probability = self.objective[self.cols + row].max(0.0);
+        }
+        normalize(strategy);
+    }
+
+    fn pivot(&mut self, pivot_row: usize, pivot_col: usize) {
+        let width = self.width();
+        let pivot = self.cells[pivot_row * width + pivot_col];
+        for col in 0..width {
+            self.cells[pivot_row * width + col] /= pivot;
+        }
+        for row in (0..self.rows).filter(|&row| row != pivot_row) {
+            let factor = self.cells[row * width + pivot_col];
             if factor != 0.0 {
                 for col in 0..width {
-                    let pivot_value = self.tableau[pivot_row * width + col];
-                    self.tableau[row * width + col] -= factor * pivot_value;
+                    let pivot_value = self.cells[pivot_row * width + col];
+                    self.cells[row * width + col] -= factor * pivot_value;
                 }
             }
         }
         let factor = self.objective[pivot_col];
         for col in 0..width {
-            self.objective[col] -= factor * self.tableau[pivot_row * width + col];
+            self.objective[col] -= factor * self.cells[pivot_row * width + col];
         }
         self.basis[pivot_row] = pivot_col;
     }
+}
+
+/// Vérifie que les deux stratégies forment un équilibre de valeur `value` et rend leur écart à l'équilibre ; une
+/// solution fausse est une erreur du solveur, qui arrête le programme.
+fn verify(matrix: &[f64], cols: usize, row_strategy: &[f64], col_strategy: &[f64], value: f64) -> f64 {
+    let (best_row_reply, worst_col_reply) = replies(matrix, cols, row_strategy, col_strategy);
+    let gap = best_row_reply - worst_col_reply;
+    assert!(
+        gap <= TOLERANCE && worst_col_reply - TOLERANCE <= value && value <= best_row_reply + TOLERANCE,
+        "solution hors d'équilibre ({} × {cols}) : valeur {value}, entre {worst_col_reply} et {best_row_reply}",
+        row_strategy.len()
+    );
+    gap
 }
 
 /// Un point-selle : la ligne du meilleur minimum et la colonne du plus petit maximum, si ces deux valeurs se
