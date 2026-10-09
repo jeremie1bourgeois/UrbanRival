@@ -14,9 +14,8 @@
 //! état résolu, vu de l'autre camp, vaut 1 − V.
 
 use std::cell::RefCell;
-use std::collections::hash_map::DefaultHasher;
 use std::collections::HashMap;
-use std::hash::{Hash, Hasher};
+use std::hash::{BuildHasher, BuildHasherDefault, Hasher};
 use std::sync::RwLock;
 
 use rayon::prelude::*;
@@ -179,20 +178,24 @@ impl<'a> Search<'a> {
 /// Un verrou lecteurs-rédacteur : les consultations, presque toutes réussies (99 % pour les états du round 4 d'une
 /// partie entière), passent ensemble ; seule l'écriture d'un état résolu attend (README, « Optimisations en place »).
 struct Memo {
-    shards: Vec<RwLock<HashMap<State, f64>>>,
+    shards: Vec<RwLock<MemoTable>>,
 }
+
+type MemoTable = HashMap<State, f64, BuildHasherDefault<StateHasher>>;
 
 impl Memo {
     fn new() -> Self {
         Memo {
-            shards: (0..MEMO_SHARDS).map(|_| RwLock::new(HashMap::new())).collect(),
+            shards: (0..MEMO_SHARDS).map(|_| RwLock::new(MemoTable::default())).collect(),
         }
     }
 
-    fn shard(&self, state: &State) -> &RwLock<HashMap<State, f64>> {
-        let mut hasher = DefaultHasher::new();
-        state.hash(&mut hasher);
-        &self.shards[hasher.finish() as usize % MEMO_SHARDS]
+    /// Le morceau se choisit sur les bits 48 à 53 de l'empreinte, que la table n'utilise pas : elle place l'état par
+    /// les bits du bas et le reconnaît par les 7 du haut. Choisi sur les bits du bas, chaque morceau n'en remplirait
+    /// qu'une case sur 64.
+    fn shard(&self, state: &State) -> &RwLock<MemoTable> {
+        let hash = BuildHasherDefault::<StateHasher>::default().hash_one(state);
+        &self.shards[(hash >> 48) as usize % MEMO_SHARDS]
     }
 
     fn get(&self, state: &State) -> Option<f64> {
@@ -227,5 +230,37 @@ impl Memo {
                     .collect::<Vec<_>>()
             })
             .collect()
+    }
+}
+
+/// Le hachage de la mémo : chaque mot de l'état (`impl Hash for State`, quelques mots de 64 bits) mêlé par une
+/// multiplication, comme FxHash, puis le finaliseur de MurmurHash3, qui répartit chaque bit d'entrée sur tous ceux de
+/// l'empreinte. Quelques nanosecondes par état contre ~12 pour SipHash, dont la mémo n'a pas besoin : ses clés ne
+/// viennent pas d'un adversaire (README, « Optimisations en place »).
+#[derive(Default)]
+struct StateHasher {
+    hash: u64,
+}
+
+impl Hasher for StateHasher {
+    fn write_u64(&mut self, word: u64) {
+        self.hash = (self.hash.rotate_left(5) ^ word).wrapping_mul(0x517c_c1b7_2722_0a95);
+    }
+
+    fn write(&mut self, bytes: &[u8]) {
+        for chunk in bytes.chunks(8) {
+            let mut word = [0; 8];
+            word[..chunk.len()].copy_from_slice(chunk);
+            self.write_u64(u64::from_le_bytes(word));
+        }
+    }
+
+    fn finish(&self) -> u64 {
+        let mut hash = self.hash;
+        hash ^= hash >> 33;
+        hash = hash.wrapping_mul(0xff51_afd7_ed55_8ccd);
+        hash ^= hash >> 33;
+        hash = hash.wrapping_mul(0xc4ce_b9fe_1a85_ec53);
+        hash ^ hash >> 33
     }
 }
