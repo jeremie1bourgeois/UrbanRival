@@ -41,5 +41,9 @@
       "decks": 300,
       "sha256": "cf43aad8cb187b07f5f4a763b9d4f933ef65e1ecd7f8c8bd51225adabdba1c33"
     }
+  },
+  "rules": {
+    "entries": 1536,
+    "sha256": "ac581a608ed8acff32ef72df97cf789684ca399e9a287720c60debdc62c3fc59"
   }
 }

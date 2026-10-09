@@ -11,7 +11,8 @@ import os
 import pytest
 
 from src.core.engine.contract import Action, deck_from_dict, state_from_dict
-from src.core.engine.corpus import VOCABULARY, family_summary, read_digests, vocabulary_digest, write_corpus
+from src.core.engine.corpus import (VOCABULARY, family_summary, read_digests, rules_summary, vocabulary_digest,
+                                    write_corpus)
 from src.core.engine.reference import play, terminal
 from src.core.engine.scenarios import FAMILIES
 from src.utils.config import BASE_DIR
@@ -38,6 +39,10 @@ def test_vocabulary_digest_is_pinned(pinned):
 @pytest.mark.parametrize("family", list(FAMILIES))
 def test_family_replays_to_its_pinned_digest(pinned, family):
     assert family_summary(family) == pinned["families"][family], f"famille {family} : " + REGENERATE
+
+
+def test_rules_replay_to_their_pinned_digest(pinned):
+    assert rules_summary() == pinned["rules"], "coups légaux ou fin de partie : " + REGENERATE
 
 
 def test_written_files_replay_from_json(tmp_path):

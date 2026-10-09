@@ -1,7 +1,8 @@
 """
 Génère le corpus de non-régression du moteur (voir src/core/engine/corpus.py) : chaque famille de scénarios
 (src/core/engine/scenarios.py) jouée par le moteur Python de référence, écrite en JSONL sous la forme du contrat,
-et met à jour les digests versionnés (data/engine_digests.json). Un moteur compilé doit reproduire chaque entrée ;
+plus les coups légaux et la fin de partie (regles.jsonl), et met à jour les digests versionnés
+(data/engine_digests.json). Un moteur compilé doit reproduire chaque entrée ;
 à relancer après tout changement de règle pour mettre le corpus et les digests à jour.
 Usage (depuis UrbanPy/Backend_fastAPI) :
     python scripts/build_engine_corpus.py [--family solo --family combat ...] [--out data/engine_corpus]
@@ -34,6 +35,8 @@ def main() -> None:
             continue
         size = os.path.getsize(os.path.join(args.out, f"{name}.jsonl")) / 1e6
         print(f"{name:14s} {summary['entries']:7d} entrées  {summary['decks']:6d} decks  {size:6.1f} Mo  {summary['sha256'][:12]}")
+    rules = digests["rules"]
+    print(f"{'regles':14s} {rules['entries']:7d} entrées  {'':12s} {'':9s} {rules['sha256'][:12]}")
     print(f"-> {args.out} en {time.perf_counter() - start:.0f} s ; digests dans {DIGESTS_PATH}")
 
 
