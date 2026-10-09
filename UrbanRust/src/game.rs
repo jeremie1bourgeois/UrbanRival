@@ -7,16 +7,20 @@ use crate::contract::{Action, PlayerState, State, FURY_COST, HAND_SIZE, NB_ROUND
 /// pillz + 1, sans fury puis avec fury si la mise et la fury tiennent dans les pillz. Le camp se désigne par son état
 /// (`&state.ally` ou `&state.enemy`), seul ce que les coups lisent. Un itérateur : rien n'est alloué.
 pub fn legal_actions(player: &PlayerState) -> impl Iterator<Item = Action> + '_ {
-    let pillz = player.pillz;
     (0..HAND_SIZE)
         .filter(|&card| !player.has_played(card))
-        .flat_map(move |card| {
-            (0..=pillz).flat_map(move |bet| {
-                let action = Action { card: card as u8, pillz: bet + 1, fury: false };
-                let fury = (bet + FURY_COST <= pillz).then_some(Action { fury: true, ..action });
-                std::iter::once(action).chain(fury)
-            })
-        })
+        .flat_map(|card| card_actions(player, card))
+}
+
+/// Les coups d'une carte, dans l'ordre de `legal_actions` : les lignes ou les colonnes d'un bloc de mises. Que la
+/// carte soit encore en main n'est pas vérifié.
+pub fn card_actions(player: &PlayerState, card: usize) -> impl Iterator<Item = Action> {
+    let pillz = player.pillz;
+    (0..=pillz).flat_map(move |bet| {
+        let action = Action { card: card as u8, pillz: bet + 1, fury: false };
+        let fury = (bet + FURY_COST <= pillz).then_some(Action { fury: true, ..action });
+        std::iter::once(action).chain(fury)
+    })
 }
 
 /// La valeur de la partie pour l'allié si elle est finie (1 gagnée, 0,5 nulle, 0 perdue), None sinon : après le

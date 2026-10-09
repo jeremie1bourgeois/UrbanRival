@@ -5,6 +5,7 @@
 //! transcrit, pour qu'on relise les deux côte à côte. Les versions rapides (bloc de mises, étape 1.4) se vérifient
 //! contre elle. Le portage se fait par pas ; ce qui est porté se lit dans `UrbanRust/README.md`.
 
+mod block;
 mod clan;
 mod level1;
 mod level2;
@@ -16,6 +17,8 @@ use crate::contract::{
     Action, CompiledCapacity, CompiledCard, Deck, LastRound, Outcome, PlayerState, SideOutcome, State, FURY_COST,
 };
 use crate::vocabulary::{clans, conditions, hows, targets, types};
+
+pub use block::play_block;
 
 const ALLY: usize = 0;
 const ENEMY: usize = 1;
@@ -79,7 +82,9 @@ impl Fighter {
     }
 }
 
-/// La partie le temps d'un round : `Game` côté Python, réduite à ce que le round lit et écrit.
+/// La partie le temps d'un round : `Game` côté Python, réduite à ce que le round lit et écrit. Copiable : le bloc de
+/// mises copie un round préparé (premier étage joué) pour chaque case.
+#[derive(Clone, Copy)]
 struct Round<'a> {
     deck: &'a Deck,
     nb_turn: u8,
@@ -97,34 +102,43 @@ pub fn play(deck: &Deck, state: &State, ally_action: Action, enemy_action: Actio
 }
 
 impl Round<'_> {
-    /// Les mises sont prélevées et les cartes préparées (`init_fight_data`).
+    /// Les cartes sont préparées (`init_fight_data`) et les mises prélevées.
     fn new<'a>(deck: &'a Deck, state: &State, actions: [Action; 2]) -> Round<'a> {
-        let mut players = [state.ally, state.enemy];
-        for side in SIDES {
-            players[side].pillz -= (actions[side].pillz - 1) + FURY_COST * actions[side].fury as i16;
-        }
         let fighters = SIDES.map(|side| {
-            let action = actions[side];
-            let card = hand(deck, side)[action.card as usize];
+            let index = actions[side].card as usize;
+            let card = hand(deck, side)[index];
             Fighter {
-                index: action.card as usize,
+                index,
                 power: card.power,
                 damage: card.damage,
                 attack: 0,
-                pillz: action.pillz,
-                fury: action.fury,
+                pillz: 0,
+                fury: false,
                 win: false,
                 slots: [card.ability, card.bonus, None],
                 cancelled: 0,
             }
         });
-        Round {
+        let mut round = Round {
             deck,
             nb_turn: state.nb_turn,
             ally_first: state.ally_first,
             last_round: state.last_round,
-            players,
+            players: [state.ally, state.enemy],
             fighters,
+        };
+        round.place_bets(state, actions);
+        round
+    }
+
+    /// Prélève les mises sur les stocks de l'état (la pillz gratuite ne coûte rien) et les pose sur les cartes.
+    fn place_bets(&mut self, state: &State, actions: [Action; 2]) {
+        let stocks = [state.ally.pillz, state.enemy.pillz];
+        for side in SIDES {
+            let action = actions[side];
+            self.players[side].pillz = stocks[side] - (action.pillz - 1) - FURY_COST * action.fury as i16;
+            self.fighters[side].pillz = action.pillz;
+            self.fighters[side].fury = action.fury;
         }
     }
 
@@ -311,17 +325,7 @@ impl Round<'_> {
             // « After » : ma carte du round précédent est du clan (jamais au round 1)
             || has(conditions::AFTER) && !previous_card.is_some_and(|index| listed(hand[index as usize].clan))
             || has(conditions::INFILTRATED) && !clan::clan_for_bonus(hand, own_index).is_some_and(listed)
-            || has(conditions::BET) && !self.bet_condition_met(capacity, side))
-    }
-
-    /// « Bet > N » / « Bet < N » : la mise de la carte, pillz gratuite comprise, fury non comptée.
-    fn bet_condition_met(&self, capacity: &CompiledCapacity, side: usize) -> bool {
-        let bet = self.fighters[side].pillz;
-        if capacity.bet_under != 0 {
-            bet < capacity.bet_under as i16
-        } else {
-            bet > capacity.bet_over as i16
-        }
+            || has(conditions::BET) && !bet_condition_met(capacity, self.fighters[side].pillz))
     }
 
     /// Un Oculus « Infiltrated » prend le bonus du clan adopté, s'il est listé sur sa carte ; sinon aucun.
@@ -409,6 +413,15 @@ fn printed(card: &CompiledCard, stat: u32) -> i16 {
         card.power
     } else {
         card.damage
+    }
+}
+
+/// « Bet > N » / « Bet < N » : la mise de la carte, pillz gratuite comprise, fury non comptée.
+fn bet_condition_met(capacity: &CompiledCapacity, bet: i16) -> bool {
+    if capacity.bet_under != 0 {
+        bet < capacity.bet_under as i16
+    } else {
+        bet > capacity.bet_over as i16
     }
 }
 
