@@ -7,3 +7,6 @@ httpx2==2.13.1  # client du TestClient de Starlette ; `httpx` 0.x est dépréci�
 # scraper (scripts/scrape_official_cards.py) et son extracteur testé
 requests==2.34.2
 beautifulsoup4==4.15.0
+
+# valeurs attendues du solveur de matrices du moteur Rust (scripts/build_nash_expected.py)
+scipy==1.15.3
