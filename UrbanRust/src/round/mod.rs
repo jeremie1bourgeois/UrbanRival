@@ -8,6 +8,7 @@
 mod clan;
 mod level1;
 mod level2;
+mod level3;
 mod level4;
 mod multipliers;
 
@@ -186,7 +187,12 @@ impl Round<'_> {
 
         self.resolve_combat();
 
+        // Un joueur tombé à 0 vie a perdu avant les effets de fin de round, sauf s'il est réanimé
+        if self.players.iter().any(|player| player.life <= 0) {
+            self.apply_reanimate();
+        }
         if self.players.iter().all(|player| player.life > 0) {
+            self.apply_capacity_lvl_3();
             self.apply_capacity_lvl_4();
         }
     }
