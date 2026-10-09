@@ -4,7 +4,7 @@
 //! Ce module vit dans les tests, pas dans la crate : le moteur reste sans dépendance, seuls les tests lisent du JSON.
 //! Format, par famille : `<famille>.decks.json` (la liste des decks) et `<famille>.jsonl` (une entrée par ligne, son
 //! deck désigné par l'indice dans cette liste). Générés sous Windows, les fichiers finissent leurs lignes par `\r\n` :
-//! la lecture accepte les deux fins de ligne.
+//! la lecture accepte les deux fins de ligne. `regles.jsonl`, à part, donne les coups légaux et la fin de partie.
 
 use serde_json::Value;
 use ur_engine::contract::{
@@ -40,6 +40,14 @@ pub struct Family {
     pub entries: Vec<Entry>,
 }
 
+/// Un état et ce que le moteur Python en dit : les coups légaux de chaque camp, dans son ordre, et la fin de partie.
+pub struct RulesEntry {
+    pub state: State,
+    pub ally_actions: Vec<Action>,
+    pub enemy_actions: Vec<Action>,
+    pub terminal: Option<f64>,
+}
+
 type Parsed<T> = Result<T, String>;
 
 /// Lit les deux fichiers de la famille ; s'arrête au premier deck ou à la première ligne illisible, en le nommant.
@@ -65,6 +73,15 @@ pub fn read_family(name: &str) -> Family {
         .collect();
 
     Family { decks, entries }
+}
+
+pub fn read_rules() -> Vec<RulesEntry> {
+    let path = format!("{CORPUS_DIR}/regles.jsonl");
+    read_file(&path)
+        .lines()
+        .enumerate()
+        .map(|(index, line)| rules_entry(line).unwrap_or_else(|error| panic!("{path}, ligne {} : {error}", index + 1)))
+        .collect()
 }
 
 fn read_file(path: &str) -> String {
@@ -224,6 +241,36 @@ fn last_round(value: &Value) -> Parsed<Option<LastRound>> {
         enemy_card: int(enemy_card)?,
         ally_won: boolean(ally_won)?,
     }))
+}
+
+// --- Règles -----------------------------------------------------------------------------------
+
+fn rules_entry(line: &str) -> Parsed<RulesEntry> {
+    let fields: Value = serde_json::from_str(line).map_err(|error| error.to_string())?;
+    let actions = |side: &str| -> Parsed<Vec<Action>> {
+        let listed = &fields["legal_actions"][side];
+        listed
+            .as_array()
+            .ok_or_else(|| format!("{listed} : liste de coups attendue"))?
+            .iter()
+            .map(action)
+            .collect()
+    };
+    let terminal = &fields["terminal"];
+    Ok(RulesEntry {
+        state: state(&fields["state"])?,
+        ally_actions: actions("ally")?,
+        enemy_actions: actions("enemy")?,
+        terminal: if terminal.is_null() {
+            None
+        } else {
+            Some(
+                terminal
+                    .as_f64()
+                    .ok_or_else(|| format!("{terminal} : nombre attendu"))?,
+            )
+        },
+    })
 }
 
 fn action(value: &Value) -> Parsed<Action> {

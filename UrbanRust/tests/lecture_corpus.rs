@@ -3,11 +3,12 @@
 //! Chaque famille est relue dans les types de `contract.rs`, puis réécrite **depuis ces types** en JSON canonique,
 //! comme Python l'empreinte (`corpus.canonical` : clés triées, sans espace) : les entrées d'abord, puis les decks,
 //! une ligne chacun. Le sha256 de cette réécriture ne peut égaler celui de `data/engine_digests.json` que si chaque
-//! champ a survécu à la lecture : un entier tronqué, un effet perdu, un booléen inversé changent l'empreinte.
+//! champ a survécu à la lecture : un entier tronqué, un effet perdu, un booléen inversé changent l'empreinte. Même
+//! épreuve pour `regles.jsonl`, les coups légaux et la fin de partie.
 
 mod corpus;
 
-use corpus::{CorpusDeck, Entry};
+use corpus::{CorpusDeck, Entry, RulesEntry};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use ur_engine::contract::{Action, CompiledCapacity, CompiledCard, PlayerState, SideOutcome, State, HAND_SIZE};
@@ -53,6 +54,17 @@ fn chaque_famille_se_relit_a_l_identique() {
         "familles qui ne se relisent pas à l'identique :\n{}",
         ecarts.join("\n")
     );
+}
+
+#[test]
+fn les_regles_se_relisent_a_l_identique() {
+    let regles = corpus::read_rules();
+    let mut empreinte = Sha256::new();
+    for entry in &regles {
+        empreinte.update(serde_json::to_string(&rules_entry_json(entry)).unwrap() + "\n");
+    }
+    let lu = json!({"entries": regles.len(), "sha256": format!("{:x}", empreinte.finalize())});
+    assert_eq!(lu, digests()["rules"], "regles.jsonl ne se relit pas à l'identique");
 }
 
 // --- Réécriture, au format de `dataclasses.asdict` (les tuples y deviennent des listes) --------
@@ -136,5 +148,14 @@ fn capacity_json(capacity: CompiledCapacity) -> Value {
         "bet_over": capacity.bet_over,
         "bet_under": capacity.bet_under,
         "clans": capacity.clans,
+    })
+}
+
+fn rules_entry_json(entry: &RulesEntry) -> Value {
+    let actions = |actions: &[Action]| actions.iter().map(action_json).collect::<Vec<_>>();
+    json!({
+        "state": state_json(&entry.state),
+        "terminal": entry.terminal,
+        "legal_actions": {"ally": actions(&entry.ally_actions), "enemy": actions(&entry.enemy_actions)},
     })
 }

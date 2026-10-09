@@ -41,7 +41,7 @@ puis le solveur de matrices et la recherche exacte.
 |---|---|---|---|
 | 1.1 | Lecteur du corpus en Rust : lire les familles générées par `scripts/build_engine_corpus.py` | les 8 familles sont lues et leurs empreintes égalent celles de `data/engine_digests.json` | ✅ |
 | 1.2 | Résolution d'un round, famille par famille (solo, interactions, planchers, persistants, leaders, oculus, combat, aleatoire) | chaque famille identique à 100 % ; au bout, tout le corpus (~113 500 rounds) | ✅ |
-| 1.3 | Coups légaux et fin de partie | mêmes résultats que `reference.py` | ⬜ |
+| 1.3 | Coups légaux et fin de partie | mêmes résultats que `reference.py` | ✅ |
 | 1.4 | Bloc de mises : toutes les combinaisons de mises d'une paire de cartes, premier étage calculé une fois | chaque case égale au round simple | ⬜ |
 | 1.5 | Test « zéro allocation » sur un round et sur un bloc | le test passe | ⬜ |
 | 1.6 | Solveur de matrices : solution pure, sinon simplexe ; chaque solution vérifiée par son écart à l'équilibre | exemple d'IA.md § 4.4 ; matrices aléatoires égales à SciPy (valeurs attendues écrites par un script Python) | ⬜ |
@@ -122,3 +122,4 @@ référence verts et mêmes valeurs → journal. Une optimisation qui ne fait ri
 | 2026-09-18 | Mac (moteur Python) | branches par seconde | ~1 000 (IA.md § 10) |
 | 2026-10-09 | PC Windows x86_64 | relire tout le corpus (113 540 entrées, 29 365 decks) puis le réécrire et l'empreinter (`tests/lecture_corpus.rs`, profil de test) | 35 s sans optimisation ; 5 s avec la crate en -O1 et les dépendances en -O3 |
 | 2026-10-09 | PC Windows, i7-8750H, un cœur | round simple (version de référence lisible), tout le corpus rejoué 30 fois en release ; mesure informelle, avant le banc de la phase 3 | ~2,8 millions de rounds/s (~360 ns par round) : la cible de départ du round simple (1 million/s par cœur) est déjà dépassée |
+| 2026-10-09 | PC Windows, i7-8750H, un cœur | coups légaux des deux camps et fin de partie, sur les états du corpus `aleatoire`, en release ; mesure informelle | ~58 ns par état (~71 coups, < 1 ns par coup) : négligeable devant un round |

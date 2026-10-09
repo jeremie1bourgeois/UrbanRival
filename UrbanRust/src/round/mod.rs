@@ -13,7 +13,7 @@ mod level4;
 mod multipliers;
 
 use crate::contract::{
-    Action, CompiledCapacity, CompiledCard, Deck, LastRound, Outcome, PlayerState, SideOutcome, State,
+    Action, CompiledCapacity, CompiledCard, Deck, LastRound, Outcome, PlayerState, SideOutcome, State, FURY_COST,
 };
 use crate::vocabulary::{clans, conditions, hows, targets, types};
 
@@ -34,7 +34,6 @@ const ATTACK: u32 = bit(types::ATTACK);
 const LIFE: u32 = bit(types::LIFE);
 const PILLZ: u32 = bit(types::PILLZ);
 
-const FURY_COST: i16 = 3;
 const FURY_DAMAGE: i16 = 2;
 
 /// Conditions vérifiées en début de round (`unmet_condition`) ; les autres (stop, killshot, perfect, defeat,

@@ -13,6 +13,10 @@ use crate::vocabulary::EFFECT_KINDS;
 
 pub const HAND_SIZE: usize = 4;
 pub const MAX_EFFECTS: usize = EFFECT_KINDS.len();
+/// Nombre de rounds d'une partie : l'état vaut `NB_ROUNDS + 1` rounds quand elle est finie.
+pub const NB_ROUNDS: u8 = 4;
+/// Une fury coûte 3 pillz, en plus de la mise.
+pub const FURY_COST: i16 = 3;
 
 /// Capacité compilée : plus un mot, rien que des indices dans le vocabulaire et des masques de bits.
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]

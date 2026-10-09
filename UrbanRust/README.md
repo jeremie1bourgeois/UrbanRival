@@ -7,8 +7,7 @@ sans tout redécouvrir. Ce qu'on compte faire : [docs/PLAN-MOTEUR.md](../docs/PL
 
 ## Où on en est
 
-*Mis à jour le 2026-10-09 — plan : phase 1, étapes 1.1 et 1.2 faites ; prochaine : 1.3 (coups légaux et fin de
-partie).*
+*Mis à jour le 2026-10-09 — plan : phase 1, étapes 1.1 à 1.3 faites ; prochaine : 1.4 (bloc de mises).*
 
 Fait :
 - le vocabulaire du contrat, transcrit de `UrbanPy/Backend_fastAPI/src/core/engine/contract.py` ; son empreinte est
@@ -20,9 +19,13 @@ Fait :
 - la résolution d'un round (étape 1.2), `round::play` : les 8 familles du corpus sont identiques à 100 % au moteur
   Python, état suivant et issue du combat (113 540 rounds). C'est la version simple, transcrite fonction par fonction
   de `process_round.py` et des quatre niveaux de capacités : la référence lisible contre laquelle se vérifieront les
-  versions rapides. Mesure informelle en release : ~2,8 millions de rounds/s sur un cœur (i7-8750H).
+  versions rapides. Mesure informelle en release : ~2,8 millions de rounds/s sur un cœur (i7-8750H) ;
+- les coups légaux et la fin de partie (étape 1.3), `game::legal_actions` et `game::terminal` : identiques à
+  `reference.py` sur les 1 536 états de `regles.jsonl` (chaque main jouée × chaque stock de pillz de 0 à 15, chaque
+  round × chaque paire de vies de 0 à 15), coups dans le même ordre. `legal_actions` est un itérateur : rien n'est
+  alloué.
 
-Pas encore fait : les coups légaux et la fin de partie (1.3), et tout ce qui suit dans le plan.
+Pas encore fait : le bloc de mises (1.4), et tout ce qui suit dans le plan.
 
 Ce code a été écrit avant le plan. Il en respecte les règles de conception, mais rien n'y est figé : la disposition
 de l'état peut changer si une mesure le justifie. Seuls les indices du vocabulaire sont intouchables, car ils sont
@@ -35,14 +38,16 @@ partagés avec Python.
 | `src/lib.rs` | point d'entrée de la crate |
 | `src/vocabulary.rs` | vocabulaire figé : les indices partagés avec Python |
 | `src/contract.rs` | état compact : deck, état, coup, résultat |
+| `src/game.rs` | coups légaux et fin de partie (`reference.py`) |
 | `src/round/mod.rs` | un round (`process_round.py`) : mises, conditions de début de round, Leader, combat, ordre des niveaux |
 | `src/round/clan.rs` | clan d'une carte en main, bonus de clan, Oculus infiltré (`clan.py`) |
 | `src/round/multipliers.rs` | multiplicateurs des capacités, champ `how` (`multipliers.py`) |
 | `src/round/level1.rs` … `level4.rs` | les quatre niveaux de capacités (`apply_capacity_lvl_1.py` … `_4.py`) |
 | `tests/vocabulaire.rs` | l'empreinte du vocabulaire égale celle de Python |
 | `tests/corpus/mod.rs` | lecteur du corpus, partagé par les tests ; hors de la crate, car seuls les tests lisent du JSON |
-| `tests/lecture_corpus.rs` | chaque famille relue puis réécrite redonne l'empreinte de Python |
+| `tests/lecture_corpus.rs` | chaque famille, et `regles.jsonl`, relus puis réécrits redonnent l'empreinte de Python |
 | `tests/differentiel.rs` | chaque round du corpus, rejoué en Rust, redonne l'état suivant et l'issue de Python |
+| `tests/regles.rs` | coups légaux et fin de partie identiques à ceux de Python, sur `regles.jsonl` |
 
 ## Lancer les tests
 
@@ -57,7 +62,8 @@ passe ainsi de 35 s à 5 s.
 ## Comment le code est vérifié
 
 - **Python est la référence.** Le corpus de non-régression se génère avec `scripts/build_engine_corpus.py` (depuis
-  `UrbanPy/Backend_fastAPI`) ; il n'est pas versionné, ses empreintes le sont (`data/engine_digests.json`).
+  `UrbanPy/Backend_fastAPI`) : les rounds joués de chaque famille, plus `regles.jsonl` pour les coups légaux et la
+  fin de partie. Il n'est pas versionné, ses empreintes le sont (`data/engine_digests.json`).
 - **Chaque version optimisée garde une version plus simple comme référence de test** : moteur Python → round simple
   en Rust → bloc de mises. Un code illisible reste ainsi comparable, case par case, à un code qu'on peut relire.
 
