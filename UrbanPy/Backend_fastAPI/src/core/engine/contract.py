@@ -20,6 +20,7 @@ from src.core.domain.effect import PersistentEffect
 from src.core.domain.game import Game
 from src.core.domain.player import Player
 from src.core.domain.round import Round
+from src.core.parsing.capacity_parser import parse_capacity
 
 HOWS = ("", "Protection", "brawl", "cancel", "copy", "counter_attack", "degrowth", "equalizer", "exchange", "growth",
         "impose", "limitless", "nb_dam_opp", "nb_damage", "nb_life_left", "nb_life_lost", "nb_pillz_left",
@@ -146,7 +147,16 @@ def capacity_from_compiled(compiled: Optional[CompiledCapacity]) -> Optional[Cap
 
 # --- Carte ------------------------------------------------------------------------------------
 
+def _check_power_handled(card: Card) -> None:
+    """Card remplace un pouvoir non géré par None : compilée, la carte jouerait sans lui sans que rien ne le signale."""
+    for text in (card.ability_description, card.bonus_description):
+        parsed = parse_capacity(text)
+        if not parsed.supported:
+            raise ValueError(f"pouvoir non géré par le moteur : {card.name} ({card.stars} étoiles), {text!r} ({parsed.reason})")
+
+
 def compile_card(card: Card) -> CompiledCard:
+    _check_power_handled(card)
     return CompiledCard(name=card.name, stars=card.stars, clan=CLANS.index(card.faction), power=card.power,
                         damage=card.damage, ability=compile_capacity(card.ability), bonus=compile_capacity(card.bonus))
 

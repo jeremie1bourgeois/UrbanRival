@@ -65,9 +65,10 @@ passe ainsi de 35 s à 5 s.
   `UrbanPy/Backend_fastAPI`) : les rounds joués de chaque famille, plus `regles.jsonl` pour les coups légaux et la
   fin de partie. Il n'est pas versionné, ses empreintes le sont (`data/engine_digests.json`).
 - **Aucune carte au pouvoir non géré.** Le Python remplace un pouvoir que son parseur ne gère pas par « pas de
-  pouvoir », sans le signaler : Rust et Python joueraient la carte faux, à l'identique. Les mains aléatoires
-  (`src/core/engine/hands.py`) ne tirent donc que les niveaux dont l'ability et le bonus sont gérés ;
-  `tests/test_engine_hands.py` le vérifie sur tout le catalogue.
+  pouvoir », sans le signaler : Rust et Python joueraient la carte faux, à l'identique. `compile_card`
+  (`src/core/engine/contract.py`) refuse donc une telle carte (`ValueError`), et les mains aléatoires
+  (`src/core/engine/hands.py`) ne tirent que les niveaux dont l'ability et le bonus sont gérés ;
+  `tests/test_engine_contract.py` et `tests/test_engine_hands.py` le vérifient.
 - **Chaque version optimisée garde une version plus simple comme référence de test** : moteur Python → round simple
   en Rust → bloc de mises. Un code illisible reste ainsi comparable, case par case, à un code qu'on peut relire.
 

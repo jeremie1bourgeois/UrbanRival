@@ -6,11 +6,14 @@ tout ce que le parseur produit.
 """
 import random
 
+import pytest
+
 from src.adapters.repositories.card_repository import _official_cards, all_capacity_descriptions
+from src.core.domain.card import Card
 from src.core.domain.game import Game
 from src.core.domain.player import Player
 from src.core.engine.contract import (CLANS, CONDITIONS, HOWS, TARGETS, TYPES, capacity_from_compiled,
-                                      compile_capacity, deck_from_game, game_from_state, state_from_game)
+                                      compile_capacity, compile_card, deck_from_game, game_from_state, state_from_game)
 from src.core.engine.hands import random_hand
 from src.core.parsing.capacity_parser import parse_capacity
 from src.core.services.game_service import check_end
@@ -43,6 +46,12 @@ def test_compiled_capacity_round_trip():
         assert (back.how, back.target, back.value, back.borne) == (capacity.how, capacity.target, capacity.value, capacity.borne)
         assert sorted(back.types) == sorted(capacity.types)
         assert sorted(back.effect_conditions) == sorted(capacity.effect_conditions)
+
+
+def test_a_card_whose_power_is_not_handled_does_not_compile():
+    compile_card(Card("Administrator", 1))                 # « Ability at Level 2 » : pas de pouvoir, géré
+    with pytest.raises(ValueError, match="Administrator"):
+        compile_card(Card("Administrator", 2))             # « Hazard » : hors moteur, deviendrait « pas de pouvoir »
 
 
 def _new_game(rng: random.Random) -> Game:
