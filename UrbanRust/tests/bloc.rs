@@ -15,8 +15,8 @@ use ur_engine::contract::{Action, Deck, State};
 use ur_engine::game::card_actions;
 use ur_engine::round::{play, play_block};
 
-const FAMILIES: [&str; 8] = [
-    "solo", "interactions", "planchers", "persistants", "leaders", "oculus", "combat", "aleatoire",
+const FAMILIES: [&str; 9] = [
+    "solo", "interactions", "planchers", "persistants", "leaders", "oculus", "combat", "aleatoire", "reels",
 ];
 
 /// Un état et une paire de cartes : un bloc de mises.
