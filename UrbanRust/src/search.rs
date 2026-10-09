@@ -21,7 +21,7 @@ use std::sync::RwLock;
 use rayon::prelude::*;
 
 use crate::contract::{Deck, State, HAND_SIZE};
-use crate::game::{card_actions, terminal};
+use crate::game::{card_actions, legal_actions, terminal};
 use crate::nash::{Solver, TOLERANCE};
 use crate::round::play_block;
 
@@ -34,6 +34,8 @@ const MEMO_SHARDS: usize = 64;
 thread_local! {
     // un solveur par fil : ses tampons servent à toutes les matrices que le fil résout
     static SOLVER: RefCell<Solver> = RefCell::new(Solver::new());
+    // de même pour la matrice que remplit `card_values`, une fois les valeurs des états suivants connues
+    static MATRIX: RefCell<Vec<f64>> = const { RefCell::new(Vec::new()) };
 }
 
 /// La recherche sur un deck : la mémo garde la valeur de chaque état déjà résolu.
@@ -84,13 +86,20 @@ impl<'a> Search<'a> {
         } else {
             (&state.enemy, &state.ally)
         };
-        let first_cards: Vec<usize> = (0..HAND_SIZE).filter(|&card| !first.has_played(card)).collect();
-        let reply_cards: Vec<usize> = (0..HAND_SIZE).filter(|&card| !second.has_played(card)).collect();
+        let first_cards = || (0..HAND_SIZE).filter(|&card| !first.has_played(card));
+        let reply_cards = || (0..HAND_SIZE).filter(|&card| !second.has_played(card));
 
+        // la place de toutes les cases est réservée d'emblée : le vecteur ne grandit pas (README, « Optimisations en
+        // place »)
+        let cells = legal_actions(first).count() * legal_actions(second).count();
         let spread = self.parallel && state.nb_turn <= PARALLEL_UNTIL_ROUND;
-        let (mut next_states, mut next_values) = (Vec::new(), Vec::new());
-        for &card in &first_cards {
-            for &reply_card in &reply_cards {
+        let (mut next_states, mut next_values) = if spread {
+            (Vec::with_capacity(cells), Vec::new())
+        } else {
+            (Vec::new(), Vec::with_capacity(cells))
+        };
+        for card in first_cards() {
+            for reply_card in reply_cards() {
                 let (ally_card, enemy_card) = if ally_first {
                     (card, reply_card)
                 } else {
@@ -112,14 +121,16 @@ impl<'a> Search<'a> {
                 .collect();
         }
 
-        let cols: usize = reply_cards.iter().map(|&card| card_actions(second, card).count()).sum();
+        let cols = legal_actions(second).count();
         let mut values = [None; HAND_SIZE];
         let mut next = next_values.iter();
-        for &card in &first_cards {
+        let mut matrix = MATRIX.with(|matrix| matrix.take());
+        for card in first_cards() {
             let rows = card_actions(first, card).count();
-            let mut matrix = vec![0.0; rows * cols];
+            matrix.clear();
+            matrix.resize(rows * cols, 0.0);
             let mut col_offset = 0;
-            for &reply_card in &reply_cards {
+            for reply_card in reply_cards() {
                 let bets = card_actions(second, reply_card).count();
                 // le bloc va ligne par ligne, lignes = mises de l'allié : transposé quand F est l'ennemi
                 let enemy_bets = if ally_first { bets } else { rows };
@@ -142,6 +153,7 @@ impl<'a> Search<'a> {
             );
             values[card] = Some(value);
         }
+        MATRIX.with(|buffer| buffer.replace(matrix));
         values
     }
 

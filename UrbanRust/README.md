@@ -222,12 +222,13 @@ gagner, et quel test garantit qu'elle ne change pas les résultats. Le code port
 | Sur un fil, la valeur de chaque état suivant calculée dès que le bloc le donne, sans garder l'état | `src/search.rs` (`card_values`) | les états suivants (114 octets chacun) étaient rangés dans un vecteur qui grandit, puis relus ; l'ordre des appels reste le même, donc la même mémo | banc A/B, meilleur de 5 : round 3 et round 2 x1,04 sur un fil, round 2 x1,05 sur 10 fils | `tests/recherche.rs` (dont parallèle = un fil, au bit près) |
 | Niveaux 3 et 4 sautés quand il n'y a rien à y faire : plus aucune capacité sur les deux cartes (et, pour le niveau 4, aucun effet actif) | `src/round/level3.rs`, `src/round/level4.rs` | ils coûtaient ~38 % d'une case (essais sans eux), alors que dans 53 % des cases où les deux joueurs restent en vie, toutes leurs boucles sont vides | criterion : bloc 17,2 → 20,0 millions de cases/s (+14 %) ; banc A/B : round 2 x1,04 sur un fil, x1,05 sur 10 fils, round 3 x1,03 | `tests/differentiel.rs`, `tests/bloc.rs` |
 | Niveau 2 : les capacités triées une fois pour les trois cibles au lieu d'une fois par cible | `src/round/level2.rs` | une passe ne change aucun plancher, et une capacité qu'elle consomme est sautée par les suivantes à sa place : même ordre, même résultat | criterion en alternance : bloc 19,4 → 21,4 millions de cases/s (+10 %) ; banc A/B : round 2 x1,08 sur un fil | `tests/differentiel.rs`, `tests/bloc.rs` |
+| La recherche n'alloue plus, par état résolu, que le vecteur de ses valeurs, réservé d'emblée à sa taille : cartes jouables en itérateurs, une matrice par fil réutilisée | `src/search.rs` (`card_values`, `MATRIX`) | allocations, libérations et réallocations pesaient ~8 % d'une recherche sur un fil | banc A/B, meilleur de 4 : round 3 x1,08, round 2 x1,05 sur un fil et x1,13 sur 10 fils | `tests/recherche.rs`, `tests/resolutions.rs` |
 
 ## Écarts connus et points ouverts
 
 - La recherche est encore écrite simplement : mémo en 64 `HashMap` sous verrou lecteurs-rédacteur, au hachage
   rapide (`StateHasher`, sur le hachage regroupé de l'état, calculé une fois pour choisir le morceau, une fois dans la
-  table), une matrice et une liste d'états suivants allouées à chaque état résolu. Le premier profil (étape 4.1, journal du plan) y place les
+  table), et un vecteur de valeurs alloué à chaque état résolu. Le premier profil (étape 4.1, journal du plan) y place les
   deux plus gros postes : l'attente des verrous de la mémo (~45 % du temps actif de la partie entière sur 10 fils,
   d'où le temps système) et le hachage de l'état (25 à 31 %, avant son regroupement) ; le round vient ensuite.
 - `rayon` est la seule dépendance du moteur, et seule la recherche s'en sert : le round n'en a aucune.
