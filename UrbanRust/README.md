@@ -7,7 +7,8 @@ sans tout redécouvrir. Ce qu'on compte faire : [docs/PLAN-MOTEUR.md](../docs/PL
 
 ## Où on en est
 
-*Mis à jour le 2026-10-09 — plan : phase 1, étape 1.1 faite ; prochaine : 1.2 (résolution d'un round).*
+*Mis à jour le 2026-10-09 — plan : phase 1, étapes 1.1 et 1.2 faites ; prochaine : 1.3 (coups légaux et fin de
+partie).*
 
 Fait :
 - le vocabulaire du contrat, transcrit de `UrbanPy/Backend_fastAPI/src/core/engine/contract.py` ; son empreinte est
@@ -15,9 +16,13 @@ Fait :
 - l'état compact d'une partie (deck, état, coup, résultat) : types de taille fixe, copiables, sans tas ;
 - le lecteur du corpus (étape 1.1) : les 8 familles (113 540 entrées, 29 365 decks) se relisent dans les types de
   `contract.rs` sans rien perdre. La preuve : réécrites depuis ces types en JSON canonique, elles redonnent
-  exactement les empreintes de Python (un lecteur qui perd les effets persistants fait échouer 7 familles sur 8).
+  exactement les empreintes de Python (un lecteur qui perd les effets persistants fait échouer 7 familles sur 8) ;
+- la résolution d'un round (étape 1.2), `round::play` : les 8 familles du corpus sont identiques à 100 % au moteur
+  Python, état suivant et issue du combat (113 540 rounds). C'est la version simple, transcrite fonction par fonction
+  de `process_round.py` et des quatre niveaux de capacités : la référence lisible contre laquelle se vérifieront les
+  versions rapides. Mesure informelle en release : ~2,8 millions de rounds/s sur un cœur (i7-8750H).
 
-Pas encore fait : la résolution d'un round, et tout ce qui suit dans le plan.
+Pas encore fait : les coups légaux et la fin de partie (1.3), et tout ce qui suit dans le plan.
 
 Ce code a été écrit avant le plan. Il en respecte les règles de conception, mais rien n'y est figé : la disposition
 de l'état peut changer si une mesure le justifie. Seuls les indices du vocabulaire sont intouchables, car ils sont
@@ -30,9 +35,14 @@ partagés avec Python.
 | `src/lib.rs` | point d'entrée de la crate |
 | `src/vocabulary.rs` | vocabulaire figé : les indices partagés avec Python |
 | `src/contract.rs` | état compact : deck, état, coup, résultat |
+| `src/round/mod.rs` | un round (`process_round.py`) : mises, conditions de début de round, Leader, combat, ordre des niveaux |
+| `src/round/clan.rs` | clan d'une carte en main, bonus de clan, Oculus infiltré (`clan.py`) |
+| `src/round/multipliers.rs` | multiplicateurs des capacités, champ `how` (`multipliers.py`) |
+| `src/round/level1.rs` … `level4.rs` | les quatre niveaux de capacités (`apply_capacity_lvl_1.py` … `_4.py`) |
 | `tests/vocabulaire.rs` | l'empreinte du vocabulaire égale celle de Python |
 | `tests/corpus/mod.rs` | lecteur du corpus, partagé par les tests ; hors de la crate, car seuls les tests lisent du JSON |
 | `tests/lecture_corpus.rs` | chaque famille relue puis réécrite redonne l'empreinte de Python |
+| `tests/differentiel.rs` | chaque round du corpus, rejoué en Rust, redonne l'état suivant et l'issue de Python |
 
 ## Lancer les tests
 
@@ -62,6 +72,13 @@ gagner, et quel test garantit qu'elle ne change pas les résultats. Le code port
 | Capacités réduites à des indices et des masques de bits | `src/contract.rs`, `src/vocabulary.rs` | aucun texte manipulé pendant un round | pas encore mesuré | `tests/vocabulaire.rs` |
 
 ## Écarts connus et points ouverts
+
+- La carte compilée Rust porte `character` (indice dans la main du premier exemplaire de la carte) au lieu du nom
+  que porte le contrat Python : le moteur lit l'identité d'une carte (le bonus de clan compte les personnages
+  distincts, chaque Leader est son propre clan pour un Oculus), jamais son texte. Le lecteur du corpus le calcule
+  depuis les noms ; une liaison Python devra faire de même.
+- Le round panique là où le Python lève une erreur (`how` sans multiplicateur, condition de fin de round inattendue) :
+  ces cas n'existent pas dans les cartes, le corpus le vérifie.
 
 - Généré sous Windows, le corpus finit ses lignes par `\r\n`, alors que Python empreinte les lignes terminées par
   `\n` : hacher les fichiers tels quels ne redonne pas les empreintes. Le lecteur accepte les deux fins de ligne, et
