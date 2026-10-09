@@ -98,6 +98,29 @@ function urRecords() {
 }
 function urRecord() { return urRecords(); }
 
+// Conseil en direct : envoie chaque nouvel état du combat en cours à scripts/conseil_nash.py, qui affiche dans son
+// terminal la stratégie de Nash du round. Lecture passive, comme la capture : rien n'est envoyé au serveur du jeu.
+function urConseil(port = 8765) {
+  clearInterval(window.__urConseil);
+  const url = `http://127.0.0.1:${port}/`;
+  let seen = window.__urCapture.length, last = null;
+  window.__urConseil = setInterval(() => {
+    const fresh = window.__urCapture.slice(seen).filter((c) => c.res && c.res.startsWith('{"battles.status"'));
+    seen = window.__urCapture.length;
+    if (!fresh.length) return;
+    let b;
+    try { b = JSON.parse(fresh[fresh.length - 1].res)["battles.status"].data.battle; } catch (e) { return; }
+    if (!b || !b.player0 || !b.player1) return;
+    const sig = JSON.stringify([b.id, b.round, b.status, b.player0.characters.map((x) => x.roundPlayed), b.player1.characters.map((x) => x.roundPlayed)]);
+    if (sig === last) return;
+    last = sig;
+    const sts = urStatuses().filter((x) => x.id === b.id);
+    const payload = { record: urRecordOf(sts), first: urFirstOf(sts, b.round, sts[0].player0.player.id), status: b };
+    fetch(url, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) }).catch(() => console.warn("conseil : script local injoignable sur " + url));
+  }, 1000);
+  return "conseil envoyé à " + url;
+}
+
 function urAbilities() {
   const abilities = {};
   for (const b of urStatuses()) for (const p of [b.player0, b.player1]) for (const x of p.characters) for (const k of ["ability", "bonus"]) if (x[k]) abilities[x[k].id] = x[k];

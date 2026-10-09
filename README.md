@@ -108,6 +108,21 @@ cd UrbanPy/Backend_fastAPI
 .venv/bin/python scripts/scrape_official_cards.py   # re-scrape iclintz.com (cache dans data/.scrape_cache, reprise possible)
 ```
 
+## Conseil de Nash pendant un combat
+
+Pendant un combat dans le client officiel, la stratégie d'équilibre exacte du round (moteur Rust), mise à jour après
+chaque coup :
+
+```bash
+cd UrbanPy/Backend_fastAPI && .venv/bin/python scripts/conseil_nash.py --moi "jere'm"
+```
+
+Puis, dans la console du client web, coller `scripts/ur_capture.js` (comme pour la capture, [docs/ORACLE.md](docs/ORACLE.md))
+et exécuter `urConseil()`. Le conseil s'affiche dans le terminal dès que c'est à vous : la valeur de la position, la
+carte, les pillz à ajouter et la fury, avec leurs probabilités quand l'équilibre est mixte (et un tirage). Les rounds
+déjà joués sont rejoués par le moteur Python et comparés au serveur ; un écart est signalé. Pour vérifier sur un
+combat enregistré : `--rejouer data/ur_battles/1181426.json`.
+
 ## Règles du moteur
 
 Un round : conditions de début de round → niveau 1 (Stop / Protection / Copy / Cancel / Exchange, résolus

@@ -155,6 +155,7 @@ partagés avec Python.
 | `tests/resolutions.rs` | 10 000 résolutions depuis le round 3, sur des mains au hasard, sans alerte des contrôles ni plantage |
 | `tests/sans_allocation.rs` | aucune allocation pendant un round, un bloc, les coups légaux, la fin de partie, et pour un solveur déjà dimensionné (valeur et équilibres) |
 | `examples/banc.rs` | le banc d'essai : les indicateurs du plan, par round de départ, sur les états de `data/engine_bench.json` |
+| `examples/conseil.rs` | le conseil d'un round, pour `scripts/conseil_nash.py` : deck, état et carte posée par l'ennemi lus en JSON ; valeur exacte et stratégie d'équilibre de l'allié rendues en JSON. Quand l'allié joue en premier, la matrice du conseil doit redonner la valeur de `Search::card_values` |
 | `benches/moteur.rs` | benchmarks criterion : round simple et bloc sur les cases du banc, solveur sur les matrices de `data/nash_expected.json` |
 
 ## Lancer les tests
