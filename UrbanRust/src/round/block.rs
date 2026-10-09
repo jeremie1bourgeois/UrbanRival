@@ -73,14 +73,16 @@ fn first_stage_of<'a>(
     unreachable!("plus de {MAX_TRANCHES} tranches de mises")
 }
 
-/// Les conditions Bet des capacités imprimées du deck.
+/// Les conditions Bet des capacités imprimées du deck : les `count` premières cases de `capacities`.
 struct BetConditions {
     capacities: [Option<CompiledCapacity>; MAX_BET_CONDITIONS],
+    count: usize,
 }
 
 impl BetConditions {
     fn of(deck: &Deck) -> Self {
         let mut capacities = [None; MAX_BET_CONDITIONS];
+        let mut count = 0;
         let printed = deck
             .ally
             .iter()
@@ -92,14 +94,16 @@ impl BetConditions {
             .enumerate()
         {
             capacities[slot] = Some(capacity);
+            count += 1;
         }
-        BetConditions { capacities }
+        BetConditions { capacities, count }
     }
 
-    /// Bit i levé : la mise remplit la i-ème condition.
+    /// Bit i levé : la mise remplit la i-ème condition. Calculée à chaque case : seules les conditions réelles se
+    /// parcourent, aucune le plus souvent (README, « Optimisations en place »).
     fn signature(&self, bet: i16) -> u32 {
         let mut signature = 0;
-        for (index, capacity) in self.capacities.iter().flatten().enumerate() {
+        for (index, capacity) in self.capacities[..self.count].iter().flatten().enumerate() {
             if bet_condition_met(capacity, bet) {
                 signature |= 1 << index;
             }
