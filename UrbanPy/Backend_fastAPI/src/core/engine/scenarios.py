@@ -2,9 +2,9 @@
 Scénarios combinatoires du moteur : des situations construites une à une — cartes synthétiques à valeurs contrôlées,
 capacités prises dans les descriptions officielles — pour exercer chaque capacité, chaque interaction méta, chaque
 condition et chaque effet persistant dans des contextes choisis, là où le corpus aléatoire ne garantit rien.
-Chaque famille est un générateur déterministe (sans graine, sauf « aleatoire ») de Scenario : deck compilé, état,
-actions du round. corpus.py les joue avec le moteur de référence et enregistre l'état suivant et l'issue du round ;
-un moteur compilé doit reproduire chaque entrée.
+Chaque famille est un générateur déterministe (sans graine, sauf « aleatoire » et « masse ») de Scenario : deck
+compilé, état, actions du round. corpus.py les joue avec le moteur de référence et enregistre l'état suivant et
+l'issue du round ; un moteur compilé doit reproduire chaque entrée.
 Le moteur applique les effets de l'allié avant ceux de l'ennemi et, avec des planchers, l'ordre compte : les familles
 où cela peut jouer enregistrent aussi le scénario miroir (camps échangés, premier joueur inversé), pour qu'un port
 reproduise les deux orientations.
@@ -658,20 +658,37 @@ def combat_scenarios() -> Iterator[Scenario]:
             yield scenario.mirrored()
 
 
-# --- Famille « aleatoire » : parties complètes jouées au hasard --------------------------------
+# --- Familles « aleatoire » et « masse » : parties complètes jouées au hasard ------------------
 
-def random_scenarios(games: int = 300, extra_pairs: int = 4, seed: int = 0) -> Iterator[Scenario]:
-    """Chaque état d'une partie aléatoire, avec le coup joué et quelques paires d'actions non jouées."""
+MASS_GAMES = 2000   # 82 % des niveaux de cartes tirables sortent au moins une fois ; ~1 min de génération
+NIGHT_RATE = 0.5
+
+
+def random_scenarios(games: int = 300, extra_pairs: int = 4, seed: int = 0, family: str = "aleatoire",
+                     night_rate: float = 0.0) -> Iterator[Scenario]:
+    """
+    Chaque état d'une partie aléatoire, avec le coup joué et quelques paires d'actions non jouées ; une partie se joue
+    de nuit avec la probabilité `night_rate`.
+    """
     rng = random.Random(seed)
     for number in range(games):
-        game = Game(1, rng.random() < 0.5, Player("ally", 12, 12), Player("enemy", 12, 12), [])
-        game.ally.cards, game.enemy.cards = random_hand(rng), random_hand(rng)
+        night = night_rate > 0 and rng.random() < night_rate   # sans nuit, aucun tirage : « aleatoire » ne change pas
+        game = Game(1, rng.random() < 0.5, Player("ally", 12, 12), Player("enemy", 12, 12), [], night=night)
+        game.ally.cards, game.enemy.cards = random_hand(rng, night), random_hand(rng, night)
         deck, state = deck_from_game(game), state_from_game(game)
         while terminal(state) is None:
             pairs = [(rng.choice(legal_actions(state, "ally")), rng.choice(legal_actions(state, "enemy"))) for _ in range(1 + extra_pairs)]
             for index, (ally_action, enemy_action) in enumerate(pairs):
-                yield Scenario(f"aleatoire/partie-{number}/round-{state.nb_turn}/coup-{index}", deck, state, ally_action, enemy_action)
+                yield Scenario(f"{family}/partie-{number}/round-{state.nb_turn}/coup-{index}", deck, state, ally_action, enemy_action)
             state = step(deck, state, *pairs[0])
+
+
+def mass_scenarios() -> Iterator[Scenario]:
+    """
+    Comme « aleatoire », en bien plus grand nombre et de nuit une fois sur deux : la plupart des cartes et des textes
+    « Night: » y sont joués. « aleatoire » reste le petit échantillon de mains réalistes dont se servent les tests.
+    """
+    return random_scenarios(games=MASS_GAMES, seed=1, family="masse", night_rate=NIGHT_RATE)
 
 
 # --- Famille « reels » : les combats réels capturés du client officiel ------------------------
@@ -720,5 +737,6 @@ FAMILIES = {
     "oculus": oculus_scenarios,
     "combat": combat_scenarios,
     "aleatoire": random_scenarios,
+    "masse": mass_scenarios,
     "reels": real_battle_scenarios,
 }

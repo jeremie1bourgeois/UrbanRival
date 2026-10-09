@@ -41,6 +41,11 @@
       "decks": 300,
       "sha256": "18cd4b3bc1f1737a45315c9cbf2aa57c136fc2a0282a369cf493f15cf7ae68d9"
     },
+    "masse": {
+      "entries": 37665,
+      "decks": 2000,
+      "sha256": "3534d8511afc51b9d8e0d335346ab1b5ea2de0789b7ed2d561630a17db417810"
+    },
     "reels": {
       "entries": 439,
       "decks": 115,
