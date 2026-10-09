@@ -9,7 +9,7 @@ sans tout redécouvrir. Ce qu'on compte faire : [docs/PLAN-MOTEUR.md](../docs/PL
 
 *Mis à jour le 2026-10-09 — plan : phase 1 faite (étapes 1.1 à 1.11) ; phase 2 faite (2.1 à 2.4) ; phase 3 : 3.1 et
 3.2 faites, 3.3 en cours (le Mac M4 est mesuré, un serveur multicœur reste à mesurer) ; phase 4 : 4.1 faite (le
-profil), 4.2 en cours (trois optimisations : le hachage de l'état, la mémo sous verrou lecteurs-rédacteur, le niveau 2 sans travail inutile).*
+profil), 4.2 en cours : optimisations du hachage, de la mémo, du round et de la recherche, et une première équivalence d'états ; voir « Optimisations en place ».*
 
 Fait :
 - le vocabulaire du contrat, transcrit de `UrbanPy/Backend_fastAPI/src/core/engine/contract.py` ; son empreinte est
@@ -224,6 +224,7 @@ gagner, et quel test garantit qu'elle ne change pas les résultats. Le code port
 | Niveau 2 : les capacités triées une fois pour les trois cibles au lieu d'une fois par cible | `src/round/level2.rs` | une passe ne change aucun plancher, et une capacité qu'elle consomme est sautée par les suivantes à sa place : même ordre, même résultat | criterion en alternance : bloc 19,4 → 21,4 millions de cases/s (+10 %) ; banc A/B : round 2 x1,08 sur un fil | `tests/differentiel.rs`, `tests/bloc.rs` |
 | La recherche n'alloue plus, par état résolu, que le vecteur de ses valeurs, réservé d'emblée à sa taille : cartes jouables en itérateurs, une matrice par fil réutilisée | `src/search.rs` (`card_values`, `MATRIX`) | allocations, libérations et réallocations pesaient ~8 % d'une recherche sur un fil | banc A/B, meilleur de 4 : round 3 x1,08, round 2 x1,05 sur un fil et x1,13 sur 10 fils | `tests/recherche.rs`, `tests/resolutions.rs` |
 | Signature des mises : seules les conditions « Bet » réelles du deck se parcourent | `src/round/block.rs` (`BetConditions`) | calculée à chaque case, elle parcourait les 16 emplacements possibles, vides le plus souvent | criterion en alternance : bloc 21,3 → 23,0 millions de cases/s (+7 %) ; banc A/B : round 3 x1,07, round 2 x1,06 sur un fil | `tests/bloc.rs` (une signature qui ignore les Bet y fait diverger 1 419 blocs) |
+| États équivalents résolus une fois : quand aucune capacité imprimée du deck ne lit le round précédent (Revenge, Confidence, After), la mémo oublie `last_round` | `src/search.rs` (`reads_last_round`, `Search::value`) | `last_round` n'est lu que par ces trois conditions, et toute capacité du round vient d'une capacité imprimée (pouvoir, bonus, copie, Team du Leader, bonus d'un Oculus) : deux états qui ne diffèrent que par l'ordre des mêmes cartes jouées ont la même valeur. 14 decks du banc sur 24 ; pour eux, 54 % d'états résolus en moins depuis le round 2, 76 % sur une partie entière | banc A/B : round 2 x1,30 sur un fil et x1,18 sur 10 fils (moyenne sur les 24 decks), partie entière x1,69 ; mêmes empreintes | `tests/recherche.rs` : `fusionner_les_etats_equivalents_ne_change_aucune_valeur` (mêmes valeurs au bit près que `Search::without_equivalences` ; forcer l'oubli sur tous les decks le fait échouer) ; la comparaison au solveur Python se fait sans équivalence |
 
 ## Écarts connus et points ouverts
 

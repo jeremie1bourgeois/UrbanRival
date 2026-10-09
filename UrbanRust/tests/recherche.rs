@@ -3,8 +3,10 @@
 //! `data/search_expected.json` (écrit par `scripts/build_search_expected.py`, lentement, avec `reference.step` et
 //! SciPy) : des états de rounds 4 et 3, leur deck, leur valeur pour l'allié et la valeur de chaque carte du premier
 //! joueur pour lui. On compare aussi le nombre d'états distincts résolus : il ne coïncide que si les deux moteurs
-//! identifient les états de la même façon et atteignent les mêmes. Le mode parallèle doit donner les mêmes nombres
-//! que le mode à un seul fil, au bit près. Vu de l'autre camp, chaque état résolu vaut 1 − V.
+//! identifient les états de la même façon et atteignent les mêmes : la comparaison se fait donc sans fusionner les
+//! états équivalents (`Search::without_equivalences`), et un test à part vérifie que les fusionner ne change aucune
+//! valeur. Le mode parallèle doit donner les mêmes nombres que le mode à un seul fil, au bit près. Vu de l'autre camp,
+//! chaque état résolu vaut 1 − V.
 
 #[allow(dead_code)] // chaque test ne lit qu'une partie de ce que le lecteur donne
 mod corpus;
@@ -65,7 +67,7 @@ fn chaque_etat_a_la_valeur_du_solveur_python() {
     let entries = expected_states();
     let mut divergent = Vec::new();
     for expected in &entries {
-        let search = Search::new(&expected.deck);
+        let search = Search::new(&expected.deck).without_equivalences();
         let card_values = search.card_values(&expected.state);
         let best = card_values
             .iter()
@@ -123,6 +125,23 @@ fn roots() -> Vec<(Deck, State)> {
             .copied(),
     );
     roots
+}
+
+/// Fusionner les états équivalents ne change aucune valeur : sur les états de départ des autres tests et sur les
+/// débuts du round 2 du banc d'essai, la recherche donne, au bit près, les valeurs de cartes de la recherche sans
+/// équivalence, en résolvant au plus autant d'états, et moins pour certains.
+#[test]
+fn fusionner_les_etats_equivalents_ne_change_aucune_valeur() {
+    let mut starts = roots();
+    starts.extend(corpus::read_bench().into_iter().map(|game| (game.deck, game.states[1])));
+    let mut merged = 0;
+    for (deck, state) in &starts {
+        let (with, without) = (Search::new(deck), Search::new(deck).without_equivalences());
+        assert_eq!(with.card_values(state), without.card_values(state), "{state:?}");
+        assert!(with.solved_states() <= without.solved_states(), "{state:?}");
+        merged += (with.solved_states() < without.solved_states()) as usize;
+    }
+    assert!(merged > 0, "aucun état fusionné : le test ne vérifie rien");
 }
 
 #[test]

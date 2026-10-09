@@ -12,6 +12,11 @@
 //! Les contrôles : chaque matrice est vérifiée par le solveur, toujours ; en mode test (assertions de debug, actives
 //! sous `cargo test`), chaque valeur est une probabilité, dans [0, 1] ; `Search::mirror_mismatches` vérifie que chaque
 //! état résolu, vu de l'autre camp, vaut 1 − V.
+//!
+//! Les états équivalents ne se résolvent qu'une fois : quand aucune capacité du deck ne lit le round précédent
+//! (Revenge, Confidence, After), `last_round` ne change rien à la suite, et la mémo l'oublie. Deux états qui ne
+//! diffèrent que par l'ordre dans lequel les mêmes cartes ont été jouées n'en font plus qu'un (README, « Optimisations
+//! en place » ; `tests/recherche.rs` le compare à la recherche sans équivalence, `Search::without_equivalences`).
 
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -24,6 +29,7 @@ use crate::contract::{Deck, State, HAND_SIZE};
 use crate::game::{card_actions, legal_actions, terminal};
 use crate::nash::{Solver, TOLERANCE};
 use crate::round::play_block;
+use crate::vocabulary::conditions;
 
 /// Jusqu'à ce round compris, `Search::parallel` répartit les états suivants d'un état sur les cœurs ; au-delà, ils
 /// sont trop vite résolus pour que la répartition rapporte.
@@ -43,17 +49,35 @@ pub struct Search<'a> {
     deck: &'a Deck,
     memo: Memo,
     parallel: bool,
+    /// Aucune capacité du deck ne lit le round précédent : la mémo oublie `last_round`.
+    forget_last_round: bool,
 }
 
 impl<'a> Search<'a> {
     /// Une recherche sur un seul fil.
     pub fn new(deck: &'a Deck) -> Self {
-        Search { deck, memo: Memo::new(), parallel: false }
+        Search {
+            deck,
+            memo: Memo::new(),
+            parallel: false,
+            forget_last_round: !reads_last_round(deck),
+        }
     }
 
     /// Une recherche qui répartit son travail sur tous les cœurs.
     pub fn parallel(deck: &'a Deck) -> Self {
-        Search { deck, memo: Memo::new(), parallel: true }
+        Search {
+            deck,
+            memo: Memo::new(),
+            parallel: true,
+            forget_last_round: !reads_last_round(deck),
+        }
+    }
+
+    /// La même recherche, sans fusionner les états équivalents : chaque état distinct se résout, comme dans le solveur
+    /// Python de référence. Elle sert à vérifier les équivalences.
+    pub fn without_equivalences(self) -> Self {
+        Search { forget_last_round: false, ..self }
     }
 
     /// V(état) pour l'allié.
@@ -61,6 +85,13 @@ impl<'a> Search<'a> {
         if let Some(end) = terminal(state) {
             return end;
         }
+        let forgotten;
+        let state = if self.forget_last_round && state.last_round.is_some() {
+            forgotten = State { last_round: None, ..*state };
+            &forgotten
+        } else {
+            state
+        };
         if let Some(known) = self.memo.get(state) {
             return known;
         }
@@ -187,6 +218,19 @@ impl<'a> Search<'a> {
             })
             .collect()
     }
+}
+
+/// Une capacité imprimée du deck lit-elle le round précédent ? Toutes celles du round en viennent : pouvoir, bonus,
+/// copie de l'adverse, capacité Team du Leader, bonus pris par un Oculus. `last_round` n'est lu que par ces trois
+/// conditions de début de round.
+fn reads_last_round(deck: &Deck) -> bool {
+    let readers = 1 << conditions::REVENGE | 1 << conditions::CONFIDENCE | 1 << conditions::AFTER;
+    deck.ally
+        .iter()
+        .chain(&deck.enemy)
+        .flat_map(|card| [card.ability, card.bonus])
+        .flatten()
+        .any(|capacity| capacity.conditions & readers != 0)
 }
 
 /// La mémo, partagée entre les fils : des tables indépendantes, choisies par l'empreinte de l'état, chacune sous son
