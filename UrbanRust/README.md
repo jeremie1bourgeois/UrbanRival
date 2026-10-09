@@ -7,8 +7,8 @@ sans tout redécouvrir. Ce qu'on compte faire : [docs/PLAN-MOTEUR.md](../docs/PL
 
 ## Où on en est
 
-*Mis à jour le 2026-10-09 — plan : phase 1 faite (étapes 1.1 à 1.11) ; phase 2 : 2.1 à 2.3 faites ; prochaine : 2.4
-(un bug du solveur, trouvé en mesurant la partie entière), puis la phase 3.*
+*Mis à jour le 2026-10-09 — plan : phase 1 faite (étapes 1.1 à 1.11) ; phase 2 faite (2.1 à 2.4) ; prochaine : la
+phase 3 (mesurer).*
 
 Fait :
 - le vocabulaire du contrat, transcrit de `UrbanPy/Backend_fastAPI/src/core/engine/contract.py` ; son empreinte est
@@ -96,7 +96,19 @@ Fait :
   plancher le plus haut d'abord, comme au niveau 2), corrigées dans les deux moteurs avec leurs tests de bout en
   bout ; le corpus en porte des cas (`regles.jsonl` pour le double KO, `oculus` et `masse` pour l'ordre des pertes).
 
-Pas encore fait : 2.4 (le bug du solveur ci-dessous), la phase 3 (mesurer), et tout ce qui suit dans le plan.
+- le solveur juste sur les matrices réelles du round 2 (étape 2.4) : il ne pivote plus sur un coefficient sous
+  `MIN_PIVOT` (1e-9). En résolvant la partie entière de `masse/partie-0` et `partie-1`, deux matrices du round 2
+  riches en pillz (13 × 57 et 17 × 39) faisaient pivoter le simplexe sur un coefficient de ~1e-11 qui vaut exactement
+  0 (en fractions, à partir des mêmes flottants) : un zéro déplacé par les arrondis, dont le pivot multiplie les erreurs
+  par ~1e11. La stratégie des lignes, lue sur les coûts réduits, s'écartait alors de 1e-3 de l'équilibre, et la
+  vérification arrêtait la recherche. Sur 1 934 matrices mixtes réelles du round 2 suivies en arithmétique exacte, ces
+  faux non-zéros vont jusqu'à 1,5e-11 (99,9 % sous 7e-15) et les vrais coefficients candidats ne descendent pas sous
+  1,4e-3 : le seuil se place entre les deux. Les coûts réduits et le départage lexicographique gardent leur seuil de
+  1e-11 : un simplexe arrêté sur un coût réduit de −5e-10 pourrait dépasser la tolérance de la vérification. Les deux
+  matrices sont des cas de `tests/nash.rs` ; les parties entières de `masse/partie-0` à `partie-9` vont au bout, en 9 à
+  19 s par main sur le Mac M4.
+
+Pas encore fait : la phase 3 (mesurer), et tout ce qui suit dans le plan.
 
 Ce code a été écrit avant le plan. Il en respecte les règles de conception, mais rien n'y est figé : la disposition
 de l'état peut changer si une mesure le justifie. Seuls les indices du vocabulaire sont intouchables, car ils sont
@@ -145,8 +157,11 @@ rejoue ~35 millions de cases deux fois, en bloc et en round simple.
   `UrbanPy/Backend_fastAPI`) : les rounds joués de chaque famille, plus `regles.jsonl` pour les coups légaux et la
   fin de partie. Il n'est pas versionné, ses empreintes le sont (`data/engine_digests.json`).
 - **SciPy est la référence du solveur** : `scripts/build_nash_expected.py` (SciPy, dans `requirements-dev.txt`) écrit
-  `data/nash_expected.json`, versionné ; une matrice peut avoir plusieurs équilibres, les tests comparent des nombres
-  uniques : la valeur, la plus forte probabilité de chaque coup dans un équilibre, et l'ensemble des coins.
+  `data/nash_expected.json`, versionné, à partir de matrices tirées au hasard et des matrices réelles de
+  `data/nash_real_matrices.json` : des matrices du moteur sur lesquelles le solveur s'est trompé (étape 2.4). Une
+  erreur du solveur arrête la recherche net ; la matrice capturée entre dans ce fichier. Une matrice peut avoir
+  plusieurs équilibres, les tests comparent des nombres uniques : la valeur, la plus forte probabilité de chaque coup
+  dans un équilibre, et l'ensemble des coins.
 - **Le solveur Python de référence est la référence de la recherche** : `scripts/build_search_expected.py` applique
   lentement la récursion de `docs/IA.md` § 5.1 (`reference.step`, SciPy pour chaque matrice, mémo par état) et écrit
   `data/search_expected.json`, versionné : pour 68 états de rounds 4 et 3, le deck, l'état, la valeur pour l'allié, la
@@ -177,7 +192,6 @@ gagner, et quel test garantit qu'elle ne change pas les résultats. Le code port
 
 ## Écarts connus et points ouverts
 
-- **Le solveur rate des matrices réelles du round 2 riches en pillz** (étape 2.4). Trouvé en mesurant la partie entière : sur une matrice 13 × 57, le simplexe rend une stratégie à ~1e-3 de l'équilibre. La vérification l'arrête net, aucune valeur fausse ne passe, mais la recherche plante. Se reproduit en résolvant depuis le round 1 `masse/partie-0` et `masse/partie-1` ; jamais vu sur les 10 000 résolutions du round 3. Malgré ce plantage, chaque main a été résolue en entier en 24 à 46 s sur 6 cœurs (journal du plan).
 - La recherche est écrite simplement, en attendant le profil de la phase 3 : mémo en 64 `HashMap` sous verrou, au
   hachage standard (SipHash, calculé une fois pour choisir le morceau, une fois dans la table), une matrice et une
   liste d'états suivants allouées à chaque état résolu. Sur un fil, elle paraît ~20 % plus lente que la version sans

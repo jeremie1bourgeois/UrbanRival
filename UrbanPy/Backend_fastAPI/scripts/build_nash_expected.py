@@ -5,6 +5,8 @@ premier joueur, résolues par SciPy (linprog, HiGHS) comme dans docs/IA.md § 4.
 par le programme des lignes et par celui des colonnes, qui doivent s'accorder. Pour chaque coup de chaque joueur, la
 plus forte probabilité qu'il reçoive dans une stratégie optimale (étape 1.7) : un programme linéaire par coup. Sur
 les petites matrices, les coins de l'ensemble des stratégies optimales de chaque joueur (étape 1.8), par force brute.
+S'y ajoutent les matrices réelles de data/nash_real_matrices.json : des matrices du moteur sur lesquelles le solveur
+Rust s'est trompé, gardées comme cas de test (étape 2.4).
 Écrit data/nash_expected.json (versionné, une matrice par ligne) ; à relancer seulement pour changer les matrices.
 Usage (depuis UrbanPy/Backend_fastAPI) :
     python scripts/build_nash_expected.py
@@ -24,6 +26,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.utils.config import BASE_DIR  # noqa: E402
 
 EXPECTED_PATH = os.path.join(BASE_DIR, "data", "nash_expected.json")
+REAL_MATRICES_PATH = os.path.join(BASE_DIR, "data", "nash_real_matrices.json")
 SEED = 0
 AGREEMENT = 1e-9   # écart toléré entre la valeur des lignes et celle des colonnes
 FEASIBILITY = 1e-9  # écart toléré sur une contrainte, et entre deux coins pour les confondre
@@ -111,6 +114,8 @@ def matrices(rng: random.Random):
             for number in range(1 if rows * cols > LARGE else 3):
                 values = [draw(rng) for _ in range(rows * cols)]
                 yield {"name": f"{rows}x{cols}/{kind}/{number}", "rows": rows, "cols": cols, "values": values}
+    with open(REAL_MATRICES_PATH, encoding="utf-8") as file:
+        yield from json.load(file)
 
 
 def main() -> None:

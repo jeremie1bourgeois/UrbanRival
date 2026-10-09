@@ -1,11 +1,12 @@
 //! Le solveur de matrices donne-t-il ce que donne SciPy ?
 //!
 //! `data/nash_expected.json` (écrit par `scripts/build_nash_expected.py`) : des matrices tirées au hasard, de 1 × 1 à
-//! 23 × 92, aux valeurs quelconques ou à nombreuses égalités ; leur valeur selon SciPy (HiGHS), et pour chaque coup de
-//! chaque joueur sa plus forte probabilité dans une stratégie optimale ; sur les petites matrices, les coins de
-//! l'ensemble des stratégies optimales de chaque joueur, par force brute. Une matrice peut avoir plusieurs équilibres :
-//! on compare ces nombres et ces ensembles, uniques, et pas une stratégie ; que les stratégies trouvées soient des
-//! équilibres, le solveur le vérifie lui-même à chaque résolution.
+//! 23 × 92, aux valeurs quelconques ou à nombreuses égalités, et des matrices réelles du moteur sur lesquelles le solveur
+//! s'est trompé (`data/nash_real_matrices.json`) ; leur valeur selon SciPy (HiGHS), et pour chaque coup de chaque joueur
+//! sa plus forte probabilité dans une stratégie optimale ; sur les petites matrices, les coins de l'ensemble des
+//! stratégies optimales de chaque joueur, par force brute. Une matrice peut avoir plusieurs équilibres : on compare ces
+//! nombres et ces ensembles, uniques, et pas une stratégie ; que les stratégies trouvées soient des équilibres, le
+//! solveur le vérifie lui-même à chaque résolution.
 
 use serde_json::Value;
 use ur_engine::nash::Solver;

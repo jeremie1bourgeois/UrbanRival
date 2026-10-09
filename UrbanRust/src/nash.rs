@@ -11,6 +11,10 @@ use std::collections::{HashSet, VecDeque};
 pub const TOLERANCE: f64 = 1e-9;
 /// En deçà, un coefficient du tableau du simplexe compte pour nul.
 const PIVOT_EPSILON: f64 = 1e-11;
+/// En deçà, un coefficient de la variable entrante ne sert pas de pivot : c'est un zéro que les arrondis ont déplacé,
+/// et pivoter dessus multiplie leurs erreurs d'autant. Sur des matrices réelles du round 2, ce bruit va jusqu'à
+/// ~1,5e-11 et les vrais coefficients ne descendent pas sous ~1e-3 (README, étape 2.4).
+const MIN_PIVOT: f64 = 1e-9;
 /// Au-delà, un coût réduit à l'optimum est strictement positif : sa variable reste nulle dans tout équilibre.
 const POSITIVE_REDUCED_COST: f64 = 1e-9;
 /// Plafond du nombre de coins par joueur : au-delà, la liste est rendue tronquée, et signalée comme telle.
@@ -345,7 +349,7 @@ impl Tableau {
         let width = self.width();
         let mut leaving: Option<usize> = None;
         for row in 0..self.rows {
-            if self.cells[row * width + entering] <= PIVOT_EPSILON {
+            if self.cells[row * width + entering] <= MIN_PIVOT {
                 continue;
             }
             if leaving.is_none_or(|best| self.lexicographically_smaller(row, best, entering)) {
