@@ -1,12 +1,15 @@
 //! Le solveur de jeux matriciels à somme nulle : la valeur et un équilibre de Nash d'une matrice dont les lignes sont
 //! le joueur qui maximise (`docs/IA.md` § 4.3). Écrit pour les matrices du moteur, petites (au plus ~23 × 92) : la
 //! solution pure d'abord (un point-selle, fréquent au round 4), sinon le simplexe. Chaque solution est vérifiée par
-//! son écart à l'équilibre. SciPy ne sert qu'aux tests (`tests/nash.rs`).
+//! son écart à l'équilibre. Pour les datasets, `Solver::equilibria` donne en plus, pour chaque coup, l'équilibre qui le
+//! joue le plus. SciPy ne sert qu'aux tests (`tests/nash.rs`).
 
 /// Écart à l'équilibre toléré : les valeurs du jeu sont des probabilités, dans [0, 1].
 pub const TOLERANCE: f64 = 1e-9;
 /// En deçà, un coefficient du tableau du simplexe compte pour nul.
 const PIVOT_EPSILON: f64 = 1e-11;
+/// Au-delà, un coût réduit à l'optimum est strictement positif : sa variable reste nulle dans tout équilibre.
+const POSITIVE_REDUCED_COST: f64 = 1e-9;
 
 /// Un équilibre de la matrice. Les stratégies sont des probabilités par ligne et par colonne.
 pub struct Solution<'a> {
@@ -19,6 +22,35 @@ pub struct Solution<'a> {
     pub gap: f64,
 }
 
+/// Pour chaque coup de chaque joueur, une stratégie optimale qui le joue avec la plus forte probabilité possible.
+///
+/// Les équilibres d'un jeu à somme nulle forment un produit : toute stratégie optimale des lignes, avec toute
+/// stratégie optimale des colonnes, est un équilibre. L'ensemble des stratégies optimales des lignes est exactement
+/// {p ≥ 0, Σ p = 1, pᵀ M ≥ valeur} : la matrice et sa valeur le décrivent entier. `row_strategy(i)[i]` est donc la plus
+/// forte probabilité que la ligne i reçoive dans un équilibre ; 0 : elle n'est jouée dans aucun.
+pub struct Equilibria<'a> {
+    pub value: f64,
+    /// Une stratégie optimale de chaque joueur, celle que trouve le simplexe.
+    pub rows: &'a [f64],
+    pub cols: &'a [f64],
+    row_strategies: &'a [f64],
+    col_strategies: &'a [f64],
+}
+
+impl<'a> Equilibria<'a> {
+    /// La stratégie optimale des lignes qui joue la ligne `row` le plus.
+    pub fn row_strategy(&self, row: usize) -> &'a [f64] {
+        let rows = self.rows.len();
+        &self.row_strategies[row * rows..(row + 1) * rows]
+    }
+
+    /// La stratégie optimale des colonnes qui joue la colonne `col` le plus.
+    pub fn col_strategy(&self, col: usize) -> &'a [f64] {
+        let cols = self.cols.len();
+        &self.col_strategies[col * cols..(col + 1) * cols]
+    }
+}
+
 /// Les tampons du solveur, dimensionnés au premier appel puis réutilisés : rien n'est alloué ensuite pour des matrices
 /// de même taille ou plus petites.
 #[derive(Default)]
@@ -26,6 +58,11 @@ pub struct Solver {
     rows: Vec<f64>,
     cols: Vec<f64>,
     tableau: Tableau,
+    // pour `equilibria`
+    optimum: Tableau,
+    banned: Vec<bool>,
+    row_strategies: Vec<f64>,
+    col_strategies: Vec<f64>,
 }
 
 impl Solver {
@@ -52,7 +89,7 @@ impl Solver {
                 (matrix[row * cols + col], true)
             }
             None => {
-                self.tableau.load(matrix, rows, cols);
+                self.tableau.load(rows, cols, |row, col| matrix[row * cols + col]);
                 self.tableau.optimize(|_| true);
                 self.tableau.row_strategy(&mut self.rows);
                 self.tableau.col_strategy(&mut self.cols);
@@ -61,6 +98,82 @@ impl Solver {
         };
         let gap = verify(matrix, cols, &self.rows, &self.cols, value);
         Solution { value, rows: &self.rows, cols: &self.cols, pure, gap }
+    }
+
+    /// Pour chaque coup de chaque joueur, la stratégie optimale qui le joue le plus (`Equilibria`). Chaque stratégie
+    /// rendue est vérifiée, avec la stratégie optimale trouvée pour l'autre joueur.
+    pub fn equilibria(&mut self, matrix: &[f64], rows: usize, cols: usize) -> Equilibria<'_> {
+        assert!(
+            rows > 0 && cols > 0 && matrix.len() == rows * cols,
+            "matrice {rows} × {cols} mal formée"
+        );
+        self.rows.resize(rows, 0.0);
+        self.cols.resize(cols, 0.0);
+        self.row_strategies.resize(rows * rows, 0.0);
+        self.col_strategies.resize(cols * cols, 0.0);
+
+        self.tableau.load(rows, cols, |row, col| matrix[row * cols + col]);
+        self.tableau.optimize(|_| true);
+        let value = self.tableau.value();
+        self.tableau.row_strategy(&mut self.rows);
+        self.tableau.col_strategy(&mut self.cols);
+        self.best_strategies(false);
+        // les lignes de M sont les colonnes du jeu vu par les colonnes, −Mᵀ
+        self.tableau.load(cols, rows, |row, col| -matrix[col * cols + row]);
+        self.tableau.optimize(|_| true);
+        self.best_strategies(true);
+
+        for row in 0..rows {
+            verify(
+                matrix,
+                cols,
+                &self.row_strategies[row * rows..(row + 1) * rows],
+                &self.cols,
+                value,
+            );
+        }
+        for col in 0..cols {
+            verify(
+                matrix,
+                cols,
+                &self.rows,
+                &self.col_strategies[col * cols..(col + 1) * cols],
+                value,
+            );
+        }
+        Equilibria {
+            value,
+            rows: &self.rows,
+            cols: &self.cols,
+            row_strategies: &self.row_strategies,
+            col_strategies: &self.col_strategies,
+        }
+    }
+
+    /// Depuis le tableau à l'optimum, pour chaque colonne de son jeu, la stratégie des colonnes optimale qui la joue
+    /// le plus : dans `row_strategies` si ce jeu est −Mᵀ (`rows_of_matrix`), sinon dans `col_strategies`.
+    ///
+    /// Une stratégie est optimale si et seulement si les variables de coût réduit strictement positif à l'optimum y
+    /// restent nulles (complémentarité avec les variables duales trouvées, même si l'optimum est dégénéré). On repart
+    /// donc du tableau optimal, ces variables interdites, pour maximiser la variable du coup : quelques pivots.
+    fn best_strategies(&mut self, rows_of_matrix: bool) {
+        let Self { tableau, optimum, banned, row_strategies, col_strategies, .. } = self;
+        let strategies = if rows_of_matrix { row_strategies } else { col_strategies };
+        let actions = tableau.cols;
+        optimum.copy_from(tableau);
+        banned.clear();
+        banned.extend((0..optimum.rhs()).map(|variable| optimum.objective[variable] > POSITIVE_REDUCED_COST));
+        for action in 0..actions {
+            let strategy = &mut strategies[action * actions..(action + 1) * actions];
+            if banned[action] {
+                optimum.col_strategy(strategy); // ce coup n'est joué dans aucun équilibre
+                continue;
+            }
+            tableau.copy_from(optimum);
+            tableau.maximize(action);
+            tableau.optimize(|variable| !banned[variable]);
+            tableau.col_strategy(strategy);
+        }
     }
 }
 
@@ -87,17 +200,21 @@ impl Tableau {
         self.cols + self.rows
     }
 
-    /// Le jeu `matrix` (`rows × cols`, ligne par ligne) décalé, à l'objectif Σ y, la base étant celle des écarts.
-    fn load(&mut self, matrix: &[f64], rows: usize, cols: usize) {
+    /// Le jeu `rows × cols` dont `entry` donne les valeurs, décalé, à l'objectif Σ y, la base étant celle des écarts.
+    fn load(&mut self, rows: usize, cols: usize, entry: impl Fn(usize, usize) -> f64) {
         self.rows = rows;
         self.cols = cols;
-        self.shift = 1.0 - matrix.iter().copied().fold(f64::INFINITY, f64::min);
+        let minimum = (0..rows)
+            .flat_map(|row| (0..cols).map(move |col| (row, col)))
+            .map(|(row, col)| entry(row, col))
+            .fold(f64::INFINITY, f64::min);
+        self.shift = 1.0 - minimum;
         let (width, rhs) = (self.width(), self.rhs());
         self.cells.clear();
         self.cells.resize(rows * width, 0.0);
         for row in 0..rows {
             for col in 0..cols {
-                self.cells[row * width + col] = matrix[row * cols + col] + self.shift;
+                self.cells[row * width + col] = entry(row, col) + self.shift;
             }
             self.cells[row * width + cols + row] = 1.0;
             self.cells[row * width + rhs] = 1.0;
@@ -136,6 +253,29 @@ impl Tableau {
             }
             let (leaving, _) = leaving.expect("simplexe non borné : impossible sur un jeu décalé à valeurs positives");
             self.pivot(leaving, entering);
+        }
+    }
+
+    /// Recopie `other` dans les tampons de ce tableau, sans réallouer.
+    fn copy_from(&mut self, other: &Tableau) {
+        self.rows = other.rows;
+        self.cols = other.cols;
+        self.shift = other.shift;
+        self.cells.clone_from(&other.cells);
+        self.objective.clone_from(&other.objective);
+        self.basis.clone_from(&other.basis);
+    }
+
+    /// L'objectif devient « maximiser la variable `variable` », exprimé dans la base courante : ses coûts réduits, et
+    /// sa valeur courante dans la dernière case.
+    fn maximize(&mut self, variable: usize) {
+        let width = self.width();
+        self.objective.fill(0.0);
+        self.objective[variable] = -1.0;
+        if let Some(row) = self.basis.iter().position(|&basic| basic == variable) {
+            for col in 0..width {
+                self.objective[col] += self.cells[row * width + col];
+            }
         }
     }
 
@@ -294,6 +434,54 @@ mod tests {
         assert_eq!(solver.solve(&[0.7], 1, 1).value, 0.7);
         assert_eq!(solver.solve(&[0.7, 0.2, 0.9], 1, 3).value, 0.2); // les colonnes choisissent le minimum
         assert_eq!(solver.solve(&[0.7, 0.2, 0.9], 3, 1).value, 0.9); // les lignes choisissent le maximum
+    }
+
+    /// La plus forte probabilité de chaque ligne et de chaque colonne dans un équilibre.
+    fn best_probabilities(matrix: &[f64], rows: usize, cols: usize) -> (Vec<f64>, Vec<f64>) {
+        let mut solver = Solver::new();
+        let equilibria = solver.equilibria(matrix, rows, cols);
+        let row_best = (0..rows).map(|row| equilibria.row_strategy(row)[row]).collect();
+        let col_best = (0..cols).map(|col| equilibria.col_strategy(col)[col]).collect();
+        (row_best, col_best)
+    }
+
+    fn assert_close(found: &[f64], expected: &[f64]) {
+        assert_eq!(found.len(), expected.len());
+        for (found, expected) in found.iter().zip(expected) {
+            assert!((found - expected).abs() < TOLERANCE, "{found} au lieu de {expected}");
+        }
+    }
+
+    #[test]
+    fn un_coup_en_double_partage_sa_probabilite_avec_son_double() {
+        // pierre-feuille-ciseaux, la pierre en deux exemplaires : à eux deux, un tiers ; chacun peut le prendre seul
+        let matrix = [0.5, 0.0, 1.0, 0.5, 0.0, 1.0, 1.0, 0.5, 0.0, 0.0, 1.0, 0.5];
+        let (rows, cols) = best_probabilities(&matrix, 4, 3);
+        assert_close(&rows, &[1.0 / 3.0; 4]);
+        assert_close(&cols, &[1.0 / 3.0; 3]);
+    }
+
+    #[test]
+    fn dans_une_matrice_constante_tout_coup_peut_etre_joue_seul() {
+        let (rows, cols) = best_probabilities(&[0.5; 6], 2, 3);
+        assert_close(&rows, &[1.0; 2]);
+        assert_close(&cols, &[1.0; 3]);
+    }
+
+    #[test]
+    fn une_ligne_strictement_dominee_n_est_jamais_jouee() {
+        // la ligne 2 rapporte 0,4 quoi qu'il arrive, sous la valeur 0,5
+        let (rows, cols) = best_probabilities(&[1.0, 0.0, 0.0, 1.0, 0.4, 0.4], 3, 2);
+        assert_close(&rows, &[0.5, 0.5, 0.0]);
+        assert_close(&cols, &[0.5, 0.5]);
+    }
+
+    #[test]
+    fn une_ligne_faiblement_dominee_peut_etre_jouee_seule() {
+        // la ligne 2 rapporte la valeur 0,5 quoi qu'il arrive : la jouer toujours est optimal
+        let (rows, cols) = best_probabilities(&[1.0, 0.0, 0.0, 1.0, 0.5, 0.5], 3, 2);
+        assert_close(&rows, &[0.5, 0.5, 1.0]);
+        assert_close(&cols, &[0.5, 0.5]);
     }
 
     #[test]

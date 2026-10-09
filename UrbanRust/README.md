@@ -7,8 +7,8 @@ sans tout redécouvrir. Ce qu'on compte faire : [docs/PLAN-MOTEUR.md](../docs/PL
 
 ## Où on en est
 
-*Mis à jour le 2026-10-09 — plan : phase 1, étapes 1.1 à 1.6 faites ; prochaine : 1.7 (les équilibres d'une
-matrice).*
+*Mis à jour le 2026-10-09 — plan : phase 1, étapes 1.1 à 1.7 faites ; prochaine : 1.8 (tous les équilibres
+« coins »).*
 
 Fait :
 - le vocabulaire du contrat, transcrit de `UrbanPy/Backend_fastAPI/src/core/engine/contract.py` ; son empreinte est
@@ -36,9 +36,17 @@ Fait :
   donne les deux stratégies d'un seul tableau, avec la règle de Bland pour ne jamais cycler. Chaque solution est
   vérifiée : écart à l'équilibre ≤ 1e-9 et valeur entre ce que garantissent les deux stratégies, sinon le solveur
   s'arrête net. Mêmes valeurs que SciPy sur 102 matrices aléatoires (plus grand écart 1,7e-15) ; l'exemple d'IA.md
-  § 4.4 est un test. Tampons réutilisés : un solveur dimensionné n'alloue plus rien.
+  § 4.4 est un test. Tampons réutilisés : un solveur dimensionné n'alloue plus rien ;
+- les équilibres d'une matrice (étape 1.7), `Solver::equilibria` : pour chaque coup de chaque joueur, la stratégie
+  optimale qui le joue avec la plus forte probabilité (0 : le coup n'est joué dans aucun équilibre). Les équilibres
+  d'un jeu à somme nulle forment un produit (toute stratégie optimale des lignes avec toute stratégie optimale des
+  colonnes) ; avec sa valeur, la matrice décrit exactement leur ensemble, {p ≥ 0, Σ p = 1, pᵀ M ≥ valeur} : c'est
+  elle que les datasets garderont. On repart du tableau optimal, les variables de coût réduit strictement positif
+  interdites (elles sont nulles dans toute stratégie optimale), pour maximiser la variable du coup ; les lignes
+  passent par le même calcul sur −Mᵀ. Chaque stratégie rendue est vérifiée ; la plus forte probabilité de chacun des
+  1 974 coups des matrices de SciPy est celle que donne SciPy (plus grand écart 5,5e-12).
 
-Pas encore fait : les équilibres d'une matrice (1.7), et tout ce qui suit dans le plan.
+Pas encore fait : tous les équilibres « coins » (1.8), et tout ce qui suit dans le plan.
 
 Ce code a été écrit avant le plan. Il en respecte les règles de conception, mais rien n'y est figé : la disposition
 de l'état peut changer si une mesure le justifie. Seuls les indices du vocabulaire sont intouchables, car ils sont
@@ -52,7 +60,7 @@ partagés avec Python.
 | `src/vocabulary.rs` | vocabulaire figé : les indices partagés avec Python |
 | `src/contract.rs` | état compact : deck, état, coup, résultat |
 | `src/game.rs` | coups légaux et fin de partie (`reference.py`) |
-| `src/nash.rs` | solveur de jeux matriciels à somme nulle : point-selle, sinon simplexe ; chaque solution vérifiée |
+| `src/nash.rs` | solveur de jeux matriciels à somme nulle : point-selle, sinon simplexe ; chaque solution vérifiée ; pour chaque coup, l'équilibre qui le joue le plus |
 | `src/round/mod.rs` | un round (`process_round.py`) : mises, conditions de début de round, Leader, combat, ordre des niveaux ; en deux étages, avant et après les mises |
 | `src/round/block.rs` | le bloc de mises : toutes les combinaisons de mises d'une paire de cartes, premier étage partagé |
 | `src/round/clan.rs` | clan d'une carte en main, bonus de clan, Oculus infiltré (`clan.py`) |
@@ -64,8 +72,8 @@ partagés avec Python.
 | `tests/differentiel.rs` | chaque round du corpus, rejoué en Rust, redonne l'état suivant et l'issue de Python |
 | `tests/regles.rs` | coups légaux et fin de partie identiques à ceux de Python, sur `regles.jsonl` |
 | `tests/bloc.rs` | chaque case de chaque bloc du corpus égale le round simple, dans l'ordre des coups légaux |
-| `tests/nash.rs` | le solveur donne la valeur de SciPy sur les matrices de `data/nash_expected.json` |
-| `tests/sans_allocation.rs` | aucune allocation pendant un round, un bloc, les coups légaux, la fin de partie, et pour un solveur déjà dimensionné |
+| `tests/nash.rs` | le solveur donne la valeur de SciPy, et la plus forte probabilité de chaque coup, sur les matrices de `data/nash_expected.json` |
+| `tests/sans_allocation.rs` | aucune allocation pendant un round, un bloc, les coups légaux, la fin de partie, et pour un solveur déjà dimensionné (valeur et équilibres) |
 
 ## Lancer les tests
 
@@ -84,7 +92,8 @@ rejoue ~29 millions de cases deux fois, en bloc et en round simple.
   `UrbanPy/Backend_fastAPI`) : les rounds joués de chaque famille, plus `regles.jsonl` pour les coups légaux et la
   fin de partie. Il n'est pas versionné, ses empreintes le sont (`data/engine_digests.json`).
 - **SciPy est la référence du solveur** : `scripts/build_nash_expected.py` (SciPy, dans `requirements-dev.txt`) écrit
-  `data/nash_expected.json`, versionné ; une matrice peut avoir plusieurs équilibres, les tests comparent la valeur.
+  `data/nash_expected.json`, versionné ; une matrice peut avoir plusieurs équilibres, les tests comparent des nombres
+  uniques : la valeur, et la plus forte probabilité de chaque coup dans un équilibre.
 - **Aucune carte au pouvoir non géré.** Le Python remplace un pouvoir que son parseur ne gère pas par « pas de
   pouvoir », sans le signaler : Rust et Python joueraient la carte faux, à l'identique. `compile_card`
   (`src/core/engine/contract.py`) refuse donc une telle carte (`ValueError`), et les mains aléatoires

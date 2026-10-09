@@ -1,5 +1,5 @@
 //! Rien n'est alloué pendant un round, un bloc de mises, ni pour les coups légaux, la fin de partie et la résolution
-//! d'une matrice (une fois les tampons du solveur dimensionnés).
+//! d'une matrice ou de ses équilibres (une fois les tampons du solveur dimensionnés).
 //!
 //! La recherche appelle ces fonctions des milliards de fois : une allocation par appel coûterait plus que le round
 //! lui-même. Ce binaire de test installe un allocateur qui compte les allocations **du fil courant** (le lanceur de
@@ -171,11 +171,14 @@ fn un_solveur_reutilise_n_alloue_rien() {
         .collect();
     let mut solver = Solver::new();
     for (values, rows, cols) in &matrices {
-        solver.solve(values, *rows, *cols); // dimensionne les tampons
+        // dimensionne les tampons
+        solver.solve(values, *rows, *cols);
+        solver.equilibria(values, *rows, *cols);
     }
     let allocations = allocations_during(|| {
         for (values, rows, cols) in &matrices {
             black_box(solver.solve(black_box(values), *rows, *cols).value);
+            black_box(solver.equilibria(black_box(values), *rows, *cols).value);
         }
     });
     assert_eq!(
