@@ -7,7 +7,7 @@ sans tout redécouvrir. Ce qu'on compte faire : [docs/PLAN-MOTEUR.md](../docs/PL
 
 ## Où on en est
 
-*Mis à jour le 2026-10-09 — plan : phase 1, étapes 1.1 à 1.3 faites ; prochaine : 1.4 (bloc de mises).*
+*Mis à jour le 2026-10-09 — plan : phase 1, étapes 1.1 à 1.4 faites ; prochaine : 1.5 (test « zéro allocation »).*
 
 Fait :
 - le vocabulaire du contrat, transcrit de `UrbanPy/Backend_fastAPI/src/core/engine/contract.py` ; son empreinte est
@@ -23,9 +23,12 @@ Fait :
 - les coups légaux et la fin de partie (étape 1.3), `game::legal_actions` et `game::terminal` : identiques à
   `reference.py` sur les 1 536 états de `regles.jsonl` (chaque main jouée × chaque stock de pillz de 0 à 15, chaque
   round × chaque paire de vies de 0 à 15), coups dans le même ordre. `legal_actions` est un itérateur : rien n'est
-  alloué.
+  alloué ;
+- le bloc de mises (étape 1.4), `round::play_block` : toutes les combinaisons de mises d'une paire de cartes, chaque
+  case identique au round simple sur les 88 132 blocs distincts du corpus (~29 millions de cases). Le premier étage
+  du round se calcule une fois par tranche de mises ; gain x2,3 par case (voir « Optimisations en place »).
 
-Pas encore fait : le bloc de mises (1.4), et tout ce qui suit dans le plan.
+Pas encore fait : le test « zéro allocation » (1.5), et tout ce qui suit dans le plan.
 
 Ce code a été écrit avant le plan. Il en respecte les règles de conception, mais rien n'y est figé : la disposition
 de l'état peut changer si une mesure le justifie. Seuls les indices du vocabulaire sont intouchables, car ils sont
@@ -39,7 +42,8 @@ partagés avec Python.
 | `src/vocabulary.rs` | vocabulaire figé : les indices partagés avec Python |
 | `src/contract.rs` | état compact : deck, état, coup, résultat |
 | `src/game.rs` | coups légaux et fin de partie (`reference.py`) |
-| `src/round/mod.rs` | un round (`process_round.py`) : mises, conditions de début de round, Leader, combat, ordre des niveaux |
+| `src/round/mod.rs` | un round (`process_round.py`) : mises, conditions de début de round, Leader, combat, ordre des niveaux ; en deux étages, avant et après les mises |
+| `src/round/block.rs` | le bloc de mises : toutes les combinaisons de mises d'une paire de cartes, premier étage partagé |
 | `src/round/clan.rs` | clan d'une carte en main, bonus de clan, Oculus infiltré (`clan.py`) |
 | `src/round/multipliers.rs` | multiplicateurs des capacités, champ `how` (`multipliers.py`) |
 | `src/round/level1.rs` … `level4.rs` | les quatre niveaux de capacités (`apply_capacity_lvl_1.py` … `_4.py`) |
@@ -48,6 +52,7 @@ partagés avec Python.
 | `tests/lecture_corpus.rs` | chaque famille, et `regles.jsonl`, relus puis réécrits redonnent l'empreinte de Python |
 | `tests/differentiel.rs` | chaque round du corpus, rejoué en Rust, redonne l'état suivant et l'issue de Python |
 | `tests/regles.rs` | coups légaux et fin de partie identiques à ceux de Python, sur `regles.jsonl` |
+| `tests/bloc.rs` | chaque case de chaque bloc du corpus égale le round simple, dans l'ordre des coups légaux |
 
 ## Lancer les tests
 
@@ -57,7 +62,8 @@ Ensuite, `cargo test`. La version du compilateur est fixée par `rust-toolchain.
 Les tests lisent le corpus, qui n'est pas versionné : sur une copie neuve du dépôt, le générer d'abord avec
 `scripts/build_engine_corpus.py` (depuis `UrbanPy/Backend_fastAPI`), sinon `tests/lecture_corpus.rs` échoue en le
 disant. Le profil de test compile la crate en -O1 et ses dépendances en -O3 (`Cargo.toml`) : relire tout le corpus
-passe ainsi de 35 s à 5 s.
+passe ainsi de 35 s à 5 s. Le plus long est `tests/bloc.rs` (~11 s sur un i7-8750H, réparti sur les cœurs) : il
+rejoue ~29 millions de cases deux fois, en bloc et en round simple.
 
 ## Comment le code est vérifié
 
@@ -81,8 +87,13 @@ gagner, et quel test garantit qu'elle ne change pas les résultats. Le code port
 |---|---|---|---|---|
 | État de taille fixe, copiable, sans tas ; cases d'effets vides normalisées | `src/contract.rs` | l'IA copie, hache et compare des états par millions ; deux chemins vers le même état doivent se hacher pareil | pas encore mesuré | tests de `contract.rs` |
 | Capacités réduites à des indices et des masques de bits | `src/contract.rs`, `src/vocabulary.rs` | aucun texte manipulé pendant un round | pas encore mesuré | `tests/vocabulaire.rs` |
+| Bloc de mises : le premier étage du round (clans, Leader, conditions, copies, niveau 1, puissance et dégâts) calculé une fois par tranche de mises, puis copié pour chaque case ; une tranche = les mises de même signature pour les conditions Bet du deck | `src/round/block.rs`, coupure `first_stage` / `second_stage` dans `src/round/mod.rs` | le premier étage pèse ~60 % d'un round et ne lit la mise que par les conditions Bet (les multiplicateurs « Par Pillz » lisent le stock d'avant la mise) | x2,3 par case (release, i7-8750H : 448 → 198 ns sur tout le corpus) | `tests/bloc.rs` ; une signature qui ignore les Bet y fait diverger 1 419 blocs |
 
 ## Écarts connus et points ouverts
+
+- Les pouvoirs exclus par décision ([docs/REGLES.md](../docs/REGLES.md), « Pouvoirs exclus » : Beyond, Rebirth,
+  Hazard, Bypass, Illusion, Overdose, Remove Ability Conditions) n'existent pas pour ce moteur : le parseur Python les
+  rejette, ils n'atteignent ni le vocabulaire, ni le corpus, ni le code Rust, et rien ne doit être prévu pour eux.
 
 - La carte compilée Rust porte `character` (indice dans la main du premier exemplaire de la carte) au lieu du nom
   que porte le contrat Python : le moteur lit l'identité d'une carte (le bonus de clan compte les personnages
