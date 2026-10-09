@@ -7,12 +7,15 @@ sans tout redécouvrir. Ce qu'on compte faire : [docs/PLAN-MOTEUR.md](../docs/PL
 
 ## Où on en est
 
-*Mis à jour le 2026-10-09 — plan : phase 1, étape 1.1 pas commencée.*
+*Mis à jour le 2026-10-09 — plan : phase 1, étape 1.1 faite ; prochaine : 1.2 (résolution d'un round).*
 
 Fait :
 - le vocabulaire du contrat, transcrit de `UrbanPy/Backend_fastAPI/src/core/engine/contract.py` ; son empreinte est
   comparée à celle que Python écrit dans `data/engine_digests.json` ;
-- l'état compact d'une partie (deck, état, coup, résultat) : types de taille fixe, copiables, sans tas.
+- l'état compact d'une partie (deck, état, coup, résultat) : types de taille fixe, copiables, sans tas ;
+- le lecteur du corpus (étape 1.1) : les 8 familles (113 540 entrées, 29 365 decks) se relisent dans les types de
+  `contract.rs` sans rien perdre. La preuve : réécrites depuis ces types en JSON canonique, elles redonnent
+  exactement les empreintes de Python (un lecteur qui perd les effets persistants fait échouer 7 familles sur 8).
 
 Pas encore fait : la résolution d'un round, et tout ce qui suit dans le plan.
 
@@ -28,11 +31,18 @@ partagés avec Python.
 | `src/vocabulary.rs` | vocabulaire figé : les indices partagés avec Python |
 | `src/contract.rs` | état compact : deck, état, coup, résultat |
 | `tests/vocabulaire.rs` | l'empreinte du vocabulaire égale celle de Python |
+| `tests/corpus/mod.rs` | lecteur du corpus, partagé par les tests ; hors de la crate, car seuls les tests lisent du JSON |
+| `tests/lecture_corpus.rs` | chaque famille relue puis réécrite redonne l'empreinte de Python |
 
 ## Lancer les tests
 
-`./bootstrap.sh` la première fois (installe rustup s'il manque, puis lance `cargo test`), ensuite `cargo test`.
-La version du compilateur est fixée par `rust-toolchain.toml`.
+`./bootstrap.sh` (Windows : `bootstrap.ps1`) la première fois : installe rustup s'il manque, puis lance `cargo test`.
+Ensuite, `cargo test`. La version du compilateur est fixée par `rust-toolchain.toml`.
+
+Les tests lisent le corpus, qui n'est pas versionné : sur une copie neuve du dépôt, le générer d'abord avec
+`scripts/build_engine_corpus.py` (depuis `UrbanPy/Backend_fastAPI`), sinon `tests/lecture_corpus.rs` échoue en le
+disant. Le profil de test compile la crate en -O1 et ses dépendances en -O3 (`Cargo.toml`) : relire tout le corpus
+passe ainsi de 35 s à 5 s.
 
 ## Comment le code est vérifié
 
@@ -53,5 +63,8 @@ gagner, et quel test garantit qu'elle ne change pas les résultats. Le code port
 
 ## Écarts connus et points ouverts
 
+- Généré sous Windows, le corpus finit ses lignes par `\r\n`, alors que Python empreinte les lignes terminées par
+  `\n` : hacher les fichiers tels quels ne redonne pas les empreintes. Le lecteur accepte les deux fins de ligne, et
+  le test réécrit les lignes au lieu de hacher les fichiers.
 - Les règles encore ouvertes (R1 surtout, un ordre de résolution ; [docs/REGLES.md](../docs/REGLES.md),
   registre) peuvent changer le moteur Python : on régénère alors le corpus, et le moteur Rust suit.
