@@ -7,8 +7,8 @@ sans tout redécouvrir. Ce qu'on compte faire : [docs/PLAN-MOTEUR.md](../docs/PL
 
 ## Où on en est
 
-*Mis à jour le 2026-10-09 — plan : phase 1 faite (étapes 1.1 à 1.11) ; phase 2 en cours, 2.1 (corpus élargi) et
-2.2 (contrôles pendant la recherche) faites ; prochaine : 2.3 (10 000 résolutions depuis le round 3).*
+*Mis à jour le 2026-10-09 — plan : phases 1 et 2 faites (étapes 1.1 à 1.11, 2.1 à 2.3) ; prochaine : phase 3, 3.1
+(banc d'essai fixe).*
 
 Fait :
 - le vocabulaire du contrat, transcrit de `UrbanPy/Backend_fastAPI/src/core/engine/contract.py` ; son empreinte est
@@ -87,7 +87,16 @@ Fait :
   depuis 2 011 états de départ), sans en changer la valeur : aucun écart. `tests/recherche.rs` contrôle ainsi ses
   72 états de départ, et vérifie d'abord que le contrôle voit un faux miroir (le deck non échangé).
 
-Pas encore fait : la fin de la phase 2 (2.3), et tout ce qui suit dans le plan.
+- les résolutions en masse (étape 2.3) : `tests/resolutions.rs` résout 10 000 débuts du round 3 de parties jouées
+  au hasard, de jour comme de nuit (`scripts/build_search_states.py`), sous ces contrôles : aucune alerte ni
+  plantage. ~4 s en profil de test sur 6 cœurs, contrôle miroir compris (640 154 états résolus, au plus 1 076 pour
+  une résolution ; 376 valeurs fractionnaires). Le premier passage a levé 4 alertes : deux règles du moteur Python
+  dépendaient du camp, et le Rust les reproduisait fidèlement. Un double KO déclarait l'allié perdant ; au niveau 3,
+  deux pertes sur un même joueur s'appliquaient dans l'ordre des camps. Tranchées par décision (match nul ; le
+  plancher le plus haut d'abord, comme au niveau 2), corrigées dans les deux moteurs avec leurs tests de bout en
+  bout ; le corpus en porte des cas (`regles.jsonl` pour le double KO, `oculus` et `masse` pour l'ordre des pertes).
+
+Pas encore fait : la phase 3 (mesurer), et tout ce qui suit dans le plan.
 
 Ce code a été écrit avant le plan. Il en respecte les règles de conception, mais rien n'y est figé : la disposition
 de l'état peut changer si une mesure le justifie. Seuls les indices du vocabulaire sont intouchables, car ils sont
@@ -116,6 +125,7 @@ partagés avec Python.
 | `tests/bloc.rs` | chaque case de chaque bloc du corpus égale le round simple, dans l'ordre des coups légaux |
 | `tests/recherche.rs` | la recherche donne les valeurs du solveur Python de référence (`data/search_expected.json`) ; le mode parallèle, celles d'un seul fil ; vu de l'autre camp, chaque état résolu vaut 1 − V |
 | `tests/nash.rs` | le solveur donne la valeur de SciPy, la plus forte probabilité de chaque coup et les coins de la force brute, sur les matrices de `data/nash_expected.json` |
+| `tests/resolutions.rs` | 10 000 résolutions depuis le round 3, sur des mains au hasard, sans alerte des contrôles ni plantage |
 | `tests/sans_allocation.rs` | aucune allocation pendant un round, un bloc, les coups légaux, la fin de partie, et pour un solveur déjà dimensionné (valeur et équilibres) |
 
 ## Lancer les tests
@@ -125,7 +135,7 @@ Ensuite, `cargo test`. La version du compilateur est fixée par `rust-toolchain.
 
 Les tests lisent le corpus, qui n'est pas versionné : sur une copie neuve du dépôt, le générer d'abord avec
 `scripts/build_engine_corpus.py` (depuis `UrbanPy/Backend_fastAPI`), sinon `tests/lecture_corpus.rs` échoue en le
-disant. Le profil de test compile la crate en -O1 et ses dépendances en -O3 (`Cargo.toml`) : relire tout le corpus
+disant ; de même, les états de départ de `tests/resolutions.rs` avec `scripts/build_search_states.py` (~75 s). Le profil de test compile la crate en -O1 et ses dépendances en -O3 (`Cargo.toml`) : relire tout le corpus
 passe ainsi de 35 s à 5 s. Le plus long est `tests/bloc.rs` (~18 s sur un i7-8750H, réparti sur les cœurs) : il
 rejoue ~35 millions de cases deux fois, en bloc et en round simple.
 
