@@ -2,7 +2,8 @@
 Valeurs attendues du solveur de matrices du moteur Rust (UrbanRust/src/nash.rs ; docs/PLAN-MOTEUR.md, étape 1.6) :
 des matrices de jeu à somme nulle tirées au hasard (graine fixe), aux tailles d'un bloc de mises et de la matrice du
 premier joueur, résolues par SciPy (linprog, HiGHS) comme dans docs/IA.md § 4.3. Chaque valeur est calculée deux fois,
-par le programme des lignes et par celui des colonnes, qui doivent s'accorder.
+par le programme des lignes et par celui des colonnes, qui doivent s'accorder. Pour chaque coup de chaque joueur, la
+plus forte probabilité qu'il reçoive dans une stratégie optimale (étape 1.7) : un programme linéaire par coup.
 Écrit data/nash_expected.json (versionné, une matrice par ligne) ; à relancer seulement pour changer les matrices.
 Usage (depuis UrbanPy/Backend_fastAPI) :
     python scripts/build_nash_expected.py
@@ -56,6 +57,25 @@ def game_value(matrix: np.ndarray) -> float:
     return row_value
 
 
+def best_probability(index: int, size: int, upper: np.ndarray, bound: float) -> float:
+    """La plus forte probabilité du coup `index` parmi les stratégies (de `size` coups) qui vérifient upper · x <= bound."""
+    objective = np.zeros(size)
+    objective[index] = -1
+    result = linprog(objective, A_ub=upper, b_ub=np.full(upper.shape[0], bound), A_eq=np.ones((1, size)), b_eq=[1],
+                     bounds=[(0, 1)] * size)
+    assert result.success, result.message
+    return result.x[index]
+
+
+def best_probabilities(matrix: np.ndarray, value: float):
+    """Pour chaque ligne, sa plus forte probabilité dans une stratégie optimale des lignes (pᵀ M >= valeur) ; de même
+    pour chaque colonne (M q <= valeur)."""
+    rows, cols = matrix.shape
+    row_best = [best_probability(row, rows, -matrix.T, -value) for row in range(rows)]
+    col_best = [best_probability(col, cols, matrix, value) for col in range(cols)]
+    return row_best, col_best
+
+
 def matrices(rng: random.Random):
     for rows, cols in SHAPES:
         for kind, draw in VALUES.items():
@@ -67,7 +87,9 @@ def matrices(rng: random.Random):
 def main() -> None:
     entries = []
     for entry in matrices(random.Random(SEED)):
-        entry["value"] = game_value(np.array(entry["values"]).reshape(entry["rows"], entry["cols"]))
+        matrix = np.array(entry["values"]).reshape(entry["rows"], entry["cols"])
+        entry["value"] = game_value(matrix)
+        entry["row_best"], entry["col_best"] = best_probabilities(matrix, entry["value"])
         entries.append(entry)
     with open(EXPECTED_PATH, "w", encoding="utf-8", newline="\n") as file:
         file.write("[\n" + ",\n".join(json.dumps(entry) for entry in entries) + "\n]\n")
