@@ -13,11 +13,11 @@ Fait :
 - le vocabulaire du contrat, transcrit de `UrbanPy/Backend_fastAPI/src/core/engine/contract.py` ; son empreinte est
   comparée à celle que Python écrit dans `data/engine_digests.json` ;
 - l'état compact d'une partie (deck, état, coup, résultat) : types de taille fixe, copiables, sans tas ;
-- le lecteur du corpus (étape 1.1) : les 8 familles (113 540 entrées, 29 365 decks) se relisent dans les types de
+- le lecteur du corpus (étape 1.1) : les 8 familles (113 510 entrées, 29 365 decks) se relisent dans les types de
   `contract.rs` sans rien perdre. La preuve : réécrites depuis ces types en JSON canonique, elles redonnent
   exactement les empreintes de Python (un lecteur qui perd les effets persistants fait échouer 7 familles sur 8) ;
 - la résolution d'un round (étape 1.2), `round::play` : les 8 familles du corpus sont identiques à 100 % au moteur
-  Python, état suivant et issue du combat (113 540 rounds). C'est la version simple, transcrite fonction par fonction
+  Python, état suivant et issue du combat (113 510 rounds). C'est la version simple, transcrite fonction par fonction
   de `process_round.py` et des quatre niveaux de capacités : la référence lisible contre laquelle se vérifieront les
   versions rapides. Mesure informelle en release : ~2,8 millions de rounds/s sur un cœur (i7-8750H) ;
 - les coups légaux et la fin de partie (étape 1.3), `game::legal_actions` et `game::terminal` : identiques à
@@ -64,6 +64,10 @@ passe ainsi de 35 s à 5 s.
 - **Python est la référence.** Le corpus de non-régression se génère avec `scripts/build_engine_corpus.py` (depuis
   `UrbanPy/Backend_fastAPI`) : les rounds joués de chaque famille, plus `regles.jsonl` pour les coups légaux et la
   fin de partie. Il n'est pas versionné, ses empreintes le sont (`data/engine_digests.json`).
+- **Aucune carte au pouvoir non géré.** Le Python remplace un pouvoir que son parseur ne gère pas par « pas de
+  pouvoir », sans le signaler : Rust et Python joueraient la carte faux, à l'identique. Les mains aléatoires
+  (`src/core/engine/hands.py`) ne tirent donc que les niveaux dont l'ability et le bonus sont gérés ;
+  `tests/test_engine_hands.py` le vérifie sur tout le catalogue.
 - **Chaque version optimisée garde une version plus simple comme référence de test** : moteur Python → round simple
   en Rust → bloc de mises. Un code illisible reste ainsi comparable, case par case, à un code qu'on peut relire.
 

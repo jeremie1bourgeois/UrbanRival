@@ -2,6 +2,8 @@
 Mains de 4 cartes tirées au hasard dans les cartes officielles, structurées comme les vraies (le bonus de clan
 demande 2 cartes du clan) : mono-clan, 2 + 2, 3 + 1, ou quatre clans distincts pour la couverture ; parfois un
 Leader ; tous niveaux d'étoiles. Reproductible par le générateur aléatoire passé en paramètre.
+Seuls les niveaux dont l'ability et le bonus sont gérés par le parseur sont tirés : Card remplace un pouvoir non
+géré par « pas de pouvoir », et la carte jouerait sans lui sans que rien ne le signale.
 """
 import random
 from functools import lru_cache
@@ -9,6 +11,7 @@ from typing import Dict, List, Tuple
 
 from src.adapters.repositories.card_repository import _official_cards
 from src.core.domain.card import Card
+from src.core.parsing.capacity_parser import parse_capacity
 
 PATTERNS = ((4,), (2, 2), (3, 1), (1, 1, 1, 1))   # nombre de cartes par clan
 LEADER = "Leader"
@@ -17,12 +20,20 @@ LEADER_RATE = 0.2                                   # part des mains où une car
 
 @lru_cache(maxsize=1)
 def _catalogue() -> Tuple[Dict[str, List[str]], Dict[str, List[int]]]:
-    """(noms par clan, niveaux jouables par nom), dans l'ordre du fichier officiel (reproductibilité)."""
+    """
+    (noms par clan, niveaux jouables par nom), dans l'ordre du fichier officiel (reproductibilité) ; une carte sans
+    niveau dont le pouvoir est géré n'y figure pas.
+    """
     names_by_clan: Dict[str, List[str]] = {}
     levels_by_name: Dict[str, List[int]] = {}
     for name, card_data in _official_cards().items():
-        names_by_clan.setdefault(card_data.get("faction", ""), []).append(name)
-        levels_by_name[name] = [int(level) for level in card_data if level.isdigit()]
+        if not parse_capacity(card_data.get("bonus", "").strip()).supported:
+            continue
+        levels = [int(level) for level, star_data in card_data.items()
+                  if level.isdigit() and parse_capacity(star_data.get("ability", "").strip()).supported]
+        if levels:
+            names_by_clan.setdefault(card_data.get("faction", ""), []).append(name)
+            levels_by_name[name] = levels
     return names_by_clan, levels_by_name
 
 

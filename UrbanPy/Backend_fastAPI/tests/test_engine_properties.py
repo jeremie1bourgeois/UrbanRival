@@ -22,8 +22,7 @@ SAMPLE_EVERY = 10    # solo et interactions : un scénario sur dix (aucune asym�
 
 KNOWN_ASYMMETRIES = frozenset({
     # niveau 4 : les effets persistants sont enregistrés dans l'ordre allié puis ennemi
-    "aleatoire/partie-200/round-2/coup-2",
-    "aleatoire/partie-200/round-4/coup-3",
+    "aleatoire/partie-39/round-1/coup-0",
 })
 
 
