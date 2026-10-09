@@ -150,6 +150,11 @@ impl Round<'_> {
         &self.hand(side)[self.fighters[side].index]
     }
 
+    /// Les capacités que portent encore les deux cartes en combat.
+    fn carried_capacities(&self) -> impl Iterator<Item = CompiledCapacity> + '_ {
+        self.fighters.iter().flat_map(|fighter| fighter.slots).flatten()
+    }
+
     fn process_round(&mut self) {
         self.first_stage();
         self.second_stage();
@@ -205,10 +210,17 @@ impl Round<'_> {
             }
         }
 
-        self.apply_killshot_condition(ALLY);
-        self.apply_killshot_condition(ENEMY);
-        self.apply_perfect_condition(ALLY);
-        self.apply_perfect_condition(ENEMY);
+        // le plus souvent, aucune capacité ne porte ces conditions : rien à vérifier (README, « Optimisations en place »)
+        let deferred = bit(conditions::KILLSHOT) | bit(conditions::PERFECT);
+        if self
+            .carried_capacities()
+            .any(|capacity| capacity.conditions & deferred != 0)
+        {
+            self.apply_killshot_condition(ALLY);
+            self.apply_killshot_condition(ENEMY);
+            self.apply_perfect_condition(ALLY);
+            self.apply_perfect_condition(ENEMY);
+        }
 
         self.resolve_combat();
 

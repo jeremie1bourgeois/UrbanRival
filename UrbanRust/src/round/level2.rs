@@ -13,8 +13,7 @@ impl Round<'_> {
     pub(super) fn apply_capacity_lvl_2(&mut self, stats: u32) {
         // aucune capacité ne touche ces stats : chacune serait rendue telle quelle (la passe de l'attaque, à chaque case
         // d'un bloc, le plus souvent ; README, « Optimisations en place »)
-        let carried = self.fighters.iter().flat_map(|fighter| fighter.slots).flatten();
-        if carried.fold(0, |types, capacity| types | capacity.types) & stats == 0 {
+        if !self.carried_capacities().any(|capacity| capacity.types & stats != 0) {
             return;
         }
         for target in [targets::ALLY, targets::BOTH, targets::ENEMY] {
