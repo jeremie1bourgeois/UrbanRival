@@ -7,8 +7,8 @@ sans tout redécouvrir. Ce qu'on compte faire : [docs/PLAN-MOTEUR.md](../docs/PL
 
 ## Où on en est
 
-*Mis à jour le 2026-10-09 — plan : phases 1 et 2 faites (étapes 1.1 à 1.11, 2.1 à 2.3) ; prochaine : phase 3, 3.1
-(banc d'essai fixe).*
+*Mis à jour le 2026-10-09 — plan : phase 1 faite (étapes 1.1 à 1.11) ; phase 2 : 2.1 à 2.3 faites ; prochaine : 2.4
+(un bug du solveur, trouvé en mesurant la partie entière), puis la phase 3.*
 
 Fait :
 - le vocabulaire du contrat, transcrit de `UrbanPy/Backend_fastAPI/src/core/engine/contract.py` ; son empreinte est
@@ -96,7 +96,7 @@ Fait :
   plancher le plus haut d'abord, comme au niveau 2), corrigées dans les deux moteurs avec leurs tests de bout en
   bout ; le corpus en porte des cas (`regles.jsonl` pour le double KO, `oculus` et `masse` pour l'ordre des pertes).
 
-Pas encore fait : la phase 3 (mesurer), et tout ce qui suit dans le plan.
+Pas encore fait : 2.4 (le bug du solveur ci-dessous), la phase 3 (mesurer), et tout ce qui suit dans le plan.
 
 Ce code a été écrit avant le plan. Il en respecte les règles de conception, mais rien n'y est figé : la disposition
 de l'état peut changer si une mesure le justifie. Seuls les indices du vocabulaire sont intouchables, car ils sont
@@ -177,6 +177,7 @@ gagner, et quel test garantit qu'elle ne change pas les résultats. Le code port
 
 ## Écarts connus et points ouverts
 
+- **Le solveur rate des matrices réelles du round 2 riches en pillz** (étape 2.4). Trouvé en mesurant la partie entière : sur une matrice 13 × 57, le simplexe rend une stratégie à ~1e-3 de l'équilibre. La vérification l'arrête net, aucune valeur fausse ne passe, mais la recherche plante. Se reproduit en résolvant depuis le round 1 `masse/partie-0` et `masse/partie-1` ; jamais vu sur les 10 000 résolutions du round 3. Malgré ce plantage, chaque main a été résolue en entier en 24 à 46 s sur 6 cœurs (journal du plan).
 - La recherche est écrite simplement, en attendant le profil de la phase 3 : mémo en 64 `HashMap` sous verrou, au
   hachage standard (SipHash, calculé une fois pour choisir le morceau, une fois dans la table), une matrice et une
   liste d'états suivants allouées à chaque état résolu. Sur un fil, elle paraît ~20 % plus lente que la version sans
