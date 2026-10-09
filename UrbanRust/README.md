@@ -7,8 +7,8 @@ sans tout redécouvrir. Ce qu'on compte faire : [docs/PLAN-MOTEUR.md](../docs/PL
 
 ## Où on en est
 
-*Mis à jour le 2026-10-09 — plan : phase 1, étapes 1.1 à 1.10 faites ; prochaine : 1.11 (parallélisme sur les
-cœurs).*
+*Mis à jour le 2026-10-09 — plan : phase 1 faite (étapes 1.1 à 1.11) ; prochaine : phase 2, 2.1 (élargir le
+corpus).*
 
 Fait :
 - le vocabulaire du contrat, transcrit de `UrbanPy/Backend_fastAPI/src/core/engine/contract.py` ; son empreinte est
@@ -67,7 +67,12 @@ Fait :
   distincts résolus), en 0,13 s contre ~17 min. Un seul fil : round 3 en 4 ms en moyenne, round 2 en 0,14 s en
   moyenne et 2,5 s au plus (états les plus riches en pillz, ~43 000 états résolus), contre ~4 h extrapolées en Python.
 
-Pas encore fait : le parallélisme sur les cœurs (1.11), et tout ce qui suit dans le plan.
+- le parallélisme (étape 1.11), `Search::parallel` : les états suivants des rounds 1 à 3 répartis sur les cœurs par
+  rayon, une mémo partagée en 64 morceaux sous verrou, un solveur par fil. La valeur d'un état se calcule de la même
+  façon quel que soit le fil : mêmes nombres au bit près qu'en un seul fil (`tests/recherche.rs`, dont des états du
+  round 2). Sur 6 cœurs : x4,3 à x4,5 sur un état du round 2 ; x4,4 sur des états indépendants, chacun sa recherche.
+
+Pas encore fait : la phase 2 (stabiliser), et tout ce qui suit dans le plan.
 
 Ce code a été écrit avant le plan. Il en respecte les règles de conception, mais rien n'y est figé : la disposition
 de l'état peut changer si une mesure le justifie. Seuls les indices du vocabulaire sont intouchables, car ils sont
@@ -81,7 +86,7 @@ partagés avec Python.
 | `src/vocabulary.rs` | vocabulaire figé : les indices partagés avec Python |
 | `src/contract.rs` | état compact : deck, état, coup, résultat |
 | `src/game.rs` | coups légaux et fin de partie (`reference.py`) |
-| `src/search.rs` | recherche exacte avec mémo : V(état), les matrices remplies par blocs de mises |
+| `src/search.rs` | recherche exacte avec mémo : V(état), les matrices remplies par blocs de mises ; sur un fil ou sur tous les cœurs |
 | `src/nash.rs` | solveur de jeux matriciels à somme nulle : point-selle, sinon simplexe ; chaque solution vérifiée ; pour chaque coup, l'équilibre qui le joue le plus ; tous les coins des équilibres |
 | `src/round/mod.rs` | un round (`process_round.py`) : mises, conditions de début de round, Leader, combat, ordre des niveaux ; en deux étages, avant et après les mises |
 | `src/round/block.rs` | le bloc de mises : toutes les combinaisons de mises d'une paire de cartes, premier étage partagé |
@@ -94,7 +99,7 @@ partagés avec Python.
 | `tests/differentiel.rs` | chaque round du corpus, rejoué en Rust, redonne l'état suivant et l'issue de Python |
 | `tests/regles.rs` | coups légaux et fin de partie identiques à ceux de Python, sur `regles.jsonl` |
 | `tests/bloc.rs` | chaque case de chaque bloc du corpus égale le round simple, dans l'ordre des coups légaux |
-| `tests/recherche.rs` | la recherche donne les valeurs du solveur Python de référence (`data/search_expected.json`) |
+| `tests/recherche.rs` | la recherche donne les valeurs du solveur Python de référence (`data/search_expected.json`) ; le mode parallèle, celles d'un seul fil |
 | `tests/nash.rs` | le solveur donne la valeur de SciPy, la plus forte probabilité de chaque coup et les coins de la force brute, sur les matrices de `data/nash_expected.json` |
 | `tests/sans_allocation.rs` | aucune allocation pendant un round, un bloc, les coups légaux, la fin de partie, et pour un solveur déjà dimensionné (valeur et équilibres) |
 
@@ -147,8 +152,11 @@ gagner, et quel test garantit qu'elle ne change pas les résultats. Le code port
 
 ## Écarts connus et points ouverts
 
-- La recherche est écrite simplement, en attendant le profil de la phase 3 : mémo `HashMap` au hachage standard
-  (SipHash), une matrice et une liste d'états suivants allouées à chaque état résolu, un seul fil.
+- La recherche est écrite simplement, en attendant le profil de la phase 3 : mémo en 64 `HashMap` sous verrou, au
+  hachage standard (SipHash, calculé une fois pour choisir le morceau, une fois dans la table), une matrice et une
+  liste d'états suivants allouées à chaque état résolu. Sur un fil, elle paraît ~20 % plus lente que la version sans
+  verrou de l'étape 1.10 : à confirmer sur le banc.
+- `rayon` est la seule dépendance du moteur, et seule la recherche s'en sert : le round n'en a aucune.
 
 - `Solver::corners` alloue (listes de coins de taille variable, bases visitées) : c'est le chemin des datasets, une
   fois par décision, pas celui de la recherche ; `solve` et `equilibria` n'allouent rien.
