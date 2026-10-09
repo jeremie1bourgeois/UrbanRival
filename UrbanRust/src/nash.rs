@@ -226,34 +226,54 @@ impl Tableau {
         self.basis.extend(cols..cols + rows);
     }
 
-    /// Le simplexe jusqu'à l'optimum de l'objectif courant, en ne faisant entrer que les variables `allowed`. Règle de
-    /// Bland : entre la première variable de coût réduit négatif ; sort la ligne du plus petit rapport, à égalité
-    /// celle dont la variable de base a le plus petit indice. Le simplexe ne peut alors pas cycler, même sur les
-    /// matrices à nombreuses égalités.
+    /// Le simplexe jusqu'à l'optimum de l'objectif courant, en ne faisant entrer que les variables `allowed` : entre la
+    /// première variable de coût réduit négatif, sort la ligne que choisit `leaving_row`.
     fn optimize(&mut self, allowed: impl Fn(usize) -> bool) {
-        let (width, rhs) = (self.width(), self.rhs());
+        let rhs = self.rhs();
         while let Some(entering) = (0..rhs).find(|&col| self.objective[col] < -PIVOT_EPSILON && allowed(col)) {
-            let mut leaving: Option<(usize, f64)> = None;
-            for row in 0..self.rows {
-                let coefficient = self.cells[row * width + entering];
-                if coefficient <= PIVOT_EPSILON {
-                    continue;
-                }
-                let ratio = self.cells[row * width + rhs] / coefficient;
-                let better = match leaving {
-                    None => true,
-                    Some((best, best_ratio)) => {
-                        ratio < best_ratio - PIVOT_EPSILON
-                            || ratio <= best_ratio + PIVOT_EPSILON && self.basis[row] < self.basis[best]
-                    }
-                };
-                if better {
-                    leaving = Some((row, ratio));
-                }
-            }
-            let (leaving, _) = leaving.expect("simplexe non borné : impossible sur un jeu décalé à valeurs positives");
+            let leaving = self
+                .leaving_row(entering)
+                .expect("simplexe non borné : impossible sur un jeu décalé à valeurs positives");
             self.pivot(leaving, entering);
         }
+    }
+
+    /// La ligne qui sort quand `entering` entre : celle du plus petit rapport, les égalités départagées dans l'ordre
+    /// lexicographique des lignes de B⁻¹ (les colonnes des écarts) divisées par le pivot. Ce départage revient à
+    /// perturber infinitésimalement le second membre : plus aucune base n'est dégénérée, le simplexe ne peut pas
+    /// cycler, et chaque base est un sommet distinct du problème perturbé (ce qu'exige `corners`). None : rien ne
+    /// borne la variable.
+    fn leaving_row(&self, entering: usize) -> Option<usize> {
+        let width = self.width();
+        let mut leaving: Option<usize> = None;
+        for row in 0..self.rows {
+            if self.cells[row * width + entering] <= PIVOT_EPSILON {
+                continue;
+            }
+            if leaving.is_none_or(|best| self.lexicographically_smaller(row, best, entering)) {
+                leaving = Some(row);
+            }
+        }
+        leaving
+    }
+
+    /// La ligne `row`, divisée par son coefficient dans `entering`, précède-t-elle `other` sur (second membre, B⁻¹) ?
+    fn lexicographically_smaller(&self, row: usize, other: usize, entering: usize) -> bool {
+        let width = self.width();
+        let (pivot, other_pivot) = (self.cells[row * width + entering], self.cells[other * width + entering]);
+        for col in std::iter::once(self.rhs()).chain(self.cols..self.cols + self.rows) {
+            let (value, other_value) = (
+                self.cells[row * width + col] / pivot,
+                self.cells[other * width + col] / other_pivot,
+            );
+            if value < other_value - PIVOT_EPSILON {
+                return true;
+            }
+            if value > other_value + PIVOT_EPSILON {
+                return false;
+            }
+        }
+        false
     }
 
     /// Recopie `other` dans les tampons de ce tableau, sans réallouer.
