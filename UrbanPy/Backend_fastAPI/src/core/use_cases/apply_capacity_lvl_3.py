@@ -25,7 +25,8 @@ def apply_capacity_lvl_3(game: Game, card1: Card, card2: Card) -> None:
     Effets de fin de round sur la vie / les pillz des joueurs (les deux joueurs sont encore en vie).
     Chaque capacité restante est filtrée par sa condition de fin de round puis appliquée une seule fois.
     Les gains passent avant les pertes, quelle que soit la carte qui les porte : un plancher mord après le gain
-    adverse (combats réels 1734030, 1734587).
+    adverse (combats réels 1734030, 1734587). Entre deux pertes, le plancher le plus haut d'abord, comme au niveau 2,
+    quelle que soit la carte qui le porte (décision utilisateur, 2026-10-09).
     """
     for losses in (False, True):
         _apply_capacities_lvl_3(game, card1, card2, losses)
@@ -35,38 +36,45 @@ def _is_loss(capacity: Capacity) -> bool:
     return capacity.value < 0 or "ko" in capacity.types
 
 
+def _floor(capacity: Capacity) -> int:
+    return -1 if capacity.borne is None else capacity.borne
+
+
 def _apply_capacities_lvl_3(game: Game, card1: Card, card2: Card, losses: bool) -> None:
-    for card, opp_card, own, opp in ((card1, card2, game.ally, game.enemy), (card2, card1, game.enemy, game.ally)):
-        for slot in FIGHT_SLOTS:
-            capacity = getattr(card, slot)
-            if capacity is None or _is_loss(capacity) != losses:
-                continue
-            if "reanimate" in capacity.types:      # Reanimate = « Defeat: +X Life » (le cas KO est traité par apply_reanimate)
-                if not card.win:
-                    before = own.life
-                    own.life += capacity.value * multiplier(capacity.how, game, own, opp, card, opp_card)
-                    note(card, "fin de round", f"{card.name} : {label(capacity)} → {stat_change('life', 'de ' + _side(game, own), before, own.life)}")
-                setattr(card, slot, None)
-                continue
-            capacity = check_capacity_condition_lvl_3(capacity, card.win)
-            if capacity is not None and "ko" in capacity.types:       # Fatal Killshot / Sinister Symmetry : KO immédiat
-                opp.life = 0
-                note(card, "fin de round", f"{card.name} : {label(capacity)} met {_side(game, opp)} KO")
-                capacity = None
-            if capacity is not None and "recover" in capacity.types:
-                before = own.pillz
-                own.pillz += recovered_pillz(card, capacity)
-                note(card, "fin de round", f"{card.name} : {label(capacity)} → {stat_change('pillz', 'de ' + _side(game, own), before, own.pillz)}")
-                if capacity.target == "both":                       # « Recover X Players Pillz » : chacun sur sa propre mise
-                    before = opp.pillz
-                    opp.pillz += recovered_pillz(opp_card, capacity)
-                    note(card, "fin de round", f"{card.name} : {label(capacity)} → {stat_change('pillz', 'de ' + _side(game, opp), before, opp.pillz)}")
-                capacity = None
-            for apply in (apply_target_ally_effects, apply_target_both_effects, apply_target_enemy_effects):
-                if capacity is None:
-                    break
-                capacity = apply(game, own, opp, capacity, card, opp_card)
-            setattr(card, slot, capacity)
+    pending = [(card, opp_card, own, opp, slot)
+               for card, opp_card, own, opp in ((card1, card2, game.ally, game.enemy), (card2, card1, game.enemy, game.ally))
+               for slot in FIGHT_SLOTS
+               if getattr(card, slot) is not None and _is_loss(getattr(card, slot)) == losses]
+    if losses:   # tri stable : à plancher égal, deux pertes commutent
+        pending.sort(key=lambda entry: -_floor(getattr(entry[0], entry[4])))
+    for card, opp_card, own, opp, slot in pending:
+        capacity = getattr(card, slot)
+        if "reanimate" in capacity.types:      # Reanimate = « Defeat: +X Life » (le cas KO est traité par apply_reanimate)
+            if not card.win:
+                before = own.life
+                own.life += capacity.value * multiplier(capacity.how, game, own, opp, card, opp_card)
+                note(card, "fin de round", f"{card.name} : {label(capacity)} → {stat_change('life', 'de ' + _side(game, own), before, own.life)}")
+            setattr(card, slot, None)
+            continue
+        capacity = check_capacity_condition_lvl_3(capacity, card.win)
+        if capacity is not None and "ko" in capacity.types:       # Fatal Killshot / Sinister Symmetry : KO immédiat
+            opp.life = 0
+            note(card, "fin de round", f"{card.name} : {label(capacity)} met {_side(game, opp)} KO")
+            capacity = None
+        if capacity is not None and "recover" in capacity.types:
+            before = own.pillz
+            own.pillz += recovered_pillz(card, capacity)
+            note(card, "fin de round", f"{card.name} : {label(capacity)} → {stat_change('pillz', 'de ' + _side(game, own), before, own.pillz)}")
+            if capacity.target == "both":                       # « Recover X Players Pillz » : chacun sur sa propre mise
+                before = opp.pillz
+                opp.pillz += recovered_pillz(opp_card, capacity)
+                note(card, "fin de round", f"{card.name} : {label(capacity)} → {stat_change('pillz', 'de ' + _side(game, opp), before, opp.pillz)}")
+            capacity = None
+        for apply in (apply_target_ally_effects, apply_target_both_effects, apply_target_enemy_effects):
+            if capacity is None:
+                break
+            capacity = apply(game, own, opp, capacity, card, opp_card)
+        setattr(card, slot, capacity)
 
 
 def pillz_placed(card: Card) -> int:

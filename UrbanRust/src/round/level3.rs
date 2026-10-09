@@ -3,24 +3,38 @@
 //! est filtrée par sa condition de fin de round (Defeat, Backlash, Victory or Defeat, ou victoire implicite sans
 //! condition), puis appliquée une seule fois ; ce qui n'est ni vie ni pillz reste pour le niveau 4.
 
+use std::cmp::Reverse;
+
 use super::{affected_sides, bit, Fighter, Round, ENEMY, FURY_COST, LIFE, PILLZ, SIDES, SLOTS};
 use crate::contract::CompiledCapacity;
 use crate::vocabulary::{conditions, targets, types};
 
 impl Round<'_> {
     /// Les gains passent avant les pertes, quelle que soit la carte qui les porte : un plancher mord après le gain
-    /// adverse (combats réels 1734030, 1734587).
+    /// adverse (combats réels 1734030, 1734587). Entre deux pertes, le plancher le plus haut d'abord, comme au niveau
+    /// 2, quelle que soit la carte qui le porte (décision utilisateur, 2026-10-09).
     pub(super) fn apply_capacity_lvl_3(&mut self) {
         for losses in [false, true] {
+            // les emplacements de la passe, dans l'ordre des camps : (camp, emplacement, plancher)
+            let mut pending = [(0, 0, 0); SIDES.len() * SLOTS.len()];
+            let mut count = 0;
             for side in SIDES {
                 for slot in SLOTS {
-                    let Some(capacity) = self.fighters[side].slots[slot] else {
-                        continue;
-                    };
-                    if is_loss(&capacity) == losses {
-                        self.fighters[side].slots[slot] = self.apply_end_of_round(side, capacity);
+                    if let Some(capacity) = self.fighters[side].slots[slot] {
+                        if is_loss(&capacity) == losses {
+                            pending[count] = (side, slot, capacity.borne);
+                            count += 1;
+                        }
                     }
                 }
+            }
+            if losses {
+                // tri stable : à plancher égal, deux pertes commutent
+                pending[..count].sort_by_key(|&(_, _, floor)| Reverse(floor));
+            }
+            for &(side, slot, _) in &pending[..count] {
+                let capacity = self.fighters[side].slots[slot].expect("un emplacement relevé plein");
+                self.fighters[side].slots[slot] = self.apply_end_of_round(side, capacity);
             }
         }
     }

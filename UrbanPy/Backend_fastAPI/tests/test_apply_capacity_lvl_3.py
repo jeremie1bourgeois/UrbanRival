@@ -122,6 +122,21 @@ def test_a_gain_applies_before_a_floored_loss_whichever_card_carries_it(template
     assert template_game.enemy.life == 2      # 8 - 5 = 3, +2 -> 5, -4 plancher 2 -> 2 (la perte d'abord : 3 -> 2 -> 4)
 
 
+@pytest.mark.parametrize("ally_wins", [True, False])
+def test_the_higher_floor_applies_first_between_two_losses_whichever_card_carries_it(template_game, ally_wins):
+    # Résolutions en masse du moteur Rust : de nuit, Crook Cr gagne avec « -1 Pillz And Life » contre Milena
+    # « Defeat: -2 Opp. Life, Min 2 », et le gagnant finissait à 2 ou 1 vie selon son camp. Décision : le plancher le
+    # plus haut d'abord, comme au niveau 2 ; le gagnant, à 3 vies : -2 plancher 2 -> 2, puis -1 -> 1
+    winner = template_game.ally if ally_wins else template_game.enemy
+    winner.life = 3
+    winner_ability, loser_ability = "Backlash: -1 Life Min 0", "Defeat: -2 Opp. Life, Min 2"
+
+    play(template_game, ally_wins=ally_wins, ally_ability=winner_ability if ally_wins else loser_ability,
+         enemy_ability=loser_ability if ally_wins else winner_ability)
+
+    assert winner.life == 1      # la perte du camp allié d'abord donnait 3 -> 2 -> 2 quand le gagnant est l'allié
+
+
 @pytest.mark.parametrize("ally_wins, expected_enemy_life", [(True, 12 - 5 - 2), (False, 12 - 2)])
 def test_victory_or_defeat_applies_either_way(template_game, ally_wins, expected_enemy_life):
     play(template_game, ally_wins=ally_wins, ally_ability="Victory Or Defeat: -2 Opp. Life, Min 0")
