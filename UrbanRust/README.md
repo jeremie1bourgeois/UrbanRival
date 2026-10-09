@@ -7,7 +7,7 @@ sans tout redécouvrir. Ce qu'on compte faire : [docs/PLAN-MOTEUR.md](../docs/PL
 
 ## Où on en est
 
-*Mis à jour le 2026-10-09 — plan : phase 1, étapes 1.1 à 1.4 faites ; prochaine : 1.5 (test « zéro allocation »).*
+*Mis à jour le 2026-10-09 — plan : phase 1, étapes 1.1 à 1.5 faites ; prochaine : 1.6 (solveur de matrices).*
 
 Fait :
 - le vocabulaire du contrat, transcrit de `UrbanPy/Backend_fastAPI/src/core/engine/contract.py` ; son empreinte est
@@ -26,9 +26,12 @@ Fait :
   alloué ;
 - le bloc de mises (étape 1.4), `round::play_block` : toutes les combinaisons de mises d'une paire de cartes, chaque
   case identique au round simple sur les 88 132 blocs distincts du corpus (~29 millions de cases). Le premier étage
-  du round se calcule une fois par tranche de mises ; gain x2,3 par case (voir « Optimisations en place »).
+  du round se calcule une fois par tranche de mises ; gain x2,3 par case (voir « Optimisations en place ») ;
+- aucune allocation (étape 1.5) : un round, un bloc de mises, les coups légaux et la fin de partie n'allouent rien,
+  en debug comme en release. `tests/sans_allocation.rs` installe un allocateur qui compte les allocations du fil
+  courant ; il vérifie d'abord que le compteur voit une allocation, pour ne pas passer à vide.
 
-Pas encore fait : le test « zéro allocation » (1.5), et tout ce qui suit dans le plan.
+Pas encore fait : le solveur de matrices (1.6), et tout ce qui suit dans le plan.
 
 Ce code a été écrit avant le plan. Il en respecte les règles de conception, mais rien n'y est figé : la disposition
 de l'état peut changer si une mesure le justifie. Seuls les indices du vocabulaire sont intouchables, car ils sont
@@ -53,6 +56,7 @@ partagés avec Python.
 | `tests/differentiel.rs` | chaque round du corpus, rejoué en Rust, redonne l'état suivant et l'issue de Python |
 | `tests/regles.rs` | coups légaux et fin de partie identiques à ceux de Python, sur `regles.jsonl` |
 | `tests/bloc.rs` | chaque case de chaque bloc du corpus égale le round simple, dans l'ordre des coups légaux |
+| `tests/sans_allocation.rs` | aucune allocation pendant un round, un bloc, les coups légaux et la fin de partie |
 
 ## Lancer les tests
 
@@ -77,6 +81,8 @@ rejoue ~29 millions de cases deux fois, en bloc et en round simple.
   `tests/test_engine_contract.py` et `tests/test_engine_hands.py` le vérifient.
 - **Chaque version optimisée garde une version plus simple comme référence de test** : moteur Python → round simple
   en Rust → bloc de mises. Un code illisible reste ainsi comparable, case par case, à un code qu'on peut relire.
+- **Aucune allocation dans le chemin chaud** : `tests/sans_allocation.rs` le vérifie ; une optimisation qui en
+  ajouterait une le fait échouer.
 
 ## Optimisations en place
 
