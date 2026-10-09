@@ -23,6 +23,13 @@ def test_game_is_decided_on_life_once_four_rounds_are_played(template_game):
     assert check_end(template_game) is GameResult.ALLY
 
 
+def test_a_double_ko_is_a_draw(template_game):
+    template_game.nb_turn = 3
+    template_game.ally.life, template_game.enemy.life = 0, 0
+
+    assert check_end(template_game) is GameResult.DRAW
+
+
 def test_fourth_round_is_accepted(template_game):
     template_game.nb_turn = 4
 

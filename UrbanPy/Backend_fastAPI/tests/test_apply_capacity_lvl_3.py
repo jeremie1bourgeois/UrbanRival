@@ -221,6 +221,14 @@ def test_xantiax_makes_both_players_lose_life_even_on_defeat(template_game):
     assert (template_game.ally.life, template_game.enemy.life) == (12 - 3 - 2, 12 - 2)
 
 
+def test_xantiax_knocking_out_both_players_is_a_draw(template_game):
+    template_game.ally.life, template_game.enemy.life = 2, 7
+    play(template_game, ally_ability="Xantiax: -2 Life, Min. 0", ally_wins=True)   # Asporov encaisse 5 -> 2
+
+    assert (template_game.ally.life, template_game.enemy.life) == (0, 0)
+    assert check_end(template_game) is GameResult.DRAW
+
+
 def test_corrupt_costs_the_winner_his_own_life(template_game):
     play(template_game, ally_ability="Corrupt 2 Min. 5", ally_wins=True)
 

@@ -24,7 +24,7 @@ pub fn card_actions(player: &PlayerState, card: usize) -> impl Iterator<Item = A
 }
 
 /// La valeur de la partie pour l'allié si elle est finie (1 gagnée, 0,5 nulle, 0 perdue), None sinon : après le
-/// dernier round, la plus grande vie gagne ; avant, un camp à 0 vie a perdu.
+/// dernier round, la plus grande vie gagne ; avant, un camp à 0 vie a perdu, et deux camps à 0 vie font match nul.
 pub fn terminal(state: &State) -> Option<f64> {
     if state.nb_turn > NB_ROUNDS {
         return Some(match state.ally.life.cmp(&state.enemy.life) {
@@ -32,6 +32,9 @@ pub fn terminal(state: &State) -> Option<f64> {
             std::cmp::Ordering::Less => 0.0,
             std::cmp::Ordering::Equal => 0.5,
         });
+    }
+    if state.ally.life == 0 && state.enemy.life == 0 {
+        return Some(0.5);
     }
     if state.ally.life == 0 {
         return Some(0.0);

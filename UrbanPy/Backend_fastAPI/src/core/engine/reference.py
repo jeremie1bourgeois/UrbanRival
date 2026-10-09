@@ -67,6 +67,8 @@ def terminal(state: State) -> Optional[float]:
         if state.ally.life != state.enemy.life:
             return 1.0 if state.ally.life > state.enemy.life else 0.0
         return 0.5
+    if state.ally.life == 0 and state.enemy.life == 0:
+        return 0.5
     if state.ally.life == 0:
         return 0.0
     if state.enemy.life == 0:

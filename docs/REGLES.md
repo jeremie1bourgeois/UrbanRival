@@ -28,7 +28,7 @@ Hiérarchie de confiance : règle officielle (support ou glossaire) > combat ré
 | Puissance et pillz minimales 1 → attaque minimale 1 hors effet ; un réducteur « Min 0 » descend bien à 0 | `apply_capacity_lvl_2` | wiki *Power* ; utilisateur |
 | Égalité d'attaque : la carte de **niveau (étoiles) le plus bas** gagne ; à niveau égal, celui qui a joué **en premier** | `resolve_combat` | wiki *Power* + FAQ support ; combat réel 1294088 |
 | Premier joueur du round 1 : aléatoire, puis alternance | `create_game` | wiki *Strike Back* |
-| Fin de partie : KO à 0 vie ; sinon après 4 rounds, plus de vie gagne ; égalité = match nul | `check_end` | wiki *KO*, *Life* |
+| Fin de partie : KO à 0 vie ; sinon après 4 rounds, plus de vie gagne ; égalité = match nul. **Double KO** (les deux joueurs à 0 vie au même round, par ex. Xantiax) = match nul | `check_end`, `reference.terminal` | wiki *KO*, *Life* ; double KO : décision utilisateur (2026-10-09), trouvé par les résolutions en masse du moteur Rust |
 
 ### Niveau 1 — Stop, Protection, Copie, Annul, Echange
 | Règle | Moteur | Source |

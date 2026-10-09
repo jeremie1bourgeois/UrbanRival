@@ -56,6 +56,8 @@ def check_end(board: Game) -> GameResult:
             return GameResult.ENEMY
         else:
             return GameResult.DRAW
+    elif board.ally.life == 0 and board.enemy.life == 0:   # double KO : match nul (décision utilisateur, 2026-10-09)
+        return GameResult.DRAW
     elif board.ally.life == 0:
         return GameResult.ENEMY
     elif board.enemy.life == 0:
