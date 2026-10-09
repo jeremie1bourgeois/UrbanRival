@@ -1,4 +1,5 @@
-//! Rien n'est alloué pendant un round, un bloc de mises, ni pour les coups légaux et la fin de partie.
+//! Rien n'est alloué pendant un round, un bloc de mises, ni pour les coups légaux, la fin de partie et la résolution
+//! d'une matrice (une fois les tampons du solveur dimensionnés).
 //!
 //! La recherche appelle ces fonctions des milliards de fois : une allocation par appel coûterait plus que le round
 //! lui-même. Ce binaire de test installe un allocateur qui compte les allocations **du fil courant** (le lanceur de
@@ -16,6 +17,7 @@ use std::hint::black_box;
 
 use ur_engine::contract::Deck;
 use ur_engine::game::{legal_actions, terminal};
+use ur_engine::nash::Solver;
 use ur_engine::round::{play, play_block};
 use ur_engine::vocabulary::conditions;
 
@@ -139,6 +141,47 @@ fn les_coups_legaux_et_la_fin_de_partie_n_allouent_rien() {
         }
     });
     assert_eq!(allocations, 0, "allocations pour les coups légaux ou la fin de partie");
+}
+
+#[test]
+fn un_solveur_reutilise_n_alloue_rien() {
+    let path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../UrbanPy/Backend_fastAPI/data/nash_expected.json"
+    );
+    let expected: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(path).expect("data/nash_expected.json introuvable")).unwrap();
+    let matrices: Vec<(Vec<f64>, usize, usize)> = expected
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|matrix| {
+            let values = matrix["values"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|value| value.as_f64().unwrap())
+                .collect();
+            (
+                values,
+                matrix["rows"].as_u64().unwrap() as usize,
+                matrix["cols"].as_u64().unwrap() as usize,
+            )
+        })
+        .collect();
+    let mut solver = Solver::new();
+    for (values, rows, cols) in &matrices {
+        solver.solve(values, *rows, *cols); // dimensionne les tampons
+    }
+    let allocations = allocations_during(|| {
+        for (values, rows, cols) in &matrices {
+            black_box(solver.solve(black_box(values), *rows, *cols).value);
+        }
+    });
+    assert_eq!(
+        allocations, 0,
+        "allocations en résolvant des matrices avec un solveur déjà dimensionné"
+    );
 }
 
 fn has_bet_condition(deck: &Deck) -> bool {
