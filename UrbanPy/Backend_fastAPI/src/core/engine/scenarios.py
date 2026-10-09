@@ -9,6 +9,9 @@ Le moteur applique les effets de l'allié avant ceux de l'ennemi et, avec des pl
 où cela peut jouer enregistrent aussi le scénario miroir (camps échangés, premier joueur inversé), pour qu'un port
 reproduise les deux orientations.
 """
+import glob
+import json
+import os
 import random
 from dataclasses import dataclass, replace
 from functools import lru_cache
@@ -17,6 +20,7 @@ from typing import Dict, Iterator, List, Optional, Tuple
 
 from src.adapters.repositories.card_repository import _official_cards, all_capacity_descriptions
 from src.core.domain.capacity import Capacity
+from src.core.domain.card import Card
 from src.core.domain.game import Game
 from src.core.domain.player import Player
 from src.core.engine.contract import (CLANS, EFFECT_KINDS, Action, CompiledCard, Deck, PlayerState, State,
@@ -25,6 +29,7 @@ from src.core.engine.hands import random_hand
 from src.core.engine.reference import legal_actions, step, terminal
 from src.core.parsing.capacity_parser import parse_capacity
 from src.core.use_cases.apply_capacity_lvl_1 import META_HOWS
+from src.utils.config import BASE_DIR
 
 
 @dataclass(frozen=True)
@@ -669,6 +674,43 @@ def random_scenarios(games: int = 300, extra_pairs: int = 4, seed: int = 0) -> I
             state = step(deck, state, *pairs[0])
 
 
+# --- Famille « reels » : les combats réels capturés du client officiel ------------------------
+
+BATTLES_DIR = os.path.join(BASE_DIR, "data", "ur_battles")
+
+
+def _battle_game(record: dict) -> Game:
+    """La partie du combat avant son premier round, comme tests/test_ur_battles.py la construit."""
+    night = record.get("night", False)   # absent : combat capturé avant que la capture relève la nuit, donc de jour
+    names = {data["id"]: name for name, data in _official_cards().items()}
+    players = [Player(name=record[side]["name"], life=record[side]["base_life"], pillz=record[side]["base_pillz"],
+                      cards=[Card(names[card["id"]], card["level"], night=night) for card in record[side]["cards"]])
+               for side in ("p0", "p1")]
+    return Game(1, True, players[0], players[1], [], night=night)
+
+
+def real_battle_scenarios() -> Iterator[Scenario]:
+    """
+    Chaque round des combats réels de data/ur_battles, ceux que tests/test_ur_battles.py confronte au client officiel :
+    l'état avant le round, rejoué par le moteur depuis le début du combat, et les choix réellement faits (carte, pillz,
+    fury, premier joueur). Un combat dont une carte porte un pouvoir non géré ne se compile pas : il est omis.
+    """
+    for path in sorted(glob.glob(os.path.join(BATTLES_DIR, "*.json"))):
+        with open(path, encoding="utf-8") as file:
+            record = json.load(file)
+        game = _battle_game(record)
+        try:
+            deck = deck_from_game(game)
+        except ValueError:
+            continue
+        state = state_from_game(game)
+        for round_ in record["rounds"]:
+            state = replace(state, ally_first=round_["first"] == "p0")
+            ally, enemy = (Action(round_[side]["index"], round_[side]["pillz"], round_[side]["fury"]) for side in ("p0", "p1"))
+            yield Scenario(f"reels/{record['battle_id']}/round-{round_['round']}", deck, state, ally, enemy)
+            state = step(deck, state, ally, enemy)
+
+
 FAMILIES = {
     "solo": solo_scenarios,
     "interactions": interactions_scenarios,
@@ -678,4 +720,5 @@ FAMILIES = {
     "oculus": oculus_scenarios,
     "combat": combat_scenarios,
     "aleatoire": random_scenarios,
+    "reels": real_battle_scenarios,
 }

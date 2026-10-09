@@ -40,6 +40,11 @@
       "entries": 5565,
       "decks": 300,
       "sha256": "18cd4b3bc1f1737a45315c9cbf2aa57c136fc2a0282a369cf493f15cf7ae68d9"
+    },
+    "reels": {
+      "entries": 439,
+      "decks": 115,
+      "sha256": "eab5a9cf8b52843835e43be7ccf02fed30485e3edcc728c4ca40f61bb0ce917e"
     }
   },
   "rules": {
