@@ -21,8 +21,8 @@ use ur_engine::nash::Solver;
 use ur_engine::round::{play, play_block};
 use ur_engine::vocabulary::conditions;
 
-const FAMILIES: [&str; 9] = [
-    "solo", "interactions", "planchers", "persistants", "leaders", "oculus", "combat", "aleatoire", "reels",
+const FAMILIES: [&str; 10] = [
+    "solo", "interactions", "planchers", "persistants", "leaders", "oculus", "combat", "aleatoire", "masse", "reels",
 ];
 
 thread_local! {

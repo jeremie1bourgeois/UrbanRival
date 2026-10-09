@@ -7,8 +7,8 @@ sans tout redécouvrir. Ce qu'on compte faire : [docs/PLAN-MOTEUR.md](../docs/PL
 
 ## Où on en est
 
-*Mis à jour le 2026-10-09 — plan : phase 1 faite (étapes 1.1 à 1.11) ; prochaine : phase 2, 2.1 (élargir le
-corpus).*
+*Mis à jour le 2026-10-09 — plan : phase 1 faite (étapes 1.1 à 1.11) ; phase 2 en cours, 2.1 faite (corpus
+élargi) ; prochaine : 2.2 (contrôles automatiques pendant la recherche).*
 
 Fait :
 - le vocabulaire du contrat, transcrit de `UrbanPy/Backend_fastAPI/src/core/engine/contract.py` ; son empreinte est
@@ -72,7 +72,13 @@ Fait :
   façon quel que soit le fil : mêmes nombres au bit près qu'en un seul fil (`tests/recherche.rs`, dont des états du
   round 2). Sur 6 cœurs : x4,3 à x4,5 sur un état du round 2 ; x4,4 sur des états indépendants, chacun sa recherche.
 
-Pas encore fait : la phase 2 (stabiliser), et tout ce qui suit dans le plan.
+- le corpus élargi (étape 2.1) : une dixième famille, `masse`, 2 000 parties jouées au hasard avec les mains de
+  `hands.py`, de nuit une fois sur deux (les cartes prennent alors leurs textes « Night: ») : 37 665 rounds, 82 % des
+  niveaux de cartes tirables, 22 des 30 textes de nuit. Le Rust y est identique au Python du premier coup, rounds et
+  blocs de mises : le corpus compte désormais 151 614 rounds et 112 945 blocs distincts (~35 millions de cases).
+  `aleatoire` (300 parties, de jour) reste le petit échantillon de mains réalistes dont se servent les tests.
+
+Pas encore fait : la suite de la phase 2 (2.2, 2.3), et tout ce qui suit dans le plan.
 
 Ce code a été écrit avant le plan. Il en respecte les règles de conception, mais rien n'y est figé : la disposition
 de l'état peut changer si une mesure le justifie. Seuls les indices du vocabulaire sont intouchables, car ils sont
@@ -111,8 +117,8 @@ Ensuite, `cargo test`. La version du compilateur est fixée par `rust-toolchain.
 Les tests lisent le corpus, qui n'est pas versionné : sur une copie neuve du dépôt, le générer d'abord avec
 `scripts/build_engine_corpus.py` (depuis `UrbanPy/Backend_fastAPI`), sinon `tests/lecture_corpus.rs` échoue en le
 disant. Le profil de test compile la crate en -O1 et ses dépendances en -O3 (`Cargo.toml`) : relire tout le corpus
-passe ainsi de 35 s à 5 s. Le plus long est `tests/bloc.rs` (~11 s sur un i7-8750H, réparti sur les cœurs) : il
-rejoue ~29 millions de cases deux fois, en bloc et en round simple.
+passe ainsi de 35 s à 5 s. Le plus long est `tests/bloc.rs` (~18 s sur un i7-8750H, réparti sur les cœurs) : il
+rejoue ~35 millions de cases deux fois, en bloc et en round simple.
 
 ## Comment le code est vérifié
 
@@ -184,3 +190,6 @@ gagner, et quel test garantit qu'elle ne change pas les résultats. Le code port
   le test réécrit les lignes au lieu de hacher les fichiers.
 - Les règles encore ouvertes (R1 surtout, un ordre de résolution ; [docs/REGLES.md](../docs/REGLES.md),
   registre) peuvent changer le moteur Python : on régénère alors le corpus, et le moteur Rust suit.
+- Les 30 textes « Night: » n'entrent dans aucune famille construite : `solo` et `interactions` ne lisent que les
+  textes de jour (`all_capacity_descriptions`). Seuls `masse` (22 sur 30) et les combats réels joués de nuit les
+  exercent.

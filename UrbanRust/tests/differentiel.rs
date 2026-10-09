@@ -13,8 +13,8 @@ use corpus::Entry;
 use ur_engine::round::play;
 
 /// Les familles de `scenarios.FAMILIES`, celles de `data/engine_digests.json`.
-const FAMILIES: [&str; 9] = [
-    "solo", "interactions", "planchers", "persistants", "leaders", "oculus", "combat", "aleatoire", "reels",
+const FAMILIES: [&str; 10] = [
+    "solo", "interactions", "planchers", "persistants", "leaders", "oculus", "combat", "aleatoire", "masse", "reels",
 ];
 
 #[test]

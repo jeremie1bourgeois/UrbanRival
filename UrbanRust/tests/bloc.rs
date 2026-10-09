@@ -1,6 +1,6 @@
 //! Le bloc de mises redonne-t-il, case par case, exactement le round simple ?
 //!
-//! Chaque bloc distinct du corpus — un état, une carte alliée, une carte ennemie : ~88 000 blocs, ~29 millions de
+//! Chaque bloc distinct du corpus — un état, une carte alliée, une carte ennemie : ~113 000 blocs, ~35 millions de
 //! cases — est joué par `play_block` ; chaque case doit égaler `play` sur les mêmes coups, et les cases arriver dans
 //! l'ordre des coups légaux, ligne par ligne. Les contextes « mise-N » du corpus exercent les tranches de mises. Le
 //! travail est réparti sur tous les cœurs.
@@ -15,8 +15,8 @@ use ur_engine::contract::{Action, Deck, State};
 use ur_engine::game::card_actions;
 use ur_engine::round::{play, play_block};
 
-const FAMILIES: [&str; 9] = [
-    "solo", "interactions", "planchers", "persistants", "leaders", "oculus", "combat", "aleatoire", "reels",
+const FAMILIES: [&str; 10] = [
+    "solo", "interactions", "planchers", "persistants", "leaders", "oculus", "combat", "aleatoire", "masse", "reels",
 ];
 
 /// Un état et une paire de cartes : un bloc de mises.
