@@ -7,8 +7,8 @@ sans tout redécouvrir. Ce qu'on compte faire : [docs/PLAN-MOTEUR.md](../docs/PL
 
 ## Où on en est
 
-*Mis à jour le 2026-10-09 — plan : phase 1 faite (étapes 1.1 à 1.11) ; phase 2 faite (2.1 à 2.4) ; prochaine : la
-phase 3 (mesurer).*
+*Mis à jour le 2026-10-09 — plan : phase 1 faite (étapes 1.1 à 1.11) ; phase 2 faite (2.1 à 2.4) ; phase 3 : 3.1
+faite ; prochaine : 3.2 (le programme de mesure).*
 
 Fait :
 - le vocabulaire du contrat, transcrit de `UrbanPy/Backend_fastAPI/src/core/engine/contract.py` ; son empreinte est
@@ -108,7 +108,12 @@ Fait :
   matrices sont des cas de `tests/nash.rs` ; les parties entières de `masse/partie-0` à `partie-9` vont au bout, en 9 à
   19 s par main sur le Mac M4.
 
-Pas encore fait : la phase 3 (mesurer), et tout ce qui suit dans le plan.
+- le banc d'essai (étape 3.1) : `data/engine_bench.json`, versionné, écrit par `scripts/build_engine_bench.py`
+  (graine fixe) : 24 paires de mains tirées comme pour les résolutions en masse (`hands.py`, 14 de nuit), et pour
+  chacune l'état de début des rounds 1, 2, 3 et 4 d'une même partie jouée au hasard. Les mesures d'une version à
+  l'autre se font sur ce lot.
+
+Pas encore fait : le reste de la phase 3 (mesurer), et tout ce qui suit dans le plan.
 
 Ce code a été écrit avant le plan. Il en respecte les règles de conception, mais rien n'y est figé : la disposition
 de l'état peut changer si une mesure le justifie. Seuls les indices du vocabulaire sont intouchables, car ils sont

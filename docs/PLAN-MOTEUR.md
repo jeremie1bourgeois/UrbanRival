@@ -68,7 +68,7 @@ Objectif : savoir combien de temps prend chaque palier, avec des chiffres compar
 
 | # | Étape | Fini quand | Statut |
 |---|---|---|---|
-| 3.1 | Banc d'essai fixe et versionné : un même lot de paires de mains et d'états de départ aux rounds 4, 3, 2 et 1 | le banc existe | ⬜ |
+| 3.1 | Banc d'essai fixe et versionné : un même lot de paires de mains et d'états de départ aux rounds 4, 3, 2 et 1 | le banc existe | ✅ |
 | 3.2 | Programme de mesure qui affiche les indicateurs (§ Ce qu'on compte) ; benchmarks `criterion` pour le round, le bloc et la matrice | une commande donne tous les chiffres | ⬜ |
 | 3.3 | Mesurer sur le Mac M4 et sur un serveur multicœur | temps connu pour chaque palier (la partie entière éventuellement extrapolée) ; chiffres au journal | ⬜ |
 
