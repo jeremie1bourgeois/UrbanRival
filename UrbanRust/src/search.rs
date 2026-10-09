@@ -13,10 +13,11 @@
 //! sous `cargo test`), chaque valeur est une probabilité, dans [0, 1] ; `Search::mirror_mismatches` vérifie que chaque
 //! état résolu, vu de l'autre camp, vaut 1 − V.
 //!
-//! Les états équivalents ne se résolvent qu'une fois : quand aucune capacité du deck ne lit le round précédent
-//! (Revenge, Confidence, After), `last_round` ne change rien à la suite, et la mémo l'oublie. Deux états qui ne
-//! diffèrent que par l'ordre dans lequel les mêmes cartes ont été jouées n'en font plus qu'un (README, « Optimisations
-//! en place » ; `tests/recherche.rs` le compare à la recherche sans équivalence, `Search::without_equivalences`).
+//! Les états équivalents ne se résolvent qu'une fois : du round précédent (`last_round`), la mémo ne garde que ce
+//! qu'une capacité du deck peut lire — les cartes jouées s'il y a un After, le vainqueur s'il y a un Revenge ou un
+//! Confidence. Deux états qui ne diffèrent que par l'ordre dans lequel les mêmes cartes ont été jouées n'en font
+//! alors souvent plus qu'un (README, « Optimisations en place » ; `tests/recherche.rs` le compare à la recherche sans
+//! équivalence, `Search::without_equivalences`).
 
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -25,7 +26,7 @@ use std::sync::RwLock;
 
 use rayon::prelude::*;
 
-use crate::contract::{Deck, State, HAND_SIZE};
+use crate::contract::{Deck, LastRound, State, HAND_SIZE};
 use crate::game::{card_actions, legal_actions, terminal};
 use crate::nash::{Solver, TOLERANCE};
 use crate::round::play_block;
@@ -49,8 +50,9 @@ pub struct Search<'a> {
     deck: &'a Deck,
     memo: Memo,
     parallel: bool,
-    /// Aucune capacité du deck ne lit le round précédent : la mémo oublie `last_round`.
-    forget_last_round: bool,
+    /// Ce que le deck lit du round précédent : les cartes jouées (After), le vainqueur (Revenge, Confidence).
+    reads_previous_cards: bool,
+    reads_previous_winner: bool,
 }
 
 impl<'a> Search<'a> {
@@ -60,24 +62,24 @@ impl<'a> Search<'a> {
             deck,
             memo: Memo::new(),
             parallel: false,
-            forget_last_round: !reads_last_round(deck),
+            reads_previous_cards: reads_condition(deck, &[conditions::AFTER]),
+            reads_previous_winner: reads_condition(deck, &[conditions::REVENGE, conditions::CONFIDENCE]),
         }
     }
 
     /// Une recherche qui répartit son travail sur tous les cœurs.
     pub fn parallel(deck: &'a Deck) -> Self {
-        Search {
-            deck,
-            memo: Memo::new(),
-            parallel: true,
-            forget_last_round: !reads_last_round(deck),
-        }
+        Search { parallel: true, ..Self::new(deck) }
     }
 
     /// La même recherche, sans fusionner les états équivalents : chaque état distinct se résout, comme dans le solveur
     /// Python de référence. Elle sert à vérifier les équivalences.
     pub fn without_equivalences(self) -> Self {
-        Search { forget_last_round: false, ..self }
+        Search {
+            reads_previous_cards: true,
+            reads_previous_winner: true,
+            ..self
+        }
     }
 
     /// V(état) pour l'allié.
@@ -85,13 +87,7 @@ impl<'a> Search<'a> {
         if let Some(end) = terminal(state) {
             return end;
         }
-        let forgotten;
-        let state = if self.forget_last_round && state.last_round.is_some() {
-            forgotten = State { last_round: None, ..*state };
-            &forgotten
-        } else {
-            state
-        };
+        let state = &self.as_remembered(state);
         if let Some(known) = self.memo.get(state) {
             return known;
         }
@@ -103,6 +99,19 @@ impl<'a> Search<'a> {
         let value = if state.ally_first { best } else { 1.0 - best };
         self.memo.insert(*state, value);
         value
+    }
+
+    /// L'état tel que la mémo le range : du round précédent, seulement ce que le deck lit. `last_round` n'est lu que
+    /// par After (les cartes jouées), Revenge et Confidence (le vainqueur), et toute capacité du round vient d'une
+    /// capacité imprimée du deck : le reste ne change rien à la suite.
+    fn as_remembered(&self, state: &State) -> State {
+        let read = self.reads_previous_cards || self.reads_previous_winner;
+        let last_round = state.last_round.filter(|_| read).map(|last| LastRound {
+            ally_card: if self.reads_previous_cards { last.ally_card } else { 0 },
+            enemy_card: if self.reads_previous_cards { last.enemy_card } else { 0 },
+            ally_won: self.reads_previous_winner && last.ally_won,
+        });
+        State { last_round, ..*state }
     }
 
     /// Pour chaque carte de la main du premier joueur, la valeur pour lui de son jeu de mises ; None si jouée.
@@ -220,11 +229,10 @@ impl<'a> Search<'a> {
     }
 }
 
-/// Une capacité imprimée du deck lit-elle le round précédent ? Toutes celles du round en viennent : pouvoir, bonus,
-/// copie de l'adverse, capacité Team du Leader, bonus pris par un Oculus. `last_round` n'est lu que par ces trois
-/// conditions de début de round.
-fn reads_last_round(deck: &Deck) -> bool {
-    let readers = 1 << conditions::REVENGE | 1 << conditions::CONFIDENCE | 1 << conditions::AFTER;
+/// Une capacité imprimée du deck porte-t-elle l'une de ces conditions ? Toutes celles du round en viennent : pouvoir,
+/// bonus, copie de l'adverse, capacité Team du Leader, bonus pris par un Oculus.
+fn reads_condition(deck: &Deck, readers: &[u8]) -> bool {
+    let readers = readers.iter().fold(0, |mask, &condition| mask | 1 << condition);
     deck.ally
         .iter()
         .chain(&deck.enemy)

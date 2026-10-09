@@ -17,6 +17,7 @@ use serde_json::Value;
 use ur_engine::contract::{Deck, State};
 use ur_engine::game::terminal;
 use ur_engine::search::Search;
+use ur_engine::vocabulary::conditions;
 
 /// La récursion empile des résolutions de matrices, chacune à ~1e-12 près.
 const AGREEMENT: f64 = 1e-9;
@@ -127,13 +128,33 @@ fn roots() -> Vec<(Deck, State)> {
     roots
 }
 
-/// Fusionner les états équivalents ne change aucune valeur : sur les états de départ des autres tests et sur les
-/// débuts du round 2 du banc d'essai, la recherche donne, au bit près, les valeurs de cartes de la recherche sans
-/// équivalence, en résolvant au plus autant d'états, et moins pour certains.
+/// Fusionner les états équivalents ne change aucune valeur : sur les états de départ des autres tests, les débuts du
+/// round 2 du banc d'essai et les débuts du round 3 de `masse` dont le deck lit le round précédent (After, Revenge,
+/// Confidence : sans eux, oublier à tort les cartes jouées passerait inaperçu), la recherche donne, au bit près, les
+/// valeurs de cartes de la recherche sans équivalence, en résolvant au plus autant d'états, et moins pour certains.
 #[test]
 fn fusionner_les_etats_equivalents_ne_change_aucune_valeur() {
     let mut starts = roots();
     starts.extend(corpus::read_bench().into_iter().map(|game| (game.deck, game.states[1])));
+    let readers = 1 << conditions::AFTER | 1 << conditions::REVENGE | 1 << conditions::CONFIDENCE;
+    let reads_previous_round = |deck: &Deck| {
+        let printed = deck
+            .ally
+            .iter()
+            .chain(&deck.enemy)
+            .flat_map(|card| [card.ability, card.bonus]);
+        printed.flatten().any(|capacity| capacity.conditions & readers != 0)
+    };
+    let family = corpus::read_family("masse");
+    let mut seen = HashSet::new();
+    starts.extend(
+        family
+            .entries
+            .iter()
+            .filter(|entry| entry.state.nb_turn == 3 && terminal(&entry.state).is_none())
+            .map(|entry| (family.decks[entry.deck].deck, entry.state))
+            .filter(|(deck, state)| reads_previous_round(deck) && seen.insert((*deck, *state))),
+    );
     let mut merged = 0;
     for (deck, state) in &starts {
         let (with, without) = (Search::new(deck), Search::new(deck).without_equivalences());
