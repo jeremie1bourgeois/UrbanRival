@@ -11,6 +11,12 @@ const MODIFIER_SLOTS: [usize; 3] = [BONUS, ABILITY, LEADER];
 impl Round<'_> {
     /// Applique les modificateurs des stats `stats` : cible ally, puis both, puis enemy, plancher le plus haut d'abord.
     pub(super) fn apply_capacity_lvl_2(&mut self, stats: u32) {
+        // aucune capacité ne touche ces stats : chacune serait rendue telle quelle (la passe de l'attaque, à chaque case
+        // d'un bloc, le plus souvent ; README, « Optimisations en place »)
+        let carried = self.fighters.iter().flat_map(|fighter| fighter.slots).flatten();
+        if carried.fold(0, |types, capacity| types | capacity.types) & stats == 0 {
+            return;
+        }
         for target in [targets::ALLY, targets::BOTH, targets::ENEMY] {
             let (modifiers, count) = self.modifiers_highest_floor_first();
             for &(side, slot) in &modifiers[..count] {
