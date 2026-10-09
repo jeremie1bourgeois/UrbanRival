@@ -85,8 +85,7 @@ Hiérarchie de confiance : règle officielle (support ou glossaire) > combat ré
 Couverture du parseur : 1 386 / 1 395 descriptions (99,4 %, `scripts/capacity_coverage.py`). Tout ce qui a une
 définition connue est implémenté et testé (code : `capacity_parser.py`, `apply_capacity_lvl_*.py`, `tests/`) ; cette
 section liste seulement ce qui reste **volontairement** hors périmètre malgré une définition connue. Perfection
-(Glibon Cr) et la coquille de Bugamon n'y figurent pas : ce ne sont pas des exclusions mais des cas sans règle
-publiée (§ 3, R6).
+(Glibon Cr) n'y figure pas : ce n'est pas une exclusion mais un cas sans règle publiée (§ 3, R6).
 
 | Mécanique | Définition (texte de carte) | Raison de l'exclusion |
 |---|---|---|
@@ -97,6 +96,7 @@ publiée (§ 3, R6).
 | **Illusion** (Kate, Leader) | Kate prend l'apparence et la position d'une des 3 autres cartes du tirage, au hasard, jusqu'à la révélation des pillz | Décision utilisateur (2026-09-21) ; concerne l'IA (information cachée), pas le moteur à information parfaite |
 | **Overdose** (Hekate, Leader) | Fury inversée : sacrifier 2 dégâts (min. 0) pour 2 pillz en fin de round | Décision utilisateur (2026-09-21) |
 | **Remove Ability Conditions** (Memento) | Définition wiki non exploitable | Décision utilisateur (2026-09-21) |
+| **Malus sur ses propres stats** (Bugamon 2★) | « Growth: -1 Power And Damage, Min 4 » : la carte perd 1 × le numéro du round en puissance et en dégâts, min. 4 ; pas une coquille du scraping | Décision utilisateur (2026-10-09) : pouvoir unique dans le jeu |
 
 ## Registre des règles non tranchées
 
@@ -159,9 +159,7 @@ deux lectures resteront confondues quel que soit le nombre de duels.
 
 ### R6 — Perfection, seul pouvoir sans règle publiée
 
-**Perfection** (Glibon Cr) n'a de règle ni sur le site ni sur le wiki ; la carte qui le porte est injouable. S'y
-ajoute une coquille probable du scraping, `Growth: -1 Power And Damage, Min 4` (Bugamon) — pas une question de
-règle, mais de parsing.
+**Perfection** (Glibon Cr) n'a de règle ni sur le site ni sur le wiki ; la carte qui le porte est injouable.
 
-Les sept pouvoirs exclus par décision (Beyond, Hazard, Illusion, Bypass, Overdose, Remove Ability Conditions,
-Rebirth) sont documentés ci-dessus : ce ne sont pas des questions ouvertes.
+Les huit pouvoirs exclus par décision (Beyond, Hazard, Illusion, Bypass, Overdose, Remove Ability Conditions,
+Rebirth, le malus de Bugamon 2★) sont documentés ci-dessus : ce ne sont pas des questions ouvertes.

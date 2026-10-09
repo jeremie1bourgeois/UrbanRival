@@ -92,8 +92,9 @@ gagner, et quel test garantit qu'elle ne change pas les résultats. Le code port
 ## Écarts connus et points ouverts
 
 - Les pouvoirs exclus par décision ([docs/REGLES.md](../docs/REGLES.md), « Pouvoirs exclus » : Beyond, Rebirth,
-  Hazard, Bypass, Illusion, Overdose, Remove Ability Conditions) n'existent pas pour ce moteur : le parseur Python les
-  rejette, ils n'atteignent ni le vocabulaire, ni le corpus, ni le code Rust, et rien ne doit être prévu pour eux.
+  Hazard, Bypass, Illusion, Overdose, Remove Ability Conditions, le malus de Bugamon 2★) n'existent pas pour ce
+  moteur : le parseur Python les rejette, ils n'atteignent ni le vocabulaire, ni le corpus, ni le code Rust, et rien
+  ne doit être prévu pour eux.
 
 - La carte compilée Rust porte `character` (indice dans la main du premier exemplaire de la carte) au lieu du nom
   que porte le contrat Python : le moteur lit l'identité d'une carte (le bonus de clan compte les personnages
