@@ -14,10 +14,10 @@
 //! état résolu, vu de l'autre camp, vaut 1 − V.
 //!
 //! Les états équivalents ne se résolvent qu'une fois : du round précédent (`last_round`), la mémo ne garde que ce
-//! qu'une capacité du deck peut lire — les cartes jouées s'il y a un After, le vainqueur s'il y a un Revenge ou un
-//! Confidence. Deux états qui ne diffèrent que par l'ordre dans lequel les mêmes cartes ont été jouées n'en font
-//! alors souvent plus qu'un (README, « Optimisations en place » ; `tests/recherche.rs` le compare à la recherche sans
-//! équivalence, `Search::without_equivalences`).
+//! qu'une capacité pourra encore lire dans la suite de la partie — les cartes jouées pour un After, le vainqueur pour
+//! un Revenge ou un Confidence. Deux états qui ne diffèrent que par l'ordre dans lequel les mêmes cartes ont été
+//! jouées n'en font alors souvent plus qu'un (README, « Optimisations en place » ; `tests/recherche.rs` le compare à
+//! la recherche sans équivalence, `Search::without_equivalences`).
 
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -26,11 +26,11 @@ use std::sync::RwLock;
 
 use rayon::prelude::*;
 
-use crate::contract::{Deck, LastRound, State, HAND_SIZE};
+use crate::contract::{CompiledCapacity, Deck, LastRound, State, HAND_SIZE};
 use crate::game::{card_actions, legal_actions, terminal};
 use crate::nash::{Solver, TOLERANCE};
 use crate::round::play_block;
-use crate::vocabulary::conditions;
+use crate::vocabulary::{clans, conditions};
 
 /// Jusqu'à ce round compris, `Search::parallel` répartit les états suivants d'un état sur les cœurs ; au-delà, ils
 /// sont trop vite résolus pour que la répartition rapporte.
@@ -50,9 +50,8 @@ pub struct Search<'a> {
     deck: &'a Deck,
     memo: Memo,
     parallel: bool,
-    /// Ce que le deck lit du round précédent : les cartes jouées (After), le vainqueur (Revenge, Confidence).
-    reads_previous_cards: bool,
-    reads_previous_winner: bool,
+    /// Où le deck lit le round précédent ; None : la mémo garde tout (`without_equivalences`).
+    readers: Option<PreviousRoundReaders>,
 }
 
 impl<'a> Search<'a> {
@@ -62,8 +61,7 @@ impl<'a> Search<'a> {
             deck,
             memo: Memo::new(),
             parallel: false,
-            reads_previous_cards: reads_condition(deck, &[conditions::AFTER]),
-            reads_previous_winner: reads_condition(deck, &[conditions::REVENGE, conditions::CONFIDENCE]),
+            readers: Some(PreviousRoundReaders::of(deck)),
         }
     }
 
@@ -75,11 +73,7 @@ impl<'a> Search<'a> {
     /// La même recherche, sans fusionner les états équivalents : chaque état distinct se résout, comme dans le solveur
     /// Python de référence. Elle sert à vérifier les équivalences.
     pub fn without_equivalences(self) -> Self {
-        Search {
-            reads_previous_cards: true,
-            reads_previous_winner: true,
-            ..self
-        }
+        Search { readers: None, ..self }
     }
 
     /// V(état) pour l'allié.
@@ -101,15 +95,17 @@ impl<'a> Search<'a> {
         value
     }
 
-    /// L'état tel que la mémo le range : du round précédent, seulement ce que le deck lit. `last_round` n'est lu que
-    /// par After (les cartes jouées), Revenge et Confidence (le vainqueur), et toute capacité du round vient d'une
-    /// capacité imprimée du deck : le reste ne change rien à la suite.
+    /// L'état tel que la mémo le range : du round précédent, seulement ce qui pourra encore être lu. `last_round` n'est
+    /// lu que par After (les cartes jouées), Revenge et Confidence (le vainqueur) : le reste ne change rien à la suite.
     fn as_remembered(&self, state: &State) -> State {
-        let read = self.reads_previous_cards || self.reads_previous_winner;
-        let last_round = state.last_round.filter(|_| read).map(|last| LastRound {
-            ally_card: if self.reads_previous_cards { last.ally_card } else { 0 },
-            enemy_card: if self.reads_previous_cards { last.enemy_card } else { 0 },
-            ally_won: self.reads_previous_winner && last.ally_won,
+        let read = self
+            .readers
+            .as_ref()
+            .map_or(READS_CARDS | READS_WINNER, |readers| readers.ahead(state));
+        let last_round = state.last_round.filter(|_| read != 0).map(|last| LastRound {
+            ally_card: if read & READS_CARDS != 0 { last.ally_card } else { 0 },
+            enemy_card: if read & READS_CARDS != 0 { last.enemy_card } else { 0 },
+            ally_won: read & READS_WINNER != 0 && last.ally_won,
         });
         State { last_round, ..*state }
     }
@@ -229,16 +225,71 @@ impl<'a> Search<'a> {
     }
 }
 
-/// Une capacité imprimée du deck porte-t-elle l'une de ces conditions ? Toutes celles du round en viennent : pouvoir,
-/// bonus, copie de l'adverse, capacité Team du Leader, bonus pris par un Oculus.
-fn reads_condition(deck: &Deck, readers: &[u8]) -> bool {
-    let readers = readers.iter().fold(0, |mask, &condition| mask | 1 << condition);
-    deck.ally
-        .iter()
-        .chain(&deck.enemy)
-        .flat_map(|card| [card.ability, card.bonus])
-        .flatten()
-        .any(|capacity| capacity.conditions & readers != 0)
+/// Ce qu'une capacité lit du round précédent, en bits : les cartes jouées (After), le vainqueur (Revenge, Confidence).
+const READS_CARDS: u8 = 1;
+const READS_WINNER: u8 = 2;
+
+fn reads(capacity: Option<CompiledCapacity>) -> u8 {
+    let has = |condition: u8| capacity.is_some_and(|capacity| capacity.conditions & 1 << condition != 0);
+    let cards = if has(conditions::AFTER) { READS_CARDS } else { 0 };
+    let winner = if has(conditions::REVENGE) || has(conditions::CONFIDENCE) {
+        READS_WINNER
+    } else {
+        0
+    };
+    cards | winner
+}
+
+/// Où le deck lit le round précédent. Toute capacité d'un round vient d'une capacité imprimée : le pouvoir ou le bonus
+/// d'une carte jouée ce round, sa copie par l'adversaire, la capacité Team du Leader de la main, le bonus d'une carte
+/// de la main (jouée ou non) pris par un Oculus infiltré.
+struct PreviousRoundReaders {
+    cards: [[u8; HAND_SIZE]; 2], // pouvoir et bonus de chaque carte, par camp (allié, ennemi)
+    bonuses: [u8; 2],            // tous les bonus d'une main
+    oculus: [u8; 2],             // les Oculus de chaque main, en masque de cartes
+    team: u8,                    // les capacités Team, jouées à chaque round
+}
+
+impl PreviousRoundReaders {
+    fn of(deck: &Deck) -> Self {
+        let mut readers = PreviousRoundReaders {
+            cards: [[0; HAND_SIZE]; 2],
+            bonuses: [0; 2],
+            oculus: [0; 2],
+            team: 0,
+        };
+        for (side, hand) in [&deck.ally, &deck.enemy].into_iter().enumerate() {
+            for (index, card) in hand.iter().enumerate() {
+                readers.cards[side][index] = reads(card.ability) | reads(card.bonus);
+                readers.bonuses[side] |= reads(card.bonus);
+                if card.clan == clans::OCULUS {
+                    readers.oculus[side] |= 1 << index;
+                }
+                if card
+                    .ability
+                    .is_some_and(|ability| ability.conditions & 1 << conditions::TEAM != 0)
+                {
+                    readers.team |= reads(card.ability);
+                }
+            }
+        }
+        readers
+    }
+
+    /// Ce qui pourra encore être lu du round précédent depuis le début du round de `state` : par une carte non jouée
+    /// (ou sa copie), un bonus de la main d'un Oculus non joué, une capacité Team. C'est parfois trop, jamais trop peu.
+    fn ahead(&self, state: &State) -> u8 {
+        let mut read = self.team;
+        for (side, player) in [&state.ally, &state.enemy].into_iter().enumerate() {
+            for card in (0..HAND_SIZE).filter(|&card| !player.has_played(card)) {
+                read |= self.cards[side][card];
+            }
+            if self.oculus[side] & !player.played != 0 {
+                read |= self.bonuses[side];
+            }
+        }
+        read
+    }
 }
 
 /// La mémo, partagée entre les fils : des tables indépendantes, choisies par l'empreinte de l'état, chacune sous son
