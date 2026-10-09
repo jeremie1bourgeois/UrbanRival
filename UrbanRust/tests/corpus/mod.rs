@@ -125,14 +125,18 @@ fn hand(value: &Value) -> Parsed<([CompiledCard; HAND_SIZE], [String; HAND_SIZE]
         .iter()
         .map(card)
         .collect::<Parsed<Vec<_>>>()?;
-    Ok((
-        std::array::from_fn(|index| cards[index].0),
-        std::array::from_fn(|index| cards[index].1.clone()),
-    ))
+    let names: [String; HAND_SIZE] = std::array::from_fn(|index| cards[index].1.clone());
+    let compiled = std::array::from_fn(|index| CompiledCard {
+        character: names.iter().position(|name| *name == names[index]).unwrap() as u8,
+        ..cards[index].0
+    });
+    Ok((compiled, names))
 }
 
+/// La carte, avec `character` à 0 : il dépend de toute la main, `hand` le pose.
 fn card(fields: &Value) -> Parsed<(CompiledCard, String)> {
     let card = CompiledCard {
+        character: 0,
         stars: int(&fields["stars"])?,
         clan: int(&fields["clan"])?,
         power: int(&fields["power"])?,

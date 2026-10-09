@@ -28,9 +28,12 @@ pub struct CompiledCapacity {
     pub clans: u64,      // masque de bits sur CLANS de la condition versus / after / infiltrated
 }
 
-/// Carte compilée. Le nom n'y est pas : il sert à lire un corpus, jamais à jouer un round.
+/// Carte compilée. Le nom n'y est pas : le moteur n'en lit que l'identité, `character`.
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
 pub struct CompiledCard {
+    /// Indice dans la main du premier exemplaire de cette carte : deux exemplaires d'un même personnage partagent ce
+    /// numéro. Le bonus de clan compte les personnages distincts, et chaque Leader est son propre clan pour un Oculus.
+    pub character: u8,
     pub stars: u8,
     pub clan: u8, // indice dans CLANS
     pub power: i16,
@@ -104,6 +107,21 @@ impl PlayerState {
         }
         self.effects[kept] = effect;
         self.effect_count = kept as u8 + 1;
+    }
+
+    /// Retire l'effet de cette sorte s'il existe ; les suivants gardent leur ordre.
+    pub fn remove(&mut self, kind: u8) {
+        let mut kept = 0;
+        for index in 0..self.effect_count as usize {
+            if self.effects[index].kind != kind {
+                self.effects[kept] = self.effects[index];
+                kept += 1;
+            }
+        }
+        for index in kept..self.effect_count as usize {
+            self.effects[index] = Effect::EMPTY;
+        }
+        self.effect_count = kept as u8;
     }
 }
 
@@ -189,6 +207,21 @@ mod tests {
             hasher.finish()
         };
         assert_eq!(empreinte(&direct), empreinte(&apres_remplacement));
+    }
+
+    #[test]
+    fn retirer_un_effet_laisse_le_meme_etat_que_ne_jamais_l_avoir_pose() {
+        let mut direct = PlayerState::new(12, 12, 0);
+        direct.register(effect(3, 1));
+        direct.register(effect(7, 4));
+
+        let mut apres_retrait = PlayerState::new(12, 12, 0);
+        apres_retrait.register(effect(3, 1));
+        apres_retrait.register(effect(5, 2));
+        apres_retrait.register(effect(7, 4));
+        apres_retrait.remove(5);
+
+        assert_eq!(direct, apres_retrait);
     }
 
     #[test]

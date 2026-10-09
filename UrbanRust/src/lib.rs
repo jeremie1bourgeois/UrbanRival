@@ -12,4 +12,5 @@
 //! obligera à régénérer le corpus. Le format de l'état et du deck, lui, n'en dépend pas : c'est ce qui est écrit ici.
 
 pub mod contract;
+pub mod round;
 pub mod vocabulary;

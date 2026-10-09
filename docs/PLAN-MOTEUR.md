@@ -40,7 +40,7 @@ puis le solveur de matrices et la recherche exacte.
 | # | Étape | Fini quand | Statut |
 |---|---|---|---|
 | 1.1 | Lecteur du corpus en Rust : lire les familles générées par `scripts/build_engine_corpus.py` | les 8 familles sont lues et leurs empreintes égalent celles de `data/engine_digests.json` | ✅ |
-| 1.2 | Résolution d'un round, famille par famille (solo, interactions, planchers, persistants, leaders, oculus, combat, aleatoire) | chaque famille identique à 100 % ; au bout, tout le corpus (~113 500 rounds) | ⬜ |
+| 1.2 | Résolution d'un round, famille par famille (solo, interactions, planchers, persistants, leaders, oculus, combat, aleatoire) | chaque famille identique à 100 % ; au bout, tout le corpus (~113 500 rounds) | 🟨 |
 | 1.3 | Coups légaux et fin de partie | mêmes résultats que `reference.py` | ⬜ |
 | 1.4 | Bloc de mises : toutes les combinaisons de mises d'une paire de cartes, premier étage calculé une fois | chaque case égale au round simple | ⬜ |
 | 1.5 | Test « zéro allocation » sur un round et sur un bloc | le test passe | ⬜ |
