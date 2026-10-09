@@ -1,9 +1,10 @@
 """
 Mains de 4 cartes tirées au hasard dans les cartes officielles, structurées comme les vraies (le bonus de clan
 demande 2 cartes du clan) : mono-clan, 2 + 2, 3 + 1, ou quatre clans distincts pour la couverture ; parfois un
-Leader ; tous niveaux d'étoiles. Reproductible par le générateur aléatoire passé en paramètre.
-Seuls les niveaux dont l'ability et le bonus sont gérés par le parseur sont tirés : Card remplace un pouvoir non
-géré par « pas de pouvoir », et la carte jouerait sans lui sans que rien ne le signale.
+Leader ; tous niveaux d'étoiles ; de jour ou de nuit (les cartes prennent alors leurs textes « Night: »).
+Reproductible par le générateur aléatoire passé en paramètre.
+Seuls les niveaux dont l'ability et le bonus, de jour comme de nuit, sont gérés par le parseur sont tirés : Card
+remplace un pouvoir non géré par « pas de pouvoir », et la carte jouerait sans lui sans que rien ne le signale.
 """
 import random
 from functools import lru_cache
@@ -27,7 +28,8 @@ def _catalogue() -> Tuple[Dict[str, List[str]], Dict[str, List[int]]]:
     names_by_clan: Dict[str, List[str]] = {}
     levels_by_name: Dict[str, List[int]] = {}
     for name, card_data in _official_cards().items():
-        if not parse_capacity(card_data.get("bonus", "").strip()).supported:
+        card_texts = (card_data.get(field, "") for field in ("bonus", "night_bonus", "night_ability"))
+        if not all(parse_capacity(text.strip()).supported for text in card_texts):
             continue
         levels = [int(level) for level, star_data in card_data.items()
                   if level.isdigit() and parse_capacity(star_data.get("ability", "").strip()).supported]
@@ -43,7 +45,7 @@ def _pick(rng: random.Random, clan: str, count: int) -> List[Tuple[str, int]]:
     return [(name, rng.choice(levels_by_name[name])) for name in rng.sample(names_by_clan[clan], count)]
 
 
-def random_hand(rng: random.Random) -> List[Card]:
+def random_hand(rng: random.Random, night: bool = False) -> List[Card]:
     clans = [clan for clan in _catalogue()[0] if clan != LEADER]
     pattern = rng.choice(PATTERNS)
     hand = []
@@ -52,4 +54,4 @@ def random_hand(rng: random.Random) -> List[Card]:
     if rng.random() < LEADER_RATE:
         hand[-1] = _pick(rng, LEADER, 1)[0]
     rng.shuffle(hand)
-    return [Card(name, level) for name, level in hand]
+    return [Card(name, level, night=night) for name, level in hand]

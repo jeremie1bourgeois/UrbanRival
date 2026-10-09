@@ -11,6 +11,7 @@ from src.core.parsing.capacity_parser import parse_capacity
 def test_every_drawable_level_has_a_supported_ability_and_bonus():
     official = _official_cards()
     for name, levels in _catalogue()[1].items():
-        assert parse_capacity(official[name].get("bonus", "").strip()).supported, name
+        for field in ("bonus", "night_bonus", "night_ability"):   # de nuit, Card prend les textes « Night: »
+            assert parse_capacity(official[name].get(field, "").strip()).supported, (name, field)
         for level in levels:
             assert parse_capacity(official[name][str(level)].get("ability", "").strip()).supported, (name, level)
