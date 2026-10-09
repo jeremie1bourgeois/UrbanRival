@@ -7,8 +7,8 @@ sans tout redécouvrir. Ce qu'on compte faire : [docs/PLAN-MOTEUR.md](../docs/PL
 
 ## Où on en est
 
-*Mis à jour le 2026-10-09 — plan : phase 1 faite (étapes 1.1 à 1.11) ; phase 2 faite (2.1 à 2.4) ; phase 3 : 3.1
-faite ; prochaine : 3.2 (le programme de mesure).*
+*Mis à jour le 2026-10-09 — plan : phase 1 faite (étapes 1.1 à 1.11) ; phase 2 faite (2.1 à 2.4) ; phase 3 : 3.1 et
+3.2 faites, 3.3 en cours (le Mac M4 est mesuré, un serveur multicœur reste à mesurer) ; ensuite, la phase 4.*
 
 Fait :
 - le vocabulaire du contrat, transcrit de `UrbanPy/Backend_fastAPI/src/core/engine/contract.py` ; son empreinte est
@@ -113,7 +113,16 @@ Fait :
   chacune l'état de début des rounds 1, 2, 3 et 4 d'une même partie jouée au hasard. Les mesures d'une version à
   l'autre se font sur ce lot.
 
-Pas encore fait : le reste de la phase 3 (mesurer), et tout ce qui suit dans le plan.
+- la mesure (étape 3.2) : `examples/banc.rs` résout les états du banc et affiche, par round de départ, sur un fil et
+  sur tous les cœurs, les indicateurs du plan : temps par état (moyen, max), nœuds et branches par état et par
+  seconde, branches par seconde et par cœur, place de la mémo (`Search::memo_bytes`), et la somme des valeurs comme
+  empreinte. Les branches se comptent après coup sur les états résolus (coups légaux de l'allié × de l'ennemi) : rien
+  n'est ajouté au chemin chaud. `benches/moteur.rs` (criterion) chronomètre le round simple et le bloc sur toutes les
+  cases des états du banc (~226 000), et le solveur sur les matrices de `data/nash_expected.json`. Sur le Mac M4 :
+  début du round 2 en 53 ms par état sur un fil, 13 ms sur 10 fils ; partie entière en ~10 s par main ; bloc de
+  mises à 13,6 millions de cases/s sur un cœur (journal du plan).
+
+Pas encore fait : la mesure sur un serveur multicœur (3.3), la phase 4, et tout ce qui suit dans le plan.
 
 Ce code a été écrit avant le plan. Il en respecte les règles de conception, mais rien n'y est figé : la disposition
 de l'état peut changer si une mesure le justifie. Seuls les indices du vocabulaire sont intouchables, car ils sont
@@ -135,7 +144,7 @@ partagés avec Python.
 | `src/round/multipliers.rs` | multiplicateurs des capacités, champ `how` (`multipliers.py`) |
 | `src/round/level1.rs` … `level4.rs` | les quatre niveaux de capacités (`apply_capacity_lvl_1.py` … `_4.py`) |
 | `tests/vocabulaire.rs` | l'empreinte du vocabulaire égale celle de Python |
-| `tests/corpus/mod.rs` | lecteur du corpus, partagé par les tests ; hors de la crate, car seuls les tests lisent du JSON |
+| `tests/corpus/mod.rs` | lecteur du corpus et du banc d'essai, partagé par les tests, le banc et les benchmarks ; hors de la crate, car seuls eux lisent du JSON |
 | `tests/lecture_corpus.rs` | chaque famille, et `regles.jsonl`, relus puis réécrits redonnent l'empreinte de Python |
 | `tests/differentiel.rs` | chaque round du corpus, rejoué en Rust, redonne l'état suivant et l'issue de Python |
 | `tests/regles.rs` | coups légaux et fin de partie identiques à ceux de Python, sur `regles.jsonl` |
@@ -144,6 +153,8 @@ partagés avec Python.
 | `tests/nash.rs` | le solveur donne la valeur de SciPy, la plus forte probabilité de chaque coup et les coins de la force brute, sur les matrices de `data/nash_expected.json` |
 | `tests/resolutions.rs` | 10 000 résolutions depuis le round 3, sur des mains au hasard, sans alerte des contrôles ni plantage |
 | `tests/sans_allocation.rs` | aucune allocation pendant un round, un bloc, les coups légaux, la fin de partie, et pour un solveur déjà dimensionné (valeur et équilibres) |
+| `examples/banc.rs` | le banc d'essai : les indicateurs du plan, par round de départ, sur les états de `data/engine_bench.json` |
+| `benches/moteur.rs` | benchmarks criterion : round simple et bloc sur les cases du banc, solveur sur les matrices de `data/nash_expected.json` |
 
 ## Lancer les tests
 
@@ -155,6 +166,13 @@ Les tests lisent le corpus, qui n'est pas versionné : sur une copie neuve du d�
 disant ; de même, les états de départ de `tests/resolutions.rs` avec `scripts/build_search_states.py` (~75 s). Le profil de test compile la crate en -O1 et ses dépendances en -O3 (`Cargo.toml`) : relire tout le corpus
 passe ainsi de 35 s à 5 s. Le plus long est `tests/bloc.rs` (~18 s sur un i7-8750H, réparti sur les cœurs) : il
 rejoue ~35 millions de cases deux fois, en bloc et en round simple.
+
+## Mesurer
+
+`cargo run --release --example banc` : tous les indicateurs du plan sur le banc d'essai (~45 s sur un Mac M4, dont
+~40 s pour la partie entière) ; `-- 4 3 2` pour ne mesurer que ces rounds de départ. `cargo bench` : le round, le
+bloc et le solveur, par criterion (~1 min). Le banc et les benchmarks ne lisent que des fichiers versionnés : ils
+marchent sans le corpus. Les chiffres vont au journal du plan, avec la machine.
 
 ## Comment le code est vérifié
 
@@ -200,7 +218,8 @@ gagner, et quel test garantit qu'elle ne change pas les résultats. Le code port
 - La recherche est écrite simplement, en attendant le profil de la phase 3 : mémo en 64 `HashMap` sous verrou, au
   hachage standard (SipHash, calculé une fois pour choisir le morceau, une fois dans la table), une matrice et une
   liste d'états suivants allouées à chaque état résolu. Sur un fil, elle paraît ~20 % plus lente que la version sans
-  verrou de l'étape 1.10 : à confirmer sur le banc.
+  verrou de l'étape 1.10 : à confirmer sur le banc. Sur tous les cœurs, la partie entière passe beaucoup de temps
+  dans le système (64 s pour 248 s de calcul sur le Mac M4) : verrous ou allocations, à voir au profil (phase 4).
 - `rayon` est la seule dépendance du moteur, et seule la recherche s'en sert : le round n'en a aucune.
 
 - `Solver::corners` alloue (listes de coins de taille variable, bases visitées) : c'est le chemin des datasets, une

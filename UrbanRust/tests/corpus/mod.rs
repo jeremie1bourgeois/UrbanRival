@@ -48,6 +48,14 @@ pub struct RulesEntry {
     pub terminal: Option<f64>,
 }
 
+/// Une partie du banc d'essai (`data/engine_bench.json`) : son deck et l'état de début de chaque round, du premier au
+/// quatrième (`states[0]` : le round 1).
+pub struct BenchGame {
+    pub id: String,
+    pub deck: Deck,
+    pub states: Vec<State>,
+}
+
 type Parsed<T> = Result<T, String>;
 
 /// Lit les deux fichiers de la famille ; s'arrête au premier deck ou à la première ligne illisible, en le nommant.
@@ -81,6 +89,30 @@ pub fn read_rules() -> Vec<RulesEntry> {
         .lines()
         .enumerate()
         .map(|(index, line)| rules_entry(line).unwrap_or_else(|error| panic!("{path}, ligne {} : {error}", index + 1)))
+        .collect()
+}
+
+/// Le banc d'essai, versionné, écrit par `scripts/build_engine_bench.py`.
+pub fn read_bench() -> Vec<BenchGame> {
+    let path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../UrbanPy/Backend_fastAPI/data/engine_bench.json"
+    );
+    let bench: Value = serde_json::from_str(&read_file(path)).unwrap_or_else(|error| panic!("{path} : {error}"));
+    bench
+        .as_array()
+        .unwrap_or_else(|| panic!("{path} : liste de parties attendue"))
+        .iter()
+        .map(|game| BenchGame {
+            id: game["id"].as_str().expect("identifiant").to_string(),
+            deck: parse_deck(&game["deck"]).deck,
+            states: game["states"]
+                .as_array()
+                .expect("états")
+                .iter()
+                .map(parse_state)
+                .collect(),
+        })
         .collect()
 }
 

@@ -147,6 +147,12 @@ impl<'a> Search<'a> {
         self.memo.len()
     }
 
+    /// La place que les tables de la mémo réservent à leurs entrées, en octets, remplies ou non ; chaque table y ajoute
+    /// un peu (un octet de contrôle par case, des cases en réserve) : c'est un minimum.
+    pub fn memo_bytes(&self) -> usize {
+        self.memo.bytes()
+    }
+
     /// Les états non terminaux résolus, chacun avec sa valeur pour l'allié, dans un ordre quelconque.
     pub fn solved(&self) -> Vec<(State, f64)> {
         self.memo.entries()
@@ -197,6 +203,14 @@ impl Memo {
 
     fn len(&self) -> usize {
         self.shards.iter().map(|shard| shard.lock().unwrap().len()).sum()
+    }
+
+    fn bytes(&self) -> usize {
+        let entry = std::mem::size_of::<(State, f64)>();
+        self.shards
+            .iter()
+            .map(|shard| shard.lock().unwrap().capacity() * entry)
+            .sum()
     }
 
     fn entries(&self) -> Vec<(State, f64)> {
