@@ -3,12 +3,15 @@ Valeurs attendues du solveur de matrices du moteur Rust (UrbanRust/src/nash.rs ;
 des matrices de jeu à somme nulle tirées au hasard (graine fixe), aux tailles d'un bloc de mises et de la matrice du
 premier joueur, résolues par SciPy (linprog, HiGHS) comme dans docs/IA.md § 4.3. Chaque valeur est calculée deux fois,
 par le programme des lignes et par celui des colonnes, qui doivent s'accorder. Pour chaque coup de chaque joueur, la
-plus forte probabilité qu'il reçoive dans une stratégie optimale (étape 1.7) : un programme linéaire par coup.
+plus forte probabilité qu'il reçoive dans une stratégie optimale (étape 1.7) : un programme linéaire par coup. Sur
+les petites matrices, les coins de l'ensemble des stratégies optimales de chaque joueur (étape 1.8), par force brute.
 Écrit data/nash_expected.json (versionné, une matrice par ligne) ; à relancer seulement pour changer les matrices.
 Usage (depuis UrbanPy/Backend_fastAPI) :
     python scripts/build_nash_expected.py
 """
+import itertools
 import json
+import math
 import os
 import random
 import sys
@@ -23,6 +26,8 @@ from src.utils.config import BASE_DIR  # noqa: E402
 EXPECTED_PATH = os.path.join(BASE_DIR, "data", "nash_expected.json")
 SEED = 0
 AGREEMENT = 1e-9   # écart toléré entre la valeur des lignes et celle des colonnes
+FEASIBILITY = 1e-9  # écart toléré sur une contrainte, et entre deux coins pour les confondre
+BRUTE_FORCE_LIMIT = 5000   # au-delà de ce nombre de choix de contraintes saturées, pas de coins
 
 # (lignes, colonnes) : de la matrice 1 × 1 au bloc de mises 23 × 23 et à la matrice du premier joueur 23 × 92
 SHAPES = ((1, 1), (1, 5), (5, 1), (2, 2), (3, 3), (4, 4), (5, 7), (7, 5), (10, 10), (13, 23), (23, 23), (23, 46),
@@ -76,6 +81,30 @@ def best_probabilities(matrix: np.ndarray, value: float):
     return row_best, col_best
 
 
+def corners(upper: np.ndarray, bound: float):
+    """
+    Les coins (sommets) de {x >= 0, Σ x = 1, upper · x <= bound}, par force brute : un sommet est un point admissible où
+    n contraintes linéairement indépendantes sont saturées, Σ x = 1 comprise. Chaque choix de n - 1 inégalités (parmi
+    upper · x <= bound et -x <= 0) donne au plus un point ; on garde les points admissibles, sans doublon. None si les
+    choix sont trop nombreux.
+    """
+    size = upper.shape[1]
+    inequalities = np.vstack([upper, -np.eye(size)])
+    limits = np.concatenate([np.full(upper.shape[0], bound), np.zeros(size)])
+    if math.comb(len(inequalities), size - 1) > BRUTE_FORCE_LIMIT:
+        return None
+    found = []
+    for active in itertools.combinations(range(len(inequalities)), size - 1):
+        system = np.vstack([inequalities[list(active)], np.ones(size)])
+        if abs(np.linalg.det(system)) < 1e-12:
+            continue
+        point = np.linalg.solve(system, np.append(limits[list(active)], 1))
+        admissible = np.all(inequalities @ point <= limits + FEASIBILITY)
+        if admissible and not any(np.max(np.abs(point - other)) <= FEASIBILITY for other in found):
+            found.append(point)
+    return sorted(np.clip(point, 0, None).tolist() for point in found)
+
+
 def matrices(rng: random.Random):
     for rows, cols in SHAPES:
         for kind, draw in VALUES.items():
@@ -90,6 +119,9 @@ def main() -> None:
         matrix = np.array(entry["values"]).reshape(entry["rows"], entry["cols"])
         entry["value"] = game_value(matrix)
         entry["row_best"], entry["col_best"] = best_probabilities(matrix, entry["value"])
+        row_corners, col_corners = corners(-matrix.T, -entry["value"]), corners(matrix, entry["value"])
+        if row_corners is not None and col_corners is not None:
+            entry["row_corners"], entry["col_corners"] = row_corners, col_corners
         entries.append(entry)
     with open(EXPECTED_PATH, "w", encoding="utf-8", newline="\n") as file:
         file.write("[\n" + ",\n".join(json.dumps(entry) for entry in entries) + "\n]\n")
