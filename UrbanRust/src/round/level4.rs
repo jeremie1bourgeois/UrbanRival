@@ -62,6 +62,11 @@ const fn is_immediate(kind: u8) -> bool {
 
 impl Round<'_> {
     pub(super) fn apply_capacity_lvl_4(&mut self) {
+        // ni capacité sur les deux cartes, ni effet actif sur les joueurs : rien n'agit ni ne se pose (README,
+        // « Optimisations en place »)
+        if self.carried_capacities().next().is_none() && self.players.iter().all(|player| player.effects().is_empty()) {
+            return;
+        }
         self.drop_effects_replaced_before_acting();
         for side in SIDES {
             let opp = ENEMY - side;

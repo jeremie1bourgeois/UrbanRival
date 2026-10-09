@@ -14,6 +14,11 @@ impl Round<'_> {
     /// adverse (combats réels 1734030, 1734587). Entre deux pertes, le plancher le plus haut d'abord, comme au niveau
     /// 2, quelle que soit la carte qui le porte (décision utilisateur, 2026-10-09).
     pub(super) fn apply_capacity_lvl_3(&mut self) {
+        // plus aucune capacité sur les deux cartes, le cas d'une case sur deux : rien à appliquer (README, « Optimisations
+        // en place »)
+        if self.carried_capacities().next().is_none() {
+            return;
+        }
         for losses in [false, true] {
             // les emplacements de la passe, dans l'ordre des camps : (camp, emplacement, plancher)
             let mut pending = [(0, 0, 0); SIDES.len() * SLOTS.len()];
