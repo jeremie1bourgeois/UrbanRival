@@ -16,8 +16,10 @@ impl Round<'_> {
         if !self.carried_capacities().any(|capacity| capacity.types & stats != 0) {
             return;
         }
+        // trié une fois pour les trois cibles : une passe ne change aucun plancher, et une capacité qu'elle consomme est
+        // sautée par les suivantes, à sa place dans le même ordre
+        let (modifiers, count) = self.modifiers_highest_floor_first();
         for target in [targets::ALLY, targets::BOTH, targets::ENEMY] {
-            let (modifiers, count) = self.modifiers_highest_floor_first();
             for &(side, slot) in &modifiers[..count] {
                 if let Some(capacity) = self.fighters[side].slots[slot] {
                     self.fighters[side].slots[slot] = self.apply_targeted(target, side, capacity, stats);
