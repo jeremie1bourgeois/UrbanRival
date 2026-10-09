@@ -17,7 +17,7 @@ use std::cell::RefCell;
 use std::collections::hash_map::DefaultHasher;
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
-use std::sync::Mutex;
+use std::sync::RwLock;
 
 use rayon::prelude::*;
 
@@ -176,40 +176,42 @@ impl<'a> Search<'a> {
 
 /// La mémo, partagée entre les fils : des tables indépendantes, choisies par l'empreinte de l'état, chacune sous son
 /// verrou. Deux fils qui résolvent le même état en même temps trouvent la même valeur : seul le travail est doublé.
+/// Un verrou lecteurs-rédacteur : les consultations, presque toutes réussies (99 % pour les états du round 4 d'une
+/// partie entière), passent ensemble ; seule l'écriture d'un état résolu attend (README, « Optimisations en place »).
 struct Memo {
-    shards: Vec<Mutex<HashMap<State, f64>>>,
+    shards: Vec<RwLock<HashMap<State, f64>>>,
 }
 
 impl Memo {
     fn new() -> Self {
         Memo {
-            shards: (0..MEMO_SHARDS).map(|_| Mutex::new(HashMap::new())).collect(),
+            shards: (0..MEMO_SHARDS).map(|_| RwLock::new(HashMap::new())).collect(),
         }
     }
 
-    fn shard(&self, state: &State) -> &Mutex<HashMap<State, f64>> {
+    fn shard(&self, state: &State) -> &RwLock<HashMap<State, f64>> {
         let mut hasher = DefaultHasher::new();
         state.hash(&mut hasher);
         &self.shards[hasher.finish() as usize % MEMO_SHARDS]
     }
 
     fn get(&self, state: &State) -> Option<f64> {
-        self.shard(state).lock().unwrap().get(state).copied()
+        self.shard(state).read().unwrap().get(state).copied()
     }
 
     fn insert(&self, state: State, value: f64) {
-        self.shard(&state).lock().unwrap().insert(state, value);
+        self.shard(&state).write().unwrap().insert(state, value);
     }
 
     fn len(&self) -> usize {
-        self.shards.iter().map(|shard| shard.lock().unwrap().len()).sum()
+        self.shards.iter().map(|shard| shard.read().unwrap().len()).sum()
     }
 
     fn bytes(&self) -> usize {
         let entry = std::mem::size_of::<(State, f64)>();
         self.shards
             .iter()
-            .map(|shard| shard.lock().unwrap().capacity() * entry)
+            .map(|shard| shard.read().unwrap().capacity() * entry)
             .sum()
     }
 
@@ -218,7 +220,7 @@ impl Memo {
             .iter()
             .flat_map(|shard| {
                 shard
-                    .lock()
+                    .read()
                     .unwrap()
                     .iter()
                     .map(|(&state, &value)| (state, value))
