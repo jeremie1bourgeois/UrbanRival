@@ -8,7 +8,8 @@ sans tout redécouvrir. Ce qu'on compte faire : [docs/PLAN-MOTEUR.md](../docs/PL
 ## Où on en est
 
 *Mis à jour le 2026-10-09 — plan : phase 1 faite (étapes 1.1 à 1.11) ; phase 2 faite (2.1 à 2.4) ; phase 3 : 3.1 et
-3.2 faites, 3.3 en cours (le Mac M4 est mesuré, un serveur multicœur reste à mesurer) ; ensuite, la phase 4.*
+3.2 faites, 3.3 en cours (le Mac M4 est mesuré, un serveur multicœur reste à mesurer) ; phase 4 : 4.1 faite (le
+profil), 4.2 en cours (première optimisation : le hachage de l'état).*
 
 Fait :
 - le vocabulaire du contrat, transcrit de `UrbanPy/Backend_fastAPI/src/core/engine/contract.py` ; son empreinte est
@@ -212,14 +213,15 @@ gagner, et quel test garantit qu'elle ne change pas les résultats. Le code port
 | État de taille fixe, copiable, sans tas ; cases d'effets vides normalisées | `src/contract.rs` | l'IA copie, hache et compare des états par millions ; deux chemins vers le même état doivent se hacher pareil | pas encore mesuré | tests de `contract.rs` |
 | Capacités réduites à des indices et des masques de bits | `src/contract.rs`, `src/vocabulary.rs` | aucun texte manipulé pendant un round | pas encore mesuré | `tests/vocabulaire.rs` |
 | Bloc de mises : le premier étage du round (clans, Leader, conditions, copies, niveau 1, puissance et dégâts) calculé une fois par tranche de mises, puis copié pour chaque case ; une tranche = les mises de même signature pour les conditions Bet du deck | `src/round/block.rs`, coupure `first_stage` / `second_stage` dans `src/round/mod.rs` | le premier étage pèse ~60 % d'un round et ne lit la mise que par les conditions Bet (les multiplicateurs « Par Pillz » lisent le stock d'avant la mise) | x2,3 par case (release, i7-8750H : 448 → 198 ns sur tout le corpus) | `tests/bloc.rs` ; une signature qui ignore les Bet y fait diverger 1 419 blocs |
+| Hachage de l'état regroupé : quelques mots de 64 bits, effets actifs seulement, au lieu d'une écriture par champ | `src/contract.rs` (`impl Hash for State`) | le `Hash` dérivé écrivait ~64 champs un à un : ~139 ns par état avec SipHash, deux fois par consultation de la mémo, plus qu'une case de bloc (73 ns) ; premier poste du profil avec les verrous de la mémo, qui hachent sous le verrou | 139 → 12 ns par état ; banc, A/B en alternance (meilleur de 3, Mac M4 chargé) : round 2 x1,56 sur un fil et x1,74 sur 10 fils, round 3 x1,13, partie entière x1,43 | `deux_etats_qui_different_d_un_seul_champ_se_hachent_differemment` (`contract.rs`) ; mêmes valeurs : `tests/recherche.rs`, empreinte du banc |
 
 ## Écarts connus et points ouverts
 
-- La recherche est écrite simplement, en attendant le profil de la phase 3 : mémo en 64 `HashMap` sous verrou, au
-  hachage standard (SipHash, calculé une fois pour choisir le morceau, une fois dans la table), une matrice et une
-  liste d'états suivants allouées à chaque état résolu. Sur un fil, elle paraît ~20 % plus lente que la version sans
-  verrou de l'étape 1.10 : à confirmer sur le banc. Sur tous les cœurs, la partie entière passe beaucoup de temps
-  dans le système (64 s pour 248 s de calcul sur le Mac M4) : verrous ou allocations, à voir au profil (phase 4).
+- La recherche est encore écrite simplement : mémo en 64 `HashMap` sous verrou, au hachage standard (SipHash, sur
+  le hachage regroupé de l'état, calculé une fois pour choisir le morceau, une fois dans la table), une matrice et une
+  liste d'états suivants allouées à chaque état résolu. Le premier profil (étape 4.1, journal du plan) y place les
+  deux plus gros postes : l'attente des verrous de la mémo (~45 % du temps actif de la partie entière sur 10 fils,
+  d'où le temps système) et le hachage de l'état (25 à 31 %, avant son regroupement) ; le round vient ensuite.
 - `rayon` est la seule dépendance du moteur, et seule la recherche s'en sert : le round n'en a aucune.
 
 - `Solver::corners` alloue (listes de coins de taille variable, bases visitées) : c'est le chemin des datasets, une

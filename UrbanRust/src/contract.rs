@@ -9,6 +9,8 @@
 //!   - un joueur porte au plus 8 effets persistants, un par sorte : `register_persistent_effect` remplace l'effet
 //!     de même sorte au lieu de l'empiler.
 
+use std::hash::{Hash, Hasher};
+
 use crate::vocabulary::EFFECT_KINDS;
 
 pub const HAND_SIZE: usize = 4;
@@ -79,7 +81,7 @@ impl Effect {
     const EMPTY: Effect = Effect { kind: u8::MAX, value: 0, borne: 0 };
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub struct PlayerState {
     pub life: i16,
     pub pillz: i16,
@@ -149,7 +151,7 @@ pub struct LastRound {
     pub ally_won: bool,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub struct State {
     pub nb_turn: u8,
     pub ally_first: bool, // l'allié joue en premier ce round
@@ -172,6 +174,36 @@ impl State {
                 enemy_card: last.ally_card,
                 ally_won: !last.ally_won,
             }),
+        }
+    }
+}
+
+/// Le hachage d'un état, la clé de la mémo de la recherche : quelques mots de 64 bits, chacun regroupant des champs,
+/// et seulement les effets actifs, au lieu d'une écriture par champ (~64 pour le `Hash` dérivé, 11 fois plus lent ;
+/// README, « Optimisations en place »). Deux états égaux ont les mêmes champs et les mêmes effets actifs : ils se
+/// hachent pareil.
+impl Hash for State {
+    fn hash<H: Hasher>(&self, hasher: &mut H) {
+        let last_round = self.last_round.map_or(0, |last| {
+            1 | (last.ally_card as u64) << 8 | (last.enemy_card as u64) << 16 | (last.ally_won as u64) << 24
+        });
+        hasher.write_u64(self.nb_turn as u64 | (self.ally_first as u64) << 8 | last_round << 16);
+        self.ally.hash(hasher);
+        self.enemy.hash(hasher);
+    }
+}
+
+impl Hash for PlayerState {
+    fn hash<H: Hasher>(&self, hasher: &mut H) {
+        hasher.write_u64(
+            self.life as u16 as u64
+                | (self.pillz as u16 as u64) << 16
+                | (self.played as u64) << 32
+                | (self.effect_count as u64) << 40,
+        );
+        for effect in self.effects() {
+            hasher
+                .write_u64(effect.kind as u64 | (effect.value as u16 as u64) << 8 | (effect.borne as u16 as u64) << 24);
         }
     }
 }
@@ -217,8 +249,9 @@ mod tests {
         assert_eq!(player.effects(), &[effect(1, 3), effect(0, 5)]);
     }
 
-    /// La mémoïsation de l'IA hache l'état entier, cases d'effets libres comprises : deux joueurs arrivés au même
-    /// jeu d'effets par des chemins différents doivent se hacher pareil, sans quoi la table double les entrées.
+    /// La mémoïsation de l'IA compare l'état entier, cases d'effets libres comprises : deux joueurs arrivés au même
+    /// jeu d'effets par des chemins différents doivent être égaux et se hacher pareil, sans quoi la table double les
+    /// entrées.
     #[test]
     fn deux_chemins_vers_les_memes_effets_donnent_le_meme_etat() {
         use std::collections::hash_map::DefaultHasher;
@@ -241,6 +274,51 @@ mod tests {
             hasher.finish()
         };
         assert_eq!(empreinte(&direct), empreinte(&apres_remplacement));
+    }
+
+    /// Le hachage regroupe les champs en mots : chaque champ doit y compter, sans quoi des états différents se
+    /// hacheraient pareil et la mémo ralentirait, sans erreur visible.
+    #[test]
+    fn deux_etats_qui_different_d_un_seul_champ_se_hachent_differemment() {
+        use std::collections::hash_map::DefaultHasher;
+
+        let empreinte = |state: &State| {
+            let mut hasher = DefaultHasher::new();
+            state.hash(&mut hasher);
+            hasher.finish()
+        };
+        let mut ally = PlayerState::new(10, 3, 0b0001);
+        ally.register(Effect { kind: 2, value: 4, borne: 6 });
+        let enemy = PlayerState::new(7, 5, 0b0100);
+        let last_round = Some(LastRound { ally_card: 0, enemy_card: 2, ally_won: true });
+        let state = State { nb_turn: 2, ally_first: true, ally, enemy, last_round };
+
+        let mut variants: Vec<State> = vec![state];
+        let mut vary = |change: &dyn Fn(&mut State)| {
+            let mut variant = state;
+            change(&mut variant);
+            variants.push(variant);
+        };
+        vary(&|state| state.nb_turn = 3);
+        vary(&|state| state.ally_first = false);
+        vary(&|state| state.last_round = None);
+        vary(&|state| state.last_round = Some(LastRound { ally_card: 1, enemy_card: 2, ally_won: true }));
+        vary(&|state| state.last_round = Some(LastRound { ally_card: 0, enemy_card: 3, ally_won: true }));
+        vary(&|state| state.last_round = Some(LastRound { ally_card: 0, enemy_card: 2, ally_won: false }));
+        vary(&|state| state.ally.life = 9);
+        vary(&|state| state.ally.pillz = -3);
+        vary(&|state| state.ally.set_played(3));
+        vary(&|state| state.ally.register(Effect { kind: 3, value: 4, borne: 6 }));
+        vary(&|state| state.ally.register(Effect { kind: 2, value: -4, borne: 6 }));
+        vary(&|state| state.ally.register(Effect { kind: 2, value: 4, borne: -1 }));
+        vary(&|state| state.ally.remove(2));
+        vary(&|state| state.enemy.life = 8);
+        vary(&|state| std::mem::swap(&mut state.ally, &mut state.enemy));
+
+        let mut hashes: Vec<u64> = variants.iter().map(empreinte).collect();
+        hashes.sort_unstable();
+        hashes.dedup();
+        assert_eq!(hashes.len(), variants.len());
     }
 
     #[test]
