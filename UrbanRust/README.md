@@ -17,8 +17,11 @@ Fait :
 - le lecteur du corpus (étape 1.1) : les 8 familles (113 510 entrées, 29 365 decks) se relisent dans les types de
   `contract.rs` sans rien perdre. La preuve : réécrites depuis ces types en JSON canonique, elles redonnent
   exactement les empreintes de Python (un lecteur qui perd les effets persistants fait échouer 7 familles sur 8) ;
-- la résolution d'un round (étape 1.2), `round::play` : les 8 familles du corpus sont identiques à 100 % au moteur
-  Python, état suivant et issue du combat (113 510 rounds). C'est la version simple, transcrite fonction par fonction
+- la résolution d'un round (étape 1.2), `round::play` : les 9 familles du corpus sont identiques à 100 % au moteur
+  Python, état suivant et issue du combat (113 949 rounds), dont `reels` : les 439 rounds de 115 combats réels
+  capturés du client officiel (`data/ur_battles`, rejoués avec les choix réellement faits ; les 4 autres combats
+  portent un pouvoir exclu). Le Python reproduisant ces combats (`tests/test_ur_battles.py`), le Rust les reproduit
+  aussi. C'est la version simple, transcrite fonction par fonction
   de `process_round.py` et des quatre niveaux de capacités : la référence lisible contre laquelle se vérifieront les
   versions rapides. Mesure informelle en release : ~2,8 millions de rounds/s sur un cœur (i7-8750H) ;
 - les coups légaux et la fin de partie (étape 1.3), `game::legal_actions` et `game::terminal` : identiques à
