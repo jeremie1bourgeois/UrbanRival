@@ -137,6 +137,15 @@ impl Round<'_> {
     }
 
     fn process_round(&mut self) {
+        self.first_stage();
+        self.second_stage();
+    }
+
+    /// Ce qui ne dépend que des deux cartes jouées : clans, Leader, conditions de début de round, copies, niveau 1,
+    /// puissance et dégâts. La mise n'y est lue que par les conditions « Bet » ; les multiplicateurs « Par Pillz
+    /// restante / perdue » lisent le stock d'avant la mise, la même pour toutes. Le bloc de mises le calcule donc une
+    /// fois par tranche de mises, pas une fois par case.
+    fn first_stage(&mut self) {
         for side in SIDES {
             self.apply_infiltrated_bonus(side);
         }
@@ -159,7 +168,10 @@ impl Round<'_> {
 
         self.apply_capacity_lvl_1();
         self.apply_capacity_lvl_2(POWER | DAMAGE);
+    }
 
+    /// Ce qui dépend des mises : fury, attaque, Tune Out, Killshot, Perfect, combat, fin de round.
+    fn second_stage(&mut self) {
         for fighter in &mut self.fighters {
             if fighter.fury {
                 fighter.damage += FURY_DAMAGE;
