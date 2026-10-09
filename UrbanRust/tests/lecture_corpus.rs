@@ -6,6 +6,7 @@
 //! champ a survécu à la lecture : un entier tronqué, un effet perdu, un booléen inversé changent l'empreinte. Même
 //! épreuve pour `regles.jsonl`, les coups légaux et la fin de partie.
 
+#[allow(dead_code)] // chaque test ne lit qu'une partie de ce que le lecteur donne
 mod corpus;
 
 use corpus::{CorpusDeck, Entry, RulesEntry};

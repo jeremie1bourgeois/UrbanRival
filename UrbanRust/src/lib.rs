@@ -6,7 +6,8 @@
 //! vérifient sur le corpus produit par `scripts/build_engine_corpus.py`, dont `data/engine_digests.json` garde
 //! l'empreinte. `round::play_block` joue toutes les mises d'une paire de cartes, chaque case égale à `round::play`
 //! (`tests/bloc.rs`). `nash::Solver` résout les matrices de la recherche et en donne les équilibres et leurs coins,
-//! vérifié contre SciPy (`tests/nash.rs`).
+//! vérifié contre SciPy (`tests/nash.rs`). `search::Search` donne la valeur exacte d'un état, vérifiée contre le solveur
+//! Python de référence (`tests/recherche.rs`).
 //! Le cap : `docs/MOTEUR-RUST.md` ; l'état du travail : `UrbanRust/README.md`.
 //!
 //! Les règles encore ouvertes (`docs/REGLES.md`, registre) peuvent changer le moteur Python : on régénère alors le
@@ -16,4 +17,5 @@ pub mod contract;
 pub mod game;
 pub mod nash;
 pub mod round;
+pub mod search;
 pub mod vocabulary;

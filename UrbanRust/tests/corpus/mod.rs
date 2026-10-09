@@ -84,6 +84,16 @@ pub fn read_rules() -> Vec<RulesEntry> {
         .collect()
 }
 
+/// Un deck écrit comme dans `<famille>.decks.json` (`dataclasses.asdict`), lu hors du corpus.
+pub fn parse_deck(fields: &Value) -> CorpusDeck {
+    deck(fields).unwrap_or_else(|error| panic!("deck illisible : {error}"))
+}
+
+/// Un état écrit comme dans le corpus (`dataclasses.asdict`), lu hors du corpus.
+pub fn parse_state(fields: &Value) -> State {
+    state(fields).unwrap_or_else(|error| panic!("état illisible : {error}"))
+}
+
 fn read_file(path: &str) -> String {
     std::fs::read_to_string(path).unwrap_or_else(|error| {
         panic!("{path} : {error} — le corpus se génère avec scripts/build_engine_corpus.py (depuis UrbanPy/Backend_fastAPI)")
