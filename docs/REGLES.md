@@ -125,8 +125,8 @@ L'ordre ne dépend **ni du camp ni du premier joueur** : c'est tranché à tous 
 - **Niveau 4** — combats réels 1413898 et 1735837 r3 : le Heal agit avant le Poison, le porteur du soin jouant en
   premier puis en second.
 
-Le moteur applique donc « les gains avant les pertes » aux niveaux 3 et 4, et `KNOWN_ASYMMETRIES` est passé de 5 à
-**2** scénarios (l'ordre d'enregistrement des effets persistants). Reste une lecture concurrente au **niveau 3** :
+Le moteur applique donc « les gains avant les pertes » aux niveaux 3 et 4, et `KNOWN_ASYMMETRIES` ne garde que
+des scénarios dus à l'ordre d'enregistrement des effets persistants. Reste une lecture concurrente au **niveau 3** :
 dans les trois combats, le gain venait de la carte **perdante** (« Defeat: »), donc « la carte perdante d'abord »
 donne les mêmes nombres.
 
