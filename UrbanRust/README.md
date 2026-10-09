@@ -7,8 +7,8 @@ sans tout redécouvrir. Ce qu'on compte faire : [docs/PLAN-MOTEUR.md](../docs/PL
 
 ## Où on en est
 
-*Mis à jour le 2026-10-09 — plan : phase 1, étapes 1.1 à 1.7 faites ; prochaine : 1.8 (tous les équilibres
-« coins »).*
+*Mis à jour le 2026-10-09 — plan : phase 1, étapes 1.1 à 1.8 faites ; prochaine : 1.9 (solveur Python de
+référence).*
 
 Fait :
 - le vocabulaire du contrat, transcrit de `UrbanPy/Backend_fastAPI/src/core/engine/contract.py` ; son empreinte est
@@ -33,7 +33,8 @@ Fait :
   courant ; il vérifie d'abord que le compteur voit une allocation, pour ne pas passer à vide ;
 - le solveur de matrices (étape 1.6), `nash::Solver` : la valeur et un équilibre d'un jeu à somme nulle (lignes =
   le joueur qui maximise). Un point-selle d'abord, en O(n·m) ; sinon le simplexe sur le jeu décalé (valeurs ≥ 1), qui
-  donne les deux stratégies d'un seul tableau, avec la règle de Bland pour ne jamais cycler. Chaque solution est
+  donne les deux stratégies d'un seul tableau : entre la première variable de coût réduit négatif, les égalités du
+  rapport se départagent lexicographiquement (ni cycle, ni base dégénérée du problème perturbé). Chaque solution est
   vérifiée : écart à l'équilibre ≤ 1e-9 et valeur entre ce que garantissent les deux stratégies, sinon le solveur
   s'arrête net. Mêmes valeurs que SciPy sur 102 matrices aléatoires (plus grand écart 1,7e-15) ; l'exemple d'IA.md
   § 4.4 est un test. Tampons réutilisés : un solveur dimensionné n'alloue plus rien ;
@@ -44,9 +45,17 @@ Fait :
   elle que les datasets garderont. On repart du tableau optimal, les variables de coût réduit strictement positif
   interdites (elles sont nulles dans toute stratégie optimale), pour maximiser la variable du coup ; les lignes
   passent par le même calcul sur −Mᵀ. Chaque stratégie rendue est vérifiée ; la plus forte probabilité de chacun des
-  1 974 coups des matrices de SciPy est celle que donne SciPy (plus grand écart 5,5e-12).
+  1 974 coups des matrices de SciPy est celle que donne SciPy (plus grand écart 5,5e-12) ;
+- tous les coins (étape 1.8), `Solver::corners` : les sommets de l'ensemble des stratégies optimales de chaque joueur
+  (toute stratégie optimale en est un mélange), au plus 256 par joueur, la troncature signalée. On visite, de proche
+  en proche depuis la base trouvée, les bases de la face optimale ; grâce au départage lexicographique, ce sont les
+  sommets d'un polytope perturbé non dégénéré, dont le graphe est connexe et dont chaque coin réel est l'image.
+  Chaque base est recalculée depuis le tableau initial, chaque coin vérifié. Mêmes coins que la force brute de SciPy
+  sur 72 matrices (144 listes) ; sur les 102, le maximum de chaque coordonnée sur les coins redonne la plus forte
+  probabilité du coup. Sur les matrices réelles du round 4 : toutes à point-selle, et pourtant jusqu'à 19 coins par
+  joueur (`aleatoire`), aucune liste tronquée.
 
-Pas encore fait : tous les équilibres « coins » (1.8), et tout ce qui suit dans le plan.
+Pas encore fait : le solveur Python de référence (1.9), et tout ce qui suit dans le plan.
 
 Ce code a été écrit avant le plan. Il en respecte les règles de conception, mais rien n'y est figé : la disposition
 de l'état peut changer si une mesure le justifie. Seuls les indices du vocabulaire sont intouchables, car ils sont
@@ -60,7 +69,7 @@ partagés avec Python.
 | `src/vocabulary.rs` | vocabulaire figé : les indices partagés avec Python |
 | `src/contract.rs` | état compact : deck, état, coup, résultat |
 | `src/game.rs` | coups légaux et fin de partie (`reference.py`) |
-| `src/nash.rs` | solveur de jeux matriciels à somme nulle : point-selle, sinon simplexe ; chaque solution vérifiée ; pour chaque coup, l'équilibre qui le joue le plus |
+| `src/nash.rs` | solveur de jeux matriciels à somme nulle : point-selle, sinon simplexe ; chaque solution vérifiée ; pour chaque coup, l'équilibre qui le joue le plus ; tous les coins des équilibres |
 | `src/round/mod.rs` | un round (`process_round.py`) : mises, conditions de début de round, Leader, combat, ordre des niveaux ; en deux étages, avant et après les mises |
 | `src/round/block.rs` | le bloc de mises : toutes les combinaisons de mises d'une paire de cartes, premier étage partagé |
 | `src/round/clan.rs` | clan d'une carte en main, bonus de clan, Oculus infiltré (`clan.py`) |
@@ -72,7 +81,7 @@ partagés avec Python.
 | `tests/differentiel.rs` | chaque round du corpus, rejoué en Rust, redonne l'état suivant et l'issue de Python |
 | `tests/regles.rs` | coups légaux et fin de partie identiques à ceux de Python, sur `regles.jsonl` |
 | `tests/bloc.rs` | chaque case de chaque bloc du corpus égale le round simple, dans l'ordre des coups légaux |
-| `tests/nash.rs` | le solveur donne la valeur de SciPy, et la plus forte probabilité de chaque coup, sur les matrices de `data/nash_expected.json` |
+| `tests/nash.rs` | le solveur donne la valeur de SciPy, la plus forte probabilité de chaque coup et les coins de la force brute, sur les matrices de `data/nash_expected.json` |
 | `tests/sans_allocation.rs` | aucune allocation pendant un round, un bloc, les coups légaux, la fin de partie, et pour un solveur déjà dimensionné (valeur et équilibres) |
 
 ## Lancer les tests
@@ -93,7 +102,7 @@ rejoue ~29 millions de cases deux fois, en bloc et en round simple.
   fin de partie. Il n'est pas versionné, ses empreintes le sont (`data/engine_digests.json`).
 - **SciPy est la référence du solveur** : `scripts/build_nash_expected.py` (SciPy, dans `requirements-dev.txt`) écrit
   `data/nash_expected.json`, versionné ; une matrice peut avoir plusieurs équilibres, les tests comparent des nombres
-  uniques : la valeur, et la plus forte probabilité de chaque coup dans un équilibre.
+  uniques : la valeur, la plus forte probabilité de chaque coup dans un équilibre, et l'ensemble des coins.
 - **Aucune carte au pouvoir non géré.** Le Python remplace un pouvoir que son parseur ne gère pas par « pas de
   pouvoir », sans le signaler : Rust et Python joueraient la carte faux, à l'identique. `compile_card`
   (`src/core/engine/contract.py`) refuse donc une telle carte (`ValueError`), et les mains aléatoires
@@ -117,8 +126,12 @@ gagner, et quel test garantit qu'elle ne change pas les résultats. Le code port
 
 ## Écarts connus et points ouverts
 
+- `Solver::corners` alloue (listes de coins de taille variable, bases visitées) : c'est le chemin des datasets, une
+  fois par décision, pas celui de la recherche ; `solve` et `equilibria` n'allouent rien.
+
 - Le solveur coûte cher sur les grandes matrices aléatoires : ~320 µs pour une 23 × 92, presque autant que les ~2 100
-  cases de moteur qui la remplissent. La règle de Bland, sûre mais lente en nombre de pivots, en est la cause probable ;
+  cases de moteur qui la remplissent. La règle d'entrée (la première variable de coût réduit négatif), sûre mais
+  lente en nombre de pivots, en est la cause probable ;
   les parades (autre règle de pivot, lignes et colonnes dominées) sont des pistes de la phase 4, à confirmer sur des
   matrices réelles, peut-être plus souvent pures que les matrices aléatoires.
 

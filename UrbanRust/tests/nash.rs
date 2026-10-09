@@ -2,9 +2,10 @@
 //!
 //! `data/nash_expected.json` (écrit par `scripts/build_nash_expected.py`) : des matrices tirées au hasard, de 1 × 1 à
 //! 23 × 92, aux valeurs quelconques ou à nombreuses égalités ; leur valeur selon SciPy (HiGHS), et pour chaque coup de
-//! chaque joueur sa plus forte probabilité dans une stratégie optimale. Une matrice peut avoir plusieurs équilibres :
-//! on compare ces nombres, uniques, et pas les stratégies ; que les stratégies trouvées soient des équilibres, le
-//! solveur le vérifie lui-même à chaque résolution.
+//! chaque joueur sa plus forte probabilité dans une stratégie optimale ; sur les petites matrices, les coins de
+//! l'ensemble des stratégies optimales de chaque joueur, par force brute. Une matrice peut avoir plusieurs équilibres :
+//! on compare ces nombres et ces ensembles, uniques, et pas une stratégie ; que les stratégies trouvées soient des
+//! équilibres, le solveur le vérifie lui-même à chaque résolution.
 
 use serde_json::Value;
 use ur_engine::nash::Solver;
@@ -21,6 +22,9 @@ struct Expected {
     value: f64,
     row_best: Vec<f64>,
     col_best: Vec<f64>,
+    /// Les coins selon la force brute, pour les petites matrices seulement.
+    row_corners: Option<Vec<Vec<f64>>>,
+    col_corners: Option<Vec<Vec<f64>>>,
 }
 
 fn expected_matrices() -> Vec<Expected> {
@@ -43,6 +47,12 @@ fn expected_matrices() -> Vec<Expected> {
             value: matrix["value"].as_f64().unwrap(),
             row_best: numbers(&matrix["row_best"]),
             col_best: numbers(&matrix["col_best"]),
+            row_corners: matrix
+                .get("row_corners")
+                .map(|corners| corners.as_array().unwrap().iter().map(numbers).collect()),
+            col_corners: matrix
+                .get("col_corners")
+                .map(|corners| corners.as_array().unwrap().iter().map(numbers).collect()),
         })
         .collect();
     assert!(!matrices.is_empty());
@@ -120,6 +130,66 @@ fn chaque_coup_a_la_plus_forte_probabilite_que_donne_scipy() {
     assert!(
         divergent.is_empty(),
         "probabilités différentes de SciPy :\n{}",
+        divergent[..divergent.len().min(10)].join("\n")
+    );
+}
+
+/// Les coins de chaque joueur : ceux de la force brute sur les petites matrices ; sur toutes, le maximum de chaque
+/// coordonnée sur les coins est la plus forte probabilité du coup (une fonction linéaire atteint son maximum en un
+/// coin), donc un coin ne manque pas dans la direction de chaque coup.
+#[test]
+fn les_coins_sont_ceux_de_la_force_brute_et_atteignent_chaque_plus_forte_probabilite() {
+    let matrices = expected_matrices();
+    let mut solver = Solver::new();
+    let mut divergent = Vec::new();
+    let (mut checked, mut largest, mut incomplete) = (0, 0, 0);
+    for matrix in &matrices {
+        let corners = solver.corners(&matrix.values, matrix.rows, matrix.cols);
+        let players = [
+            (
+                "lignes", &corners.rows, corners.rows_complete, &matrix.row_best, &matrix.row_corners,
+            ),
+            (
+                "colonnes", &corners.cols, corners.cols_complete, &matrix.col_best, &matrix.col_corners,
+            ),
+        ];
+        for (player, found, complete, best, brute_force) in players {
+            largest = largest.max(found.len());
+            if !complete {
+                incomplete += 1;
+                continue;
+            }
+            for (action, best) in best.iter().enumerate() {
+                let reached = found.iter().map(|corner| corner[action]).fold(0.0, f64::max);
+                if (reached - best).abs() > AGREEMENT {
+                    divergent.push(format!(
+                        "  {} {player} : coup {action} au plus {reached} sur les coins, {best} pour SciPy",
+                        matrix.name
+                    ));
+                }
+            }
+            if let Some(expected) = brute_force {
+                checked += 1;
+                let same = |corner: &Vec<f64>, other: &Vec<f64>| {
+                    corner.iter().zip(other).all(|(a, b)| (a - b).abs() <= AGREEMENT)
+                };
+                let matched = found.len() == expected.len()
+                    && expected
+                        .iter()
+                        .all(|corner| found.iter().any(|other| same(corner, other)));
+                if !matched {
+                    divergent.push(format!(
+                        "  {} {player} : coins {found:?}, force brute {expected:?}",
+                        matrix.name
+                    ));
+                }
+            }
+        }
+    }
+    eprintln!("{checked} listes de coins comparées à la force brute ; au plus {largest} coins ; {incomplete} listes tronquées");
+    assert!(
+        divergent.is_empty(),
+        "coins différents de SciPy :\n{}",
         divergent[..divergent.len().min(10)].join("\n")
     );
 }

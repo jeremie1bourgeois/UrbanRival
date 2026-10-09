@@ -2,7 +2,10 @@
 //! le joueur qui maximise (`docs/IA.md` § 4.3). Écrit pour les matrices du moteur, petites (au plus ~23 × 92) : la
 //! solution pure d'abord (un point-selle, fréquent au round 4), sinon le simplexe. Chaque solution est vérifiée par
 //! son écart à l'équilibre. Pour les datasets, `Solver::equilibria` donne en plus, pour chaque coup, l'équilibre qui le
-//! joue le plus. SciPy ne sert qu'aux tests (`tests/nash.rs`).
+//! joue le plus, et `Solver::corners` tous les coins de l'ensemble des équilibres. SciPy ne sert qu'aux tests
+//! (`tests/nash.rs`).
+
+use std::collections::{HashSet, VecDeque};
 
 /// Écart à l'équilibre toléré : les valeurs du jeu sont des probabilités, dans [0, 1].
 pub const TOLERANCE: f64 = 1e-9;
@@ -10,6 +13,10 @@ pub const TOLERANCE: f64 = 1e-9;
 const PIVOT_EPSILON: f64 = 1e-11;
 /// Au-delà, un coût réduit à l'optimum est strictement positif : sa variable reste nulle dans tout équilibre.
 const POSITIVE_REDUCED_COST: f64 = 1e-9;
+/// Plafond du nombre de coins par joueur : au-delà, la liste est rendue tronquée, et signalée comme telle.
+pub const MAX_CORNERS: usize = 256;
+/// Plafond du nombre de bases visitées par joueur (un coin dégénéré en a plusieurs) : le travail reste borné.
+const MAX_BASES: usize = 10_000;
 
 /// Un équilibre de la matrice. Les stratégies sont des probabilités par ligne et par colonne.
 pub struct Solution<'a> {
@@ -51,6 +58,17 @@ impl<'a> Equilibria<'a> {
     }
 }
 
+/// Les coins de l'ensemble des stratégies optimales de chaque joueur. Cet ensemble est un polytope : toute stratégie
+/// optimale est un mélange de ses coins, et tout mélange de coins est optimal. Une liste peut être tronquée au plafond
+/// (`MAX_CORNERS`, ou trop de bases visitées) : `rows_complete` et `cols_complete` le disent.
+pub struct Corners {
+    pub value: f64,
+    pub rows: Vec<Vec<f64>>,
+    pub cols: Vec<Vec<f64>>,
+    pub rows_complete: bool,
+    pub cols_complete: bool,
+}
+
 /// Les tampons du solveur, dimensionnés au premier appel puis réutilisés : rien n'est alloué ensuite pour des matrices
 /// de même taille ou plus petites.
 #[derive(Default)]
@@ -58,8 +76,9 @@ pub struct Solver {
     rows: Vec<f64>,
     cols: Vec<f64>,
     tableau: Tableau,
-    // pour `equilibria`
+    // pour `equilibria` et `corners`
     optimum: Tableau,
+    initial: Tableau,
     banned: Vec<bool>,
     row_strategies: Vec<f64>,
     col_strategies: Vec<f64>,
@@ -151,18 +170,15 @@ impl Solver {
     }
 
     /// Depuis le tableau à l'optimum, pour chaque colonne de son jeu, la stratégie des colonnes optimale qui la joue
-    /// le plus : dans `row_strategies` si ce jeu est −Mᵀ (`rows_of_matrix`), sinon dans `col_strategies`.
-    ///
-    /// Une stratégie est optimale si et seulement si les variables de coût réduit strictement positif à l'optimum y
-    /// restent nulles (complémentarité avec les variables duales trouvées, même si l'optimum est dégénéré). On repart
-    /// donc du tableau optimal, ces variables interdites, pour maximiser la variable du coup : quelques pivots.
+    /// le plus : dans `row_strategies` si ce jeu est −Mᵀ (`rows_of_matrix`), sinon dans `col_strategies`. On repart du
+    /// tableau optimal, les variables hors de la face optimale interdites, pour maximiser la variable du coup :
+    /// quelques pivots.
     fn best_strategies(&mut self, rows_of_matrix: bool) {
         let Self { tableau, optimum, banned, row_strategies, col_strategies, .. } = self;
         let strategies = if rows_of_matrix { row_strategies } else { col_strategies };
         let actions = tableau.cols;
         optimum.copy_from(tableau);
-        banned.clear();
-        banned.extend((0..optimum.rhs()).map(|variable| optimum.objective[variable] > POSITIVE_REDUCED_COST));
+        optimum.optimal_face(banned);
         for action in 0..actions {
             let strategy = &mut strategies[action * actions..(action + 1) * actions];
             if banned[action] {
@@ -174,6 +190,88 @@ impl Solver {
             tableau.optimize(|variable| !banned[variable]);
             tableau.col_strategy(strategy);
         }
+    }
+
+    /// Les coins de l'ensemble des stratégies optimales de chaque joueur (`Corners`), au plus `MAX_CORNERS` chacun.
+    /// Chaque coin rendu est vérifié, avec la stratégie optimale trouvée pour l'autre joueur.
+    pub fn corners(&mut self, matrix: &[f64], rows: usize, cols: usize) -> Corners {
+        assert!(
+            rows > 0 && cols > 0 && matrix.len() == rows * cols,
+            "matrice {rows} × {cols} mal formée"
+        );
+        self.rows.resize(rows, 0.0);
+        self.cols.resize(cols, 0.0);
+
+        self.initial.load(rows, cols, |row, col| matrix[row * cols + col]);
+        self.tableau.copy_from(&self.initial);
+        self.tableau.optimize(|_| true);
+        let value = self.tableau.value();
+        self.tableau.row_strategy(&mut self.rows);
+        self.tableau.col_strategy(&mut self.cols);
+        let (col_corners, cols_complete) = self.optimal_corners();
+        // les lignes de M sont les colonnes du jeu vu par les colonnes, −Mᵀ
+        self.initial.load(cols, rows, |row, col| -matrix[col * cols + row]);
+        self.tableau.copy_from(&self.initial);
+        self.tableau.optimize(|_| true);
+        let (row_corners, rows_complete) = self.optimal_corners();
+
+        for corner in &row_corners {
+            verify(matrix, cols, corner, &self.cols, value);
+        }
+        for corner in &col_corners {
+            verify(matrix, cols, &self.rows, corner, value);
+        }
+        Corners {
+            value,
+            rows: row_corners,
+            cols: col_corners,
+            rows_complete,
+            cols_complete,
+        }
+    }
+
+    /// Les coins de la face optimale du tableau à l'optimum (des stratégies des colonnes de son jeu), en visitant ses
+    /// bases de proche en proche depuis la base trouvée ; faux si un plafond a été atteint.
+    ///
+    /// Grâce au départage lexicographique, les bases de la face optimale sont les sommets d'un polytope perturbé non
+    /// dégénéré : son graphe est connexe, et chaque coin de la face est l'image d'au moins un de ses sommets. Les
+    /// voisines d'une base s'obtiennent en faisant entrer une variable autorisée ; chaque base est recalculée depuis le
+    /// tableau initial (`initial`, base des écarts).
+    fn optimal_corners(&mut self) -> (Vec<Vec<f64>>, bool) {
+        let Self { tableau, initial, banned, .. } = self;
+        tableau.optimal_face(banned);
+        let start = tableau.basis.clone();
+        let mut visited = HashSet::from([sorted(&start)]);
+        let mut queue = VecDeque::from([start]);
+        let mut corners: Vec<Vec<f64>> = Vec::new();
+        while let Some(basis) = queue.pop_front() {
+            tableau.rebuild(initial, &basis);
+            let mut corner = vec![0.0; tableau.cols];
+            tableau.col_strategy(&mut corner);
+            if !corners.iter().any(|known| same_strategy(known, &corner)) {
+                if corners.len() == MAX_CORNERS {
+                    return (corners, false);
+                }
+                corners.push(corner);
+            }
+            for (entering, &outside_face) in banned.iter().enumerate() {
+                if outside_face || tableau.basis.contains(&entering) {
+                    continue;
+                }
+                let Some(leaving) = tableau.leaving_row(entering) else {
+                    continue;
+                };
+                let mut neighbor = tableau.basis.clone();
+                neighbor[leaving] = entering;
+                if visited.insert(sorted(&neighbor)) {
+                    if visited.len() > MAX_BASES {
+                        return (corners, false);
+                    }
+                    queue.push_back(neighbor);
+                }
+            }
+        }
+        (corners, true)
     }
 }
 
@@ -274,6 +372,34 @@ impl Tableau {
             }
         }
         false
+    }
+
+    /// Interdit, dans `banned`, les variables de coût réduit strictement positif à l'optimum : une stratégie est
+    /// optimale si et seulement si ces variables y restent nulles (complémentarité avec les variables duales trouvées,
+    /// même si l'optimum est dégénéré). Le reste est la face optimale.
+    fn optimal_face(&self, banned: &mut Vec<bool>) {
+        banned.clear();
+        banned.extend((0..self.rhs()).map(|variable| self.objective[variable] > POSITIVE_REDUCED_COST));
+    }
+
+    /// Le tableau de la base `basis`, recalculé depuis le tableau initial `initial` (base des écarts) plutôt
+    /// qu'atteint de pivot en pivot depuis une autre base : les erreurs d'arrondi ne s'accumulent pas.
+    fn rebuild(&mut self, initial: &Tableau, basis: &[usize]) {
+        self.copy_from(initial);
+        let width = self.width();
+        for &variable in basis {
+            if self.basis.contains(&variable) {
+                continue;
+            }
+            // parmi les lignes dont la variable doit sortir, celle du plus grand coefficient (pivot partiel)
+            let magnitude = |row: usize| self.cells[row * width + variable].abs();
+            let row = (0..self.rows)
+                .filter(|&row| !basis.contains(&self.basis[row]))
+                .max_by(|&row, &other| magnitude(row).total_cmp(&magnitude(other)))
+                .expect("base de taille incohérente");
+            assert!(magnitude(row) > PIVOT_EPSILON, "base singulière");
+            self.pivot(row, variable);
+        }
     }
 
     /// Recopie `other` dans les tampons de ce tableau, sans réallouer.
@@ -405,6 +531,19 @@ fn replies(matrix: &[f64], cols: usize, row_strategy: &[f64], col_strategy: &[f6
     (best_row_reply, worst_col_reply)
 }
 
+fn sorted(basis: &[usize]) -> Vec<usize> {
+    let mut key = basis.to_vec();
+    key.sort_unstable();
+    key
+}
+
+fn same_strategy(strategy: &[f64], other: &[f64]) -> bool {
+    strategy
+        .iter()
+        .zip(other)
+        .all(|(probability, other)| (probability - other).abs() <= TOLERANCE)
+}
+
 fn normalize(strategy: &mut [f64]) {
     let total: f64 = strategy.iter().sum();
     for probability in strategy {
@@ -502,6 +641,63 @@ mod tests {
         let (rows, cols) = best_probabilities(&[1.0, 0.0, 0.0, 1.0, 0.5, 0.5], 3, 2);
         assert_close(&rows, &[0.5, 0.5, 1.0]);
         assert_close(&cols, &[0.5, 0.5]);
+    }
+
+    /// Les coins de chaque joueur, triés ; les deux listes doivent être complètes.
+    fn corners_of(matrix: &[f64], rows: usize, cols: usize) -> (Vec<Vec<f64>>, Vec<Vec<f64>>) {
+        let mut corners = Solver::new().corners(matrix, rows, cols);
+        assert!(corners.rows_complete && corners.cols_complete);
+        corners.rows.sort_by(|corner, other| corner.partial_cmp(other).unwrap());
+        corners.cols.sort_by(|corner, other| corner.partial_cmp(other).unwrap());
+        (corners.rows, corners.cols)
+    }
+
+    fn assert_corners(found: &[Vec<f64>], expected: &[&[f64]]) {
+        assert_eq!(found.len(), expected.len(), "{found:?} au lieu de {expected:?}");
+        for (found, expected) in found.iter().zip(expected) {
+            assert_close(found, expected);
+        }
+    }
+
+    #[test]
+    fn deux_exemplaires_d_un_coup_donnent_deux_coins() {
+        // pierre-feuille-ciseaux, la pierre en deux exemplaires : le tiers de la pierre sur l'un ou sur l'autre
+        let matrix = [0.5, 0.0, 1.0, 0.5, 0.0, 1.0, 1.0, 0.5, 0.0, 0.0, 1.0, 0.5];
+        let (rows, cols) = corners_of(&matrix, 4, 3);
+        let third = 1.0 / 3.0;
+        assert_corners(&rows, &[&[0.0, third, third, third], &[third, 0.0, third, third]]);
+        assert_corners(&cols, &[&[third, third, third]]);
+    }
+
+    #[test]
+    fn les_coins_d_une_matrice_constante_sont_les_coups_purs() {
+        let (rows, cols) = corners_of(&[0.5; 6], 2, 3);
+        assert_corners(&rows, &[&[0.0, 1.0], &[1.0, 0.0]]);
+        assert_corners(&cols, &[&[0.0, 0.0, 1.0], &[0.0, 1.0, 0.0], &[1.0, 0.0, 0.0]]);
+    }
+
+    #[test]
+    fn une_ligne_faiblement_dominee_est_un_coin_a_elle_seule() {
+        let (rows, cols) = corners_of(&[1.0, 0.0, 0.0, 1.0, 0.5, 0.5], 3, 2);
+        assert_corners(&rows, &[&[0.0, 0.0, 1.0], &[0.5, 0.5, 0.0]]);
+        assert_corners(&cols, &[&[0.5, 0.5]]);
+    }
+
+    #[test]
+    fn une_ligne_strictement_dominee_n_entre_dans_aucun_coin() {
+        let (rows, cols) = corners_of(&[1.0, 0.0, 0.0, 1.0, 0.4, 0.4], 3, 2);
+        assert_corners(&rows, &[&[0.5, 0.5, 0.0]]);
+        assert_corners(&cols, &[&[0.5, 0.5]]);
+    }
+
+    #[test]
+    fn le_plafond_de_coins_est_signale() {
+        // une seule colonne, toutes les lignes égales : chaque ligne pure est un coin, un de plus que le plafond
+        let corners = Solver::new().corners(&[0.5; MAX_CORNERS + 1], MAX_CORNERS + 1, 1);
+        assert!(!corners.rows_complete);
+        assert_eq!(corners.rows.len(), MAX_CORNERS);
+        assert!(corners.cols_complete);
+        assert_eq!(corners.cols.len(), 1);
     }
 
     #[test]
