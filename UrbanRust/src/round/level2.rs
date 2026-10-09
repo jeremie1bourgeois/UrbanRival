@@ -1,13 +1,9 @@
 //! Niveau 2 : modificateurs de puissance, dégâts et attaque des cartes en combat, transcrit de
 //! `apply_capacity_lvl_2.py`. Appelé en deux passes : puissance et dégâts avant le calcul de l'attaque, attaque après.
 
-use super::{affected_sides, bit, Fighter, Round, ABILITY, BONUS, LEADER, SIDES};
+use super::{affected_sides, Round, ABILITY, ATTACK, BONUS, DAMAGE, LEADER, POWER, SIDES};
 use crate::contract::CompiledCapacity;
-use crate::vocabulary::{targets, types};
-
-pub(super) const POWER: u32 = bit(types::POWER);
-pub(super) const DAMAGE: u32 = bit(types::DAMAGE);
-pub(super) const ATTACK: u32 = bit(types::ATTACK);
+use crate::vocabulary::targets;
 
 /// À plancher égal : carte alliée puis ennemie, et bonus, pouvoir, Leader (`_MODIFIER_SLOTS`).
 const MODIFIER_SLOTS: [usize; 3] = [BONUS, ABILITY, LEADER];
@@ -65,20 +61,12 @@ impl Round<'_> {
             let fighter = &mut self.fighters[card_side];
             for stat in [POWER, DAMAGE, ATTACK] {
                 if applied & stat != 0 {
-                    apply_to(stat_mut(fighter, stat), bonus, capacity.borne, capacity.value > 0);
+                    apply_to(fighter.stat_mut(stat), bonus, capacity.borne, capacity.value > 0);
                 }
             }
         }
         capacity.types &= !applied;
         (capacity.types != 0).then_some(capacity)
-    }
-}
-
-fn stat_mut(fighter: &mut Fighter, stat: u32) -> &mut i16 {
-    match stat {
-        POWER => &mut fighter.power,
-        DAMAGE => &mut fighter.damage,
-        _ => &mut fighter.attack,
     }
 }
 

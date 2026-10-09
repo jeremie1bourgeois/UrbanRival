@@ -14,8 +14,7 @@ mod multipliers;
 use crate::contract::{
     Action, CompiledCapacity, CompiledCard, Deck, LastRound, Outcome, PlayerState, SideOutcome, State,
 };
-use crate::vocabulary::{clans, conditions, hows, targets};
-use level2::{ATTACK, DAMAGE, POWER};
+use crate::vocabulary::{clans, conditions, hows, targets, types};
 
 const ALLY: usize = 0;
 const ENEMY: usize = 1;
@@ -27,6 +26,12 @@ const ABILITY: usize = 0;
 const BONUS: usize = 1;
 const LEADER: usize = 2;
 const SLOTS: [usize; 3] = [ABILITY, BONUS, LEADER];
+
+const POWER: u32 = bit(types::POWER);
+const DAMAGE: u32 = bit(types::DAMAGE);
+const ATTACK: u32 = bit(types::ATTACK);
+const LIFE: u32 = bit(types::LIFE);
+const PILLZ: u32 = bit(types::PILLZ);
 
 const FURY_COST: i16 = 3;
 const FURY_DAMAGE: i16 = 2;
@@ -58,6 +63,20 @@ struct Fighter {
     win: bool,
     slots: [Option<CompiledCapacity>; 3], // ability_fight, bonus_fight, leader_fight
     cancelled: u32, // masque sur TYPES (life, pillz) : modifications annulées par un Cancel adverse (cancelled_modifs)
+}
+
+impl Fighter {
+    fn stat_mut(&mut self, stat: u32) -> &mut i16 {
+        match stat {
+            POWER => &mut self.power,
+            DAMAGE => &mut self.damage,
+            _ => &mut self.attack,
+        }
+    }
+
+    fn has_how(&self, how: u8) -> bool {
+        self.slots.iter().flatten().any(|capacity| capacity.how == how)
+    }
 }
 
 /// La partie le temps d'un round : `Game` côté Python, réduite à ce que le round lit et écrit.
@@ -131,6 +150,11 @@ impl Round<'_> {
         }
         self.apply_leader_modes();
 
+        // Copy: Opp. Ability / Bonus copie le texte adverse, conditions comprises, puis les conditions de la copie sont
+        // évaluées pour le copieur (combat réel 1349481) : instantané avant la première passe, seconde passe après
+        let copy_sources = self.fighters.map(|fighter| fighter.slots);
+        self.drop_unmet_conditions();
+        self.apply_copies(&copy_sources);
         self.drop_unmet_conditions();
 
         self.apply_capacity_lvl_1();
@@ -147,6 +171,19 @@ impl Round<'_> {
         // une fois l'attaque de base connue : sinon un « -X Opp Attack, Min Y » s'appliquerait à une attaque nulle
         self.apply_capacity_lvl_2(ATTACK);
 
+        // Tune Out : le round se résout aux pillz, les deux cartes à puissance 1, fury non comptée (combat 1248952)
+        if self.consume_tune_out(ALLY) | self.consume_tune_out(ENEMY) {
+            for fighter in &mut self.fighters {
+                fighter.power = 1;
+                fighter.attack = fighter.pillz;
+            }
+        }
+
+        self.apply_killshot_condition(ALLY);
+        self.apply_killshot_condition(ENEMY);
+        self.apply_perfect_condition(ALLY);
+        self.apply_perfect_condition(ENEMY);
+
         self.resolve_combat();
 
         if self.players.iter().all(|player| player.life > 0) {
@@ -159,6 +196,8 @@ impl Round<'_> {
         let (ally_stars, enemy_stars) = (self.card(ALLY).stars, self.card(ENEMY).stars);
         let ally_wins = if ally.attack != enemy.attack {
             ally.attack > enemy.attack
+        } else if ally.has_how(hows::TIE_BREAK) != enemy.has_how(hows::TIE_BREAK) {
+            ally.has_how(hows::TIE_BREAK) // Tie-break (Solomon) : gagne toute égalité
         } else if ally_stars != enemy_stars {
             ally_stars < enemy_stars // moins d'étoiles gagne
         } else {
@@ -170,6 +209,45 @@ impl Round<'_> {
         loser_player.life = (loser_player.life - damage).max(0);
         self.fighters[ALLY].win = ally_wins;
         self.fighters[ENEMY].win = !ally_wins;
+    }
+
+    /// Retire un Tune Out (survivant à la phase des Stops) de la carte ; vrai s'il y en avait un.
+    fn consume_tune_out(&mut self, side: usize) -> bool {
+        let found = self.fighters[side].has_how(hows::TUNE_OUT);
+        for slot in &mut self.fighters[side].slots {
+            if slot.is_some_and(|capacity| capacity.how == hows::TUNE_OUT) {
+                *slot = None;
+            }
+        }
+        found
+    }
+
+    /// Killshot : attaque au moins double de l'attaque adverse ; la condition est consommée, ou la capacité retirée.
+    fn apply_killshot_condition(&mut self, side: usize) {
+        let (own, opp) = (self.fighters[side].attack, self.fighters[ENEMY - side].attack);
+        self.apply_deferred_condition(side, conditions::KILLSHOT, own > 0 && own >= 2 * opp);
+    }
+
+    /// Perfect : l'écart d'attaque est strictement inférieur à la puissance de la carte (une pillz de moins n'aurait
+    /// pas gagné) ; la victoire est exigée au niveau 3.
+    fn apply_perfect_condition(&mut self, side: usize) {
+        let fighter = &self.fighters[side];
+        let met = fighter.attack - self.fighters[ENEMY - side].attack < fighter.power;
+        self.apply_deferred_condition(side, conditions::PERFECT, met);
+    }
+
+    fn apply_deferred_condition(&mut self, side: usize, condition: u8, met: bool) {
+        for slot in &mut self.fighters[side].slots {
+            if let Some(capacity) = slot {
+                if capacity.conditions & bit(condition) != 0 {
+                    if met {
+                        capacity.conditions &= !bit(condition);
+                    } else {
+                        *slot = None;
+                    }
+                }
+            }
+        }
     }
 
     /// Les conditions de début de round de chaque capacité : remplies, elles sont consommées ; sinon la capacité
@@ -305,6 +383,15 @@ impl Round<'_> {
             state,
             Outcome { ally: side_outcome(&ally), enemy: side_outcome(&enemy) },
         )
+    }
+}
+
+/// La valeur imprimée d'une stat (puissance ou dégâts), que lisent Copy, Exchange et Impose.
+fn printed(card: &CompiledCard, stat: u32) -> i16 {
+    if stat == POWER {
+        card.power
+    } else {
+        card.damage
     }
 }
 
