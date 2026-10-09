@@ -74,8 +74,9 @@ impl<'a> Search<'a> {
 
     /// Pour chaque carte de la main du premier joueur, la valeur pour lui de son jeu de mises ; None si jouée.
     ///
-    /// En trois temps : les états suivants de tous les blocs (carte de F, puis carte de S, puis case du bloc), leurs
-    /// valeurs, puis les matrices.
+    /// En deux temps : les valeurs des états suivants de tous les blocs (carte de F, puis carte de S, puis case du
+    /// bloc), puis les matrices. Sur un fil, chaque valeur se calcule dès que le bloc donne l'état, sans le garder ;
+    /// réparti sur les cœurs, les états sont d'abord rassemblés (README, « Optimisations en place »).
     pub fn card_values(&self, state: &State) -> [Option<f64>; HAND_SIZE] {
         let ally_first = state.ally_first;
         let (first, second) = if ally_first {
@@ -86,7 +87,8 @@ impl<'a> Search<'a> {
         let first_cards: Vec<usize> = (0..HAND_SIZE).filter(|&card| !first.has_played(card)).collect();
         let reply_cards: Vec<usize> = (0..HAND_SIZE).filter(|&card| !second.has_played(card)).collect();
 
-        let mut next_states = Vec::new();
+        let spread = self.parallel && state.nb_turn <= PARALLEL_UNTIL_ROUND;
+        let (mut next_states, mut next_values) = (Vec::new(), Vec::new());
         for &card in &first_cards {
             for &reply_card in &reply_cards {
                 let (ally_card, enemy_card) = if ally_first {
@@ -95,18 +97,20 @@ impl<'a> Search<'a> {
                     (reply_card, card)
                 };
                 play_block(self.deck, state, ally_card, enemy_card, |_, _, next_state, _| {
-                    next_states.push(*next_state)
+                    if spread {
+                        next_states.push(*next_state);
+                    } else {
+                        next_values.push(self.value(next_state));
+                    }
                 });
             }
         }
-        let next_values: Vec<f64> = if self.parallel && state.nb_turn <= PARALLEL_UNTIL_ROUND {
-            next_states
+        if spread {
+            next_values = next_states
                 .par_iter()
                 .map(|next_state| self.value(next_state))
-                .collect()
-        } else {
-            next_states.iter().map(|next_state| self.value(next_state)).collect()
-        };
+                .collect();
+        }
 
         let cols: usize = reply_cards.iter().map(|&card| card_actions(second, card).count()).sum();
         let mut values = [None; HAND_SIZE];
