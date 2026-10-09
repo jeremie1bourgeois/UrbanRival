@@ -7,8 +7,8 @@ sans tout redécouvrir. Ce qu'on compte faire : [docs/PLAN-MOTEUR.md](../docs/PL
 
 ## Où on en est
 
-*Mis à jour le 2026-10-09 — plan : phase 1, étapes 1.1 à 1.8 faites ; prochaine : 1.9 (solveur Python de
-référence).*
+*Mis à jour le 2026-10-09 — plan : phase 1, étapes 1.1 à 1.9 faites ; prochaine : 1.10 (recherche exacte avec
+mémo).*
 
 Fait :
 - le vocabulaire du contrat, transcrit de `UrbanPy/Backend_fastAPI/src/core/engine/contract.py` ; son empreinte est
@@ -55,7 +55,10 @@ Fait :
   probabilité du coup. Sur les matrices réelles du round 4 : toutes à point-selle, et pourtant jusqu'à 19 coins par
   joueur (`aleatoire`), aucune liste tronquée.
 
-Pas encore fait : le solveur Python de référence (1.9), et tout ce qui suit dans le plan.
+- les valeurs attendues de la recherche (étape 1.9, côté Python) : `data/search_expected.json`, la valeur exacte de
+  68 états de rounds 4 et 3 selon le solveur Python de référence (voir « Comment le code est vérifié »).
+
+Pas encore fait : la recherche exacte avec mémo (1.10), et tout ce qui suit dans le plan.
 
 Ce code a été écrit avant le plan. Il en respecte les règles de conception, mais rien n'y est figé : la disposition
 de l'état peut changer si une mesure le justifie. Seuls les indices du vocabulaire sont intouchables, car ils sont
@@ -103,6 +106,13 @@ rejoue ~29 millions de cases deux fois, en bloc et en round simple.
 - **SciPy est la référence du solveur** : `scripts/build_nash_expected.py` (SciPy, dans `requirements-dev.txt`) écrit
   `data/nash_expected.json`, versionné ; une matrice peut avoir plusieurs équilibres, les tests comparent des nombres
   uniques : la valeur, la plus forte probabilité de chaque coup dans un équilibre, et l'ensemble des coins.
+- **Le solveur Python de référence est la référence de la recherche** : `scripts/build_search_expected.py` applique
+  lentement la récursion de `docs/IA.md` § 5.1 (`reference.step`, SciPy pour chaque matrice, mémo par état) et écrit
+  `data/search_expected.json`, versionné : pour 68 états de rounds 4 et 3, le deck, l'état, la valeur pour l'allié, la
+  valeur de chaque carte du premier joueur et le nombre d'états distincts résolus. Les états viennent de parties
+  aléatoires (graine fixe) ; leurs mains sont souvent si inégales que la valeur vaut 0, ½ ou 1, d'où l'ajout des
+  états du round 3 les plus riches en pillz et de « jumeaux » (la même main des deux côtés, mêmes vies et pillz), où
+  le bluff donne des valeurs fractionnaires (4/7, 1/3). ~17 min à régénérer.
 - **Aucune carte au pouvoir non géré.** Le Python remplace un pouvoir que son parseur ne gère pas par « pas de
   pouvoir », sans le signaler : Rust et Python joueraient la carte faux, à l'identique. `compile_card`
   (`src/core/engine/contract.py`) refuse donc une telle carte (`ValueError`), et les mains aléatoires
