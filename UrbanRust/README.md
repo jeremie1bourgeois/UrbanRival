@@ -7,8 +7,8 @@ sans tout redécouvrir. Ce qu'on compte faire : [docs/PLAN-MOTEUR.md](../docs/PL
 
 ## Où on en est
 
-*Mis à jour le 2026-10-09 — plan : phase 1 faite (étapes 1.1 à 1.11) ; phase 2 en cours, 2.1 faite (corpus
-élargi) ; prochaine : 2.2 (contrôles automatiques pendant la recherche).*
+*Mis à jour le 2026-10-09 — plan : phase 1 faite (étapes 1.1 à 1.11) ; phase 2 en cours, 2.1 (corpus élargi) et
+2.2 (contrôles pendant la recherche) faites ; prochaine : 2.3 (10 000 résolutions depuis le round 3).*
 
 Fait :
 - le vocabulaire du contrat, transcrit de `UrbanPy/Backend_fastAPI/src/core/engine/contract.py` ; son empreinte est
@@ -78,7 +78,16 @@ Fait :
   blocs de mises : le corpus compte désormais 151 614 rounds et 112 945 blocs distincts (~35 millions de cases).
   `aleatoire` (300 parties, de jour) reste le petit échantillon de mains réalistes dont se servent les tests.
 
-Pas encore fait : la suite de la phase 2 (2.2, 2.3), et tout ce qui suit dans le plan.
+- les contrôles pendant la recherche (étape 2.2) : chaque matrice est vérifiée par le solveur, toujours (écart à
+  l'équilibre, étape 1.6) ; en mode test (assertions de debug, actives sous `cargo test`, absentes en release),
+  chaque valeur est une probabilité, dans [0, 1] ; `Search::mirror_mismatches` revoit chaque état résolu de l'autre
+  camp (`State::mirrored`, sur `Deck::mirrored`) et rend ceux qui ne valent pas 1 − V. Il compare des valeurs, pas
+  des ensembles d'états : l'asymétrie connue du round (`KNOWN_ASYMMETRIES`, l'ordre d'enregistrement des effets
+  persistants) mène parfois le miroir à un état aux mêmes effets dans un autre ordre (14 états sur 501 157 contrôlés
+  depuis 2 011 états de départ), sans en changer la valeur : aucun écart. `tests/recherche.rs` contrôle ainsi ses
+  72 états de départ, et vérifie d'abord que le contrôle voit un faux miroir (le deck non échangé).
+
+Pas encore fait : la fin de la phase 2 (2.3), et tout ce qui suit dans le plan.
 
 Ce code a été écrit avant le plan. Il en respecte les règles de conception, mais rien n'y est figé : la disposition
 de l'état peut changer si une mesure le justifie. Seuls les indices du vocabulaire sont intouchables, car ils sont
@@ -90,9 +99,9 @@ partagés avec Python.
 |---|---|
 | `src/lib.rs` | point d'entrée de la crate |
 | `src/vocabulary.rs` | vocabulaire figé : les indices partagés avec Python |
-| `src/contract.rs` | état compact : deck, état, coup, résultat |
+| `src/contract.rs` | état compact : deck, état, coup, résultat ; la même partie vue de l'autre camp (`mirrored`) |
 | `src/game.rs` | coups légaux et fin de partie (`reference.py`) |
-| `src/search.rs` | recherche exacte avec mémo : V(état), les matrices remplies par blocs de mises ; sur un fil ou sur tous les cœurs |
+| `src/search.rs` | recherche exacte avec mémo : V(état), les matrices remplies par blocs de mises ; sur un fil ou sur tous les cœurs ; les contrôles : valeurs dans [0, 1], 1 − V vu de l'autre camp |
 | `src/nash.rs` | solveur de jeux matriciels à somme nulle : point-selle, sinon simplexe ; chaque solution vérifiée ; pour chaque coup, l'équilibre qui le joue le plus ; tous les coins des équilibres |
 | `src/round/mod.rs` | un round (`process_round.py`) : mises, conditions de début de round, Leader, combat, ordre des niveaux ; en deux étages, avant et après les mises |
 | `src/round/block.rs` | le bloc de mises : toutes les combinaisons de mises d'une paire de cartes, premier étage partagé |
@@ -105,7 +114,7 @@ partagés avec Python.
 | `tests/differentiel.rs` | chaque round du corpus, rejoué en Rust, redonne l'état suivant et l'issue de Python |
 | `tests/regles.rs` | coups légaux et fin de partie identiques à ceux de Python, sur `regles.jsonl` |
 | `tests/bloc.rs` | chaque case de chaque bloc du corpus égale le round simple, dans l'ordre des coups légaux |
-| `tests/recherche.rs` | la recherche donne les valeurs du solveur Python de référence (`data/search_expected.json`) ; le mode parallèle, celles d'un seul fil |
+| `tests/recherche.rs` | la recherche donne les valeurs du solveur Python de référence (`data/search_expected.json`) ; le mode parallèle, celles d'un seul fil ; vu de l'autre camp, chaque état résolu vaut 1 − V |
 | `tests/nash.rs` | le solveur donne la valeur de SciPy, la plus forte probabilité de chaque coup et les coins de la force brute, sur les matrices de `data/nash_expected.json` |
 | `tests/sans_allocation.rs` | aucune allocation pendant un round, un bloc, les coups légaux, la fin de partie, et pour un solveur déjà dimensionné (valeur et équilibres) |
 

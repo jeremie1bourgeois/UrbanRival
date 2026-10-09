@@ -55,6 +55,18 @@ pub struct Deck {
     pub enemy_start: (i16, i16),
 }
 
+impl Deck {
+    /// La même partie vue de l'autre camp : les mains et les situations de départ échangées.
+    pub fn mirrored(&self) -> Deck {
+        Deck {
+            ally: self.enemy,
+            enemy: self.ally,
+            ally_start: self.enemy_start,
+            enemy_start: self.ally_start,
+        }
+    }
+}
+
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
 pub struct Effect {
     pub kind: u8, // indice dans EFFECT_KINDS
@@ -146,6 +158,24 @@ pub struct State {
     pub last_round: Option<LastRound>, // None au round 1
 }
 
+impl State {
+    /// Le même état vu de l'autre camp, sur `Deck::mirrored` : joueurs échangés, premier joueur inversé
+    /// (`Scenario.mirrored`, côté Python).
+    pub fn mirrored(&self) -> State {
+        State {
+            nb_turn: self.nb_turn,
+            ally_first: !self.ally_first,
+            ally: self.enemy,
+            enemy: self.ally,
+            last_round: self.last_round.map(|last| LastRound {
+                ally_card: last.enemy_card,
+                enemy_card: last.ally_card,
+                ally_won: !last.ally_won,
+            }),
+        }
+    }
+}
+
 /// Un coup : la carte de la main, `pillz_fight` (1 + la mise, la pillz gratuite comprise) et la fury.
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
 pub struct Action {
@@ -226,6 +256,26 @@ mod tests {
         apres_retrait.remove(5);
 
         assert_eq!(direct, apres_retrait);
+    }
+
+    #[test]
+    fn le_miroir_echange_les_camps_et_le_premier_joueur() {
+        let mut ally = PlayerState::new(10, 3, 0b0001);
+        ally.register(effect(0, 2));
+        let enemy = PlayerState::new(7, 5, 0b0100);
+        let last_round = Some(LastRound { ally_card: 0, enemy_card: 2, ally_won: true });
+        let state = State { nb_turn: 2, ally_first: true, ally, enemy, last_round };
+
+        let mirrored = state.mirrored();
+        assert_eq!(
+            (mirrored.ally, mirrored.enemy, mirrored.ally_first),
+            (enemy, ally, false)
+        );
+        assert_eq!(
+            mirrored.last_round,
+            Some(LastRound { ally_card: 2, enemy_card: 0, ally_won: false })
+        );
+        assert_eq!(mirrored.mirrored(), state);
     }
 
     #[test]

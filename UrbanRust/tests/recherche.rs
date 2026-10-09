@@ -4,7 +4,7 @@
 //! SciPy) : des états de rounds 4 et 3, leur deck, leur valeur pour l'allié et la valeur de chaque carte du premier
 //! joueur pour lui. On compare aussi le nombre d'états distincts résolus : il ne coïncide que si les deux moteurs
 //! identifient les états de la même façon et atteignent les mêmes. Le mode parallèle doit donner les mêmes nombres
-//! que le mode à un seul fil, au bit près.
+//! que le mode à un seul fil, au bit près. Vu de l'autre camp, chaque état résolu vaut 1 − V.
 
 #[allow(dead_code)] // chaque test ne lit qu'une partie de ce que le lecteur donne
 mod corpus;
@@ -18,7 +18,7 @@ use ur_engine::search::Search;
 
 /// La récursion empile des résolutions de matrices, chacune à ~1e-12 près.
 const AGREEMENT: f64 = 1e-9;
-/// États du round 2 de la famille `aleatoire` sur lesquels comparer les deux modes.
+/// États du round 2 de la famille `aleatoire` sur lesquels comparer les deux modes et contrôler le miroir.
 const ROUND_2_STATES: usize = 4;
 
 /// Un état de `data/search_expected.json` et ce qu'en dit le solveur Python.
@@ -99,8 +99,9 @@ fn chaque_etat_a_la_valeur_du_solveur_python() {
     );
 }
 
-#[test]
-fn le_mode_parallele_donne_les_memes_valeurs_qu_un_seul_fil() {
+/// Les états de `data/search_expected.json`, puis `ROUND_2_STATES` états du round 2 d'`aleatoire`, à intervalle
+/// régulier.
+fn roots() -> Vec<(Deck, State)> {
     let mut roots: Vec<(Deck, State)> = expected_states()
         .into_iter()
         .map(|expected| (expected.deck, expected.state))
@@ -121,10 +122,42 @@ fn le_mode_parallele_donne_les_memes_valeurs_qu_un_seul_fil() {
             .take(ROUND_2_STATES)
             .copied(),
     );
+    roots
+}
 
-    for (deck, state) in &roots {
+#[test]
+fn le_mode_parallele_donne_les_memes_valeurs_qu_un_seul_fil() {
+    for (deck, state) in &roots() {
         let (single, parallel) = (Search::new(deck), Search::parallel(deck));
         assert_eq!(single.card_values(state), parallel.card_values(state), "{state:?}");
         assert_eq!(single.solved_states(), parallel.solved_states(), "{state:?}");
     }
+}
+
+#[test]
+fn chaque_etat_resolu_vaut_1_moins_v_vu_de_l_autre_camp() {
+    let mut mismatches = Vec::new();
+    for (deck, state) in &roots() {
+        let search = Search::parallel(deck);
+        search.value(state);
+        let mirror_deck = deck.mirrored();
+        mismatches.extend(search.mirror_mismatches(&Search::parallel(&mirror_deck)));
+    }
+    assert!(
+        mismatches.is_empty(),
+        "{} états, vus de l'autre camp, ne valent pas 1 − V ; les premiers (état, V, miroir) : {:?}",
+        mismatches.len(),
+        &mismatches[..mismatches.len().min(3)]
+    );
+}
+
+#[test]
+fn le_controle_du_miroir_voit_un_faux_miroir() {
+    // sans échanger le deck, les joueurs changent de camp mais pas leurs cartes : le miroir est faux
+    let caught = expected_states().iter().any(|expected| {
+        let search = Search::new(&expected.deck);
+        search.value(&expected.state);
+        !search.mirror_mismatches(&Search::new(&expected.deck)).is_empty()
+    });
+    assert!(caught, "le contrôle du miroir ne voit rien, même sur un faux miroir");
 }

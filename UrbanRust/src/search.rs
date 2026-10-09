@@ -8,6 +8,10 @@
 //!
 //! `Search::parallel` répartit sur les cœurs les états suivants des premiers rounds. La valeur d'un état se calcule
 //! toujours de la même façon, quel que soit le fil : les deux modes donnent les mêmes nombres, au bit près.
+//!
+//! Les contrôles : chaque matrice est vérifiée par le solveur, toujours ; en mode test (assertions de debug, actives
+//! sous `cargo test`), chaque valeur est une probabilité, dans [0, 1] ; `Search::mirror_mismatches` vérifie que chaque
+//! état résolu, vu de l'autre camp, vaut 1 − V.
 
 use std::cell::RefCell;
 use std::collections::hash_map::DefaultHasher;
@@ -19,7 +23,7 @@ use rayon::prelude::*;
 
 use crate::contract::{Deck, State, HAND_SIZE};
 use crate::game::{card_actions, terminal};
-use crate::nash::Solver;
+use crate::nash::{Solver, TOLERANCE};
 use crate::round::play_block;
 
 /// Jusqu'à ce round compris, `Search::parallel` répartit les états suivants d'un état sur les cœurs ; au-delà, ils
@@ -128,7 +132,12 @@ impl<'a> Search<'a> {
                 }
                 col_offset += bets;
             }
-            values[card] = Some(SOLVER.with(|solver| solver.borrow_mut().solve(&matrix, rows, cols).value));
+            let value = SOLVER.with(|solver| solver.borrow_mut().solve(&matrix, rows, cols).value);
+            debug_assert!(
+                (-TOLERANCE..=1.0 + TOLERANCE).contains(&value),
+                "valeur {value} hors de [0, 1] : {state:?}"
+            );
+            values[card] = Some(value);
         }
         values
     }
@@ -136,6 +145,26 @@ impl<'a> Search<'a> {
     /// Le nombre d'états non terminaux résolus et gardés en mémo.
     pub fn solved_states(&self) -> usize {
         self.memo.len()
+    }
+
+    /// Les états non terminaux résolus, chacun avec sa valeur pour l'allié, dans un ordre quelconque.
+    pub fn solved(&self) -> Vec<(State, f64)> {
+        self.memo.entries()
+    }
+
+    /// Contrôle : vu de l'autre camp, chaque état résolu vaut 1 − V. `mirror` est une recherche sur `Deck::mirrored`,
+    /// qui résout le miroir de chaque état (`State::mirrored`) ; rend les états qui s'en écartent de plus de
+    /// `TOLERANCE`, avec leur valeur et celle de leur miroir. On compare des valeurs, pas des ensembles d'états : la
+    /// seule asymétrie connue du round (`KNOWN_ASYMMETRIES`, l'ordre d'enregistrement des effets persistants) mène
+    /// parfois le miroir à un état aux mêmes effets dans un autre ordre, sans en changer la valeur jusqu'ici.
+    pub fn mirror_mismatches(&self, mirror: &Search) -> Vec<(State, f64, f64)> {
+        self.solved()
+            .into_iter()
+            .filter_map(|(state, value)| {
+                let mirrored = mirror.value(&state.mirrored());
+                ((mirrored - (1.0 - value)).abs() > TOLERANCE).then_some((state, value, mirrored))
+            })
+            .collect()
     }
 }
 
@@ -168,5 +197,19 @@ impl Memo {
 
     fn len(&self) -> usize {
         self.shards.iter().map(|shard| shard.lock().unwrap().len()).sum()
+    }
+
+    fn entries(&self) -> Vec<(State, f64)> {
+        self.shards
+            .iter()
+            .flat_map(|shard| {
+                shard
+                    .lock()
+                    .unwrap()
+                    .iter()
+                    .map(|(&state, &value)| (state, value))
+                    .collect::<Vec<_>>()
+            })
+            .collect()
     }
 }
